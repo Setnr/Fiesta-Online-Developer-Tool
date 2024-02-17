@@ -9,9 +9,6 @@ public:
 	~FiestaOnlineTool() 
 	{
 		ShowCursor(true);
-		NiDelete cursor;
-		//NiDelete m_spInterfaceCamera;
-		//NiDelete Interface;
 	}
 	virtual bool CreateRenderer();
 	virtual bool Initialize();
@@ -27,8 +24,7 @@ private:
 	};
 
 	static bool HandleMouseMovement(NiActionData* pkActionData);
-	NiNode* LoadNifFile(const char* File, NiTexturePalette* pTexturePalette);
-	char CatchCamera(NiAVObject*, NiCameraPtr*);
+	void DrawCursor();
 	bool CreateRenderer(HWND hWnd);
 	NiAlphaAccumulatorPtr Sorter;
 
@@ -37,15 +33,12 @@ private:
 	static FiestaOnlineTool* _Tool;
 	NiInputSystem::CreateParams* GetInputCreationParameters();
 
-	NiActionMap* EmptyActionMap;
-	NiActionMap* StartActionMap;
+	NiActionMapPtr EmptyActionMap;
+	NiActionMapPtr StartActionMap;
 
 	NiInputKeyboardPtr m_spKeyboard;
 	NiInputMousePtr m_spMouse;
-	NiNode* ServerList;
-	NiCursor* cursor;
-	NiNode* LoginInputPanel;
-	NiCamera* InterfaceCamera;
-	NiNodePtr Interface;
-	PgWinMgr* Pgg_kWinMgr;
+	NiCursorPtr cursor;
+	NiNodePtr LoginInputPanel;
+	NiPointer<PgWinMgr> Pgg_kWinMgr;
 };

@@ -97,7 +97,9 @@ public:
 		}
 	}
 };
-class PgWinMgr
+
+NiSmartPointer(PgWinMgr);
+class PgWinMgr : public NiRefObject
 {
 public:
 	PgWinMgr(){}
@@ -116,7 +118,7 @@ public:
 
 	}
 
-	void ShowWin(NiNode* SceneRootNode) 
+	void ShowWin(NiNodePtr SceneRootNode) 
 	{
 		m_spCamera->m_spScene->AttachChild(SceneRootNode);
 		SceneRootNode->UpdateProperties();
@@ -136,22 +138,5 @@ public:
 			NiDrawScene(this->m_spCamera, this->m_spCamera->m_spScene, kWinCuller, 0);
 		}
 	}
-	/*CNSTimer_MarkCheck m_kMarkCheck;
-	NiPointer<NiNode> m_spFullScreenEffectNode;*/
 	NiPointer<PgWinCamera> m_spCamera;
-	/*PgTList<NiPointer<PgWin> > m_kWinList;
-	PgTList<PgWin*> m_kShowList;
-	PgTQueue<PgWinMgr::PgWinMsg> m_kMsgQ;
-	NiPointer<PgWin> m_pkModalWin;
-	PgTList<PgWin*> m_kStackModalWin;
-	PgCursor* m_pkCursor;
-	NiPointer<NiInputMouse> m_spMouse;
-	NiPointer<NiInputKeyboard> m_spKeyboard;
-	bool m_bEnableInput;
-	NiTList<PgWin*> m_kPopupWinStack;
-	PgWin* m_pkToolTipWin;
-	PgWin* m_pkFirstHitWin;
-	NiPointer<NiTexturePalette> m_spTexturePalette;
-	bool m_bHitWin;
-	bool m_bTopWinScroll;*/
 };
