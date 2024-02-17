@@ -142,12 +142,16 @@
     <ClCompile Include="FiestaOnlineTool.cpp" />
     <ClCompile Include="FiestaRenderer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PgWin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FiestaOnlineTool.h" />
     <ClInclude Include="FiestaRenderer.h" />
     <ClInclude Include="FiestaRendererTypeDef.h" />
+    <ClInclude Include="PgUtil.h" />
     <ClInclude Include="PgWin.h" />
+    <ClInclude Include="PgWinMgr.h" />
+    <ClInclude Include="PgWinObj.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

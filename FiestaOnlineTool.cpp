@@ -13,15 +13,17 @@
 #include <NiD3D10Renderer.h>
 #pragma comment(lib, "NiD3D10Renderer.lib")
 #include "PgUtil.h" 
+#include "PgWin.h"
 
-#define MY_PRINTF(...) {char cad[512]; sprintf(cad, __VA_ARGS__);  OutputDebugStringA(cad);}
 
-/*
-int PgWin::ms_iScreenRightPos = 1023;
-int PgWin::ms_iScreenBottomPos = 767;
-unsigned int PgWin::ms_uiScreenWidth = 1024u;
-unsigned int PgWin::ms_uiScreenHeight = 768u;
-*/
+int PgWinMgr::iScreenLeftPos;
+int PgWinMgr::iScreenRightPos;
+
+int PgWinMgr::iScreenWidth;
+int PgWinMgr::iScreenHeight;
+
+int PgWinMgr::iScreenTopPos;
+int PgWinMgr::iScreenBottomPos;
 
 FiestaOnlineTool* FiestaOnlineTool::_Tool = NULL;
 NiApplication* NiApplication::Create() {
@@ -42,18 +44,22 @@ bool FiestaOnlineTool::Initialize()
     NiSortAdjustNode* BaseNode = NiNew NiSortAdjustNode;
     BaseNode->SetSortingMode(NiSortAdjustNode::SORTING_INHERIT);
 
-     NiNodePtr NiN = PgUitl::LoadNifFile("E:/Coding/Core/Core Fiesta/resmenu/account/LoginBackground.nif", 0);
+    NiNodePtr NiN = PgUtil::LoadNifFile("E:/Coding/Core/Core Fiesta/resmenu/account/LoginBackground.nif", 0);
 
     BaseNode->AttachChild(NiN, 1);
     m_spScene = BaseNode;
     NIASSERT(m_spScene != NULL);
-    if (!PgUitl::CatchCamera(m_spScene, &m_spCamera))
+    if (!PgUtil::CatchCamera(m_spScene, &m_spCamera))
     {
         NiMessageBox::DisplayMessage("Failed to Catch Camera", "Error");
         return 0;
     }
+    this->m_pkFrameRate = NiNew NiFrameRate;
+    this->m_pkFrameRate->Init(true);
+    this->m_pkFrameRate->SetColor(NiColor::BLACK);
     EnableFrameRate(true);
-    
+    this->SetMaxFrameRate(144.0f);
+
     NiRect<int> kRect;
     kRect.m_left = 0;
     kRect.m_top = 0;
@@ -64,13 +70,14 @@ bool FiestaOnlineTool::Initialize()
     cursor->SetPosition(0.0f, 320, 240);
     cursor->Show(true);
     ShowCursor(false);
+
     Pgg_kWinMgr = NiNew PgWinMgr;
     Pgg_kWinMgr->PgInit(m_spRenderer);
 
-
-    LoginInputPanel = PgUitl::LoadNifFile("E:\\Coding\\Core\\Core Fiesta\\resmenu\\account\\LoginServerList.nif", NULL);
-    Pgg_kWinMgr->ShowWin(LoginInputPanel);
-
+    LoginServerList* win = NiNew LoginServerList;
+    Pgg_kWinMgr->AddWindow(win);
+    Pgg_kWinMgr->ShowWin(win);
+    Pgg_kWinMgr->Update();
     m_spScene->Update(0.0);
     m_spScene->UpdateProperties();
     m_spScene->UpdateEffects();
@@ -79,52 +86,19 @@ bool FiestaOnlineTool::Initialize()
     return true;
 }
 
-
-bool FiestaOnlineTool::CreateRenderer() 
-{
-    NiWindowRef test = this->GetAppWindow()->GetWindowReference();
-    return CreateRenderer(test);
-}
-
-bool FiestaOnlineTool::CreateRenderer(HWND hWnd)
-{
-    if (false) //MAYBE I WILL NEVER USE D3DX10 xD So just hardcode it for D3DX9 for now
-    {
-        NiD3D10Renderer::CreationParameters kParameters(hWnd);
-        
-        NiD3D10RendererPtr spD3D10Renderer;
-
-        bool bResult = NiD3D10Renderer::Create(kParameters, spD3D10Renderer);
-
-        if (bResult)
-            m_spRenderer = spD3D10Renderer;
-
-        return bResult;
-    }
-    else
-    {
-        char Flag = NiDX9Renderer::USE_NOFLAGS;
-        //Flag = NiDX9Renderer::USE_STENCIL | NiDX9Renderer::USE_MULTITHREADED | NiDX9Renderer::USE_16BITBUFFERS | NiDX9Renderer::USE_FULLSCREEN;
-
-        m_spRenderer = NiDX9Renderer::Create(1600, 900, Flag, hWnd, NULL, NULL);
-        return (m_spRenderer != NULL);
-    }
-    return false;
-}
-void FiestaOnlineTool::DrawCursor() 
-{
-    tagPOINT kPoint;
-    GetCursorPos(&kPoint);
-    ScreenToClient(this->GetRenderWindowReference(), &kPoint);
-    _Tool->cursor->SetPosition(0.0, kPoint.x + 5, kPoint.y + 9);
-    cursor->Draw();
-}
 void FiestaOnlineTool::OnIdle()
 {
-
-    m_spScene->Update(NiGetCurrentTimeInSec());
     if(MeasureTime())
     {
+        /*Update FrameRate*/
+        if (m_pkFrameRate)
+        {
+            m_pkFrameRate->TakeSample();
+            m_pkFrameRate->Update();
+        }
+
+        m_spScene->Update(NiGetCurrentTimeInSec());
+        Pgg_kWinMgr->Update();
         /*Prepare Framerendering*/
         this->UpdateFrame();
         this->BeginFrame();
@@ -154,48 +128,62 @@ void FiestaOnlineTool::OnIdle()
 static const GUID s_kInputDemoGUID = { 0xef33646e, 0x82d0, 0x4b8b,
     { 0xab, 0x49, 0x2F, 0xc8, 0xb2, 0x1a, 0x29, 0xff } }; 
 
-NiActionMap* FiestaOnlineTool::CreateNewActionMap(const char* pcName) {
+NiActionMapPtr FiestaOnlineTool::CreateNewActionMap(const char* pcName) {
     return NiNew NiActionMap(pcName, (void*)&s_kInputDemoGUID);
 }
-NiActionMap* FiestaOnlineTool::CreateInitActionMap() 
+NiActionMapPtr FiestaOnlineTool::CreateInitActionMap() 
 {
-    NiActionMap* ActionMap = CreateNewActionMap("StartScreenActionMap");
-    /*
-    * Mouse Movement is Currently not needed Click and Stuff could be interessting in the Future
-    * But updateing Mouse Position is not Needed currently
-    * Could be Usefull to move Ingame Camera at one Point
-    if (!ActionMap->AddAction("MouseMoveActionSetX", MouseMovementActionCode::XAxis,
+    NiActionMapPtr ActionMap = CreateNewActionMap("StartScreenActionMap");
+    
+    if (!ActionMap->AddAction("MouseMoveActionX", NiAction::MOUSE_AXIS_X,
         NiAction::MOUSE_AXIS_X, 0, 0, 0, 0,
         (void*)FiestaOnlineTool::HandleMouseMovement)) 
     {
-        NiMessageBox::DisplayMessage("Failed to AddAction MouseMoveActionSetX", "Error");
+        NiMessageBox::DisplayMessage("Failed to AddAction MouseMoveActionX", "Error");
     }
-    if (!ActionMap->AddAction("MouseMoveActionSetY", MouseMovementActionCode::YAxis,
+    if (!ActionMap->AddAction("MouseMoveActionY", NiAction::MOUSE_AXIS_Y,
         NiAction::MOUSE_AXIS_Y, 0, 0, 0, 0,
         (void*)FiestaOnlineTool::HandleMouseMovement))
         {
-            NiMessageBox::DisplayMessage("Failed to AddAction MouseMoveActionSetX", "Error");
+            NiMessageBox::DisplayMessage("Failed to AddAction MouseMoveActionY", "Error");
     }
-    if (!ActionMap->AddAction("MouseMoveActionSetZ", MouseMovementActionCode::ZAxis,
+    if (!ActionMap->AddAction("MouseMoveActionZ", NiAction::MOUSE_AXIS_Z,
         NiAction::MOUSE_AXIS_Z, 0, 0, 0, 0,
         (void*)FiestaOnlineTool::HandleMouseMovement))
         {
-            NiMessageBox::DisplayMessage("Failed to AddAction MouseMoveActionSetX", "Error");
-    }*/
+            NiMessageBox::DisplayMessage("Failed to AddAction MouseMoveActionZ", "Error");
+    }
+
+    if (!ActionMap->AddAction("MouseClickActionLeft", NiAction::MOUSE_BUTTON_LEFT,
+        NiAction::MOUSE_BUTTON_LEFT, NiAction::RETURN_BOOLEAN, 0, 0, 0,
+        (void*)FiestaOnlineTool::HandleMouseMovement))
+    {
+        NiMessageBox::DisplayMessage("Failed to AddAction MouseClickActionLeft", "Error");
+    }
     return ActionMap;
 }
 bool FiestaOnlineTool::HandleMouseMovement(NiActionData* pkActionData) 
 {
     switch (pkActionData->GetAppData()) 
     {
-    case MouseMovementActionCode::XAxis:
-    case MouseMovementActionCode::YAxis:
-    case MouseMovementActionCode::ZAxis:
+    case NiAction::MOUSE_AXIS_X:
+    case NiAction::MOUSE_AXIS_Y:
+    case NiAction::MOUSE_AXIS_Z:
+        //UtilDebugString("Mouse Moved Check For Hit")
+        /*Check For Hits If Something is Hitted Update Frame*/
+        FiestaOnlineTool::_Tool->CheckInterfaceForHit();
         break;
-
+    case NiAction::MOUSE_BUTTON_LEFT:
+        
+        if(pkActionData->GetDataValue())
+            FiestaOnlineTool::_Tool->CheckInterfaceForClick();
+        else
+            FiestaOnlineTool::_Tool->UpdateInterface();
+        break;
     default:
         return false;
     }
+    return true;
 }
 typedef bool(*InputFunc)(NiActionData*);
 void FiestaOnlineTool::ProcessInput() 
@@ -227,7 +215,6 @@ NiInputSystem::CreateParams* FiestaOnlineTool::GetInputCreationParameters()
     pkParams->SetOwnerWindow(GetWindowReference());
     return pkParams;
 }
-
 bool FiestaOnlineTool::CreateInputSystem() 
 {
     /*
@@ -235,15 +222,14 @@ bool FiestaOnlineTool::CreateInputSystem()
     */
     NiInputSystem::CreateParams* pkParams = GetInputCreationParameters();
     NIASSERT(pkParams);
-
+    
     pkParams->SetRenderer(m_spRenderer);
     pkParams->SetKeyboardUsage(
         NiInputSystem::FOREGROUND | NiInputSystem::EXCLUSIVE);
     pkParams->SetMouseUsage(
         NiInputSystem::FOREGROUND | NiInputSystem::NONEXCLUSIVE);
-    StartActionMap = CreateInitActionMap();
-    EmptyActionMap = CreateNewActionMap("DeadMap");
-    pkParams->SetActionMap(StartActionMap);
+    m_spActionMap = CreateInitActionMap();
+    pkParams->SetActionMap(m_spActionMap);
 
     m_spInputSystem = NiInputSystem::Create(pkParams);
     NiDelete pkParams;
@@ -273,17 +259,12 @@ bool FiestaOnlineTool::CreateInputSystem()
         }
     }
 
-    char acTemp[256];
     NiOutputDebugString("Devices found:\n");
 
-    NiInputDevice::Description* pkNiDesc =
-        m_spInputSystem->GetFirstDeviceDesc();
+    NiInputDevice::Description* pkNiDesc = m_spInputSystem->GetFirstDeviceDesc();
     while (pkNiDesc)
     {
-        NiSprintf(acTemp, 256, "    Port %d - %s\n", pkNiDesc->GetPort(),
-            pkNiDesc->GetName());
-        NiOutputDebugString(acTemp);
-
+        UtilDebugString("    Port %d - %s\n", pkNiDesc->GetPort(), pkNiDesc->GetName());
         pkNiDesc = m_spInputSystem->GetNextDeviceDesc();
     }
 
@@ -291,4 +272,43 @@ bool FiestaOnlineTool::CreateInputSystem()
     m_spKeyboard = m_spInputSystem->OpenKeyboard();
     m_spMouse = m_spInputSystem->OpenMouse();
     return true;
+}
+
+bool FiestaOnlineTool::CreateRenderer()
+{
+    NiWindowRef test = this->GetAppWindow()->GetWindowReference();
+    return CreateRenderer(test);
+}
+bool FiestaOnlineTool::CreateRenderer(HWND hWnd)
+{
+    if (false) //MAYBE I WILL NEVER USE D3DX10 xD So just hardcode it for D3DX9 for now
+    {
+        NiD3D10Renderer::CreationParameters kParameters(hWnd);
+
+        NiD3D10RendererPtr spD3D10Renderer;
+
+        bool bResult = NiD3D10Renderer::Create(kParameters, spD3D10Renderer);
+
+        if (bResult)
+            m_spRenderer = spD3D10Renderer;
+
+        return bResult;
+    }
+    else
+    {
+        char Flag = NiDX9Renderer::USE_NOFLAGS;
+        //Flag = NiDX9Renderer::USE_STENCIL | NiDX9Renderer::USE_MULTITHREADED | NiDX9Renderer::USE_16BITBUFFERS | NiDX9Renderer::USE_FULLSCREEN;
+
+        m_spRenderer = NiDX9Renderer::Create(1600, 900, Flag, hWnd, NULL, NULL);
+        return (m_spRenderer != NULL);
+    }
+    return false;
+}
+void FiestaOnlineTool::DrawCursor()
+{
+    tagPOINT kPoint;
+    GetCursorPos(&kPoint);
+    ScreenToClient(this->GetRenderWindowReference(), &kPoint);
+    _Tool->cursor->SetPosition(0.0, kPoint.x + 5, kPoint.y + 9);
+    cursor->Draw();
 }

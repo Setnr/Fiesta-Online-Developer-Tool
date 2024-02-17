@@ -10,6 +10,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Fiesta Online Tool</Filter>
     </ClCompile>
+    <ClCompile Include="PgWin.cpp">
+      <Filter>FIestaRenderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fiesta Online Tool">
@@ -29,7 +32,16 @@
     <ClInclude Include="FiestaRendererTypeDef.h">
       <Filter>FIestaRenderer</Filter>
     </ClInclude>
+    <ClInclude Include="PgWinMgr.h">
+      <Filter>Fiesta Online Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="PgUtil.h">
+      <Filter>Fiesta Online Tool</Filter>
+    </ClInclude>
     <ClInclude Include="PgWin.h">
+      <Filter>Fiesta Online Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="PgWinObj.h">
       <Filter>Fiesta Online Tool</Filter>
     </ClInclude>
   </ItemGroup>
