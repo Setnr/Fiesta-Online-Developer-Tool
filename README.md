@@ -24,3 +24,11 @@ Updates of PgWin
 <font color="red">For FPS gain this could be changed to only Update for Events (maybe xD)!</font>
 
 Clicks are only viable for 1 Frame because the Obj Gets added into a ResetClick Array which gets cleared every Frame or every MouseClick-Event
+
+
+## FiestaScene
+
+Fiesta Scene is a Base class, it is intended to be used for the Logic parts of a Scene and Updateing this Scene specific.
+
+### Start Scene
+Loads the Background nif and shall create a second Thread which handles a OpenFileDialog-Construct to select and load a map.

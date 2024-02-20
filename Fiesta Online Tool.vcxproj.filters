@@ -7,11 +7,17 @@
     <ClCompile Include="FiestaOnlineTool.cpp">
       <Filter>Fiesta Online Tool</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Fiesta Online Tool</Filter>
-    </ClCompile>
     <ClCompile Include="PgWin.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>FIestaRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="FiestaScene.cpp">
+      <Filter>Scenes\BaseScene</Filter>
+    </ClCompile>
+    <ClCompile Include="StartScene.cpp">
+      <Filter>Scenes\StartScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -20,6 +26,18 @@
     </Filter>
     <Filter Include="FIestaRenderer">
       <UniqueIdentifier>{f6e5c635-6649-4c6f-8d31-ca5b6d66719e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{219b8528-5768-47fa-8c14-f67c9e8cc575}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{7950002a-1ced-4ad7-9ec0-c76f4489c8f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\BaseScene">
+      <UniqueIdentifier>{97b91627-f845-4ad9-8c08-1b31d93c9ab3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\StartScene">
+      <UniqueIdentifier>{3c4d4f8b-d7da-431a-836c-9281e91432d7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -32,17 +50,21 @@
     <ClInclude Include="FiestaRendererTypeDef.h">
       <Filter>FIestaRenderer</Filter>
     </ClInclude>
-    <ClInclude Include="PgWinMgr.h">
-      <Filter>Fiesta Online Tool</Filter>
-    </ClInclude>
-    <ClInclude Include="PgUtil.h">
-      <Filter>Fiesta Online Tool</Filter>
-    </ClInclude>
     <ClInclude Include="PgWin.h">
-      <Filter>Fiesta Online Tool</Filter>
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="PgWinMgr.h">
+      <Filter>Interface</Filter>
     </ClInclude>
     <ClInclude Include="PgWinObj.h">
-      <Filter>Fiesta Online Tool</Filter>
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="PgUtil.h" />
+    <ClInclude Include="FiestaScene.h">
+      <Filter>Scenes\BaseScene</Filter>
+    </ClInclude>
+    <ClInclude Include="StartScene.h">
+      <Filter>Scenes\StartScene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

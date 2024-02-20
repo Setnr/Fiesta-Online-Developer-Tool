@@ -71,7 +71,7 @@ public:
     static NiNodePtr LoadNifFile(const char* File, NiTexturePalette* /*Currently Unused */) 
     {
         NiNode* Node = NiNew NiNode;
-        sizeof(NiNode);
+
         NiStream kStream;
         bool bLoaded = kStream.Load(File);
         NIASSERT(bLoaded);

@@ -15,7 +15,8 @@
 #include "PgUtil.h" 
 #include "PgWin.h"
 
-
+#include <Windows.h>
+#include "StartScene.h"
 int PgWinMgr::iScreenLeftPos;
 int PgWinMgr::iScreenRightPos;
 
@@ -41,19 +42,14 @@ bool FiestaOnlineTool::Initialize()
     Sorter = NiNew NiAlphaAccumulator();
     m_spRenderer->SetSorter(Sorter);
 
-    NiSortAdjustNode* BaseNode = NiNew NiSortAdjustNode;
-    BaseNode->SetSortingMode(NiSortAdjustNode::SORTING_INHERIT);
+    _Scene = NiNew StartScene;
+    
+    _Scene->SetupScene(m_spScene, m_spCamera);
 
-    NiNodePtr NiN = PgUtil::LoadNifFile("./resmenu/account/LoginBackground.nif", 0);
+    NiAVObject* test = m_spScene->GetObjectByName("sky");
+    if (!m_spScene)
+        NiMessageBox::DisplayMessage("No Sky", "");
 
-    BaseNode->AttachChild(NiN, 1);
-    m_spScene = BaseNode;
-    NIASSERT(m_spScene != NULL);
-    if (!PgUtil::CatchCamera(m_spScene, &m_spCamera))
-    {
-        NiMessageBox::DisplayMessage("Failed to Catch Camera", "Error");
-        return 0;
-    }
     this->m_pkFrameRate = NiNew NiFrameRate;
     this->m_pkFrameRate->Init(true);
     this->m_pkFrameRate->SetColor(NiColor::BLACK);

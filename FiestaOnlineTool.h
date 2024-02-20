@@ -2,6 +2,7 @@
 #include <NiApplication.h>
 #include <NiCursor.h>
 #include "PgWinMgr.h"
+#include "FiestaScene.h"
 class FiestaOnlineTool : public NiApplication
 {
 public:
@@ -18,6 +19,8 @@ public:
 	virtual void Terminate() 
 	{
 		m_spActionMap = 0;
+		m_spScene = 0;
+		_Scene = 0;
 		NiApplication::Terminate();
 	}
 
@@ -41,7 +44,7 @@ public:
 	}
 private: 
 
-
+	FiestaScenePtr _Scene;
 
 	static bool HandleMouseMovement(NiActionData* pkActionData);
 	void DrawCursor();
