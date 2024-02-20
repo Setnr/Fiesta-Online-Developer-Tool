@@ -54,6 +54,23 @@ public:
 	{
 		UtilDebugString("Clicked Button with Enum Index %i", ClickID);
 	}
+	void CenterWindow(LPRECT kRect)
+	{
+		int Left, Top;
+		unsigned int Width, Heigth;
+		_Frame->GetData(&Left, &Top, &Width, &Heigth);
+		int Left2, Top2;
+		unsigned int Width2, Heigth2;
+		_Panel->GetData(&Left2, &Top2, &Width2, &Heigth2);
+		Heigth += Heigth2;
+		
+		int WindowLeft = (kRect->right - Width) / 2;
+		int WindowTop = (kRect->bottom - Heigth) / 2;
+		NiPoint3 translate = _SceneRoot->GetTranslate();
+		translate.x = WindowLeft;
+		translate.y = WindowTop;
+		_SceneRoot->Update(0.0f);
+	}
 protected:
 	PgWin(){}
 	void CreateButton(NiNode* SceneObj,unsigned int ClickID, const char* RegularName, const char* Hovername, const char* ClickName) 
@@ -100,7 +117,7 @@ class LoginServerList : public PgWin
 public:
 	LoginServerList() 
 	{
-		_SceneRoot = PgUtil::LoadNifFile("E:\\Coding\\Core\\Core Fiesta\\resmenu\\account\\LoginServerList.nif", NULL);
+		_SceneRoot = PgUtil::LoadNifFile(".\\resmenu\\account\\LoginServerList.nif", NULL);
 		CreatePanel(_SceneRoot, "Panel01");
 		CreateFrame(_SceneRoot, "Frame");// Das geht nicht
 		CreateButton(_SceneRoot, Button::SelectWorld, "SelectNor", "SelectOver", "SelectClick");

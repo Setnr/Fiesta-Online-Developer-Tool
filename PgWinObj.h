@@ -49,6 +49,10 @@ public:
 	virtual void HandleLeave() {}
 	virtual void ResetClick() {  }
 	virtual bool Click(PgWin* Window) { return false; }
+	void GetData(int* iLeft, int* iTop, unsigned int* uiWidth, unsigned int* uiHeight)
+	{
+		PgUtil::CreateScreenGeometryDataFromTriShapeData(_RegularSprite->GetModelData(), iLeft, iTop, uiWidth, uiHeight);
+	}
 protected:
 	NiNode* ParentObj;
 	NiTriShapePtr _RegularSprite;
@@ -68,7 +72,6 @@ public:
 		_HoveredSprite->DetachParent();
 		return this->AddObj(SceneObj, RegularName);
 	}
-
 	void HandleHit()
 	{
 		if (_HoveredSprite->GetParent())
@@ -118,6 +121,7 @@ public:
 		_ClickedSprite->DetachParent();
 		PgWinHoverObj::HandleHit();
 	}
+	
 protected:
 	NiTriShapePtr _ClickedSprite;
 	unsigned int ClickID;

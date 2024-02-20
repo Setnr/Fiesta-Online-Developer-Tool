@@ -44,7 +44,7 @@ bool FiestaOnlineTool::Initialize()
     NiSortAdjustNode* BaseNode = NiNew NiSortAdjustNode;
     BaseNode->SetSortingMode(NiSortAdjustNode::SORTING_INHERIT);
 
-    NiNodePtr NiN = PgUtil::LoadNifFile("E:/Coding/Core/Core Fiesta/resmenu/account/LoginBackground.nif", 0);
+    NiNodePtr NiN = PgUtil::LoadNifFile("./resmenu/account/LoginBackground.nif", 0);
 
     BaseNode->AttachChild(NiN, 1);
     m_spScene = BaseNode;
@@ -66,7 +66,7 @@ bool FiestaOnlineTool::Initialize()
     kRect.m_right = m_spRenderer->GetDefaultBackBuffer()->GetWidth();
     kRect.m_bottom = m_spRenderer->GetDefaultBackBuffer()->GetHeight();
 
-    cursor = NiCursor::Create(this->m_spRenderer, kRect, NiCursor::IMMEDIATE, 8, 10, "E:\\Coding\\Core\\Core Fiesta\\resmenu\\cursor\\NorCursor.tga");
+    cursor = NiCursor::Create(this->m_spRenderer, kRect, NiCursor::IMMEDIATE, 8, 10, ".\\FiestaOnlineTool\\NorCursor.tga");
     cursor->SetPosition(0.0f, 320, 240);
     cursor->Show(true);
     ShowCursor(false);
@@ -74,10 +74,6 @@ bool FiestaOnlineTool::Initialize()
     Pgg_kWinMgr = NiNew PgWinMgr;
     Pgg_kWinMgr->PgInit(m_spRenderer);
 
-    LoginServerList* win = NiNew LoginServerList;
-    Pgg_kWinMgr->AddWindow(win);
-    Pgg_kWinMgr->ShowWin(win);
-    Pgg_kWinMgr->Update();
     m_spScene->Update(0.0);
     m_spScene->UpdateProperties();
     m_spScene->UpdateEffects();
@@ -115,7 +111,6 @@ void FiestaOnlineTool::OnIdle()
         this->RenderScreenItems();
         /*Draws the Cursor*/
         DrawCursor();
-
 
         m_spRenderer->EndUsingRenderTargetGroup();
         this->EndFrame();
