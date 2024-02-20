@@ -13,3 +13,4 @@ bool FiestaScene::SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamera)
     }
     return 1;
 }
+

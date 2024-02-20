@@ -44,11 +44,12 @@ bool FiestaOnlineTool::Initialize()
 
     _Scene = NiNew StartScene;
     
+    StartScene* s = (StartScene*)&*_Scene;
+    s->SetHWND(this->GetWindowReference());
+
     _Scene->SetupScene(m_spScene, m_spCamera);
 
-    NiAVObject* test = m_spScene->GetObjectByName("sky");
-    if (!m_spScene)
-        NiMessageBox::DisplayMessage("No Sky", "");
+
 
     this->m_pkFrameRate = NiNew NiFrameRate;
     this->m_pkFrameRate->Init(true);
@@ -88,7 +89,7 @@ void FiestaOnlineTool::OnIdle()
             m_pkFrameRate->TakeSample();
             m_pkFrameRate->Update();
         }
-
+        _Scene->UpdateScene();
         m_spScene->Update(NiGetCurrentTimeInSec());
         Pgg_kWinMgr->Update();
         /*Prepare Framerendering*/
