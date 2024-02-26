@@ -19,6 +19,12 @@
     <ClCompile Include="StartScene.cpp">
       <Filter>Scenes\StartScene</Filter>
     </ClCompile>
+    <ClCompile Include="EditorScene.cpp">
+      <Filter>Scenes\EditorScene</Filter>
+    </ClCompile>
+    <ClCompile Include="IngameWorld.cpp">
+      <Filter>Scenes\EditorScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fiesta Online Tool">
@@ -38,6 +44,9 @@
     </Filter>
     <Filter Include="Scenes\StartScene">
       <UniqueIdentifier>{3c4d4f8b-d7da-431a-836c-9281e91432d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\EditorScene">
+      <UniqueIdentifier>{57826ec9-bc66-4db8-8d1c-16e497b677c9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -65,6 +74,12 @@
     </ClInclude>
     <ClInclude Include="StartScene.h">
       <Filter>Scenes\StartScene</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorScene.h">
+      <Filter>Scenes\EditorScene</Filter>
+    </ClInclude>
+    <ClInclude Include="IngameWorld.h">
+      <Filter>Scenes\EditorScene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -139,18 +139,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EditorScene.cpp" />
     <ClCompile Include="FiestaOnlineTool.cpp" />
     <ClCompile Include="FiestaRenderer.cpp" />
     <ClCompile Include="FiestaScene.cpp" />
+    <ClCompile Include="IngameWorld.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PgWin.cpp" />
     <ClCompile Include="StartScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EditorScene.h" />
     <ClInclude Include="FiestaOnlineTool.h" />
     <ClInclude Include="FiestaRenderer.h" />
     <ClInclude Include="FiestaRendererTypeDef.h" />
     <ClInclude Include="FiestaScene.h" />
+    <ClInclude Include="IngameWorld.h" />
     <ClInclude Include="PgUtil.h" />
     <ClInclude Include="PgWin.h" />
     <ClInclude Include="PgWinMgr.h" />

@@ -43,9 +43,6 @@ bool FiestaOnlineTool::Initialize()
     m_spRenderer->SetSorter(Sorter);
 
     _Scene = NiNew StartScene;
-    
-    StartScene* s = (StartScene*)&*_Scene;
-    s->SetHWND(this->GetWindowReference());
 
     _Scene->SetupScene(m_spScene, m_spCamera);
 
@@ -89,7 +86,11 @@ void FiestaOnlineTool::OnIdle()
             m_pkFrameRate->TakeSample();
             m_pkFrameRate->Update();
         }
-        _Scene->UpdateScene();
+        if (_Scene->UpdateScene()) 
+        {
+            _Scene = _Scene->GetNewScene();
+            _Scene->SetupScene(m_spScene, m_spCamera);
+        }
         m_spScene->Update(NiGetCurrentTimeInSec());
         Pgg_kWinMgr->Update();
         /*Prepare Framerendering*/
@@ -101,7 +102,8 @@ void FiestaOnlineTool::OnIdle()
         this->m_spRenderer->SetBackgroundColor(m_kBackGroundColor);
 
         /*Draw MainScene (GameWorld)*/
-        NiDrawScene(m_spCamera, m_spScene, *m_spCuller);
+        _Scene->Draw(this->m_spRenderer);
+        
         /*Draw Interface Windows*/
         Pgg_kWinMgr->Draw(m_spRenderer);
         /*Draw NiScreenElements Maybe needs Work so it Draws Player HP Hud and stuff*/

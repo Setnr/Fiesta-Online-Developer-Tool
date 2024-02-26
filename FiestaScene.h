@@ -12,9 +12,18 @@ public:
 	~FiestaScene() 
 	{
 	}
-	bool SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamerea);
-	virtual void UpdateScene(){}
+	virtual bool SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamerea);
+	virtual bool UpdateScene()
+	{
+		return 0;
+	}
+	virtual FiestaScene* GetNewScene() 
+	{
+		return NULL;
+	}
+	virtual void Draw(NiRenderer* renderer) {}
 protected:
 	NiSortAdjustNodePtr BaseNode;
+	
 };
 

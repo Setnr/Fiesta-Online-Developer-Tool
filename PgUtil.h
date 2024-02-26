@@ -1,7 +1,7 @@
 #pragma once
 #include <NiNode.h>
 #include <NiCamera.h>
-
+#include <NiSourceTexture.h>
 
 #define UtilDebugString(pcText, ...)  { char acTemp[512]; NiSprintf(acTemp, sizeof(acTemp), pcText, __VA_ARGS__); NiOutputDebugString(acTemp);}
 class PgUtil 
@@ -84,4 +84,28 @@ public:
          
         return Node;
     }
+    static bool LoadNodeNifFile(const char* File, NiNodePtr* spNode,  NiTexturePalette* /*Currently Unused */)
+    {
+        bool oldFlag = NiSourceTexture::GetDestroyAppDataFlag();
+        NiSourceTexture::SetDestroyAppDataFlag(false);
+        NiStream kStream;
+        bool bLoaded = kStream.Load(File);
+        NiSourceTexture::SetDestroyAppDataFlag(oldFlag);
+        NIASSERT(bLoaded)
+        if (kStream.GetObjectCount() != 1) 
+        {
+            UtilDebugString("k Stream has to much root objects")
+            return NULL;
+        }
+        NiObject* obj = kStream.GetObjectAt(0);
+        if (obj->IsKindOf(&NiNode::ms_RTTI))
+            *spNode = (NiNode*)obj;;
+
+        NiStream kStream2;
+        kStream2.InsertObject(obj);
+        kStream2.Save("./TESTING2.nif");
+        return true;
+
+    }
+
 };
