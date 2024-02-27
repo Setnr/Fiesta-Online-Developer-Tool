@@ -13,7 +13,7 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 		return;
 	if (!kWorld.InitShadow())
 		return;
-	UtilDebugString("World Init Done");
+
 #define EditorSceneError(Msg) {NiMessageBox::DisplayMessage(Msg, "Error"); return;}
 	FILE* file = fopen(FilePath, "r");
 	if (!file)
@@ -43,12 +43,9 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 		{
 			char buf[1024];
 			GetCurrentDirectoryA(sizeof(buf), buf);
-			UtilDebugString("Try Loading %s", acFileName)
-			UtilDebugString("´from %s", buf)
 			NiNodePtr sky;
 			PgUtil::LoadNodeNifFile(acFileName, &sky, NULL);
 			kWorld.AttachSky(sky);
-			UtilDebugString("Succesfully loaded sky %s", acFileName)
 		}
 		else 
 		{
@@ -103,12 +100,15 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	{
 		EditorSceneError("Failed Loading GlobalLight")
 	}
-	NiAmbientLightPtr MapLight = NiNew NiAmbientLight;
-	MapLight->SetDiffuseColor(NiColor(red, green, blue));
+	//NiAmbientLightPtr MapLight = NiNew NiAmbientLight;
+	//MapLight->SetDiffuseColor(NiColor(red, green, blue));
 
+	kWorld.SetAmbientLightAmbientColor(NiColor(red, green, blue));
 	//kWorld.ClearGlobalLightMap();
 	//kWorld.AddGlobalLight(MapLight);
-
+	// 
+	// 
+	//World::LoadLightInfoNode(v2, v20);
 	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "Fog", &depth, &red, &green, &blue)) 
 	{
 		EditorSceneError("Failed Loading Fog")
@@ -133,14 +133,11 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	kWorld.SetFarFrumstum(Frustum); // MachineOpt::SetViewTerrainLength
 	while (true) 
 	{
-		NiNodePtr AddNote = NiNew NiNode;
-		BaseNode->AttachChild(AddNote);
 		if (!fgets(acFileBuff, 256, file))
 		{
 			EditorSceneError("Failed Loading ObjectDataStream")
 		}
 		sscanf(acFileBuff, "%s", acTempText);
-		UtilDebugString("Loaded Line %s", acFileBuff)
 		if (!strcmp(acTempText, "DataObjectLoadingEnd"))
 		{
 			UtilDebugString("Found End of Data with DataObjectLoadingEnd")
@@ -185,13 +182,16 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	kWorld.SetMapDirectionalLightDiffuseColor(NiColor(red, green, blue));
 	
 	Camera = kWorld.GetCamera();
-	NiNode* CameraNode = NiNew NiNode;
-	CameraNode->SetName("Camera Node");
-	CameraNode->SetTranslate(NiPoint3(5576, 5768, 1100));
-	Camera->LookAtWorldPoint(NiPoint3(5576.985840, 5768.680176, 743.123779), World::ms_kUpDir);
+	Camera->SetTranslate(NiPoint3(5576, 5768, 900));
+	Pitch = 1.57f * 2.0f;
+	Yaw = -1.57f;
+	Roll = 1.57f;
+	NiMatrix3 rotation;
+	rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
 
-	CameraNode->AttachChild(Camera);
-	BaseNode->AttachChild(CameraNode);
+	Camera->SetRotate(rotation);
+	//Camera->LookAtWorldPoint(NiPoint3(5576.985840, 5768.680176, 743.123779), World::ms_kUpDir);
+
 	BaseNode->AttachChild(kWorld.GetWorldScene());
 	BaseNode->UpdateEffects();
 	BaseNode->UpdateProperties();
@@ -199,8 +199,13 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 
 	Camera->Update(0.0f);
 
+	UtilDebugString("Finished Loading World")
+	
+
 	NiStream kStream;
-	kStream.InsertObject(BaseNode);
+	kStream.InsertObject(kWorld.GetSkyNode());
 	kStream.InsertObject(Camera);
 	kStream.Save("./TESTING.nif");
+
+	return;
 }

@@ -16,15 +16,12 @@ public:
 	{
 		NiVisibleArray m_kVisible;
 		NiCullingProcess m_spCuller(&m_kVisible);
+		NiDrawScene(Camera, kWorld.GetSkyNode(), m_spCuller);
+
 		NiVisibleArray m_kVisible2;
 		NiCullingProcess m_spCuller2(&m_kVisible2);
-		NiCamera* m_spCamera = kWorld.GetCamera();
-		//NiDrawScene(m_spCamera, kWorld.GetSkyNode(), m_spCuller);
-		NiDrawScene(m_spCamera, BaseNode, m_spCuller2);
+		NiDrawScene(Camera, kWorld.GetWorldScene(), m_spCuller2);
 		return;
-		renderer->SetCameraData(m_spCamera);
-		m_spCuller.Process(m_spCamera, kWorld.GetWorldScene(), m_spCuller.GetVisibleSet());
-		NiDrawVisibleArray(m_spCamera, *m_spCuller.GetVisibleSet());
 	}
 
 private:
@@ -102,6 +99,5 @@ private:
 	}
 	World kWorld;
 	NiColor BackgroundColor;
-	NiCameraPtr Camera;
 };
 

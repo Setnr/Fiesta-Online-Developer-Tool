@@ -73,6 +73,7 @@ bool FiestaOnlineTool::Initialize()
     m_spScene->UpdateEffects();
     m_spCamera->Update(0.0f);
 
+
     return true;
 }
 
@@ -86,14 +87,18 @@ void FiestaOnlineTool::OnIdle()
             m_pkFrameRate->TakeSample();
             m_pkFrameRate->Update();
         }
+
+        //MainWorldScene
         if (_Scene->UpdateScene()) 
         {
             _Scene = _Scene->GetNewScene();
             _Scene->SetupScene(m_spScene, m_spCamera);
         }
-        DoCamera();
-        m_spScene->Update(NiGetCurrentTimeInSec());
+        _Scene->Update(NiGetCurrentTimeInSec());
+
+        //Interface Scene
         Pgg_kWinMgr->Update();
+
         /*Prepare Framerendering*/
         this->UpdateFrame();
         this->BeginFrame();

@@ -22,8 +22,20 @@ public:
 		return NULL;
 	}
 	virtual void Draw(NiRenderer* renderer) {}
+	virtual void Update(float fTime)
+	{
+		this->UpdateCamera(fTime);
+		BaseNode->Update(fTime);
+	}
+	virtual void UpdateCamera(float fTime);
+	
 protected:
 	NiSortAdjustNodePtr BaseNode;
+	NiCameraPtr Camera;
+
+	float Yaw;
+	float Pitch;
+	float Roll;
 	
 };
 

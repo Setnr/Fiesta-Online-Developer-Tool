@@ -12,10 +12,9 @@ public:
 	{
 		if(_procedure)
 			NiDelete _procedure;
-		if (_Thread->GetStatus() != NiThread::COMPLETE) 
-		{
+		if(_Thread)
 			NiDelete _Thread;
-		}
+		
 	}
 	void RunThread();
 	bool IsLoaded() 
@@ -34,6 +33,7 @@ public:
 	{
 		return LoadedScene;
 	}
+	void UpdateCamera(float fTime) {}
 	void Draw(NiRenderer* renderer)
 	{
 		if (!m_spCamera)

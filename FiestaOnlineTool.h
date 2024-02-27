@@ -42,6 +42,21 @@ public:
 	{
 		Pgg_kWinMgr->Update();
 	}
+
+	static bool GetRotateCamera() 
+	{
+		if (_Tool)
+			return _Tool->MoveCamera;
+		return false;
+	}
+	static bool GetPositionDelta(int& iX, int& iY, int& iZ) 
+	{
+		if (_Tool) 
+		{
+			return _Tool->m_spMouse->GetPositionDelta(iX, iY, iZ);
+		}
+		return false;
+	}
 private: 
 
 	FiestaScenePtr _Scene;
@@ -68,46 +83,5 @@ private:
 	bool MoveCamera;
 	void EnableCameraMove() { MoveCamera = true; }
 	void DisableCameraMove() { MoveCamera = false; }
-
-	void DoCamera() 
-	{
-		if (!MoveCamera)
-			return;
-		int iX, iY, iZ;
-		if (m_spMouse->GetPositionDelta(iX, iY, iZ))
-		{
-			UtilDebugString("UpdateCamera")
-			NiMatrix3 kv = m_spCamera->GetRotate();
-			NiPoint3 translate =m_spCamera->GetTranslate();
-			float CurrentPitch;
-			float CurrentYaw;
-			float CurrentRoll;
-			float Angle;
-			kv.ExtractAngleAndAxis(Angle, CurrentRoll, CurrentYaw, CurrentPitch);
-
-			UtilDebugString("Angle %f ,CurrentRoll %f ,CurrentYaw %f ,CurrentPitch %f ", Angle, CurrentRoll,CurrentYaw,CurrentPitch)
-			UtilDebugString("translate.x %f ,translate.y %f ,translate.z %f ", translate.x, translate.y, translate.z)
-
-			unsigned int uiAppHeight = NiApplication::ms_pkApplication->
-				GetAppWindow()->GetHeight();
-			// in pixels to avoid the sensitivity changing with screen resolution
-			//CameraCtrl::CalCulateCamera
-			unsigned int uiAppWidth = NiApplication::ms_pkApplication->
-				GetAppWindow()->GetWidth();
-			if (uiAppHeight > 0 && uiAppWidth > 0)
-			{
-				float fPitchDelta = NI_PI * 0.375f * (float)(iY)
-					/ (float)uiAppHeight;
-				float fHeadingDelta = NI_PI * 0.5f * (float)(iX)
-					/ (float)uiAppWidth;
-				UtilDebugString("fPitchDelta %f", fPitchDelta)
-				NiMatrix3 kv2(NiPoint3::ZERO, NiPoint3::ZERO, NiPoint3::ZERO);
-				kv2.MakeRotation(Angle, CurrentRoll, CurrentYaw + fHeadingDelta, CurrentPitch + fPitchDelta);
-
-				m_spCamera->SetRotate(kv2);
-				m_spCamera->Update(0.0f);
-			}
-
-		}
-	}
+	float m_fLastUpdateTime;
 };

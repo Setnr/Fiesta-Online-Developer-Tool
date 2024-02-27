@@ -267,6 +267,10 @@ public:
 	{
 		m_spMapDirectionalLight->SetDiffuseColor(kColor);
 	}
+	void SetAmbientLightAmbientColor(NiColor kColor)
+	{
+		m_spAmbientLight->SetAmbientColor(kColor);
+	}
 	NiCamera* GetCamera() { return m_spCamera; }
 	static NiPoint3 ms_kUpDir; // idb
 	static NiPoint3 ms_kDownDir; // idb
