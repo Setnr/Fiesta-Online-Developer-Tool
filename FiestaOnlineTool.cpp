@@ -46,7 +46,7 @@ bool FiestaOnlineTool::Initialize()
 
     _Scene->SetupScene(m_spScene, m_spCamera);
 
-
+    MoveCamera = false;
 
     this->m_pkFrameRate = NiNew NiFrameRate;
     this->m_pkFrameRate->Init(true);
@@ -91,6 +91,7 @@ void FiestaOnlineTool::OnIdle()
             _Scene = _Scene->GetNewScene();
             _Scene->SetupScene(m_spScene, m_spCamera);
         }
+        DoCamera();
         m_spScene->Update(NiGetCurrentTimeInSec());
         Pgg_kWinMgr->Update();
         /*Prepare Framerendering*/
@@ -154,6 +155,12 @@ NiActionMapPtr FiestaOnlineTool::CreateInitActionMap()
     {
         NiMessageBox::DisplayMessage("Failed to AddAction MouseClickActionLeft", "Error");
     }
+    if (!ActionMap->AddAction("MouseClickActionLeft", NiAction::MOUSE_BUTTON_RIGHT,
+        NiAction::MOUSE_BUTTON_RIGHT, NiAction::RETURN_BOOLEAN, 0, 0, 0,
+        (void*)FiestaOnlineTool::HandleMouseMovement))
+    {
+        NiMessageBox::DisplayMessage("Failed to AddAction MouseClickActionLeft", "Error");
+    }
     return ActionMap;
 }
 bool FiestaOnlineTool::HandleMouseMovement(NiActionData* pkActionData) 
@@ -173,6 +180,13 @@ bool FiestaOnlineTool::HandleMouseMovement(NiActionData* pkActionData)
             FiestaOnlineTool::_Tool->CheckInterfaceForClick();
         else
             FiestaOnlineTool::_Tool->UpdateInterface();
+        break;
+    case NiAction::MOUSE_BUTTON_RIGHT:
+
+        if (pkActionData->GetDataValue())
+            FiestaOnlineTool::_Tool->EnableCameraMove();
+        else
+            FiestaOnlineTool::_Tool->DisableCameraMove();
         break;
     default:
         return false;

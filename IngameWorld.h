@@ -255,7 +255,7 @@ public:
 	}
 	void SetFarFrumstum(float Frustum) 
 	{
-		NiFrustum frust; m_spCamera->GetViewFrustum();
+		NiFrustum frust = m_spCamera->GetViewFrustum();
 		frust.m_fFar = Frustum * 1.0;
 		m_spCamera->SetViewFrustum(frust);
 	}

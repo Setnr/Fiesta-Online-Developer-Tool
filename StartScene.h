@@ -40,6 +40,7 @@ public:
 			PgUtil::CatchCamera(BaseNode, &m_spCamera);
 		NiVisibleArray m_kVisible;
 		NiCullingProcess m_spCuller(&m_kVisible);
+		
 		NiDrawScene(m_spCamera, BaseNode, m_spCuller);
 	}
 private:

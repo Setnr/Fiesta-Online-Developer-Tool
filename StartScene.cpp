@@ -14,7 +14,7 @@ StartScene::StartScene()
     BaseNode->SetSortingMode(NiSortAdjustNode::SORTING_INHERIT);
 
     NiNodePtr NiN = PgUtil::LoadNifFile(".\\resmenu\\account\\LoginBackground.nif", 0);
-
+    //NiNodePtr NiN = PgUtil::LoadNifFile(".\\resmap\\field\\Rou\\TESTING.nif", 0);
     BaseNode->AttachChild(NiN, 1);
 
     _procedure = NiNew StartSceneBackgroundThread(this);

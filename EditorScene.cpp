@@ -187,8 +187,8 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	Camera = kWorld.GetCamera();
 	NiNode* CameraNode = NiNew NiNode;
 	CameraNode->SetName("Camera Node");
-	CameraNode->SetTranslate(NiPoint3(5576, 5768, 780));
-	Camera->LookAtWorldPoint(NiPoint3(5576.985840, 5768.680176, 743.123779), World::ms_kDownDir);
+	CameraNode->SetTranslate(NiPoint3(5576, 5768, 1100));
+	Camera->LookAtWorldPoint(NiPoint3(5576.985840, 5768.680176, 743.123779), World::ms_kUpDir);
 
 	CameraNode->AttachChild(Camera);
 	BaseNode->AttachChild(CameraNode);

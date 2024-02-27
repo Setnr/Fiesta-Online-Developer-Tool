@@ -17,16 +17,16 @@ public:
 		NiVisibleArray m_kVisible;
 		NiCullingProcess m_spCuller(&m_kVisible);
 		NiVisibleArray m_kVisible2;
-		NiCullingProcess m_spCuller2(&m_kVisible);
+		NiCullingProcess m_spCuller2(&m_kVisible2);
 		NiCamera* m_spCamera = kWorld.GetCamera();
-		NiDrawScene(m_spCamera, kWorld.GetSkyNode(), m_spCuller);
+		//NiDrawScene(m_spCamera, kWorld.GetSkyNode(), m_spCuller);
 		NiDrawScene(m_spCamera, BaseNode, m_spCuller2);
 		return;
 		renderer->SetCameraData(m_spCamera);
 		m_spCuller.Process(m_spCamera, kWorld.GetWorldScene(), m_spCuller.GetVisibleSet());
 		NiDrawVisibleArray(m_spCamera, *m_spCuller.GetVisibleSet());
 	}
-	
+
 private:
 	bool GetObjectCountLine(FILE* file, char* acFileBuff, char* acTempText,const char* ObjName, int* Counter)
 	{
