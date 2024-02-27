@@ -255,9 +255,13 @@ public:
 	}
 	void SetFarFrumstum(float Frustum) 
 	{
-		NiFrustum frust = m_spCamera->GetViewFrustum();
-		frust.m_fFar = Frustum * 1.0;
-		m_spCamera->SetViewFrustum(frust);
+		m_kWorldFrustum.m_fFar = Frustum;
+	}
+	NiFrustum& GetSkyFrustum() {
+		return m_kSkyFrustum;
+	}
+	NiFrustum& GetWorldFrustum() {
+		return m_kWorldFrustum;
 	}
 	void SetMapDirectionalLightAmbientColor(NiColor kColor)
 	{

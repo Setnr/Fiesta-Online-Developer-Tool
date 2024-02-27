@@ -14,16 +14,22 @@ public:
 	}
 	void Draw(NiRenderer* renderer) 
 	{
+		Camera->SetViewFrustum(kWorld.GetSkyFrustum());
 		NiVisibleArray m_kVisible;
 		NiCullingProcess m_spCuller(&m_kVisible);
 		NiDrawScene(Camera, kWorld.GetSkyNode(), m_spCuller);
 
+		Camera->SetViewFrustum(kWorld.GetWorldFrustum());
 		NiVisibleArray m_kVisible2;
 		NiCullingProcess m_spCuller2(&m_kVisible2);
 		NiDrawScene(Camera, kWorld.GetWorldScene(), m_spCuller2);
 		return;
 	}
-
+	void Update(float fTime)
+	{
+		kWorld.GetSkyNode()->Update(fTime);
+		FiestaScene::Update(fTime);
+	}
 private:
 	bool GetObjectCountLine(FILE* file, char* acFileBuff, char* acTempText,const char* ObjName, int* Counter)
 	{

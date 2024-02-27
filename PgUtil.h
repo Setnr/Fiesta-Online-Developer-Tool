@@ -87,7 +87,7 @@ public:
     static bool LoadNodeNifFile(const char* File, NiNodePtr* spNode,  NiTexturePalette* /*Currently Unused */)
     {
         bool oldFlag = NiSourceTexture::GetDestroyAppDataFlag();
-        NiSourceTexture::SetDestroyAppDataFlag(false);
+        NiSourceTexture::SetDestroyAppDataFlag(true);
         NiStream kStream;
         bool bLoaded = kStream.Load(File);
         NiSourceTexture::SetDestroyAppDataFlag(oldFlag);

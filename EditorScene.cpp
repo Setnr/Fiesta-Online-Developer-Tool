@@ -182,7 +182,7 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	kWorld.SetMapDirectionalLightDiffuseColor(NiColor(red, green, blue));
 	
 	Camera = kWorld.GetCamera();
-	Camera->SetTranslate(NiPoint3(5576, 5768, 900));
+	Camera->SetTranslate(NiPoint3(5576, 5768, 2500));
 	Pitch = 1.57f * 2.0f;
 	Yaw = -1.57f;
 	Roll = 1.57f;

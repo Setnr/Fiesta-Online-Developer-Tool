@@ -94,7 +94,11 @@ bool World::InitCamera()
 {
 	m_spCamera = NiNew NiCamera;
 	m_bCameraOrtho = false;
-	m_spCamera->SetViewFrustum(NiFrustum(-0.25, 0.25, 0.1875, -0.1875, 1.0, 60000.0, m_bCameraOrtho)); //World::SetCameraFOV
+	NiFrustum SkyFrustum(-0.25, 0.25, 0.1875, -0.1875, 1.0, 60000.0, m_bCameraOrtho);
+	m_kSkyFrustum = SkyFrustum;
+	NiFrustum WorldFrustum(-0.25, 0.25, 0.1875, -0.1875, 1.0, 60000.0, m_bCameraOrtho);
+	m_kWorldFrustum = WorldFrustum;
+	m_spCamera->SetViewFrustum(m_kWorldFrustum); //World::SetCameraFOV
 	m_kCameraCtrl.InitDirection(ms_kUpDir, ms_kEastDir, ms_kNorthDir);
 	m_kCameraCtrl.InitZoomMinMax(40.0, 600.0);
 	m_kCameraCtrl.m_fAngleUDMax = 295.0;
