@@ -17,33 +17,51 @@ bool FiestaScene::SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamera)
 
 void FiestaScene::UpdateCamera(float fTime)
 {
-	if (!FiestaOnlineTool::GetRotateCamera())
-		return;
-	int iX, iY, iZ;
-	if (FiestaOnlineTool::GetPositionDelta(iX, iY, iZ))
+	
+	if (FiestaOnlineTool::GetRotateCamera())
 	{
-		
-		unsigned int uiAppHeight = NiApplication::ms_pkApplication->GetAppWindow()->GetHeight();
-		unsigned int uiAppWidth = NiApplication::ms_pkApplication->GetAppWindow()->GetWidth();
-		if (uiAppHeight > 0 && uiAppWidth > 0)
+		int iX, iY, iZ;
+		if (FiestaOnlineTool::GetPositionDelta(iX, iY, iZ))
 		{
-			float fPitchDelta = NI_PI * 0.375f * (float)(iY) / (float)uiAppHeight;
-			float fHeadingDelta = NI_PI * 0.375f * (float)(iX) / (float)uiAppWidth;
-			Pitch += fPitchDelta;
-			Yaw += fHeadingDelta;
-			UtilDebugString("fPitchDelta %f", fPitchDelta)
 
-			NiMatrix3 rotation;
-			rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
+			unsigned int uiAppHeight = NiApplication::ms_pkApplication->GetAppWindow()->GetHeight();
+			unsigned int uiAppWidth = NiApplication::ms_pkApplication->GetAppWindow()->GetWidth();
+			if (uiAppHeight > 0 && uiAppWidth > 0)
+			{
+				float fPitchDelta = NI_PI * 0.375f * (float)(iY) / (float)uiAppHeight;
+				float fHeadingDelta = NI_PI * 0.375f * (float)(iX) / (float)uiAppWidth;
+				Pitch += fPitchDelta;
+				Yaw += fHeadingDelta;
 
-			UtilDebugString("Roll: %f, Pitch: %f, Yaw: %f", Roll, Pitch, Yaw);
-			Camera->SetRotate(rotation);
+				NiMatrix3 rotation;
+				rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
+				Camera->SetRotate(rotation);
 
-			Camera->Update(0.0f);
+			}
 		}
-		return;
-		NiPoint3 translate = Camera->GetTranslate();
-		UtilDebugString("translate.x %f ,translate.y %f ,translate.z %f ", translate.x, translate.y, translate.z)
 	}
+	bool W_Key = false;
+	bool S_Key = false;
+	bool A_Key = false;
+	bool D_Key = false;
+	if (FiestaOnlineTool::IsMoveKeyPressed(W_Key, S_Key, A_Key,D_Key)) 
+	{
+		NiPoint3 CameraPosition = Camera->GetTranslate();
+		NiPoint3 MoveDirect(0.0f, 0.0f, 0.0f);
+
+		NiPoint3 WorldDirect = Camera->GetWorldDirection();
+		NiPoint3 RightDirect = Camera->GetWorldRightVector();
+		
+		if(W_Key)
+			MoveDirect += WorldDirect;
+		if (S_Key)
+			MoveDirect -= WorldDirect;
+		if (D_Key)
+			MoveDirect += RightDirect;
+		if (A_Key)
+			MoveDirect -=  RightDirect;
+		Camera->SetTranslate(CameraPosition + MoveDirect);
+	}
+	Camera->Update(0.0f);
 }
 

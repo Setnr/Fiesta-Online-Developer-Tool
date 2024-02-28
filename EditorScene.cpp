@@ -130,7 +130,7 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	{
 		EditorSceneError("Failed Loading Frustum")
 	}
-	kWorld.SetFarFrumstum(Frustum); // MachineOpt::SetViewTerrainLength
+	kWorld.SetFarFrumstum(Frustum);
 	while (true) 
 	{
 		if (!fgets(acFileBuff, 256, file))
@@ -145,12 +145,15 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 		}
 		sscanf(acFileBuff, "%s %d", acTempText, &Counter);
 		sprintf(acFileName, "%s%s", "..\\..\\..\\", acTempText);
+
 		NiNodePtr obj;
 		PgUtil::LoadNodeNifFile(acFileName, &obj, NULL);
+
 		if(!obj)
 			UtilDebugString("Failed to Load Map Data Object %s ", acFileName)
 		NiPoint3 point;
 		NiQuaternion quater;
+		
 		float Scale;
 		for (int i = 0; i < Counter; i++) 
 		{
@@ -158,14 +161,13 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 			{
 				EditorSceneError("Failed Loading Object Positon")
 			}
-
+			
 			NiNode* AddingObj = NiNew NiNode;
 			AddingObj->AttachChild(obj);
 			AddingObj->SetTranslate(point);
 			AddingObj->SetRotate(quater);
 			AddingObj->SetScale(Scale);
 			kWorld.AttachGroundCollidee(AddingObj);
-			
 		}
 	}
 	
@@ -179,6 +181,7 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	{
 		EditorSceneError("Failed Loading DirectionLightDiffuse")
 	}
+
 	kWorld.SetMapDirectionalLightDiffuseColor(NiColor(red, green, blue));
 	
 	Camera = kWorld.GetCamera();

@@ -160,12 +160,13 @@ NiActionMapPtr FiestaOnlineTool::CreateInitActionMap()
     {
         NiMessageBox::DisplayMessage("Failed to AddAction MouseClickActionLeft", "Error");
     }
-    if (!ActionMap->AddAction("MouseClickActionLeft", NiAction::MOUSE_BUTTON_RIGHT,
+    if (!ActionMap->AddAction("MouseClickActionRight", NiAction::MOUSE_BUTTON_RIGHT,
         NiAction::MOUSE_BUTTON_RIGHT, NiAction::RETURN_BOOLEAN, 0, 0, 0,
         (void*)FiestaOnlineTool::HandleMouseMovement))
     {
         NiMessageBox::DisplayMessage("Failed to AddAction MouseClickActionLeft", "Error");
     }
+
     return ActionMap;
 }
 bool FiestaOnlineTool::HandleMouseMovement(NiActionData* pkActionData) 
@@ -193,6 +194,7 @@ bool FiestaOnlineTool::HandleMouseMovement(NiActionData* pkActionData)
         else
             FiestaOnlineTool::_Tool->DisableCameraMove();
         break;
+
     default:
         return false;
     }

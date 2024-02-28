@@ -100,7 +100,7 @@ private:
 		{
 			return false;
 		}
-		sscanf(acFileBuff, "%f %f %f %f %f %f %f %f", &kPoint->x, &kPoint->y, &kPoint->z, &quater->m_fW, &quater->m_fX, &quater->m_fY, &quater->m_fZ, scale);
+		sscanf(acFileBuff, "%f %f %f %f %f %f %f %f", &kPoint->x, &kPoint->y, &kPoint->z, &quater->m_fX, &quater->m_fY, &quater->m_fZ, &quater->m_fW, scale);
 		return true;
 	}
 	World kWorld;

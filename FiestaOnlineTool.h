@@ -49,6 +49,34 @@ public:
 			return _Tool->MoveCamera;
 		return false;
 	}
+	static bool IsMoveKeyPressed(bool &W_Key, bool& S_Key, bool& A_Key, bool& D_Key)
+	{
+		bool ret = false;
+		if (_Tool) 
+		{
+			if (_Tool->m_spKeyboard->KeyIsDown(NiInputKeyboard::KEY_W)) 
+			{
+				W_Key = true;
+				ret = true;
+			}
+			if (_Tool->m_spKeyboard->KeyIsDown(NiInputKeyboard::KEY_S))
+			{
+				S_Key = true;
+				ret = true;
+			}
+			if (_Tool->m_spKeyboard->KeyIsDown(NiInputKeyboard::KEY_A))
+			{
+				A_Key = true;
+				ret = true;
+			}
+			if (_Tool->m_spKeyboard->KeyIsDown(NiInputKeyboard::KEY_D))
+			{
+				D_Key = true;
+				ret = true;
+			}
+		}
+		return ret;
+	}
 	static bool GetPositionDelta(int& iX, int& iY, int& iZ) 
 	{
 		if (_Tool) 
