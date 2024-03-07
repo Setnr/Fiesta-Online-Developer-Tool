@@ -1,7 +1,53 @@
 #pragma once
 #include "FiestaScene.h"
-
 #include "IngameWorld.h"
+
+#include <NiThread.h>
+
+class IniFile
+{
+public:
+	class Layer
+	{
+	public:
+		Layer() {}
+
+		NiString Name;
+		NiString DiffuseFileName;
+		NiString BlendFileName;
+		float StartPos_X;
+		float StartPos_Y;
+		float Width;
+		float Height;
+		float UVScaleDiffuse;
+		float UVScaleBlend;
+	};
+	NiString FileType;
+	float Version;
+	NiString HeightFileName;
+	NiString VertexColorTexture;
+	int HeightMap_width;
+	int HeightMap_height;
+	float OneBlock_width;
+	float OneBlock_height;
+	int QuadsWide;
+	int QuadsHigh;
+
+	std::vector<Layer*> LayerList;
+
+	void Load(FILE* Ini);
+	bool LoadLine(FILE* Ini, char* Type, char* DeadChar, char* Info);
+	void LoadLayer(FILE* Ini);
+
+	void Print()
+	{
+		UtilDebugString("HeightFileName: %s LayerCount: %i", HeightFileName, LayerList.size())
+			for (int i = 0; i < LayerList.size(); i++)
+				UtilDebugString("Name: %s", LayerList.at(i)->Name)
+				
+	}
+};
+
 class EditorScene : public FiestaScene
 {
 public:
@@ -30,6 +76,8 @@ public:
 		kWorld.GetSkyNode()->Update(fTime);
 		FiestaScene::Update(fTime);
 	}
+	NiNode* LoadTerrain();
+
 private:
 	bool GetObjectCountLine(FILE* file, char* acFileBuff, char* acTempText,const char* ObjName, int* Counter)
 	{
@@ -105,5 +153,30 @@ private:
 	}
 	World kWorld;
 	NiColor BackgroundColor;
+
+	NiThreadProcedure* _procedure;
+	NiThread* _Thread;
+	NiString _FilePath;
+	NiString _FileName;
+	IniFile _IniFile;
+	NiNodePtr terrain;
+};
+
+
+class EditorSceneBackgroundThread : public NiThreadProcedure
+{
+public:
+	EditorSceneBackgroundThread(EditorScene* editorScene)
+	{
+		_Scene = editorScene;
+	}
+	unsigned int ThreadProcedure(void* pvArg)
+	{
+		_Scene->LoadTerrain();
+		return 1;
+	}
+
+private:
+	EditorScene* _Scene;
 };
 

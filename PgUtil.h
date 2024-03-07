@@ -87,7 +87,7 @@ public:
     static bool LoadNodeNifFile(const char* File, NiNodePtr* spNode,  NiTexturePalette* /*Currently Unused */)
     {
         bool oldFlag = NiSourceTexture::GetDestroyAppDataFlag();
-        NiSourceTexture::SetDestroyAppDataFlag(true);
+        NiSourceTexture::SetDestroyAppDataFlag(false);
         NiStream kStream;
         bool bLoaded = kStream.Load(File);
         NiSourceTexture::SetDestroyAppDataFlag(oldFlag);
@@ -99,11 +99,8 @@ public:
         }
         NiObject* obj = kStream.GetObjectAt(0);
         if (obj->IsKindOf(&NiNode::ms_RTTI))
-            *spNode = (NiNode*)obj;;
-
-        NiStream kStream2;
-        kStream2.InsertObject(obj);
-        kStream2.Save("./TESTING2.nif");
+            *spNode = (NiNode*)obj;
+    
         return true;
 
     }
