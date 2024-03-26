@@ -335,55 +335,30 @@ NiNode* EditorScene::LoadTerrain()
 				pkNormal[i] = World::ms_kUpDir;
 				pkColor[i] = NiColorA(0.50f, 0.50f, 0.50f, 1.0f);
 			}
-			int j = 0;
 			for (int w = 0; w < _IniFile.QuadsWide; w++)
 			{
-				int i = 0;
-				if (j % 2)
-				{
-					i = 1;
-				}
-				j++;
+
 				for (int h = 0; h < _IniFile.QuadsHigh; h++)
 				{
-					unsigned short UL = w + (h * (_IniFile.QuadsWide + 1)) ;      // Upper left.
-					unsigned short UR = (w + 1) + (h * (_IniFile.QuadsWide + 1));  // Upper rwght.
-					unsigned short BL  = UL + (_IniFile.QuadsWide + 1);          // Bottom left.
-					unsigned short BR = UR + (_IniFile.QuadsWide + 1);      // Bottom right.
+					unsigned short BottomLeft = w + (h * (_IniFile.QuadsWide + 1)) ;      // Upper left.
+					unsigned short BottomRight = (w + 1) + (h * (_IniFile.QuadsWide + 1));  // Upper rwght.
+					unsigned short TopLeft  = BottomLeft + (_IniFile.QuadsWide + 1);          // Bottom left.
+					unsigned short TopRight = BottomRight + (_IniFile.QuadsWide + 1);      // Bottom right.
 
-					if (i % 2) 
-					{
-						pusTriList[trict] = UL;
-						trict++;
-						pusTriList[trict] = UR;
-						trict++;
-						pusTriList[trict] = BR;
-						trict++;
 
-						pusTriList[trict] = UL;
-						trict++;
-						pusTriList[trict] = BL;
-						trict++;
-						pusTriList[trict] = BR;
-						trict++;
-					}
-					else 
-					{
-						pusTriList[trict] = BL;
-						trict++;
-						pusTriList[trict] = UR;
-						trict++;
-						pusTriList[trict] = UL;
-						trict++;
+					pusTriList[trict] = BottomLeft;
+					trict++;
+					pusTriList[trict] = BottomRight;
+					trict++;
+					pusTriList[trict] = TopLeft;
+					trict++;
 
-						pusTriList[trict] = UR;
-						trict++;
-						pusTriList[trict] = BR;
-						trict++;
-						pusTriList[trict] = BL;
-						trict++;
-					}
-					i++;
+					pusTriList[trict] = TopLeft;
+					trict++;
+					pusTriList[trict] = BottomRight;
+					trict++;
+					pusTriList[trict] = TopRight;
+					trict++;
 				}
 			}
 			NiTriShapeData* data = NiNew NiTriShapeData(Vertices, TerrainBlock, pkNormal, pkColor, pkTexture, usNumTextureSets, eNBTMethod, usTriangles, pusTriList);
