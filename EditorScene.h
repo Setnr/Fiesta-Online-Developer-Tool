@@ -3,7 +3,10 @@
 #include "IngameWorld.h"
 
 #include <NiThread.h>
-
+struct HTDPoint
+{
+	float Height;
+};
 class IniFile
 {
 public:
@@ -151,9 +154,57 @@ private:
 		sscanf(acFileBuff, "%f %f %f %f %f %f %f %f", &kPoint->x, &kPoint->y, &kPoint->z, &quater->m_fX, &quater->m_fY, &quater->m_fZ, &quater->m_fW, scale);
 		return true;
 	}
+
+	void FlipVertical(NiPoint3* BlockPoints, int QuadsWide, int QuadsHigh)
+	{
+		int HalfW = QuadsWide / 2;
+		int HalfH = QuadsHigh / 2;
+		for (int h = 0; h <= HalfH; h++)
+		{
+			for (int w = 0; w < QuadsWide + 1; w++)
+			{
+				int secondh = QuadsHigh - h;
+				NiPoint3 BottomPoint = BlockPoints[w + h * (QuadsWide + 1)];
+				NiPoint3 TopPoint = BlockPoints[w + secondh * (QuadsWide + 1)];
+
+				BlockPoints[w + h * (QuadsWide + 1)] = TopPoint;
+				BlockPoints[w + secondh * (QuadsWide + 1)] = BottomPoint;
+			}
+		}
+	}
+	void RotateRight(NiPoint3* BlockPoints, int QuadsWide, int QuadsHigh)
+	{
+		for (int h = 0; h < QuadsHigh / 2; h++)
+		{
+			for (int w = 0; w <= QuadsWide / 2; w++)
+			{
+				int secondh = QuadsHigh - h;
+				int secondw = QuadsWide - w;
+				int TL = w + h * (QuadsWide + 1);
+				int BR = secondw + secondh * (QuadsWide + 1);
+
+
+				int TR = QuadsWide - h + (QuadsWide + 1) * w;
+				int BL = h + secondw * (QuadsWide + 1);
+				NiPoint3 TopLeft = BlockPoints[TL];
+				NiPoint3 TopRight = BlockPoints[TR];
+				NiPoint3 BotLeft = BlockPoints[BL];
+				NiPoint3 BotRight = BlockPoints[BR];
+
+				BlockPoints[TL] = BotLeft;
+				BlockPoints[TR] = TopLeft;
+				BlockPoints[BR] = TopRight;
+				BlockPoints[BL] = BotRight;
+			}
+		}
+	}
+	
+	void FixSupTexturing(NiNode* obj);
+
 	World kWorld;
 	NiColor BackgroundColor;
 
+	
 	NiThreadProcedure* _procedure;
 	NiThread* _Thread;
 	NiString _FilePath;

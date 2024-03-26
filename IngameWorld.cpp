@@ -96,7 +96,7 @@ bool World::InitCamera()
 	m_bCameraOrtho = false;
 	NiFrustum SkyFrustum(-0.25, 0.25, 0.1875, -0.1875, 1.0, 60000.0, m_bCameraOrtho);
 	m_kSkyFrustum = SkyFrustum;
-	NiFrustum WorldFrustum(-0.25, 0.25, 0.1875, -0.1875, 1.0, 60000.0, m_bCameraOrtho);
+	NiFrustum WorldFrustum(-0.25, 0.25, 0.1875, -0.1875, 1.0, 600000.0, m_bCameraOrtho);
 	m_kWorldFrustum = WorldFrustum;
 	m_spCamera->SetViewFrustum(m_kWorldFrustum); //World::SetCameraFOV
 	m_kCameraCtrl.InitDirection(ms_kUpDir, ms_kEastDir, ms_kNorthDir);

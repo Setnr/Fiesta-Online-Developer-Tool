@@ -3,6 +3,8 @@
 #include <NiCursor.h>
 #include "PgWinMgr.h"
 #include "FiestaScene.h"
+
+
 class FiestaOnlineTool : public NiApplication
 {
 public:
@@ -112,4 +114,23 @@ private:
 	void EnableCameraMove() { MoveCamera = true; }
 	void DisableCameraMove() { MoveCamera = false; }
 	float m_fLastUpdateTime;
+};
+
+class Engine3D
+{
+public:
+	static char Init(NiCamera* pkCamera);
+	static void ShaderRunParserCallback(const char* pcLibFile, NiRenderer* pkRenderer, const char* pcDirectory, bool bRecurseSubFolders);
+	static BOOL ShaderClassCreateCallback(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char** apcDirectories, bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary);
+	static bool FXLibraryClassCreate(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char** apcDirectories, bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary);
+	static bool GetEnableCarToon();
+	static void EnableCarToon(bool bEnable);
+	bool Terminate();
+	static unsigned int ShaderErrorCallback(const char* pcError,NiShaderError eError, bool bRecoverable) {
+		NiMessageBox(pcError, "Shader Error");
+		NiOutputDebugString("ERROR: ");
+		NiOutputDebugString(pcError);
+
+		return 0;
+	}
 };

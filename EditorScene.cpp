@@ -1,6 +1,7 @@
 #include "EditorScene.h"
 #include <NiMain.h>
 #include "PgUtil.h"
+#include <NiApplication.h>
 EditorScene::EditorScene(NiString FilePath, NiString FileName) 
 {
 
@@ -111,15 +112,9 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	{
 		EditorSceneError("Failed Loading GlobalLight")
 	}
-	//NiAmbientLightPtr MapLight = NiNew NiAmbientLight;
-	//MapLight->SetDiffuseColor(NiColor(red, green, blue));
 
 	kWorld.SetAmbientLightAmbientColor(NiColor(red, green, blue));
-	//kWorld.ClearGlobalLightMap();
-	//kWorld.AddGlobalLight(MapLight);
-	// 
-	// 
-	//World::LoadLightInfoNode(v2, v20);
+
 	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "Fog", &depth, &red, &green, &blue)) 
 	{
 		EditorSceneError("Failed Loading Fog")
@@ -181,7 +176,6 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 			kWorld.AttachGroundCollidee(AddingObj);
 		}
 	}
-	
 	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "DirectionLightAmbient", &red, &green, &blue))
 	{
 		EditorSceneError("Failed Loading DirectionLightAmbient")
@@ -194,7 +188,7 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	}
 
 	kWorld.SetMapDirectionalLightDiffuseColor(NiColor(red, green, blue));
-	
+
 	Camera = kWorld.GetCamera();
 	Camera->SetTranslate(NiPoint3(5576, 5768, 2500));
 	Pitch = 1.57f * 2.0f;
@@ -204,8 +198,6 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
 
 	Camera->SetRotate(rotation);
-	//Camera->LookAtWorldPoint(NiPoint3(5576.985840, 5768.680176, 743.123779), World::ms_kUpDir);
-
 
 	_Thread->WaitForCompletion();
 
@@ -213,10 +205,14 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	if(terrain)
 	{
 		terrain->SetName("terrain");
-		kWorld.GetWorldScene()->AttachChild(terrain);
+		kWorld.AttachGroundCollidee(terrain);
 	}
 	UtilDebugString("After Terrain")
 
+
+	//NiNodePtr NiN = PgUtil::LoadNifFile("E:\\VM\\Gamebryo\\MemoriaV2TestServer\\Testing2.nif", 0);
+	//FixSupTexturing(NiN);
+	//kWorld.AttachGroundCollidee(NiN);
 
 	BaseNode->AttachChild(kWorld.GetWorldScene());
 	BaseNode->UpdateEffects();
@@ -227,10 +223,10 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 
 	UtilDebugString("Finished Loading World")
 	
-
 	NiStream kStream;
 	kStream.InsertObject(kWorld.GetWorldScene());
-	kStream.InsertObject(Camera);
+	//kStream.InsertObject(terrain);
+	//kStream.InsertObject(Camera);
 	kStream.Save("./TESTING.nif");
 
 	return;
@@ -243,17 +239,13 @@ NiNode* EditorScene::LoadTerrain()
 	NiString CleanPath = _FilePath.GetSubstring(0, ".");
 	NiString IniFile = CleanPath;
 	IniFile.Insert(".ini", CleanPath.Length());
-	UtilDebugString("IniFile: %s", IniFile)
-	UtilDebugString("IniFile: %s", IniFile)
 	FILE* Ini = fopen(IniFile, "r");
 	if (!Ini)
 		return NULL;
-	UtilDebugString("IniFile start load")
 	_IniFile.Load(Ini);
 	_IniFile.Print();
 	char HTDFilePath[256];
 	_IniFile.HeightFileName = _IniFile.HeightFileName.GetSubstring(1, _IniFile.HeightFileName.Length() - 1);
-	UtilDebugString("Reduced Path to %s", _IniFile.HeightFileName)
 	sprintf(HTDFilePath, "%s%s", "..\\..\\..\\", _IniFile.HeightFileName);
 	FILE* HTD =fopen(HTDFilePath, "rb");
 	if(!HTD)
@@ -261,37 +253,57 @@ NiNode* EditorScene::LoadTerrain()
 	int PointCounter;
 	fread(&PointCounter, sizeof(PointCounter), 1, HTD);
 	UtilDebugString("HTDSize = %i", PointCounter)
-	struct HTDPoint 
-	{
-		float Height;
-	};
+
 	HTDPoint* PointArray = new HTDPoint[PointCounter];
 	fread(PointArray, sizeof(HTDPoint) * PointCounter, 1, HTD);
+
 	int Width = _IniFile.HeightMap_width - 1;
 	int Height = _IniFile.HeightMap_height - 1;
 	int BlockX = Width / _IniFile.QuadsWide;
 	int BlockY = Height / _IniFile.QuadsHigh;
 
-	NiSourceTexturePtr texture = NiSourceTexture::Create(NiFixedString(_IniFile.LayerList[0]->BlendFileName));
-	
 	NiPoint3** BlockArray = new NiPoint3*[BlockX * BlockY];
+
 	for (int _BlockX = 0; _BlockX < BlockX; _BlockX++) 
 	{
 		for (int _BlockY = 0; _BlockY < BlockY; _BlockY++)
 		{
-			NiPoint3* BlockPoints = NiNew NiPoint3[(_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh  + 1)];
+			int BlockPointsSize = (_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh + 1);
+			NiPoint3* BlockPoints = NiNew NiPoint3[BlockPointsSize];
+
 			BlockArray[_BlockX + _BlockY * BlockX] = BlockPoints;
+			int MaxPointEntry = 0;
 			for (int w = 0; w < _IniFile.QuadsWide + 1; w++)
 			{
 				for (int h = 0; h < _IniFile.QuadsHigh + 1; h++)
 				{
-					/*
-					* TODO Fix Points
-					*/
-					BlockPoints[w + h * _IniFile.QuadsWide] = NiPoint3(_IniFile.OneBlock_width * w, _IniFile.OneBlock_height * h, PointArray[w + _BlockX * _IniFile.QuadsWide + h * _IniFile.QuadsWide * BlockY].Height );
-					
+					float x = _IniFile.OneBlock_width * w + _IniFile.OneBlock_width * _IniFile.QuadsWide * _BlockX;
+					float y = _IniFile.OneBlock_height * h + _IniFile.OneBlock_height * _IniFile.QuadsHigh * _BlockY;
 
+					int XPart = w + _IniFile.QuadsWide * _BlockX;
+
+					int PreBlockLines = (_IniFile.QuadsWide * BlockX + 1) * _IniFile.QuadsHigh * _BlockY;
+					int PreFullLines = (_IniFile.QuadsWide * BlockX + 1) * h;
+					int YPart = PreBlockLines + PreFullLines;
+					int PointOffset = XPart + YPart;
+
+					//UtilDebugString("ID %i mit XPart %i und YPart %i", PointOffset, XPart, YPart)
+
+					float z = PointArray[PointOffset].Height;
+
+					int BlockPointsOffset = w + h * (_IniFile.QuadsWide + 1);
+					if (BlockPointsOffset > MaxPointEntry)
+						MaxPointEntry = BlockPointsOffset;
+
+					//UtilDebugString("Array Struct %i w: %i h: %i, Wide: %i", BlockPointsOffset, w, h, _IniFile.QuadsWide)
+
+					BlockPoints[BlockPointsOffset] = NiPoint3(x,y,z);
 				}
+			}
+			if(BlockPointsSize - 1 != MaxPointEntry)
+			{
+				UtilDebugString("BlockPoint Array MissMatch")
+				NiMessageBox::DisplayMessage("Load Terrain BlockPoint Array MissMatch", "Error");
 			}
 		}
 	}
@@ -300,85 +312,181 @@ NiNode* EditorScene::LoadTerrain()
 	{
 		for (int _BlockY = 0; _BlockY < BlockY; _BlockY++)
 		{
-			unsigned short Vertices = (_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh + 1);
+			unsigned short Vertices = (_IniFile.QuadsWide + 1 ) * (_IniFile.QuadsHigh + 1 );
+			unsigned short usTriangles = _IniFile.QuadsWide * _IniFile.QuadsHigh * 2;
+
 			NiPoint3* TerrainBlock = BlockArray[_BlockX + _BlockY * BlockX];
-			NiPoint3* pkNormal = NiNew NiPoint3[Vertices * 2];
-			NiColorA* pkColor = NiNew NiColorA[Vertices * 2];
-			NiPoint2* pkTexture = 0;
-			unsigned short usNumTextureSets = 1;
+
+			NiPoint3* pkNormal = NiNew NiPoint3[usTriangles];
+			NiColorA* pkColor = NiNew NiColorA[usTriangles];
+
+			NiPoint2* pkTexture = NULL;//  NiNew NiPoint2[2 * (_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh + 1)];
+			//memset(pkTexture, 0xFF, 2 * (_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh + 1) * sizeof(NiPoint2));
+			unsigned short usNumTextureSets = 0;
+
 			NiGeometryData::DataFlags eNBTMethod = NiGeometryData::DataFlags::NBT_METHOD_NONE;
-			unsigned short usTriangles = (_IniFile.QuadsHigh + 1) * (_IniFile.QuadsWide + 1) * 2;
+
 			unsigned short* pusTriList = (unsigned short* )NiNew NiPoint3 [usTriangles];
 			memset(pusTriList, 0, usTriangles * 3 * 4);
+
 			int trict = 0;
-			int PosCount = 0;
-			for (int h = 0; h < _IniFile.QuadsHigh; h++)
+			for (int i = 0; i < usTriangles; i++)
 			{
-				for (int w = 0; w < _IniFile.QuadsWide; w++)
+				pkNormal[i] = World::ms_kUpDir;
+				pkColor[i] = NiColorA(0.50f, 0.50f, 0.50f, 1.0f);
+			}
+			int j = 0;
+			for (int w = 0; w < _IniFile.QuadsWide; w++)
+			{
+				int i = 0;
+				if (j % 2)
+				{
+					i = 1;
+				}
+				j++;
+				for (int h = 0; h < _IniFile.QuadsHigh; h++)
 				{
 					unsigned short UL = w + (h * (_IniFile.QuadsWide + 1)) ;      // Upper left.
 					unsigned short UR = (w + 1) + (h * (_IniFile.QuadsWide + 1));  // Upper rwght.
 					unsigned short BL  = UL + (_IniFile.QuadsWide + 1);          // Bottom left.
 					unsigned short BR = UR + (_IniFile.QuadsWide + 1);      // Bottom right.
 
-					pusTriList[trict] = UR;
-					trict++;
-					pusTriList[trict] = BL;
-					trict++;
-					pusTriList[trict] = UL;
-					trict++;
+					if (i % 2) 
+					{
+						pusTriList[trict] = UL;
+						trict++;
+						pusTriList[trict] = UR;
+						trict++;
+						pusTriList[trict] = BR;
+						trict++;
 
-					//UtilDebugString("Top Triangle %i %i %i", pusTriList[trict - 3], pusTriList[trict - 2], pusTriList[trict - 1])
+						pusTriList[trict] = UL;
+						trict++;
+						pusTriList[trict] = BL;
+						trict++;
+						pusTriList[trict] = BR;
+						trict++;
+					}
+					else 
+					{
+						pusTriList[trict] = BL;
+						trict++;
+						pusTriList[trict] = UR;
+						trict++;
+						pusTriList[trict] = UL;
+						trict++;
 
-					pusTriList[trict] = BR;
-					trict++;
-					pusTriList[trict] = UR;
-					trict++;
-					pusTriList[trict] = BL;
-					trict++;
-
-					//UtilDebugString("Bot Triangle %i %i %i", pusTriList[trict - 3], pusTriList[trict - 2], pusTriList[trict - 1])
-					
-					/*
-					*	0	|	1	|	2 
-					* 	3	|	4	|	5
-					* 	6	|	7	|	8
-					* 013
-					* 134
-					* 124
-					* 245
-					* 346
-					* 467
-					* 457
-					* 578
-					* 
-					* 
-					* 
-					* 	0	|	1	|	2   ... | 64
-					* 	65	|	66	|	67  ... | 128
-					* 	...	|	...	|	... ... | ...
-					* 	4031|	4032|	4033... | 4095
-					*/
-					pkNormal[PosCount] = World::ms_kUpDir;
-					pkColor[PosCount] = NiColorA(0.0f, 1.0f, 0.0f, 1.0f);
-					PosCount++;
-
-					pkNormal[PosCount] = World::ms_kUpDir;
-					pkColor[PosCount] = NiColorA(0.0f, 1.0f, 0.0f, 1.0f);
-					PosCount++;
+						pusTriList[trict] = UR;
+						trict++;
+						pusTriList[trict] = BR;
+						trict++;
+						pusTriList[trict] = BL;
+						trict++;
+					}
+					i++;
 				}
 			}
 			NiTriShapeData* data = NiNew NiTriShapeData(Vertices, TerrainBlock, pkNormal, pkColor, pkTexture, usNumTextureSets, eNBTMethod, usTriangles, pusTriList);
 			NiTriShape* Shape = NiNew NiTriShape(data);
-			char TexturePath[256];
-			sprintf(TexturePath, "%s%s", "..\\..\\..\\", _IniFile.LayerList[0]->DiffuseFileName);
-			UtilDebugString("TexturePath %s", TexturePath)
-			NiTexturingPropertyPtr prop = NiNew NiTexturingProperty("E:\\VM\\Gamebryo\\MemoriaV2TestServer\\resmap\\field\\Rou\\grasst1.dds");
-			Shape->AttachProperty(prop);
+
+			NiPixelDataPtr pixldata;
+			NiImageConverter* conv = NiImageConverter::GetImageConverter();
+			NiPixelData* ReadImage = conv->ReadImageFile("E:\\VM\\Gamebryo\\\MemoriaV2TestServer\\resmap\\fieldtexture\\L1_A.BMP", 0);
+			pixldata = NiNew NiPixelData(ReadImage->GetWidth(), ReadImage->GetHeight(), NiPixelFormat::RGBA32,1,1);
+			NiTexture::FormatPrefs kPrefs;
+			kPrefs.m_eAlphaFmt = NiTexture::FormatPrefs::AlphaFormat::ALPHA_DEFAULT;
+			kPrefs.m_ePixelLayout = NiTexture::FormatPrefs::PixelLayout::TRUE_COLOR_32;
+			kPrefs.m_eMipMapped = NiTexture::FormatPrefs::MipFlag::YES;
+
+			NiSourceTexturePtr BlendTexture = NiSourceTexture::Create(pixldata, kPrefs);
+			NiSourceTexturePtr BaseTexture = NiSourceTexture::Create("E:\\VM\\Gamebryo\\\MemoriaV2TestServer\\resmap\\field\\Rou\\grasst1.dds",kPrefs,true,true);
+			
+			NiTexturingProperty::ShaderMap* BaseTextureMap = NiNew NiTexturingProperty::ShaderMap(BaseTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
+			BaseTextureMap->SetID(0);
+			NiTexturingProperty::ShaderMap* BlendTextureMap = NiNew NiTexturingProperty::ShaderMap(BlendTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
+			BlendTextureMap->SetID(1);
+			NiTexturingProperty* pkTP = NiNew NiTexturingProperty();
+			NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
+
+			alphaprop->SetDestBlendMode(NiAlphaProperty::ALPHA_ZERO);
+			
+			BaseTextureMap->SetTexture(BaseTexture);
+			BlendTextureMap->SetTexture(BlendTexture);
+
+			pkTP->SetShaderMap(0, BaseTextureMap);
+			pkTP->SetShaderMap(1, BlendTextureMap);
+			NiTexturingProperty::Map* NormalMap = NiNew NiTexturingProperty::Map();
+			NormalMap->SetFilterMode(NiTexturingProperty::FILTER_BILERP_MIPNEAREST);
+			pkTP->SetBaseMap(NormalMap);
+			pkTP->SetApplyMode(NiTexturingProperty::APPLY_DECAL); //APPLY_MODULATE
+			pkTP->SetBaseClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
+			pkTP->SetBaseFilterMode(NiTexturingProperty::FILTER_NEAREST);
+			//pkTP->SetBaseTexture(BaseTexture);
+
+			Shape->AttachProperty(pkTP);
+			Shape->AttachProperty(alphaprop);
+			
+			
+			NiShaderFactory* ptr = NiShaderFactory::GetInstance();
+
+			if (!ptr)
+				MessageBoxA(0, "Shader NiShaderFactory* ptr Error", "Error", 0);
+			NiShader* shader = ptr->RetrieveShader("PgTerrain",0);
+			if(!shader)
+				MessageBoxA(0, "Shader PgTerrain Search Error", "Error", 0);
+			Shape->SetShader(shader);
+			Shape->StoreNormalBinormalTangent(NiGeometryData::DataFlags::NBT_METHOD_ATI);
+			Shape->CreateNormals(true);
+			Shape->CalculateNormals();
+			
+			UtilDebugString("Done Texture");
+
+			Shape->Update(0.0);
+			Shape->UpdateEffects();
+			Shape->UpdateProperties();
 			Shape->Update(0.0);
 			if (!terrain)
 				terrain = NiNew NiNode;
 			terrain->AttachChild(Shape);
+		}
+	}
+}
+
+void EditorScene::FixSupTexturing(NiNode* obj) 
+{
+	if (obj->GetChildCount() >= 0) 
+	{
+		for (int i = 0; i < obj->GetChildCount(); i++)
+		{
+			NiAVObject* AVObj = obj->GetAt(i);
+			if (AVObj->IsKindOf(&NiNode::ms_RTTI))
+				FixSupTexturing((NiNode*)AVObj);
+			else if (AVObj->IsKindOf(&NiTriShape::ms_RTTI)) 
+			{
+				NiTriShape* shape = (NiTriShape*)AVObj;
+				NiTexturingProperty* prop = (NiTexturingProperty*)shape->GetProperty(NiProperty::TEXTURING);
+				NiTexturingProperty::ShaderMap* map = prop->GetShaderMap(0);
+				NiTexture* text = map->GetTexture();
+				if(!text->IsKindOf(&NiSourceTexture::ms_RTTI))
+					MessageBoxA(0, "No SourceTexture", "Error", 0);
+				else
+				{
+					NiSourceTexture* stext = (NiSourceTexture*)text;
+					MessageBoxA(0, stext->GetFilename(), "Info", 0);
+					NiTexture::FormatPrefs kPrefs;
+					kPrefs.m_eAlphaFmt = NiTexture::FormatPrefs::AlphaFormat::ALPHA_DEFAULT;
+					kPrefs.m_ePixelLayout = NiTexture::FormatPrefs::PixelLayout::TRUE_COLOR_32;
+					kPrefs.m_eMipMapped = NiTexture::FormatPrefs::MipFlag::YES;
+					NiSourceTexturePtr BaseTexture = NiSourceTexture::Create("E:\\VM\\Gamebryo\\\MemoriaV2TestServer\\resmap\\field\\Rou\\grasst1.dds", kPrefs, true, true);
+					NiTexturingProperty* NewProp = NiNew NiTexturingProperty();
+					NewProp->SetBaseTexture(BaseTexture);
+					shape->DetachProperty(prop);
+					shape->AttachProperty(NewProp);
+				}
+				//NiTexturingProperty* NewProp = NiNew NiTexturingProperty;
+				//NewProp->SetBaseTexture(text);
+				//NiDelete prop;
+			}
 		}
 	}
 }

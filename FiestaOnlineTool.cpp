@@ -17,6 +17,23 @@
 
 #include <Windows.h>
 #include "StartScene.h"
+
+#include <NiD3DShaderProgramFactory.h>
+
+#define _LIB
+#include <NSBShaderLib.h>
+#include <NSFParserLib.h>
+#include <NiD3DXEffectShaderLib.h>
+#undef _LIB
+
+#if defined(WIN32)
+#pragma comment(lib, "NiBinaryShaderLibDX9.lib")
+#pragma comment(lib, "NiD3D10BinaryShaderLibD3D10.lib")
+#pragma comment(lib, "NSBShaderLibDX9.lib")
+#pragma comment(lib, "NSFParserLibDX9.lib")
+#pragma comment(lib, "NiD3DXEffectShaderLibDX9.lib")
+#endif
+
 int PgWinMgr::iScreenLeftPos;
 int PgWinMgr::iScreenRightPos;
 
@@ -63,7 +80,7 @@ bool FiestaOnlineTool::Initialize()
     cursor = NiCursor::Create(this->m_spRenderer, kRect, NiCursor::IMMEDIATE, 8, 10, ".\\FiestaOnlineTool\\NorCursor.tga");
     cursor->SetPosition(0.0f, 320, 240);
     cursor->Show(true);
-    ShowCursor(false);
+    ShowCursor(true);
 
     Pgg_kWinMgr = NiNew PgWinMgr;
     Pgg_kWinMgr->PgInit(m_spRenderer);
@@ -73,6 +90,7 @@ bool FiestaOnlineTool::Initialize()
     m_spScene->UpdateEffects();
     m_spCamera->Update(0.0f);
 
+    Engine3D::Init(NULL);
 
     return true;
 }
@@ -326,4 +344,58 @@ void FiestaOnlineTool::DrawCursor()
     ScreenToClient(this->GetRenderWindowReference(), &kPoint);
     _Tool->cursor->SetPosition(0.0, kPoint.x + 5, kPoint.y + 9);
     cursor->Draw();
+}
+
+void Engine3D::ShaderRunParserCallback(const char* pcLibFile, NiRenderer* pkRenderer, const char* pcDirectory, bool bRecurseSubFolders) 
+{
+    NSFParserLib_RunShaderParser(pcDirectory, bRecurseSubFolders);
+}
+BOOL Engine3D::ShaderClassCreateCallback(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char** apcDirectories, bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary) 
+{
+    *ppkLibrary = 0;
+    return NSBShaderLib_LoadShaderLibrary(pkRenderer, iDirectoryCount, apcDirectories, bRecurseSubFolders, ppkLibrary);
+}
+bool Engine3D::FXLibraryClassCreate(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char** apcDirectories, bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary)
+{
+    *ppkLibrary = 0;
+    return NiD3DXEffectShaderLib_LoadShaderLibrary(
+        pkRenderer,
+        iDirectoryCount,
+        apcDirectories,
+        bRecurseSubFolders,
+        ppkLibrary);
+}
+bool Engine3D::GetEnableCarToon() 
+{
+    bool result = 0; // al
+
+    //if (Engine3D::ms_spToonExtraData.m_pObject)
+    //    result = Engine3D::ms_spToonExtraData.m_pObject->m_bOn;
+    return result;
+}
+void Engine3D::EnableCarToon(bool bEnable)
+{
+    //if (Engine3D::ms_spToonExtraData.m_pObject)
+    //    Engine3D::ms_spToonExtraData.m_pObject->m_bOn = bEnable;
+}
+bool Engine3D::Terminate() { return true; }
+char Engine3D::Init(NiCamera* pkCamera) 
+{
+    NiShaderFactory::RegisterRunParserCallback((unsigned int(__cdecl*)(const char*, NiRenderer*, const char*, bool))Engine3D::ShaderRunParserCallback);
+    NiShaderFactory::RegisterClassCreationCallback((bool(__cdecl*)(const char*, NiRenderer*, int, char**, bool, NiShaderLibrary**))Engine3D::ShaderClassCreateCallback);
+    NiShaderFactory::RegisterErrorCallback(ShaderErrorCallback);
+    NiD3DShaderProgramFactory* factory = NiD3DShaderProgramFactory::GetInstance();
+    char acFolder[] = ".\\shader\\";
+    char* pacShaderDir[2];
+    pacShaderDir[0] = acFolder;
+    pacShaderDir[1] = 0;
+    factory->AddProgramDirectory(pacShaderDir[0]);
+    if (!NiShaderFactory::LoadAndRunParserLibrary(0, acFolder, 1))
+        MessageBoxA(0, "LoadAndRunParserLibrary 1", "Error", 0);
+    if (!NiShaderFactory::LoadAndRegisterShaderLibrary(0, 1, pacShaderDir, 1))
+        MessageBoxA(0, "LoadAndRunParserLibrary 2", "Error", 0);
+    NiShaderFactory::RegisterClassCreationCallback(Engine3D::FXLibraryClassCreate);
+    if (!NiShaderFactory::LoadAndRegisterShaderLibrary(0, 1, pacShaderDir, 1))
+        MessageBoxA(0, "LoadAndRunParserLibrary 3", "Error", 0);
+    return 1;
 }
