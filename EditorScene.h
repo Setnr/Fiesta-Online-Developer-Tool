@@ -45,8 +45,12 @@ public:
 	void Print()
 	{
 		UtilDebugString("HeightFileName: %s LayerCount: %i", HeightFileName, LayerList.size())
-			for (int i = 0; i < LayerList.size(); i++)
-				UtilDebugString("Name: %s", LayerList.at(i)->Name)
+		for (int i = 0; i < LayerList.size(); i++)
+		{
+			UtilDebugString("Name: %s", LayerList.at(i)->Name)
+			UtilDebugString("DiffuseFileName: %s", LayerList.at(i)->DiffuseFileName)
+			UtilDebugString("BlendFileName: %s", LayerList.at(i)->BlendFileName)
+		}
 				
 	}
 };

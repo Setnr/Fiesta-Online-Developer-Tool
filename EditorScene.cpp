@@ -169,7 +169,8 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 			}
 			
 			NiNode* AddingObj = NiNew NiNode;
-			AddingObj->AttachChild((NiNode*)obj->Clone());
+			//AddingObj->AttachChild((NiNode*)obj->Clone());
+			AddingObj->AttachChild(obj);
 			AddingObj->SetTranslate(point);
 			AddingObj->SetRotate(quater);
 			AddingObj->SetScale(Scale);
@@ -212,7 +213,7 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	NiNodePtr NiN;
 	PgUtil::LoadTerrainNif("E:\\VM\\Gamebryo\\MemoriaV2TestServer\\ClearTerrain.nif",&NiN, 0);
 	FixSupTexturing(NiN);
-	kWorld.AttachGroundTerrain(NiN);
+	//kWorld.AttachGroundTerrain(NiN);
 
 	BaseNode->AttachChild(kWorld.GetWorldScene());
 	BaseNode->UpdateEffects();
@@ -234,7 +235,6 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 
 NiNode* EditorScene::LoadTerrain()
 {
-	return NULL;
 	terrain = NULL;
 	char RowBuffer[256];
 	NiString CleanPath = _FilePath.GetSubstring(0, ".");
@@ -308,7 +308,7 @@ NiNode* EditorScene::LoadTerrain()
 			}
 		}
 	}
-
+	
 	for (int _BlockX = 0; _BlockX < BlockX; _BlockX++)
 	{
 		for (int _BlockY = 0; _BlockY < BlockY; _BlockY++)
@@ -321,9 +321,9 @@ NiNode* EditorScene::LoadTerrain()
 			NiPoint3* pkNormal = NiNew NiPoint3[usTriangles];
 			NiColorA* pkColor = NiNew NiColorA[usTriangles];
 
-			NiPoint2* pkTexture =   NiNew NiPoint2[2 * (_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh + 1)];
-			memset(pkTexture, 0xFF, 2 * (_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh + 1) * sizeof(NiPoint2));
-			unsigned short usNumTextureSets = 2;
+			NiPoint2* pkTexture = NULL;//  NiNew NiPoint2[2 * (_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh + 1)];
+			//memset(pkTexture, 0xFF, 2 * (_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh + 1) * sizeof(NiPoint2));
+			unsigned short usNumTextureSets = 0;
 
 			NiGeometryData::DataFlags eNBTMethod = NiGeometryData::DataFlags::NBT_METHOD_NONE;
 
@@ -430,7 +430,7 @@ NiNode* EditorScene::LoadTerrain()
 			Shape->Update(0.0);
 			if (!terrain)
 				terrain = NiNew NiNode;
-			terrain->AttachChild(Shape);
+			//terrain->AttachChild(Shape);
 		}
 	}
 }
@@ -538,8 +538,10 @@ void IniFile::Load(FILE* Ini)
 
 	while (true) 
 	{
+		memset(Type, 0, sizeof(Type));
 		if (LoadLine(Ini, Type, DeadChar, Info)) 
 		{
+			UtilDebugString("Name %s",Type);
 			if (NiString(Type) == "#END_FILE")
 				break;
 			if (NiString(Type) == "#Layer")
@@ -564,19 +566,37 @@ void IniFile::LoadLayer(FILE* Ini)
 	char Type[256];
 	char DeadChar[256];
 	char Info[256];
-	int ct = 0;
+	char InfoFixer[256];
+	char FileNamePathFixer[256];
 	Layer* _Layer = new Layer;;
 	while (true)
 	{
-		if (LoadLine(Ini, Type, DeadChar, Info))
-			ct++;
+		LoadLine(Ini, Type, InfoFixer, DeadChar);
 
+		if (NiString(Type) == "{")
+			continue;
+		if (NiString(Type) == "}")
+			break;
+		strcpy(Info, &InfoFixer[1]);
 		if (NiString(Type) == "#Name")
+		{
+			UtilDebugString("Name");
 			_Layer->Name = Info;
+		}
 		if (NiString(Type) == "#DiffuseFileName")
-			_Layer->DiffuseFileName = Info;
+		{
+			UtilDebugString("DiffuseFileName");
+			strcpy(FileNamePathFixer, &Info[1]);
+			FileNamePathFixer[strlen(FileNamePathFixer) - 1] = 0x0;
+			_Layer->DiffuseFileName = FileNamePathFixer;
+		}
 		if (NiString(Type) == "#BlendFileName")
-			_Layer->BlendFileName = Info;
+		{
+			UtilDebugString("BlendFileName");
+			strcpy(FileNamePathFixer, &Info[1]);
+			FileNamePathFixer[strlen(FileNamePathFixer) - 1] = 0x0;
+			_Layer->BlendFileName = FileNamePathFixer;
+		}
 
 
 		if (NiString(Type) == "#StartPos_X")
@@ -593,8 +613,6 @@ void IniFile::LoadLayer(FILE* Ini)
 		if (NiString(Type) == "#UVScaleBlend")
 			_Layer->UVScaleBlend = atof(Info);
 
-		if (ct > 8)
-			break;
 	}
 	LayerList.push_back(_Layer);
 }
