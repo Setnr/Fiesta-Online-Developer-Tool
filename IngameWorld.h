@@ -234,6 +234,13 @@ public:
 		m_spGroundObjectCollidee->UpdateEffects();
 		m_spGroundObjectCollidee->Update(0.0);
 	}
+	void AttachGroundTerrain(NiNode* obj) 
+	{
+		m_spGroundObject->AttachChild(obj, 1);
+		m_spGroundObject->UpdateProperties();
+		m_spGroundObject->UpdateEffects();
+		m_spGroundObject->Update(0.0);
+	}
 	NiNode* GetWorldScene() {
 		return m_spWorldScene;
 	}

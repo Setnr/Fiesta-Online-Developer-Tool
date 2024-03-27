@@ -55,6 +55,10 @@ class EditorScene : public FiestaScene
 {
 public:
 	EditorScene(NiString FilePath, NiString FileName);
+	~EditorScene() {
+		if (_Thread)
+			NiDelete _Thread;
+	}
 	bool SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamerea) 
 	{
 		m_spScene = BaseNode;

@@ -104,5 +104,23 @@ public:
         return true;
 
     }
+    static bool LoadTerrainNif(const char* File, NiNodePtr* spNode, NiTexturePalette* /*Currently Unused */)
+    {
+        bool oldFlag = NiSourceTexture::GetDestroyAppDataFlag();
+        NiSourceTexture::SetDestroyAppDataFlag(true);
+        NiStream kStream;
+        bool bLoaded = kStream.Load(File);
+        NiSourceTexture::SetDestroyAppDataFlag(oldFlag);
+        NIASSERT(bLoaded)
+        if (kStream.GetObjectCount() != 1)
+        {
+            UtilDebugString("k Stream has to much root objects")
+            return NULL;
+        }
+        NiObject* obj = kStream.GetObjectAt(0);
+        if (obj->IsKindOf(&NiNode::ms_RTTI))
+            *spNode = (NiNode*)obj;
+        return true;
 
+    }
 };
