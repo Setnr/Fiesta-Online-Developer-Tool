@@ -43,8 +43,13 @@ int PgWinMgr::iScreenHeight;
 int PgWinMgr::iScreenTopPos;
 int PgWinMgr::iScreenBottomPos;
 
+char PgUtil::FolderPath[512];
+
 FiestaOnlineTool* FiestaOnlineTool::_Tool = NULL;
-NiApplication* NiApplication::Create() {
+NiApplication* NiApplication::Create() 
+{
+    GetCurrentDirectoryA(sizeof(PgUtil::FolderPath), PgUtil::FolderPath);
+    NiSourceTexture::SetDestroyAppDataFlag(false);
     return NiNew FiestaOnlineTool;
 }
 

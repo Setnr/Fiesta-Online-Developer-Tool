@@ -13,8 +13,135 @@ public:
 	class Layer
 	{
 	public:
-		Layer() {}
+		struct RGBColor {
+		public:
+			RGBColor(unsigned char _r, unsigned char _g, unsigned char _b) {
+				r = _r;
+				g = _g;
+				b = _b;
+			}
+			RGBColor(unsigned char c) {
+				r = c;
+				g = c;
+				b = c;
+			}
+			bool operator==(const RGBColor& c)
+			{
+				return c.b == b && c.g == g && c.r == r;
+			}
+			unsigned char r;
+			unsigned char g;
+			unsigned char b;
+		};
+		struct RGBAColor {
+		public:
+			RGBAColor(unsigned char _r, unsigned char _g, unsigned char _b, unsigned char _a) {
+				r = _r;
+				g = _g;
+				b = _b;
+				a = _a;
+			}
+			RGBAColor(RGBColor c) {
+				r = c.r;
+				g = c.g;
+				b = c.b;
+				a = 0xFF;
+			}
+			RGBAColor(unsigned char c) {
+				r = c;
+				g = c;
+				b = c;
+				a = c;
+			}
+			bool operator==(const RGBAColor& c)
+			{
+				return c.a == a && c.b == b && c.g == g && c.r == r;
+			}
+			bool operator!=(const RGBAColor& c)
+			{
+				return c.a != a || c.b != b || c.g != g || c.r != r;
+			}
+			bool operator>(const RGBColor& c)
+			{
+				return r > c.r && g > c.g && b > c.b;
+			}
+			bool operator==(const RGBColor& c)
+			{
+				return c.b == b && c.g == g && c.r == r;
+			}
+			bool operator!=(const RGBColor& c)
+			{
+				return c.b != b || c.g != g || c.r != r;
+			}
+			unsigned char r;
+			unsigned char g;
+			unsigned char b;
+			unsigned char a;
+		};
 
+		Layer() {}
+		void CreateTexture() 
+		{
+			NiImageConverter* conv = NiImageConverter::GetImageConverter();
+
+			char acFileName[513];
+			PgUtil::CreateFullFilePathFromBaseFolder(acFileName, BlendFileName);
+			UtilDebugString("BlendFileName for Texture %s", acFileName);
+
+			NiPixelData* ReadImage = conv->ReadImageFile(acFileName, 0);
+			if (ReadImage->GetPixelFormat() != NiPixelFormat::RGB24)
+			{
+				UtilDebugString("BlendFileName for Texture %s", acFileName)
+				UtilDebugString("NiPixelFormat %i", ReadImage->GetPixelFormat())
+				NiMessageBox::DisplayMessage("NiPixelData From ReadImage in Layer::CreateTexture Has Wrong NiPixelFormat", "Error");
+			}
+			
+			pixldata = NiNew NiPixelData(ReadImage->GetWidth(), ReadImage->GetHeight(), NiPixelFormat::RGBA32);
+			RGBAColor* PixelColorA = (RGBAColor*)pixldata->GetPixels();
+			RGBColor* PixelColor = (RGBColor*)ReadImage->GetPixels();
+			if (ReadImage->GetSizeInBytes() / sizeof(RGBColor) != pixldata->GetSizeInBytes() / sizeof(RGBAColor))
+			{
+				UtilDebugString("ReadImage Pixels %i | WriteImage Pixels %i", ReadImage->GetSizeInBytes() / sizeof(RGBColor), pixldata->GetSizeInBytes() / sizeof(RGBAColor))
+				NiMessageBox::DisplayMessage("Size MissMatch in Recreating NiPixelData for TerrainTexture", "Error");
+			}
+
+			for (int w = 0; w < ReadImage->GetWidth(); w++)
+			{
+				for (int h = 0; h < ReadImage->GetHeight(); h++)
+				{ 
+					int XPart = w;
+
+					int PreFullLines = ReadImage->GetWidth() * h;
+					int YPartNormal = PreFullLines;
+					int PointOffsetNormal = XPart + YPartNormal;
+
+					int YPartFlipped = ReadImage->GetWidth() * (ReadImage->GetHeight() - h - 1);
+					int PointOffsetFlipped = XPart + YPartFlipped;
+
+					PixelColorA[PointOffsetFlipped] = RGBAColor(PixelColor[PointOffsetNormal]);
+				}
+			}
+
+			UtilDebugString("NiPixelFormat %i", pixldata->GetPixelFormat());
+			NiTexture::FormatPrefs BasePref;
+			BasePref.m_ePixelLayout = NiTexture::FormatPrefs::PixelLayout::PIX_DEFAULT;
+			BasePref.m_eMipMapped = NiTexture::FormatPrefs::MipFlag::MIP_DEFAULT;
+			BasePref.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
+
+			NiTexture::FormatPrefs BlendPref;
+			BlendPref.m_ePixelLayout = NiTexture::FormatPrefs::PixelLayout::TRUE_COLOR_32;
+			BlendPref.m_eMipMapped = NiTexture::FormatPrefs::MipFlag::YES;
+			BlendPref.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
+
+			BlendTexture = NiSourceTexture::Create(pixldata, BlendPref);
+
+			
+			PgUtil::CreateFullFilePathFromBaseFolder(acFileName, DiffuseFileName);
+			UtilDebugString("DiffuseFileName for Texture %s", acFileName);
+			BaseTexture = NiSourceTexture::Create(acFileName,BasePref);
+			if (BaseTexture == NULL)
+				NiMessageBox::DisplayMessage("BaseTexture is Nullptr", "");
+		}
 		NiString Name;
 		NiString DiffuseFileName;
 		NiString BlendFileName;
@@ -24,6 +151,10 @@ public:
 		float Height;
 		float UVScaleDiffuse;
 		float UVScaleBlend;
+
+		NiPixelData* pixldata;
+		NiSourceTexture* BlendTexture;
+		NiSourceTexture* BaseTexture;
 	};
 	NiString FileType;
 	float Version;
@@ -62,6 +193,8 @@ public:
 	~EditorScene() {
 		if (_Thread)
 			NiDelete _Thread;
+		if (_procedure)
+			NiDelete _procedure;
 	}
 	bool SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamerea) 
 	{
@@ -110,7 +243,7 @@ private:
 			return false;
 		}
 		sscanf(acFileBuff, "%s", acTempText);
-		sprintf(acFileName, "%s%s", "..\\..\\..\\", acTempText);
+		PgUtil::CreateFullFilePathFromBaseFolder(acFileName, acTempText);
 		return true;
 	}
 	bool LoadGlobalMapObject(FILE* file, char* acFileBuff, char* acTempText, const char* ObjName, float* one, float* two, float* three)
@@ -153,7 +286,7 @@ private:
 		return true;
 	}
 	
-	bool LoadObjectPositoon(FILE* file, char* acFileBuff, char* acTempText, NiPoint3* kPoint, NiQuaternion* quater, float* scale)
+	bool LoadObjectPosition(FILE* file, char* acFileBuff, char* acTempText, NiPoint3* kPoint, NiQuaternion* quater, float* scale)
 	{
 		if (!fgets(acFileBuff, 256, file))
 		{
@@ -209,6 +342,11 @@ private:
 	
 	void FixSupTexturing(NiNode* obj);
 
+	void LoadBeforeObjects(FILE* file);
+	void LoadObjects(FILE* file);
+	void LoadAfterObjects(FILE* file);
+
+
 	World kWorld;
 	NiColor BackgroundColor;
 
@@ -219,6 +357,9 @@ private:
 	NiString _FileName;
 	IniFile _IniFile;
 	NiNodePtr terrain;
+
+	std::map<NiTexture*, NiTexturingProperty::ShaderMap*> BaseTextureSafeMap;
+	std::map<NiTexture*, NiTexturingProperty::ShaderMap*> BlendTextureSafeMap;
 };
 
 

@@ -236,13 +236,16 @@ public:
 	}
 	void AttachGroundTerrain(NiNode* obj) 
 	{
-		m_spGroundObject->AttachChild(obj, 1);
-		m_spGroundObject->UpdateProperties();
-		m_spGroundObject->UpdateEffects();
-		m_spGroundObject->Update(0.0);
+		m_spGroundTerrain->AttachChild(obj, 1);
+		m_spGroundTerrain->UpdateProperties();
+		m_spGroundTerrain->UpdateEffects();
+		m_spGroundTerrain->Update(0.0);
 	}
 	NiNode* GetWorldScene() {
 		return m_spWorldScene;
+	}
+	NiNode* GetTerrainScene() {
+		return m_spGroundTerrain;
 	}
 	NiNode* GetSkyNode() {
 		return m_spSkyScene;

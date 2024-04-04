@@ -3,7 +3,7 @@
 #include <NiCamera.h>
 #include <NiSourceTexture.h>
 
-#define UtilDebugString(pcText, ...)  { char acTemp[512]; NiSprintf(acTemp, sizeof(acTemp), pcText, __VA_ARGS__); NiOutputDebugString(acTemp);}
+#define UtilDebugString(pcText, ...)  { char acTemp[1025]; NiSprintf(acTemp, sizeof(acTemp), pcText, __VA_ARGS__); NiOutputDebugString(acTemp);}
 class PgUtil 
 {
 public:
@@ -86,11 +86,8 @@ public:
     }
     static bool LoadNodeNifFile(const char* File, NiNodePtr* spNode,  NiTexturePalette* /*Currently Unused */)
     {
-        bool oldFlag = NiSourceTexture::GetDestroyAppDataFlag();
-        NiSourceTexture::SetDestroyAppDataFlag(false);
         NiStream kStream;
         bool bLoaded = kStream.Load(File);
-        NiSourceTexture::SetDestroyAppDataFlag(oldFlag);
         NIASSERT(bLoaded)
         if (kStream.GetObjectCount() != 1) 
         {
@@ -107,7 +104,7 @@ public:
     static bool LoadTerrainNif(const char* File, NiNodePtr* spNode, NiTexturePalette* /*Currently Unused */)
     {
         bool oldFlag = NiSourceTexture::GetDestroyAppDataFlag();
-        NiSourceTexture::SetDestroyAppDataFlag(true);
+        NiSourceTexture::SetDestroyAppDataFlag(false);
         NiStream kStream;
         bool bLoaded = kStream.Load(File);
         NiSourceTexture::SetDestroyAppDataFlag(oldFlag);
@@ -121,6 +118,23 @@ public:
         if (obj->IsKindOf(&NiNode::ms_RTTI))
             *spNode = (NiNode*)obj;
         return true;
-
     }
+
+    static bool CreateFullFilePathFromBaseFolder(char* FilePath,const char* File) 
+    { 
+        char FileHelper[256];
+        bool ret = false;
+        if(File[0] == '.')
+        {
+            strcpy(FileHelper, &File[1]);
+            ret = sprintf(FilePath, "%s%s", PgUtil::FolderPath, FileHelper);
+        }
+        else 
+        {
+            ret = sprintf(FilePath, "%s\\%s", PgUtil::FolderPath, File);
+        }
+        UtilDebugString("Created FilePath %s from %s", FilePath, File);
+        return ret;
+    }
+    static char FolderPath[512];
 };

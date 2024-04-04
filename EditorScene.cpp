@@ -2,6 +2,7 @@
 #include <NiMain.h>
 #include "PgUtil.h"
 #include <NiApplication.h>
+#include <NiD3DShaderFactory.h>
 EditorScene::EditorScene(NiString FilePath, NiString FileName) 
 {
 
@@ -32,164 +33,12 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	{
 		EditorSceneError("Failed to open SHMDFile")
 	}
-	char acFileBuff[256];
-	char acFileName[256];
-	char acTempText[256];
-	if (!fgets(acFileBuff, 256, file))
-	{
-		EditorSceneError("Failed to Read SHMDFile")
-	}
-	sscanf(acFileBuff, "%s", acTempText);
-	if (strcmp(acTempText, "shmd0_5"))
-	{
-		EditorSceneError("Wrong Version of SHMDFile")
-	}
-	int Counter;
-	if (!GetObjectCountLine(file, acFileBuff, acTempText, "Sky", &Counter))
-	{
-		EditorSceneError("Failed Loading Sky Count")
-	}
-	if (Counter)
-	{
-		if(LoadObjectNifFile(file, acFileBuff, acTempText, acFileName))
-		{
-			char buf[1024];
-			GetCurrentDirectoryA(sizeof(buf), buf);
-			NiNodePtr sky;
-			PgUtil::LoadNodeNifFile(acFileName, &sky, NULL);
-			kWorld.AttachSky(sky);
-		}
-		else 
-		{
-			EditorSceneError("Failed Loading Sky Path")
-		}
-	}
-	if (!GetObjectCountLine(file, acFileBuff, acTempText, "Water", &Counter))
-	{
-		EditorSceneError("Failed Loading Water Count")
-	}
-	if (Counter) 
-	{
-		for (int i = 0; i < Counter; i++) 
-		{
-			if (LoadObjectNifFile(file, acFileBuff, acTempText, acFileName))
-			{
-				NiNodePtr water;
-				PgUtil::LoadNodeNifFile(acFileName, &water, NULL);
-				kWorld.AttachWater(water);
-			}
-			else
-			{
-				EditorSceneError("Failed Loading Water Path")
-			}
-		}
-	}
-	if (!GetObjectCountLine(file, acFileBuff, acTempText, "GroundObject", &Counter))
-	{
-		EditorSceneError("Failed Loading GroundObject Count")
-	}
-	if (Counter)
-	{
-		for (int i = 0; i < Counter; i++)
-		{
-			if (LoadObjectNifFile(file, acFileBuff, acTempText, acFileName))
-			{
-				NiNodePtr groundobject;
-				PgUtil::LoadNodeNifFile(acFileName, &groundobject, NULL);
-				kWorld.AttachGroundObj(groundobject);
-			}
-			else
-			{
-				EditorSceneError("Failed Loading GroundObject Path")
-			}
-		}
-	}
-	float depth;
-	float red;
-	float green;
-	float blue;
-	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "GlobalLight", &red, &green, &blue)) 
-	{
-		EditorSceneError("Failed Loading GlobalLight")
-	}
-
-	kWorld.SetAmbientLightAmbientColor(NiColor(red, green, blue));
-
-	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "Fog", &depth, &red, &green, &blue)) 
-	{
-		EditorSceneError("Failed Loading Fog")
-	}
-
-	kWorld.SetFogColor(NiColor(red,green,blue));
-	kWorld.SetFogDepth(depth);
-
-	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "BackGroundColor", &red, &green, &blue))
-	{
-		EditorSceneError("Failed Loading BackGroundColor")
-	}
-	BackgroundColor.r = red;
-	BackgroundColor.g = green;
-	BackgroundColor.b = blue;
-
-	float Frustum;
-	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "Frustum", &Frustum))
-	{
-		EditorSceneError("Failed Loading Frustum")
-	}
-	kWorld.SetFarFrumstum(Frustum);
-	while (true) 
-	{
-		if (!fgets(acFileBuff, 256, file))
-		{
-			EditorSceneError("Failed Loading ObjectDataStream")
-		}
-		sscanf(acFileBuff, "%s", acTempText);
-		if (!strcmp(acTempText, "DataObjectLoadingEnd"))
-		{
-			UtilDebugString("Found End of Data with DataObjectLoadingEnd")
-			break;
-		}
-		sscanf(acFileBuff, "%s %d", acTempText, &Counter);
-		sprintf(acFileName, "%s%s", "..\\..\\..\\", acTempText);
-
-		NiNodePtr obj;
-		PgUtil::LoadNodeNifFile(acFileName, &obj, NULL);
-
-		if(!obj)
-			UtilDebugString("Failed to Load Map Data Object %s ", acFileName)
-		NiPoint3 point;
-		NiQuaternion quater;
-		
-		float Scale;
-		for (int i = 0; i < Counter; i++) 
-		{
-			if (!LoadObjectPositoon(file, acFileBuff, acTempText, &point, &quater, &Scale)) 
-			{
-				EditorSceneError("Failed Loading Object Positon")
-			}
-			
-			NiNode* AddingObj = NiNew NiNode;
-			//AddingObj->AttachChild((NiNode*)obj->Clone());
-			AddingObj->AttachChild(obj);
-			AddingObj->SetTranslate(point);
-			AddingObj->SetRotate(quater);
-			AddingObj->SetScale(Scale);
-			kWorld.AttachGroundCollidee(AddingObj);
-		}
-	}
-	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "DirectionLightAmbient", &red, &green, &blue))
-	{
-		EditorSceneError("Failed Loading DirectionLightAmbient")
-	}
-	kWorld.SetMapDirectionalLightAmbientColor(NiColor(red,green,blue));
-
-	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "DirectionLightDiffuse", &red, &green, &blue))
-	{
-		EditorSceneError("Failed Loading DirectionLightDiffuse")
-	}
-
-	kWorld.SetMapDirectionalLightDiffuseColor(NiColor(red, green, blue));
-
+	
+	LoadBeforeObjects(file);
+	LoadObjects(file);
+	LoadAfterObjects(file);
+	
+	
 	Camera = kWorld.GetCamera();
 	Camera->SetTranslate(NiPoint3(5576, 5768, 2500));
 	Pitch = 1.57f * 2.0f;
@@ -210,9 +59,12 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	}
 	UtilDebugString("After Terrain")
 
-	NiNodePtr NiN;
-	PgUtil::LoadTerrainNif("E:\\VM\\Gamebryo\\MemoriaV2TestServer\\ClearTerrain.nif",&NiN, 0);
-	FixSupTexturing(NiN);
+	//NiNodePtr NiN;
+	//NiString CleanPath = _FilePath.GetSubstring(0, ".");
+	//NiString IniFile = CleanPath;
+	//IniFile.Insert(".sdt", CleanPath.Length());
+	//PgUtil::LoadTerrainNif(IniFile,&NiN, 0);
+	//FixSupTexturing(NiN);
 	//kWorld.AttachGroundTerrain(NiN);
 
 	BaseNode->AttachChild(kWorld.GetWorldScene());
@@ -223,12 +75,10 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	Camera->Update(0.0f);
 
 	UtilDebugString("Finished Loading World")
-	
+		
 	NiStream kStream;
-	kStream.InsertObject(kWorld.GetWorldScene());
-	//kStream.InsertObject(terrain);
-	//kStream.InsertObject(Camera);
-	kStream.Save("./TESTING.nif");
+	kStream.InsertObject(kWorld.GetTerrainScene());
+	kStream.Save("./TESTING123.nif");
 
 	return;
 }
@@ -236,7 +86,7 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 NiNode* EditorScene::LoadTerrain()
 {
 	terrain = NULL;
-	char RowBuffer[256];
+	char RowBuffer[513];
 	NiString CleanPath = _FilePath.GetSubstring(0, ".");
 	NiString IniFile = CleanPath;
 	IniFile.Insert(".ini", CleanPath.Length());
@@ -245,9 +95,10 @@ NiNode* EditorScene::LoadTerrain()
 		return NULL;
 	_IniFile.Load(Ini);
 	_IniFile.Print();
-	char HTDFilePath[256];
+
+	char HTDFilePath[513];
 	_IniFile.HeightFileName = _IniFile.HeightFileName.GetSubstring(1, _IniFile.HeightFileName.Length() - 1);
-	sprintf(HTDFilePath, "%s%s", "..\\..\\..\\", _IniFile.HeightFileName);
+	PgUtil::CreateFullFilePathFromBaseFolder(HTDFilePath, _IniFile.HeightFileName);
 	FILE* HTD =fopen(HTDFilePath, "rb");
 	if(!HTD)
 		UtilDebugString("Failed to open %s", HTDFilePath)
@@ -308,7 +159,164 @@ NiNode* EditorScene::LoadTerrain()
 			}
 		}
 	}
-	
+
+	for (int _BlockX = 0; _BlockX < BlockX; _BlockX++)
+	{
+		for (int _BlockY = 0; _BlockY < BlockY; _BlockY++)
+		{
+			for (int _Layer = 0; _Layer < _IniFile.LayerList.size(); _Layer++)
+			{
+				IniFile::Layer::RGBColor SplitColor(239);
+
+				IniFile::Layer* CurrentLayer = _IniFile.LayerList.at(_Layer);
+				NiPixelData* LayerData = CurrentLayer->pixldata;
+				if (LayerData->GetPixelFormat() != NiPixelFormat::RGBA32)
+				{
+					UtilDebugString("NiPixelFormat %i for Layer %i", LayerData->GetPixelFormat(), _Layer);
+					NiMessageBox::DisplayMessage("NiPixelData From Layer Has Wrong NiPixelFormat", "Error");
+				}
+
+				IniFile::Layer::RGBAColor* ColorArray = (IniFile::Layer::RGBAColor*)LayerData->GetPixels();
+				if (LayerData->GetSizeInBytes() < (_IniFile.HeightMap_height - 1) * (_IniFile.HeightMap_width - 1) * sizeof(IniFile::Layer::RGBAColor))
+				{
+					UtilDebugString("NiPixelDataLayerSize %i", LayerData->GetSizeInBytes());
+					NiMessageBox::DisplayMessage("NiPixelData From Layer Has Wrong Size", "Error");
+				}
+				int PixelCounter = 0;
+				for (int x = 0; x < _IniFile.QuadsWide; x++)
+				{
+					for (int y = 0; y < _IniFile.QuadsHigh; y++)
+					{
+						int PreBlockXPart = _BlockX * _IniFile.QuadsWide;
+						int CurrentBlockXPart = x;
+						int XPart = PreBlockXPart + CurrentBlockXPart;
+
+						int PreBlockYPart = _BlockY * _IniFile.QuadsHigh * LayerData->GetWidth();
+						int CurrentBlockYPart = LayerData->GetWidth() * y;
+						int YPart = PreBlockYPart + CurrentBlockYPart;
+
+						int PointOffset = XPart + YPart;
+						if (ColorArray[PointOffset] > SplitColor)
+						{
+							PixelCounter++;
+						}
+					}
+				}
+
+				UtilDebugString("Got PixelCounter %i for Layer %i and LayerName %s", PixelCounter, _Layer, CurrentLayer->Name);
+				if (PixelCounter < 1)
+					continue;
+
+
+
+				unsigned short Vertices = (_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh + 1);
+				unsigned short usTriangles = PixelCounter * 2;
+
+				NiPoint3* TerrainBlock = BlockArray[_BlockX + _BlockY * BlockX];
+
+				NiPoint3* pkNormal = NiNew NiPoint3[Vertices];
+				NiColorA* pkColor = NiNew NiColorA[Vertices];
+
+				NiPoint2* pkTexture = NULL;//  NiNew NiPoint2[2 * (_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh + 1)];
+				//memset(pkTexture, 0xFF, 2 * (_IniFile.QuadsWide + 1) * (_IniFile.QuadsHigh + 1) * sizeof(NiPoint2));
+				unsigned short usNumTextureSets = 0;
+
+				NiGeometryData::DataFlags eNBTMethod = NiGeometryData::DataFlags::NBT_METHOD_NONE;
+
+				unsigned short* pusTriList = (unsigned short*)NiNew NiPoint3[usTriangles];
+				memset(pusTriList, 0, usTriangles * 3 * 4);
+
+				int trict = 0;
+				for (int i = 0; i < Vertices; i++)
+				{
+					pkNormal[i] = World::ms_kUpDir;
+					pkColor[i] = NiColorA(1.00f, 1.00f, 1.00f, 1.0f);
+				}
+				for (int w = 0; w < _IniFile.QuadsWide; w++)
+				{
+					for (int h = 0; h < _IniFile.QuadsHigh; h++)
+					{
+						int PreBlockXPart = _BlockX * _IniFile.QuadsWide;
+						int CurrentBlockXPart = w;
+						int XPart = PreBlockXPart + CurrentBlockXPart;
+
+						int PreBlockYPart = _BlockY * _IniFile.QuadsHigh * LayerData->GetWidth();
+						int CurrentBlockYPart = LayerData->GetWidth() * h;
+						int YPart = PreBlockYPart + CurrentBlockYPart;
+
+						int PointOffset = XPart + YPart;
+
+						if (ColorArray[PointOffset] > SplitColor)
+						{
+
+							unsigned short BottomLeft = w + (h * (_IniFile.QuadsWide + 1));      // Upper left.
+							unsigned short BottomRight = (w + 1) + (h * (_IniFile.QuadsWide + 1));  // Upper rwght.
+							unsigned short TopLeft = BottomLeft + (_IniFile.QuadsWide + 1);          // Bottom left.
+							unsigned short TopRight = BottomRight + (_IniFile.QuadsWide + 1);      // Bottom right.
+
+
+							pusTriList[trict] = BottomLeft;
+							trict++;
+							pusTriList[trict] = BottomRight;
+							trict++;
+							pusTriList[trict] = TopLeft;
+							trict++;
+
+							pusTriList[trict] = TopLeft;
+							trict++;
+							pusTriList[trict] = BottomRight;
+							trict++;
+							pusTriList[trict] = TopRight;
+							trict++;
+						}
+					}
+				}
+				NiSourceTexturePtr BaseTexture = CurrentLayer->BaseTexture;
+				NiSourceTexturePtr BlendTexture = CurrentLayer->BlendTexture;
+
+				NiTriShapeData* data = NiNew NiTriShapeData(Vertices, TerrainBlock, pkNormal, pkColor, pkTexture, usNumTextureSets, eNBTMethod, usTriangles, pusTriList);
+				NiTriShape* Shape = NiNew NiTriShape(data);
+				NiTexturingProperty::ShaderMap* BaseTextureMap = NiNew NiTexturingProperty::ShaderMap(BaseTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
+				BaseTextureMap->SetID(0);
+				NiTexturingProperty::ShaderMap* BlendTextureMap = NiNew NiTexturingProperty::ShaderMap(BlendTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
+				BlendTextureMap->SetID(1);
+
+				NiTexturingProperty* pkTP = NiNew NiTexturingProperty();
+				NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
+
+				alphaprop->SetDestBlendMode(NiAlphaProperty::ALPHA_ZERO);
+
+				BaseTextureMap->SetTexture(BaseTexture);
+				BlendTextureMap->SetTexture(BlendTexture);
+
+				pkTP->SetShaderMap(0, BaseTextureMap);
+				pkTP->SetShaderMap(1, BlendTextureMap);
+				NiTexturingProperty::Map* NormalMap = NiNew NiTexturingProperty::Map();
+				NormalMap->SetFilterMode(NiTexturingProperty::FILTER_BILERP_MIPNEAREST);
+				NormalMap->SetClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
+				NormalMap->SetTexture(NULL);
+				pkTP->SetBaseMap(NormalMap);
+				pkTP->SetBaseClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
+
+				pkTP->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
+				Shape->AttachProperty(pkTP);
+				Shape->AttachProperty(alphaprop);
+
+				Shape->CalculateNormals();
+				
+				Shape->ApplyAndSetActiveMaterial("PgTerrain");
+
+				Shape->Update(0.0);
+				Shape->UpdateEffects();
+				Shape->UpdateProperties();
+				Shape->Update(0.0);
+				if (!terrain)
+					terrain = NiNew NiSortAdjustNode;
+				terrain->AttachChild(Shape);
+			}
+		}
+	}
+	return NULL;
 	for (int _BlockX = 0; _BlockX < BlockX; _BlockX++)
 	{
 		for (int _BlockY = 0; _BlockY < BlockY; _BlockY++)
@@ -446,30 +454,59 @@ void EditorScene::FixSupTexturing(NiNode* obj)
 				FixSupTexturing((NiNode*)AVObj);
 			else if (AVObj->IsKindOf(&NiTriShape::ms_RTTI)) 
 			{
-
 				NiTriShape* Shape = (NiTriShape*)AVObj;
+
 				NiTexturingProperty* prop = (NiTexturingProperty*)Shape->GetProperty(NiProperty::TEXTURING);
 				Shape->DetachAllProperties();
-				UtilDebugString("Start Create New Property");
+
 				NiTexture* BaseTexture = prop->GetShaderMap(0)->GetTexture();
 				NiTexture* BlendTexture = prop->GetShaderMap(1)->GetTexture();
 
-				UtilDebugString("Create ShaderMaps");
-				NiTexturingProperty::ShaderMap* BaseTextureMap = NiNew NiTexturingProperty::ShaderMap(BaseTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
-				BaseTextureMap->SetID(0);
-				NiTexturingProperty::ShaderMap* BlendTextureMap = NiNew NiTexturingProperty::ShaderMap(BlendTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
-				BlendTextureMap->SetID(1);
+				std::map<NiTexture*, NiTexturingProperty::ShaderMap*>::iterator BaseTextureIterator = BaseTextureSafeMap.find(BaseTexture);
+				std::map<NiTexture*, NiTexturingProperty::ShaderMap*>::iterator BlendTextureIterator = BlendTextureSafeMap.find(BlendTexture);
 
-				UtilDebugString("Create NiTexturingProperty");
+				NiTexturingProperty::ShaderMap* BaseTextureMap;
+				NiTexturingProperty::ShaderMap* BlendTextureMap;
+
+				if (BaseTextureIterator != BaseTextureSafeMap.end())
+				{
+					BaseTextureMap = BaseTextureIterator->second;
+				}
+				else 
+				{
+					UtilDebugString("Start Create New BaseTexture with ID %i", BaseTextureSafeMap.size());
+					BaseTextureMap = NiNew NiTexturingProperty::ShaderMap(BaseTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
+					BaseTextureMap->SetID(0);
+					BaseTextureMap->SetTexture(BaseTexture);
+					BaseTextureSafeMap.insert(std::pair<NiTexture*, NiTexturingProperty::ShaderMap*>(BaseTexture, BaseTextureMap));
+					
+				}
+
+				if (BlendTextureIterator != BlendTextureSafeMap.end())
+				{
+					BlendTextureMap = BaseTextureIterator->second;
+				}
+				else
+				{
+					if(BlendTextureSafeMap.size() != 7)
+					{
+						UtilDebugString("Start Create New BlendTexture with ID %i", BlendTextureSafeMap.size());
+						BlendTextureMap = NiNew NiTexturingProperty::ShaderMap(BlendTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
+						BlendTextureMap->SetID(1);
+						BlendTextureMap->SetTexture(BlendTexture);
+						BlendTextureSafeMap.insert(std::pair<NiTexture*, NiTexturingProperty::ShaderMap*>(BlendTexture, BlendTextureMap));
+					}
+					else
+						BlendTextureMap = NULL;
+
+				}
+
+
 				NiTexturingProperty* pkTP = NiNew NiTexturingProperty();
 
-				BaseTextureMap->SetTexture(BaseTexture);
-				BlendTextureMap->SetTexture(BlendTexture);
-
-				UtilDebugString("Set Shader Maps");
 				pkTP->SetShaderMap(0, BaseTextureMap);
 				pkTP->SetShaderMap(1, BlendTextureMap);
-				UtilDebugString("Create Normal Map");
+
 				NiTexturingProperty::Map* NormalMap = NiNew NiTexturingProperty::Map();
 				NormalMap->SetFilterMode(NiTexturingProperty::FILTER_BILERP_MIPNEAREST);
 				NormalMap->SetClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
@@ -479,15 +516,193 @@ void EditorScene::FixSupTexturing(NiNode* obj)
 				pkTP->SetBaseClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
 
 				pkTP->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
-				UtilDebugString("AttachProperty");
+
 				Shape->AttachProperty(pkTP);
 
 				NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
 				alphaprop->SetDestBlendMode(NiAlphaProperty::ALPHA_ZERO);
 				Shape->AttachProperty(alphaprop);
+
 			}
 		}
 	}
+}
+
+void EditorScene::LoadBeforeObjects(FILE* file) 
+{
+	char acFileBuff[513];
+	char acFileName[513];
+	char acTempText[513];
+	int Counter;
+	float depth;
+	float red;
+	float green;
+	float blue;
+	if (!fgets(acFileBuff, 256, file))
+	{
+		EditorSceneError("Failed to Read SHMDFile")
+	}
+	sscanf(acFileBuff, "%s", acTempText);
+	if (strcmp(acTempText, "shmd0_5"))
+	{
+		EditorSceneError("Wrong Version of SHMDFile")
+	}
+	if (!GetObjectCountLine(file, acFileBuff, acTempText, "Sky", &Counter))
+	{
+		EditorSceneError("Failed Loading Sky Count")
+	}
+	if (Counter)
+	{
+		if (LoadObjectNifFile(file, acFileBuff, acTempText, acFileName))
+		{
+			char buf[1024];
+			GetCurrentDirectoryA(sizeof(buf), buf);
+			NiNodePtr sky;
+			PgUtil::LoadNodeNifFile(acFileName, &sky, NULL);
+			kWorld.AttachSky(sky);
+		}
+		else
+		{
+			EditorSceneError("Failed Loading Sky Path")
+		}
+	}
+	if (!GetObjectCountLine(file, acFileBuff, acTempText, "Water", &Counter))
+	{
+		EditorSceneError("Failed Loading Water Count")
+	}
+	if (Counter)
+	{
+		for (int i = 0; i < Counter; i++)
+		{
+			if (LoadObjectNifFile(file, acFileBuff, acTempText, acFileName))
+			{
+				NiNodePtr water;
+				PgUtil::LoadNodeNifFile(acFileName, &water, NULL);
+				kWorld.AttachWater(water);
+			}
+			else
+			{
+				EditorSceneError("Failed Loading Water Path")
+			}
+		}
+	}
+	if (!GetObjectCountLine(file, acFileBuff, acTempText, "GroundObject", &Counter))
+	{
+		EditorSceneError("Failed Loading GroundObject Count")
+	}
+	if (Counter)
+	{
+		for (int i = 0; i < Counter; i++)
+		{
+			if (LoadObjectNifFile(file, acFileBuff, acTempText, acFileName))
+			{
+				NiNodePtr groundobject;
+				PgUtil::LoadNodeNifFile(acFileName, &groundobject, NULL);
+				kWorld.AttachGroundObj(groundobject);
+			}
+			else
+			{
+				EditorSceneError("Failed Loading GroundObject Path")
+			}
+		}
+	}
+	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "GlobalLight", &red, &green, &blue))
+	{
+		EditorSceneError("Failed Loading GlobalLight")
+	}
+
+	kWorld.SetAmbientLightAmbientColor(NiColor(red, green, blue));
+
+	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "Fog", &depth, &red, &green, &blue))
+	{
+		EditorSceneError("Failed Loading Fog")
+	}
+
+	kWorld.SetFogColor(NiColor(red, green, blue));
+	kWorld.SetFogDepth(depth);
+
+	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "BackGroundColor", &red, &green, &blue))
+	{
+		EditorSceneError("Failed Loading BackGroundColor")
+	}
+	BackgroundColor.r = red;
+	BackgroundColor.g = green;
+	BackgroundColor.b = blue;
+
+	float Frustum;
+	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "Frustum", &Frustum))
+	{
+		EditorSceneError("Failed Loading Frustum")
+	}
+	kWorld.SetFarFrumstum(Frustum);
+}
+void EditorScene::LoadAfterObjects(FILE* file) 
+{
+	char acFileBuff[513];
+	char acFileName[513];
+	char acTempText[513];
+	float red;
+	float green;
+	float blue;
+	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "DirectionLightAmbient", &red, &green, &blue))
+	{
+		EditorSceneError("Failed Loading DirectionLightAmbient")
+	}
+	kWorld.SetMapDirectionalLightAmbientColor(NiColor(red, green, blue));
+
+	if (!LoadGlobalMapObject(file, acFileBuff, acTempText, "DirectionLightDiffuse", &red, &green, &blue))
+	{
+		EditorSceneError("Failed Loading DirectionLightDiffuse")
+	}
+
+	kWorld.SetMapDirectionalLightDiffuseColor(NiColor(red, green, blue));
+}
+void EditorScene::LoadObjects(FILE* file) 
+{
+	char acFileBuff[513];
+	char acFileName[513];
+	char acTempText[513];
+	int Counter;
+	while (true)
+	{
+		NiNodePtr obj;
+		NiPoint3 point;
+		NiQuaternion quater;
+		float Scale;
+
+		if (!fgets(acFileBuff, 256, file))
+		{
+			EditorSceneError("Failed Loading ObjectDataStream")
+		}
+		sscanf(acFileBuff, "%s", acTempText);
+		if (!strcmp(acTempText, "DataObjectLoadingEnd"))
+		{
+			UtilDebugString("Found End of Data with DataObjectLoadingEnd")
+				break;
+		}
+		sscanf(acFileBuff, "%s %d", acTempText, &Counter);
+		PgUtil::CreateFullFilePathFromBaseFolder(acFileName, acTempText);
+		PgUtil::LoadNodeNifFile(acFileName, &obj, NULL);
+
+		if (!obj)
+			UtilDebugString("Failed to Load Map Data Object %s ", acFileName);
+		for (int i = 0; i < Counter; i++)
+		{
+			if (!LoadObjectPosition(file, acFileBuff, acTempText, &point, &quater, &Scale))
+			{
+				EditorSceneError("Failed Loading Object Positon")
+			}
+
+			NiNode* AddingObj = NiNew NiNode;
+			AddingObj->AttachChild((NiNode*)obj->Clone());
+			//AddingObj->AttachChild(obj);
+			AddingObj->SetTranslate(point);
+			AddingObj->SetRotate(quater);
+			AddingObj->SetScale(Scale);
+			kWorld.AttachGroundCollidee(AddingObj);
+		}
+	}
+
 }
 
 void IniFile::Load(FILE* Ini) 
@@ -580,19 +795,16 @@ void IniFile::LoadLayer(FILE* Ini)
 		strcpy(Info, &InfoFixer[1]);
 		if (NiString(Type) == "#Name")
 		{
-			UtilDebugString("Name");
 			_Layer->Name = Info;
 		}
 		if (NiString(Type) == "#DiffuseFileName")
 		{
-			UtilDebugString("DiffuseFileName");
 			strcpy(FileNamePathFixer, &Info[1]);
 			FileNamePathFixer[strlen(FileNamePathFixer) - 1] = 0x0;
 			_Layer->DiffuseFileName = FileNamePathFixer;
 		}
 		if (NiString(Type) == "#BlendFileName")
 		{
-			UtilDebugString("BlendFileName");
 			strcpy(FileNamePathFixer, &Info[1]);
 			FileNamePathFixer[strlen(FileNamePathFixer) - 1] = 0x0;
 			_Layer->BlendFileName = FileNamePathFixer;
@@ -614,5 +826,12 @@ void IniFile::LoadLayer(FILE* Ini)
 			_Layer->UVScaleBlend = atof(Info);
 
 	}
+	UtilDebugString("Create Layer Texture");
+	_Layer->CreateTexture();
+	UtilDebugString("NiPixelFormat %i", _Layer->pixldata->GetPixelFormat());
+	UtilDebugString("Created Layer Texture");
 	LayerList.push_back(_Layer);
+	UtilDebugString("NiPixelFormat %i", _Layer->pixldata->GetPixelFormat());
+
+
 }
