@@ -13,7 +13,7 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	_Thread = NiThread::Create(_procedure);
 	NIASSERT(_Thread)
 	_Thread->SetPriority(NiThread::NORMAL);
-	_Thread->Resume();;
+	_Thread->Resume();
 
 
 	if (!kWorld.InitScene())
@@ -52,10 +52,10 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 	_Thread->WaitForCompletion();
 
 	UtilDebugString("Thred Done")
-	if(terrain)
+	if(TerrainParent)
 	{
 		terrain->SetName("terrain");
-		kWorld.AttachGroundTerrain(terrain);
+		kWorld.AttachGroundTerrain(TerrainParent);
 	}
 	UtilDebugString("After Terrain")
 
@@ -74,11 +74,15 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 
 	Camera->Update(0.0f);
 
-	UtilDebugString("Finished Loading World")
-		
-	NiStream kStream;
-	kStream.InsertObject(kWorld.GetTerrainScene());
-	kStream.Save("./TESTING123.nif");
+	UtilDebugString("Finished Loading World");
+
+	NiStream kStream2;
+	UtilDebugString("Insert Object");
+	kStream2.InsertObject(kWorld.GetTerrainScene());
+	UtilDebugString("Start Savceing");
+	//kStream2.InsertObject(terrain);
+	kStream2.Save("./TESTING123.nif");
+	UtilDebugString("Saved File World");
 
 	return;
 }
@@ -86,6 +90,7 @@ EditorScene::EditorScene(NiString FilePath, NiString FileName)
 NiNode* EditorScene::LoadTerrain()
 {
 	terrain = NULL;
+	TerrainParent = NULL;
 	char RowBuffer[513];
 	NiString CleanPath = _FilePath.GetSubstring(0, ".");
 	NiString IniFile = CleanPath;
@@ -291,14 +296,16 @@ NiNode* EditorScene::LoadTerrain()
 
 				pkTP->SetShaderMap(0, BaseTextureMap);
 				pkTP->SetShaderMap(1, BlendTextureMap);
-				NiTexturingProperty::Map* NormalMap = NiNew NiTexturingProperty::Map();
+				NiTexturingProperty::Map* NormalMap = NiNew NiTexturingProperty::Map(NULL,0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP_MIPNEAREST,0);
+				
 				NormalMap->SetFilterMode(NiTexturingProperty::FILTER_BILERP_MIPNEAREST);
 				NormalMap->SetClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
 				NormalMap->SetTexture(NULL);
-				pkTP->SetBaseMap(NormalMap);
+
 				pkTP->SetBaseClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
 
 				pkTP->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
+				pkTP->SetBaseMap(NormalMap);
 				Shape->AttachProperty(pkTP);
 				Shape->AttachProperty(alphaprop);
 
@@ -311,11 +318,16 @@ NiNode* EditorScene::LoadTerrain()
 				Shape->UpdateProperties();
 				Shape->Update(0.0);
 				if (!terrain)
-					terrain = NiNew NiSortAdjustNode;
+				{
+					terrain = NiNew NiNode;
+					TerrainParent = NiNew NiSortAdjustNode;
+					TerrainParent->AttachChild(terrain);
+				}
 				terrain->AttachChild(Shape);
 			}
 		}
 	}
+	UtilDebugString("Terrain Thread Finished");
 	return NULL;
 	for (int _BlockX = 0; _BlockX < BlockX; _BlockX++)
 	{
@@ -694,8 +706,8 @@ void EditorScene::LoadObjects(FILE* file)
 			}
 
 			NiNode* AddingObj = NiNew NiNode;
-			AddingObj->AttachChild((NiNode*)obj->Clone());
-			//AddingObj->AttachChild(obj);
+			//AddingObj->AttachChild((NiNode*)obj->Clone());
+			AddingObj->AttachChild(obj);
 			AddingObj->SetTranslate(point);
 			AddingObj->SetRotate(quater);
 			AddingObj->SetScale(Scale);

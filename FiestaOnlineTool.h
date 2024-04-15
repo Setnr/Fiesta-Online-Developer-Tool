@@ -1,11 +1,11 @@
 #pragma once
-#include <NiApplication.h>
+#include <NiSample.h>
 #include <NiCursor.h>
 #include "PgWinMgr.h"
 #include "FiestaScene.h"
 
 
-class FiestaOnlineTool : public NiApplication
+class FiestaOnlineTool : public NiSample
 {
 public:
 	FiestaOnlineTool();
@@ -92,6 +92,52 @@ private:
 	FiestaScenePtr _Scene;
 
 	static bool HandleMouseMovement(NiActionData* pkActionData);
+	virtual bool RegisterShaderParsers() 
+	{
+		char Path[513];
+
+		char acProgramPath[NI_MAX_PATH];
+
+		PgUtil::CreateFullFilePathFromBaseFolder(acProgramPath, ".\\shader\\");
+
+		if (!NiShaderFactory::LoadAndRunParserLibrary(".\\NSFParserLibDX9" NI_DLL_SUFFIX ".dll", 
+			acProgramPath,true))
+		{
+			NiMessageBox("Failed to load shader library!", "ERROR");
+			return false;
+		}
+		return true;
+	}
+	virtual bool RegisterShaderLibraries() 
+	{
+		char Path[513];
+
+		char acShaderPath[NI_MAX_PATH];
+		char acProgramPath[NI_MAX_PATH];
+		int iDirectoryCount = 1;
+		char* apcDirectories[1];
+
+		PgUtil::CreateFullFilePathFromBaseFolder(acShaderPath, "");
+		apcDirectories[0] = acShaderPath;
+		PgUtil::CreateFullFilePathFromBaseFolder(acProgramPath, ".\\shader\\");
+
+		NiShaderFactory::AddShaderProgramFileDirectory(acProgramPath);
+		
+
+		if (!NiShaderFactory::LoadAndRegisterShaderLibrary(".\\NSBShaderLibDX9" NI_DLL_SUFFIX ".dll", 
+			iDirectoryCount, apcDirectories,true))
+		{
+			NiMessageBox("Failed to load shader library!", "ERROR");
+			return false;
+		}
+		if (!NiShaderFactory::LoadAndRegisterShaderLibrary(".\\NiD3DXEffectShaderLibDX9" NI_DLL_SUFFIX ".dll", 
+			iDirectoryCount, apcDirectories,true))
+		{
+			NiMessageBox("Failed to load shader library!", "ERROR");
+			return false;
+		}
+		return true;
+	}
 	void DrawCursor();
 	bool CreateRenderer(HWND hWnd);
 	NiAlphaAccumulatorPtr Sorter;

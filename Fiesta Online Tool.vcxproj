@@ -71,7 +71,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\DebugDLL;$(LibraryPath)</LibraryPath>
+    <OutDir>E:\VM\Gamebryo\GameClient</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
@@ -86,12 +88,14 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NIDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NIMAIN_IMPORT;NIDX9RENDERER_IMPORT;NISYSTEM_IMPORT;NSFPARSERLIB_IMPORT;NIINPUT_IMPORT;NSBSHADERLIB_IMPORT;_USRDLL;WIN32;_DEBUG;_CONSOLE;NIDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem23VC80D.lib;NiCollision23VC80D.lib;NiAnimation23VC80D.lib;NiParticle23VC80D.lib;NiMain23VC80D.lib;NiVisualTracker23VC80D.lib;NiInput23VC80D.lib;NiFont23VC80D.lib;NiCursor23VC80D.lib;NiD3DXEffectShaderLibDX923VC80D.lib;NSBShaderLibDX923VC80D.lib;NiBinaryShaderLibDX923VC80D.lib;NiD3D10BinaryShaderLibD3D1023VC80D.lib;NSFParserLibDX923VC80D.lib;legacy_stdio_definitions.lib;NiUserInterface23VC80D.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

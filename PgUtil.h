@@ -71,7 +71,6 @@ public:
     static NiNodePtr LoadNifFile(const char* File, NiTexturePalette* /*Currently Unused */) 
     {
         NiNode* Node = NiNew NiNode;
-
         NiStream kStream;
         bool bLoaded = kStream.Load(File);
         NIASSERT(bLoaded);
@@ -133,7 +132,6 @@ public:
         {
             ret = sprintf(FilePath, "%s\\%s", PgUtil::FolderPath, File);
         }
-        UtilDebugString("Created FilePath %s from %s", FilePath, File);
         return ret;
     }
     static char FolderPath[512];

@@ -1,4 +1,5 @@
 #pragma once
+#include <NiMainLibType.h>
 #include <NiMain.h>
 NiSmartPointer(FiestaScene);
 class FiestaScene : public NiRefObject

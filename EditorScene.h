@@ -122,7 +122,6 @@ public:
 				}
 			}
 
-			UtilDebugString("NiPixelFormat %i", pixldata->GetPixelFormat());
 			NiTexture::FormatPrefs BasePref;
 			BasePref.m_ePixelLayout = NiTexture::FormatPrefs::PixelLayout::PIX_DEFAULT;
 			BasePref.m_eMipMapped = NiTexture::FormatPrefs::MipFlag::MIP_DEFAULT;
@@ -134,8 +133,8 @@ public:
 			BlendPref.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
 
 			BlendTexture = NiSourceTexture::Create(pixldata, BlendPref);
-
 			
+
 			PgUtil::CreateFullFilePathFromBaseFolder(acFileName, DiffuseFileName);
 			UtilDebugString("DiffuseFileName for Texture %s", acFileName);
 			BaseTexture = NiSourceTexture::Create(acFileName,BasePref);
@@ -357,7 +356,7 @@ private:
 	NiString _FileName;
 	IniFile _IniFile;
 	NiNodePtr terrain;
-
+	NiNodePtr TerrainParent;
 	std::map<NiTexture*, NiTexturingProperty::ShaderMap*> BaseTextureSafeMap;
 	std::map<NiTexture*, NiTexturingProperty::ShaderMap*> BlendTextureSafeMap;
 };

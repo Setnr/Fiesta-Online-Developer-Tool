@@ -1,4 +1,13 @@
 #include "FiestaOnlineTool.h"
+
+#include <NiSystemLibType.h>
+#include <NiDX9RendererLibType.h>
+#include <NiMainLibType.h>
+#include <NiAnimationLibType.h>
+#include <NSBShaderLibLibType.h>
+#include <NSFParserLibLibType.h>
+#include <NiInputLibType.h>
+
 #include <NiAnimation.h>
 #include <NiParticle.h>
 #include <NiSystem.h>
@@ -7,11 +16,11 @@
 #include <string>
 #include <NiDI8InputSystem.h>
 #include <NiDX9Renderer.h>
-#pragma comment(lib, "NiDX9Renderer.lib")
+#pragma comment(lib, "NiDX9Renderer23VC80D.lib")
 #pragma comment(lib, "dxguid.lib")
 
 #include <NiD3D10Renderer.h>
-#pragma comment(lib, "NiD3D10Renderer.lib")
+#pragma comment(lib, "NiD3D10Renderer23VC80D.lib")
 #include "PgUtil.h" 
 #include "PgWin.h"
 
@@ -24,15 +33,19 @@
 #include <NSBShaderLib.h>
 #include <NSFParserLib.h>
 #include <NiD3DXEffectShaderLib.h>
+#include <NSBShaderLibLibType.h>
+#include <NiD3DXEffectShaderLibType.h>
 #undef _LIB
 
 #if defined(WIN32)
-#pragma comment(lib, "NiBinaryShaderLibDX9.lib")
-#pragma comment(lib, "NiD3D10BinaryShaderLibD3D10.lib")
-#pragma comment(lib, "NSBShaderLibDX9.lib")
-#pragma comment(lib, "NSFParserLibDX9.lib")
-#pragma comment(lib, "NiD3DXEffectShaderLibDX9.lib")
+#pragma comment(lib, "NiBinaryShaderLibDX923VC80D.lib")
+#pragma comment(lib, "NiD3D10BinaryShaderLibD3D1023VC80D.lib")
+#pragma comment(lib, "NSBShaderLibDX923VC80D.lib")
+#pragma comment(lib, "NSFParserLibDX923VC80D.lib")
+#pragma comment(lib, "NiD3DXEffectShaderLibDX923VC80D.lib")
 #endif
+
+#include <filesystem>
 
 int PgWinMgr::iScreenLeftPos;
 int PgWinMgr::iScreenRightPos;
@@ -48,19 +61,23 @@ char PgUtil::FolderPath[512];
 FiestaOnlineTool* FiestaOnlineTool::_Tool = NULL;
 NiApplication* NiApplication::Create() 
 {
-    GetCurrentDirectoryA(sizeof(PgUtil::FolderPath), PgUtil::FolderPath);
+    GetModuleFileNameA(NULL, PgUtil::FolderPath, sizeof(PgUtil::FolderPath));
+    std::string ParentPath = std::filesystem::path(PgUtil::FolderPath).parent_path().string();
+    strcpy_s(PgUtil::FolderPath, ParentPath.c_str());
     NiSourceTexture::SetDestroyAppDataFlag(false);
     return NiNew FiestaOnlineTool;
 }
 
-FiestaOnlineTool::FiestaOnlineTool() : NiApplication("DeveloperTools bei Set", 1600, 900)
+FiestaOnlineTool::FiestaOnlineTool() : NiSample("DeveloperTools bei Set", 1600, 900)
 {
     if (!_Tool)
         _Tool = this;
+
 }
 bool FiestaOnlineTool::Initialize() 
 {
-    NiApplication::Initialize();
+
+    NiSample::Initialize();
     Sorter = NiNew NiAlphaAccumulator();
     m_spRenderer->SetSorter(Sorter);
 
@@ -95,6 +112,8 @@ bool FiestaOnlineTool::Initialize()
     m_spScene->UpdateEffects();
     m_spCamera->Update(0.0f);
 
+
+    //this->CreateInputSystem();
     Engine3D::Init(NULL);
 
     return true;
@@ -353,22 +372,23 @@ void FiestaOnlineTool::DrawCursor()
 
 void Engine3D::ShaderRunParserCallback(const char* pcLibFile, NiRenderer* pkRenderer, const char* pcDirectory, bool bRecurseSubFolders) 
 {
-    NSFParserLib_RunShaderParser(pcDirectory, bRecurseSubFolders);
+    return ;// NSFParserLib_RunShaderParser(pcDirectory, bRecurseSubFolders);
 }
 BOOL Engine3D::ShaderClassCreateCallback(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char** apcDirectories, bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary) 
 {
     *ppkLibrary = 0;
-    return NSBShaderLib_LoadShaderLibrary(pkRenderer, iDirectoryCount, apcDirectories, bRecurseSubFolders, ppkLibrary);
+
+    return 0; //NSBShaderLib_LoadShaderLibrary(pkRenderer, iDirectoryCount, apcDirectories, bRecurseSubFolders, ppkLibrary);
 }
 bool Engine3D::FXLibraryClassCreate(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char** apcDirectories, bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary)
 {
     *ppkLibrary = 0;
-    return NiD3DXEffectShaderLib_LoadShaderLibrary(
+    return 0;/* NiD3DXEffectShaderLib_LoadShaderLibrary(
         pkRenderer,
         iDirectoryCount,
         apcDirectories,
         bRecurseSubFolders,
-        ppkLibrary);
+        ppkLibrary);*/
 }
 bool Engine3D::GetEnableCarToon() 
 {
@@ -386,6 +406,8 @@ void Engine3D::EnableCarToon(bool bEnable)
 bool Engine3D::Terminate() { return true; }
 char Engine3D::Init(NiCamera* pkCamera) 
 {
+
+    return 0;
     NiShaderFactory::RegisterRunParserCallback((unsigned int(__cdecl*)(const char*, NiRenderer*, const char*, bool))Engine3D::ShaderRunParserCallback);
     NiShaderFactory::RegisterClassCreationCallback((bool(__cdecl*)(const char*, NiRenderer*, int, char**, bool, NiShaderLibrary**))Engine3D::ShaderClassCreateCallback);
     NiShaderFactory::RegisterErrorCallback(ShaderErrorCallback);

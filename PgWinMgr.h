@@ -71,7 +71,7 @@ class PgWinCullingProcess : public NiCullingProcess
 public:
 	PgWinCullingProcess(NiVisibleArray& pkVisibleSet) : NiCullingProcess(&pkVisibleSet)
 	{
-
+		
 	}
 	void Process(NiAVObject* pkObject) 
 	{
@@ -91,8 +91,8 @@ public:
 			}
 			if (this->m_pkVisibleSet)
 				pkScene->Cull(*this);
-			if (pkVisibleSet)
-				this->m_pkVisibleSet = pkSaveVisibleSet;
+			//if (pkVisibleSet)
+				//this->m_pkVisibleSet = pkSaveVisibleSet;
 			this->m_pkCamera = 0;
 		}
 	}
