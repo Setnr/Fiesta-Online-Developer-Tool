@@ -109,7 +109,7 @@ public:
 	{
 		if (!AddButton(SceneObj, ClickID ,RegularName, Hovername, ClickName))
 		{
-			UtilDebugString("Failed To Add Hidden Button");
+			//UtilDebugString("Failed To Add Hidden Button");
 			return 0;
 		}
 		_RegularSprite->DetachParent();

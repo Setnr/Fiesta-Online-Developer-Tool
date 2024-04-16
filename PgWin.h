@@ -2,6 +2,8 @@
 #include <NiNode.h>
 #include "PgWinObj.h"
 #include "PgUtil.h"
+#include <iostream>
+#include <string>
 NiSmartPointer(PgWin);
 class PgWin : public NiRefObject
 {
@@ -52,7 +54,7 @@ public:
 	}
 	void OnCommand(unsigned int ClickID) 
 	{
-		UtilDebugString("Clicked Button with Enum Index %i", ClickID);
+		std::cout << "Clicked Button with Enum Index " << std::dec << ClickID << std::endl;
 	}
 	void CenterWindow(LPRECT kRect)
 	{

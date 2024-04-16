@@ -14,9 +14,8 @@ StartScene::StartScene()
     BaseNode->SetSortingMode(NiSortAdjustNode::SORTING_INHERIT);
 
 
-    char Path[513];
-    PgUtil::CreateFullFilePathFromBaseFolder(Path, ".\\resmenu\\account\\LoginBackground.nif");
-    NiNodePtr NiN = PgUtil::LoadNifFile(Path, 0);
+    std::string Path = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\account\\LoginBackground.nif");
+    NiNodePtr NiN = PgUtil::LoadNifFile(Path.c_str(), 0);
     BaseNode->AttachChild(NiN, 1);
 
     _procedure = NiNew StartSceneBackgroundThread(this);

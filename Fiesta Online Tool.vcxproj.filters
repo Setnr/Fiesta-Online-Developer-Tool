@@ -25,6 +25,18 @@
     <ClCompile Include="IngameWorld.cpp">
       <Filter>Scenes\EditorScene</Filter>
     </ClCompile>
+    <ClCompile Include="FiestaOnlineTool_Init.cpp">
+      <Filter>Fiesta Online Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="FiestaOnlineTool_StaticDefines.cpp">
+      <Filter>Fiesta Online Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="FiestaOnlineTool_UI.cpp">
+      <Filter>Fiesta Online Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="SHMDLoad.cpp">
+      <Filter>Scenes\EditorScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fiesta Online Tool">
@@ -80,6 +92,9 @@
     </ClInclude>
     <ClInclude Include="IngameWorld.h">
       <Filter>Scenes\EditorScene</Filter>
+    </ClInclude>
+    <ClInclude Include="FiestaOnlineTool_GeneralHeaders.h">
+      <Filter>Fiesta Online Tool</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

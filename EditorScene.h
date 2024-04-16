@@ -2,6 +2,8 @@
 #include "FiestaScene.h"
 #include "IngameWorld.h"
 
+#include <iostream>
+#include <string>
 #include <NiThread.h>
 struct HTDPoint
 {
@@ -84,15 +86,12 @@ public:
 		{
 			NiImageConverter* conv = NiImageConverter::GetImageConverter();
 
-			char acFileName[513];
-			PgUtil::CreateFullFilePathFromBaseFolder(acFileName, BlendFileName);
-			UtilDebugString("BlendFileName for Texture %s", acFileName);
+			std::string acFileName =  PgUtil::CreateFullFilePathFromBaseFolder(BlendFileName);
+			std::cout <<"BlendFileName for Texture " << acFileName << std::endl;
 
-			NiPixelData* ReadImage = conv->ReadImageFile(acFileName, 0);
+			NiPixelData* ReadImage = conv->ReadImageFile(acFileName.c_str(), 0);
 			if (ReadImage->GetPixelFormat() != NiPixelFormat::RGB24)
 			{
-				UtilDebugString("BlendFileName for Texture %s", acFileName)
-				UtilDebugString("NiPixelFormat %i", ReadImage->GetPixelFormat())
 				NiMessageBox::DisplayMessage("NiPixelData From ReadImage in Layer::CreateTexture Has Wrong NiPixelFormat", "Error");
 			}
 			
@@ -101,7 +100,6 @@ public:
 			RGBColor* PixelColor = (RGBColor*)ReadImage->GetPixels();
 			if (ReadImage->GetSizeInBytes() / sizeof(RGBColor) != pixldata->GetSizeInBytes() / sizeof(RGBAColor))
 			{
-				UtilDebugString("ReadImage Pixels %i | WriteImage Pixels %i", ReadImage->GetSizeInBytes() / sizeof(RGBColor), pixldata->GetSizeInBytes() / sizeof(RGBAColor))
 				NiMessageBox::DisplayMessage("Size MissMatch in Recreating NiPixelData for TerrainTexture", "Error");
 			}
 
@@ -118,7 +116,7 @@ public:
 					int YPartFlipped = ReadImage->GetWidth() * (ReadImage->GetHeight() - h - 1);
 					int PointOffsetFlipped = XPart + YPartFlipped;
 
-					PixelColorA[PointOffsetFlipped] = RGBAColor(PixelColor[PointOffsetNormal]);
+					PixelColorA[PointOffsetNormal] = RGBAColor(PixelColor[PointOffsetNormal].g);
 				}
 			}
 
@@ -133,17 +131,17 @@ public:
 			BlendPref.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
 
 			BlendTexture = NiSourceTexture::Create(pixldata, BlendPref);
-			
 
-			PgUtil::CreateFullFilePathFromBaseFolder(acFileName, DiffuseFileName);
-			UtilDebugString("DiffuseFileName for Texture %s", acFileName);
-			BaseTexture = NiSourceTexture::Create(acFileName,BasePref);
+			acFileName = PgUtil::CreateFullFilePathFromBaseFolder(DiffuseFileName);
+			BaseTexture = NiSourceTexture::Create(acFileName.c_str(), BasePref);
 			if (BaseTexture == NULL)
 				NiMessageBox::DisplayMessage("BaseTexture is Nullptr", "");
+
+
 		}
-		NiString Name;
-		NiString DiffuseFileName;
-		NiString BlendFileName;
+		std::string Name;
+		std::string DiffuseFileName;
+		std::string BlendFileName;
 		float StartPos_X;
 		float StartPos_Y;
 		float Width;
@@ -155,10 +153,10 @@ public:
 		NiSourceTexture* BlendTexture;
 		NiSourceTexture* BaseTexture;
 	};
-	NiString FileType;
+	std::string FileType;
 	float Version;
-	NiString HeightFileName;
-	NiString VertexColorTexture;
+	std::string HeightFileName;
+	std::string VertexColorTexture;
 	int HeightMap_width;
 	int HeightMap_height;
 	float OneBlock_width;
@@ -174,12 +172,12 @@ public:
 
 	void Print()
 	{
-		UtilDebugString("HeightFileName: %s LayerCount: %i", HeightFileName, LayerList.size())
+		std::cout << "HeightFileName: " << HeightFileName << " LayerCount: " << std::to_string(LayerList.size()) << std::endl;
 		for (int i = 0; i < LayerList.size(); i++)
 		{
-			UtilDebugString("Name: %s", LayerList.at(i)->Name)
-			UtilDebugString("DiffuseFileName: %s", LayerList.at(i)->DiffuseFileName)
-			UtilDebugString("BlendFileName: %s", LayerList.at(i)->BlendFileName)
+			std::cout << "Name: "<<LayerList.at(i)->Name << std::endl;
+			std::cout << "DiffuseFileName: " << LayerList.at(i)->DiffuseFileName << std::endl;
+			std::cout << "BlendFileName: " << LayerList.at(i)->BlendFileName << std::endl;
 		}
 				
 	}
@@ -222,79 +220,6 @@ public:
 	NiNode* LoadTerrain();
 
 private:
-	bool GetObjectCountLine(FILE* file, char* acFileBuff, char* acTempText,const char* ObjName, int* Counter)
-	{
-		if (!fgets(acFileBuff, 256, file))
-		{
-			return false;
-		}
-		sscanf(acFileBuff, "%s %d", acTempText, Counter);
-		if (strcmp(acTempText, ObjName))
-		{
-			return false;
-		}
-		return true;
-	}
-	bool LoadObjectNifFile(FILE* file, char* acFileBuff, char* acTempText, char* acFileName)
-	{
-		if (!fgets(acFileBuff, 256, file))
-		{
-			return false;
-		}
-		sscanf(acFileBuff, "%s", acTempText);
-		PgUtil::CreateFullFilePathFromBaseFolder(acFileName, acTempText);
-		return true;
-	}
-	bool LoadGlobalMapObject(FILE* file, char* acFileBuff, char* acTempText, const char* ObjName, float* one, float* two, float* three)
-	{
-		if (!fgets(acFileBuff, 256, file))
-		{
-			return false;
-		}
-		sscanf(acFileBuff, "%s %f %f %f", acTempText, one, two, three);
-		if (strcmp(acTempText, ObjName))
-		{
-			return false;
-		}
-		return true;
-	}
-	bool LoadGlobalMapObject(FILE* file, char* acFileBuff, char* acTempText, const char* ObjName, float* one, float* two, float* three, float* four)
-	{
-		if (!fgets(acFileBuff, 256, file))
-		{
-			return false;
-		}
-		sscanf(acFileBuff, "%s %f %f %f %f", acTempText, one, two, three, four);
-		if (strcmp(acTempText, ObjName))
-		{
-			return false;
-		}
-		return true;
-	}
-	bool LoadGlobalMapObject(FILE* file, char* acFileBuff, char* acTempText, const char* ObjName, float* one)
-	{
-		if (!fgets(acFileBuff, 256, file))
-		{
-			return false;
-		}
-		sscanf(acFileBuff, "%s %f", acTempText, one);
-		if (strcmp(acTempText, ObjName))
-		{
-			return false;
-		}
-		return true;
-	}
-	
-	bool LoadObjectPosition(FILE* file, char* acFileBuff, char* acTempText, NiPoint3* kPoint, NiQuaternion* quater, float* scale)
-	{
-		if (!fgets(acFileBuff, 256, file))
-		{
-			return false;
-		}
-		sscanf(acFileBuff, "%f %f %f %f %f %f %f %f", &kPoint->x, &kPoint->y, &kPoint->z, &quater->m_fX, &quater->m_fY, &quater->m_fZ, &quater->m_fW, scale);
-		return true;
-	}
-
 	void FlipVertical(NiPoint3* BlockPoints, int QuadsWide, int QuadsHigh)
 	{
 		int HalfW = QuadsWide / 2;
@@ -341,10 +266,18 @@ private:
 	
 	void FixSupTexturing(NiNode* obj);
 
-	void LoadBeforeObjects(FILE* file);
-	void LoadObjects(FILE* file);
-	void LoadAfterObjects(FILE* file);
-
+	bool CheckSHMDVersion(std::ifstream& SHMD);
+	bool LoadSky(std::ifstream& SHMD);
+	bool LoadWater(std::ifstream& SHMD);
+	bool LoadGroundObject(std::ifstream& SHMD);
+	bool LoadGlobalLight(std::ifstream& SHMD);
+	bool LoadFog(std::ifstream& SHMD);
+	bool LoadBackGroundColor(std::ifstream& SHMD);
+	bool LoadFrustum(std::ifstream& SHMD);
+	bool LoadGlobalObjects(std::ifstream& SHMD);
+	bool LoadOneObject(std::ifstream& SHMD, std::string& path);
+	bool LoadDirectionLightAmbient(std::ifstream& SHMD);
+	bool LoadDirectionLightDiffuse(std::ifstream& SHMD);
 
 	World kWorld;
 	NiColor BackgroundColor;

@@ -2,8 +2,8 @@
 #include <NiNode.h>
 #include <NiCamera.h>
 #include <NiSourceTexture.h>
+#include <iostream>
 
-#define UtilDebugString(pcText, ...)  { char acTemp[1025]; NiSprintf(acTemp, sizeof(acTemp), pcText, __VA_ARGS__); NiOutputDebugString(acTemp);}
 class PgUtil 
 {
 public:
@@ -90,7 +90,7 @@ public:
         NIASSERT(bLoaded)
         if (kStream.GetObjectCount() != 1) 
         {
-            UtilDebugString("k Stream has to much root objects")
+            std::cout << "k Stream has to much root objects" << std::endl;
             return NULL;
         }
         NiObject* obj = kStream.GetObjectAt(0);
@@ -110,7 +110,7 @@ public:
         NIASSERT(bLoaded)
         if (kStream.GetObjectCount() != 1)
         {
-            UtilDebugString("k Stream has to much root objects")
+            std::cout << "k Stream has to much root objects" << std::endl;
             return NULL;
         }
         NiObject* obj = kStream.GetObjectAt(0);
@@ -119,20 +119,17 @@ public:
         return true;
     }
 
-    static bool CreateFullFilePathFromBaseFolder(char* FilePath,const char* File) 
-    { 
-        char FileHelper[256];
-        bool ret = false;
-        if(File[0] == '.')
+    static std::string CreateFullFilePathFromBaseFolder(std::string File)
+    {
+        if (!File.empty()) 
         {
-            strcpy(FileHelper, &File[1]);
-            ret = sprintf(FilePath, "%s%s", PgUtil::FolderPath, FileHelper);
+            if (File.at(0) == '.')
+                return FolderPath + File.substr(1);
+            else
+                return FolderPath + "\\" + File;
         }
-        else 
-        {
-            ret = sprintf(FilePath, "%s\\%s", PgUtil::FolderPath, File);
-        }
-        return ret;
+        return FolderPath;
     }
-    static char FolderPath[512];
+
+    static std::string FolderPath;
 };

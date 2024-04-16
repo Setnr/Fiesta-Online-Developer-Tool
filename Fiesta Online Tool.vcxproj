@@ -145,16 +145,21 @@
   <ItemGroup>
     <ClCompile Include="EditorScene.cpp" />
     <ClCompile Include="FiestaOnlineTool.cpp" />
+    <ClCompile Include="FiestaOnlineTool_Init.cpp" />
+    <ClCompile Include="FiestaOnlineTool_StaticDefines.cpp" />
+    <ClCompile Include="FiestaOnlineTool_UI.cpp" />
     <ClCompile Include="FiestaRenderer.cpp" />
     <ClCompile Include="FiestaScene.cpp" />
     <ClCompile Include="IngameWorld.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PgWin.cpp" />
+    <ClCompile Include="SHMDLoad.cpp" />
     <ClCompile Include="StartScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EditorScene.h" />
     <ClInclude Include="FiestaOnlineTool.h" />
+    <ClInclude Include="FiestaOnlineTool_GeneralHeaders.h" />
     <ClInclude Include="FiestaRenderer.h" />
     <ClInclude Include="FiestaRendererTypeDef.h" />
     <ClInclude Include="FiestaScene.h" />

@@ -26,24 +26,9 @@ public:
 		NiApplication::Terminate();
 	}
 
-	void CheckInterfaceForHit() {
-
-		tagPOINT kPoint;
-		GetCursorPos(&kPoint);
-		ScreenToClient(this->GetWindowReference(), &kPoint);
-		Pgg_kWinMgr->CheckForHit(kPoint);
-	}
-	void CheckInterfaceForClick() {
-
-		tagPOINT kPoint;
-		GetCursorPos(&kPoint);
-		ScreenToClient(this->GetWindowReference(), &kPoint);
-		Pgg_kWinMgr->CheckForClick(kPoint);
-	}
-	void UpdateInterface()
-	{
-		Pgg_kWinMgr->Update();
-	}
+	void CheckInterfaceForHit();
+	void CheckInterfaceForClick();
+	void UpdateInterface();
 
 	static bool GetRotateCamera() 
 	{
@@ -87,6 +72,7 @@ public:
 		}
 		return false;
 	}
+
 private: 
 
 	FiestaScenePtr _Scene;
@@ -94,14 +80,10 @@ private:
 	static bool HandleMouseMovement(NiActionData* pkActionData);
 	virtual bool RegisterShaderParsers() 
 	{
-		char Path[513];
-
-		char acProgramPath[NI_MAX_PATH];
-
-		PgUtil::CreateFullFilePathFromBaseFolder(acProgramPath, ".\\shader\\");
+		std::string acProgramPath =PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\");
 
 		if (!NiShaderFactory::LoadAndRunParserLibrary(".\\NSFParserLibDX9" NI_DLL_SUFFIX ".dll", 
-			acProgramPath,true))
+			acProgramPath.c_str(), true))
 		{
 			NiMessageBox("Failed to load shader library!", "ERROR");
 			return false;
@@ -110,18 +92,13 @@ private:
 	}
 	virtual bool RegisterShaderLibraries() 
 	{
-		char Path[513];
-
-		char acShaderPath[NI_MAX_PATH];
-		char acProgramPath[NI_MAX_PATH];
 		int iDirectoryCount = 1;
 		char* apcDirectories[1];
 
-		PgUtil::CreateFullFilePathFromBaseFolder(acShaderPath, "");
-		apcDirectories[0] = acShaderPath;
-		PgUtil::CreateFullFilePathFromBaseFolder(acProgramPath, ".\\shader\\");
+		apcDirectories[0] = (char*)PgUtil::FolderPath.c_str();
+		std::string acProgramPath = PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\");
 
-		NiShaderFactory::AddShaderProgramFileDirectory(acProgramPath);
+		NiShaderFactory::AddShaderProgramFileDirectory(acProgramPath.c_str());
 		
 
 		if (!NiShaderFactory::LoadAndRegisterShaderLibrary(".\\NSBShaderLibDX9" NI_DLL_SUFFIX ".dll", 
@@ -160,23 +137,4 @@ private:
 	void EnableCameraMove() { MoveCamera = true; }
 	void DisableCameraMove() { MoveCamera = false; }
 	float m_fLastUpdateTime;
-};
-
-class Engine3D
-{
-public:
-	static char Init(NiCamera* pkCamera);
-	static void ShaderRunParserCallback(const char* pcLibFile, NiRenderer* pkRenderer, const char* pcDirectory, bool bRecurseSubFolders);
-	static BOOL ShaderClassCreateCallback(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char** apcDirectories, bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary);
-	static bool FXLibraryClassCreate(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char** apcDirectories, bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary);
-	static bool GetEnableCarToon();
-	static void EnableCarToon(bool bEnable);
-	bool Terminate();
-	static unsigned int ShaderErrorCallback(const char* pcError,NiShaderError eError, bool bRecoverable) {
-		NiMessageBox(pcError, "Shader Error");
-		NiOutputDebugString("ERROR: ");
-		NiOutputDebugString(pcError);
-
-		return 0;
-	}
 };
