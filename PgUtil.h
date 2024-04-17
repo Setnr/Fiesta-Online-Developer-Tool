@@ -3,6 +3,7 @@
 #include <NiCamera.h>
 #include <NiSourceTexture.h>
 #include <iostream>
+#include <NiGeometry.h>
 
 class PgUtil 
 {

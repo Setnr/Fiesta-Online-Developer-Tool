@@ -37,6 +37,9 @@
     <ClCompile Include="SHMDLoad.cpp">
       <Filter>Scenes\EditorScene</Filter>
     </ClCompile>
+    <ClCompile Include="IniFile.cpp">
+      <Filter>Scenes\EditorScene\IniFile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fiesta Online Tool">
@@ -59,6 +62,9 @@
     </Filter>
     <Filter Include="Scenes\EditorScene">
       <UniqueIdentifier>{57826ec9-bc66-4db8-8d1c-16e497b677c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\EditorScene\IniFile">
+      <UniqueIdentifier>{fa9d5ea4-bfe0-4656-8eb3-266e96377044}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +101,9 @@
     </ClInclude>
     <ClInclude Include="FiestaOnlineTool_GeneralHeaders.h">
       <Filter>Fiesta Online Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="IniFile.h">
+      <Filter>Scenes\EditorScene\IniFile</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

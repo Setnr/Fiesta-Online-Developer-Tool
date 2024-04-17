@@ -151,6 +151,7 @@
     <ClCompile Include="FiestaRenderer.cpp" />
     <ClCompile Include="FiestaScene.cpp" />
     <ClCompile Include="IngameWorld.cpp" />
+    <ClCompile Include="IniFile.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PgWin.cpp" />
     <ClCompile Include="SHMDLoad.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="FiestaRendererTypeDef.h" />
     <ClInclude Include="FiestaScene.h" />
     <ClInclude Include="IngameWorld.h" />
+    <ClInclude Include="IniFile.h" />
     <ClInclude Include="PgUtil.h" />
     <ClInclude Include="PgWin.h" />
     <ClInclude Include="PgWinMgr.h" />

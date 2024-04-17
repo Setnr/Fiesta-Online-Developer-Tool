@@ -50,8 +50,7 @@ void StartScene::RunThread()
     if (GetOpenFileNameA(&l))
     {
 
-        LoadedScene = NiNew EditorScene(NiString(FilePathBuffer), NiString(FileNameBuffer));
-
+        LoadedScene = NiNew EditorScene(FilePathBuffer, FileNameBuffer);
         LoadingFinished();
     }
     else
