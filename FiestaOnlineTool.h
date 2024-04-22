@@ -73,6 +73,7 @@ public:
 		return false;
 	}
 
+	static FiestaOnlineTool* _Tool;
 private: 
 
 	FiestaScenePtr _Scene;
@@ -121,7 +122,6 @@ private:
 
 	NiActionMapPtr CreateNewActionMap(const char* pcName);
 	NiActionMapPtr CreateInitActionMap();
-	static FiestaOnlineTool* _Tool;
 	NiInputSystem::CreateParams* GetInputCreationParameters();
 
 	NiActionMapPtr m_spActionMap;

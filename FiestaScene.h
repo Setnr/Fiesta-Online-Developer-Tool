@@ -1,14 +1,17 @@
 #pragma once
 #include <NiMainLibType.h>
 #include <NiMain.h>
+
+#include <iostream>
+#include <string>
 NiSmartPointer(FiestaScene);
 class FiestaScene : public NiRefObject
 {
-	NiDeclareRootRTTI(FiestaScene);
+	//NiDeclareRootRTTI(FiestaScene);
 public:
 	FiestaScene() 
 	{
-		BaseNode = NiNew NiSortAdjustNode;
+		
 	};
 	~FiestaScene() 
 	{
@@ -31,12 +34,13 @@ public:
 	virtual void UpdateCamera(float fTime);
 	
 protected:
-	NiSortAdjustNodePtr BaseNode;
+	NiNodePtr BaseNode;
 	NiCameraPtr Camera;
 
 	float Yaw;
 	float Pitch;
 	float Roll;
 	
+
 };
 

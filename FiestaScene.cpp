@@ -2,7 +2,7 @@
 #include "PgUtil.h"
 
 #include "FiestaOnlineTool.h"
-const NiRTTI FiestaScene::ms_RTTI("FiestaScene", NULL);
+//const NiRTTI FiestaScene::ms_RTTI("FiestaScene", NULL);
 bool FiestaScene::SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamera)
 {
 	m_spScene = BaseNode;
@@ -31,7 +31,7 @@ void FiestaScene::UpdateCamera(float fTime)
 				float fPitchDelta = NI_PI * 0.375f * (float)(iY) / (float)uiAppHeight;
 				float fHeadingDelta = NI_PI * 0.375f * (float)(iX) / (float)uiAppWidth;
 				Pitch += fPitchDelta;
-				Yaw += fHeadingDelta;
+				Yaw -= fHeadingDelta;
 
 				NiMatrix3 rotation;
 				rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
@@ -49,8 +49,8 @@ void FiestaScene::UpdateCamera(float fTime)
 		NiPoint3 CameraPosition = Camera->GetTranslate();
 		NiPoint3 MoveDirect(0.0f, 0.0f, 0.0f);
 
-		NiPoint3 WorldDirect = Camera->GetWorldDirection();
-		NiPoint3 RightDirect = Camera->GetWorldRightVector();
+		NiPoint3 WorldDirect = Camera->GetWorldDirection() * 32;
+		NiPoint3 RightDirect = Camera->GetWorldRightVector() * 32;
 		
 		if(W_Key)
 			MoveDirect += WorldDirect;

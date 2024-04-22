@@ -2,6 +2,23 @@
 #include "FiestaOnlineTool.h"
 #include "FiestaOnlineTool_GeneralHeaders.h"
 
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_dx9.h"
+#include "ImGui/imgui_impl_win32.h"
+
+#include "Detours/detours.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
+typedef LRESULT(__stdcall* WindProcHookDef)(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
+auto WinProc_Org = (WindProcHookDef)(&NiApplication::WinProc);
+LRESULT CALLBACK WinProc_Hook(HWND hWnd, UINT uiMsg, WPARAM wParam,
+    LPARAM lParam)
+{
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, uiMsg, wParam, lParam))
+        return true;
+    return WinProc_Org(hWnd, uiMsg, wParam, lParam);
+}
+
 FiestaOnlineTool::FiestaOnlineTool() : NiSample("DeveloperTools bei Set", 1600, 900)
 {
     if (!_Tool)
@@ -10,6 +27,15 @@ FiestaOnlineTool::FiestaOnlineTool() : NiSample("DeveloperTools bei Set", 1600, 
 }
 bool FiestaOnlineTool::Initialize()
 {
+    /* 
+    Gamebryo doesnt allow to overwrite its WinProc Function
+    So i just hook it, aka fuck it.    
+    */
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourAttach(&(PVOID&)WinProc_Org, &WinProc_Hook);
+    DetourTransactionCommit();
+
     NiSample::Initialize();
     Sorter = NiNew NiAlphaAccumulator();
     m_spRenderer->SetSorter(Sorter);
@@ -23,6 +49,7 @@ bool FiestaOnlineTool::Initialize()
     this->m_pkFrameRate = NiNew NiFrameRate;
     this->m_pkFrameRate->Init(true);
     this->m_pkFrameRate->SetColor(NiColor::BLACK);
+    
     EnableFrameRate(true);
     this->SetMaxFrameRate(144.0f);
 
@@ -44,6 +71,19 @@ bool FiestaOnlineTool::Initialize()
     m_spScene->UpdateProperties();
     m_spScene->UpdateEffects();
     m_spCamera->Update(0.0f);
+
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    ImGui_ImplWin32_Init(this->GetWindowReference());
+    NiDX9Renderer* ptr = (NiDX9Renderer*)&*this->m_spRenderer;
+    ImGui_ImplDX9_Init(ptr->GetD3DDevice());
+
+    
 
     return true;
 }
@@ -240,3 +280,5 @@ bool FiestaOnlineTool::CreateRenderer(HWND hWnd)
     }
     return false;
 }
+
+

@@ -11,7 +11,10 @@ DWORD WINAPI HandleLoading(void*  ptr)
 StartScene::StartScene() 
 {
     Loaded = false;
-    BaseNode->SetSortingMode(NiSortAdjustNode::SORTING_INHERIT);
+    NiSortAdjustNodePtr sortNode = NiNew NiSortAdjustNode;
+    sortNode->SetSortingMode(NiSortAdjustNode::SORTING_INHERIT);
+    BaseNode = sortNode;
+    BaseNode->SetName("Scene BaseNode");
 
 
     std::string Path = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\account\\LoginBackground.nif");

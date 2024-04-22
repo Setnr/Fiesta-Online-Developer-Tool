@@ -7,6 +7,11 @@ NiPoint3 World::ms_kEastDir = NiPoint3(1.0, 0.0, 0.0);
 NiPoint3 World::ms_kWestDir = NiPoint3(-1.0, 0.0, 0.0); 
 NiPoint3 World::ms_kDefaultDirectionalLightDir = NiPoint3(0.5, 0.69999999, -0.40000001); 
 
+
+World::~World() 
+{
+}
+
 bool World::InitScene() 
 {
 	m_spLightArea = NiNew NiNode;
@@ -81,13 +86,23 @@ bool World::InitScene()
 	m_spWorldScene->AttachChild(m_spAbstateCharScene);
 	m_spWorldScene->AttachChild(m_spLightArea);
 	m_spWorldScene->AttachChild(m_spFog);
-	m_spShadowScene->AttachProperty(NiNew NiAlphaProperty);
-	m_spShadowScene->AttachProperty(NiNew NiVertexColorProperty);
-	m_spShadowScene->AttachProperty(NiNew NiFogProperty);
-	m_spWorldScene->AttachProperty(NiNew NiVertexColorProperty);
-	m_spWorldScene->AttachProperty(NiNew NiMaterialProperty);
-	m_spWorldScene->AttachProperty(NiNew NiFogProperty);
-	m_spSkyScene->AttachProperty(NiNew NiZBufferProperty);
+
+	NiAlphaPropertyPtr alpha = NiNew NiAlphaProperty;
+	NiVertexColorPropertyPtr Vertex = NiNew NiVertexColorProperty;
+	NiFogPropertyPtr Fog = NiNew NiFogProperty;
+	m_spShadowScene->AttachProperty(alpha);
+	m_spShadowScene->AttachProperty(Vertex);
+	m_spShadowScene->AttachProperty(Fog);
+
+	Vertex = NiNew NiVertexColorProperty;
+	NiMaterialPropertyPtr Material = NiNew NiMaterialProperty;
+	Fog = NiNew NiFogProperty;
+	m_spWorldScene->AttachProperty(Vertex);
+	m_spWorldScene->AttachProperty(Material);
+	m_spWorldScene->AttachProperty(Fog);
+
+	NiZBufferPropertyPtr ZBuff = NiNew NiZBufferProperty;
+	m_spSkyScene->AttachProperty(ZBuff);
 	return true;
 }
 bool World::InitCamera() 

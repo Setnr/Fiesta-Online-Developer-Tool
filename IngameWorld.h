@@ -116,6 +116,9 @@ struct SkyCtrl
 };
 class World 
 {
+public:
+	~World();
+private:
 	struct ExtraLightScene
 	{
 		unsigned int dwRGB;
@@ -206,48 +209,36 @@ public:
 	bool InitLightFog();
 	bool InitShadow() { return true; }
 
-	void AttachSky(NiNode* sky)
+	void AttachSky(NiNodePtr sky)
 	{
 		m_spSkyScene->AttachChild(sky,1);
 		m_spSkyScene->UpdateProperties();
 		m_spSkyScene->UpdateEffects();
 		m_spSkyScene->Update(0.0);
 	}
-	void AttachWater(NiNode* water)
+	void AttachWater(NiNodePtr water)
 	{
 		m_spWaterScene->AttachChild(water, 1);
-		m_spWaterScene->UpdateProperties();
-		m_spWaterScene->UpdateEffects();
-		m_spWaterScene->Update(0.0);
 	}
-	void AttachGroundObj(NiNode* obj)
+	void AttachGroundObj(NiNodePtr& obj)
 	{
 		m_spGroundObject->AttachChild(obj, 1);
-		m_spGroundObject->UpdateProperties();
-		m_spGroundObject->UpdateEffects();
-		m_spGroundObject->Update(0.0);
 	}
-	void AttachGroundCollidee(NiNode* obj)
+	void AttachGroundCollidee(NiNodePtr obj)
 	{
 		m_spGroundObjectCollidee->AttachChild(obj, 1);
-		m_spGroundObjectCollidee->UpdateProperties();
-		m_spGroundObjectCollidee->UpdateEffects();
-		m_spGroundObjectCollidee->Update(0.0);
 	}
-	void AttachGroundTerrain(NiNode* obj) 
+	void AttachGroundTerrain(NiTriShapePtr obj)
 	{
 		m_spGroundTerrain->AttachChild(obj, 1);
-		m_spGroundTerrain->UpdateProperties();
-		m_spGroundTerrain->UpdateEffects();
-		m_spGroundTerrain->Update(0.0);
 	}
-	NiNode* GetWorldScene() {
+	NiNodePtr GetWorldScene() {
 		return m_spWorldScene;
 	}
-	NiNode* GetTerrainScene() {
+	NiSortAdjustNodePtr GetTerrainScene() {
 		return m_spGroundTerrain;
 	}
-	NiNode* GetSkyNode() {
+	NiNodePtr GetSkyNode() {
 		return m_spSkyScene;
 	}
 
@@ -285,7 +276,7 @@ public:
 	{
 		m_spAmbientLight->SetAmbientColor(kColor);
 	}
-	NiCamera* GetCamera() { return m_spCamera; }
+	NiCameraPtr GetCamera() { return m_spCamera; }
 	static NiPoint3 ms_kUpDir; // idb
 	static NiPoint3 ms_kDownDir; // idb
 	static NiPoint3 ms_kNorthDir; // idb

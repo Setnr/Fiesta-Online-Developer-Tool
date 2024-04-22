@@ -3,9 +3,73 @@
 #include "PgUtil.h"
 #include <NiApplication.h>
 #include <NiD3DShaderFactory.h>
+#include <NiViewMath.h>
 #include <iostream>
 #include <fstream>
 #include <thread>
+#include <future>
+
+#include <chrono>
+
+#include "ImGui/imgui.h"
+#include "ImGui/ImGuizmo.h"
+#include "ImGui/imgui_impl_dx9.h"
+#include "ImGui/imgui_impl_win32.h"
+#include "ImGuiConstantFuncs.h"
+
+#include "FiestaOnlineTool.h"
+float cameraView[16] =
+{ 1.f, 0.f, 0.f, 0.f,
+  0.f, 1.f, 0.f, 0.f,
+  0.f, 0.f, 1.f, 0.f,
+  0.f, 0.f, 0.f, 1.f };
+
+float cameraProjection[16];
+
+float objectMatrix[4][16] = {
+  { 1.f, 0.f, 0.f, 0.f,
+	0.f, 1.f, 0.f, 0.f,
+	0.f, 0.f, 1.f, 0.f,
+	0.f, 0.f, 0.f, 1.f },
+
+  { 1.f, 0.f, 0.f, 0.f,
+  0.f, 1.f, 0.f, 0.f,
+  0.f, 0.f, 1.f, 0.f,
+  2.f, 0.f, 0.f, 1.f },
+
+  { 1.f, 0.f, 0.f, 0.f,
+  0.f, 1.f, 0.f, 0.f,
+  0.f, 0.f, 1.f, 0.f,
+  2.f, 0.f, 2.f, 1.f },
+
+  { 1.f, 0.f, 0.f, 0.f,
+  0.f, 1.f, 0.f, 0.f,
+  0.f, 0.f, 1.f, 0.f,
+  0.f, 0.f, 2.f, 1.f }
+};
+
+
+bool isPerspective = true;
+float fov = 27.f;
+float viewWidth = 10.f; // for orthographic
+float camYAngle = 165.f / 180.f * 3.14159f;
+float camXAngle = 32.f / 180.f * 3.14159f;
+float camDistance = 8.f;
+glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
+{
+	if (q.w == 1.f)
+	{
+		return { 0.f, 1.f, 0.f, 0.f };
+	}
+
+	float_t angle_rad = acos(q.w) * 2;
+
+	float_t x = q.x / sin(angle_rad / 2);
+	float_t y = q.y / sin(angle_rad / 2);
+	float_t z = q.z / sin(angle_rad / 2);
+
+	return { angle_rad, x, y, z };
+}
 
 void LoadTerrainThread(EditorScene* Scene)
 {
@@ -16,13 +80,9 @@ void LoadTerrainThread(EditorScene* Scene)
 
 EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile(FilePath.substr(0, FilePath.length() - 5) + ".ini")
 {
-
+	auto start = std::chrono::steady_clock::now();
 	_FilePath = FilePath;
 	_FileName = FileName;
-
-	std::thread _Thread(LoadTerrainThread,this);
-
-
 
 	if (!kWorld.InitScene())
 		return;
@@ -34,6 +94,8 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 		return;
 	if (!kWorld.InitShadow())
 		return;
+
+	std::thread _Thread(LoadTerrainThread, this);
 
 #define EditorSceneError(Msg) {NiMessageBox::DisplayMessage(Msg, "Error"); return;}
 	std::ifstream SHMD;
@@ -61,14 +123,57 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 		EditorSceneError("SHMD - Failed to Load BackGroundColor");
 	if (!LoadFrustum(SHMD))
 		EditorSceneError("SHMD - Failed to Load Frustum");
-	if(!LoadGlobalObjects(SHMD))
+
+	std::vector<std::pair<std::string, std::vector<ObjectPosition>>> ObjectList;
+	if(!LoadGlobalObjects(SHMD, ObjectList))
 		EditorSceneError("SHMD - Failed to Load GlobalObjects");
 	if (!LoadDirectionLightAmbient(SHMD))
 		EditorSceneError("SHMD - Failed to Load GlobalObjects");
 	if (!LoadDirectionLightDiffuse(SHMD))
 		EditorSceneError("SHMD - Failed to Load GlobalObjects");
 
+	std::vector<std::shared_future<void>> _ThreadList;
+	
+	for (auto obj : ObjectList) 
+	{
+		auto future = std::async(std::launch::async, [this, obj] 
+			{
+				NiNodePtr Obj;
+				for(auto pos = obj.second.begin(); pos < obj.second.end(); pos++)
+				{
+					if (!Obj)
+					{
+						Obj = PgUtil::LoadNifFile(obj.first.c_str(), NULL);
+					}
+					else
+					{
+						Obj = (NiNode*)Obj->Clone();
+					}
+					this->AttachGroundObj(Obj);
+					Obj->SetDefaultCopyType(Obj->COPY_EXACT);
+					Obj->SetTranslate(pos->pos);
+					Obj->SetRotate(pos->quater);
+					Obj->SetScale(pos->Scale);
+					Sleep(2);
+				}
+			});
+		_ThreadList.push_back(future.share());
+	}
+
+	{
+		using namespace std::chrono_literals;
+		while (_ThreadList.size())
+		{
+			auto status = _ThreadList.at(_ThreadList.size() - 1).wait_for(20ms);
+			if (status == std::future_status::ready)
+				_ThreadList.pop_back();
+			Sleep(15);
+		}
+	}
+	_Thread.join();
+
 	Camera = kWorld.GetCamera();
+	
 	Camera->SetTranslate(NiPoint3(5576, 5768, 2500));
 	Pitch = 1.57f * 2.0f;
 	Yaw = -1.57f;
@@ -78,49 +183,28 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 
 	Camera->SetRotate(rotation);
 
-	_Thread.join();
 
-	if(TerrainParent)
-	{
-		terrain->SetName("terrain");
-		kWorld.AttachGroundTerrain(TerrainParent);
-	}
-
-	//NiNodePtr NiN;
-	//NiString CleanPath = _FilePath.GetSubstring(0, ".");
-	//NiString IniFile = CleanPath;
-	//IniFile.Insert(".sdt", CleanPath.Length());
-	//PgUtil::LoadTerrainNif(IniFile,&NiN, 0);
-	//FixSupTexturing(NiN);
-	//kWorld.AttachGroundTerrain(NiN);
-
-	BaseNode->AttachChild(kWorld.GetWorldScene());
+	BaseNode = kWorld.GetWorldScene();
 	BaseNode->UpdateEffects();
 	BaseNode->UpdateProperties();
 	BaseNode->Update(0.0);
 
 	Camera->Update(0.0f);
 
+	float eye[] = { cosf(Pitch) * cosf(Roll) * camDistance, sinf(Roll) * camDistance, sinf(Pitch) * cosf(Roll) * camDistance };
+	float at[] = { 0.f, 0.f, 0.f };
+	float up[] = { 0.f, 1.f, 0.f };
+	LookAt(eye, at, up, cameraView);
 
-	NiStream kStream2;
-	kStream2.InsertObject(kWorld.GetTerrainScene());
-	kStream2.InsertObject(kWorld.GetSkyNode());
-	kStream2.Save("./TESTING123.nif");	
-
-	//NiStream kStream;
-	//kStream.InsertObject(NiN);
-	//kStream.Save("./STDNIF.nif");
 	return;
 }
 
 bool EditorScene::LoadTerrain()
 {
-	terrain = NULL;
-	TerrainParent = NULL;
 
 	if (!_InitFile.Load())
 		return false;
-
+	if (_InitFile.FileType == "")return true;
 	std::string HTDFilePath = PgUtil::CreateFullFilePathFromBaseFolder(_InitFile.HeightFileName);;
 	std::ifstream HTDFile;
 	struct PointInfos
@@ -138,6 +222,33 @@ bool EditorScene::LoadTerrain()
 		unsigned short two;
 		unsigned short three;
 	};
+	/*
+	This is a two dimensional Array, with the size of the Map
+	It contains the Informations which Pixels are used (BL TL BR TR and Used) as 1 Information
+	
+	The second usage is to be a 2 dimensonal array saveing the Z-Coordinate of the NiPoint3 for the Vertexes
+
+	for e.g 
+	a 256 x 256 map has 256x256 Pixels each Pixel containing a TopLeftCorner, BottomLeftCorner ...
+	Each Corner is 1 Vertix and has a increasing Number (following TriCt)
+	a 256x256 Map has 257x257 Vertixes thats why HeightMap_width is used für the vector sizes
+
+	Based on that i can relate to every Pixel with its x and y Koordinages
+	aswell as its relative Vertixes with x,y & x+1,y & x,y+1 & x+1,y+1
+	Because the NiTriStripsGeometry has a limited size (unsigned short) the whole Map gets splitted up
+	this leads to in the following to Calculateing ActiveW and ActiveH based on the Current Block and 
+	the current position within this Block, because of that we can use ActiveW and ActiveH as the PixelCoordinates
+	in the 2D-Array
+
+	We check every Pixel if its used and check if any Vertex of it, already has a ID (ID is saved in TL, TR...)
+	We only need to Check the LeftPixel and the 3 Connected Pixels below the current Pixel
+	if one of those Pixels is used we copy connected TL/BL and so on
+	otherwise we create new ID´s
+
+	finaly we add everything in the needed vectors
+	convert the vectors in fix Arrays and create the TriStripsData aswell as the Texturing Propertys
+	*/
+	
 	std::vector<std::vector<PointInfos>> VertexMap;
 	int PointCounter;
 
@@ -174,8 +285,6 @@ bool EditorScene::LoadTerrain()
 				{
 					for (int w = 0; w < _InitFile.QuadsWide; w++) 
 					{
-						if (w == 64)
-							BlockY = BlockY + 1 - 1;
 						auto ColorArray = (TerrainLayer::RGBAColor*)CurrentLayer->pixldata->GetPixels();
 					
 						int PreBlockXPart = BlockX * _InitFile.QuadsWide;
@@ -298,7 +407,6 @@ bool EditorScene::LoadTerrain()
 				for (int i = 0; i < TextureList2.size(); i++)
 					TextureList1.push_back(TextureList2.at(i));
 
-
 				NiPoint3* pkVertix = NiNew NiPoint3[(int)VerticesList.size()];
 				NiPoint3* pkNormal = NiNew NiPoint3[(int)NormalList.size()];
 				NiColorA* pkColor = NiNew NiColorA[(int)ColorList.size()];
@@ -311,8 +419,8 @@ bool EditorScene::LoadTerrain()
 				memcpy(pkTexture, &TextureList1[0], (int)TextureList1.size() * sizeof(NiPoint2));
 				memcpy(pusTriList, &TriangleList[0], (int)TriangleList.size() * 3 * sizeof(unsigned short));
 
-				NiTriShapeData* data = NiNew NiTriShapeData((unsigned short)VerticesList.size(), pkVertix, pkNormal, pkColor, pkTexture, 2, NiGeometryData::DataFlags::NBT_METHOD_NONE, (unsigned short)TriangleList.size(), pusTriList);
-				NiTriShape* Shape = NiNew NiTriShape(data);
+				NiTriShapeDataPtr data = NiNew NiTriShapeData((unsigned short)VerticesList.size(), pkVertix, pkNormal, pkColor, pkTexture, 2, NiGeometryData::DataFlags::NBT_METHOD_NONE, (unsigned short)TriangleList.size(), pusTriList);
+				NiTriShapePtr Shape = NiNew NiTriShape(data);
 
 				NiSourceTexturePtr BaseTexture = CurrentLayer->BaseTexture;
 				NiSourceTexturePtr BlendTexture = CurrentLayer->BlendTexture;
@@ -323,7 +431,7 @@ bool EditorScene::LoadTerrain()
 				NiTexturingProperty::ShaderMap* BlendTextureMap = NiNew NiTexturingProperty::ShaderMap(BlendTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
 				BlendTextureMap->SetID(1);
 
-				NiTexturingProperty* pkTP = NiNew NiTexturingProperty();
+				NiTexturingPropertyPtr pkTP = NiNew NiTexturingProperty();
 				NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
 
 				alphaprop->SetDestBlendMode(NiAlphaProperty::ALPHA_ZERO);
@@ -354,15 +462,11 @@ bool EditorScene::LoadTerrain()
 				Shape->UpdateEffects();
 				Shape->UpdateProperties();
 				Shape->Update(0.0);
-				if (!terrain)
+
 				{
-					terrain = NiNew NiNode;
-					TerrainParent = NiNew NiSortAdjustNode;
-					NiAlphaProperty* alphapro = NiNew NiAlphaProperty();
-					TerrainParent->AttachChild(terrain);
-					TerrainParent->AttachProperty(alphapro);
+					std::lock_guard<std::mutex> lock(WorldLock);
+					kWorld.AttachGroundTerrain(Shape);
 				}
-				terrain->AttachChild(Shape);
 			}				
 
 		}
@@ -388,4 +492,77 @@ bool EditorScene::LoadTerrain()
 			}
 		}
 	}
+}
+
+void EditorScene::Draw(NiRenderer* renderer)
+{
+	Camera->SetViewFrustum(kWorld.GetSkyFrustum());
+
+	NiVisibleArray m_kVisible;
+	NiCullingProcess m_spCuller(&m_kVisible);
+	NiDrawScene(Camera, kWorld.GetSkyNode(), m_spCuller);
+
+	Camera->SetViewFrustum(kWorld.GetWorldFrustum());
+	NiVisibleArray m_kVisible2;
+	NiCullingProcess m_spCuller2(&m_kVisible2);
+	NiDrawScene(Camera, kWorld.GetWorldScene(), m_spCuller2);
+
+
+	ImGui_ImplDX9_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuizmo::BeginFrame();
+	float_t matrix[16]{};
+	float matrixScale[3] = { 1.f, 1.f, 1.f };
+	glm::vec3 tmpRotation{};
+	NiNode* SelectedNode = rotationValues.begin()->first;
+	const auto target = NiViewMath::Dolly(100.f, Camera->GetTranslate(), Camera->GetRotate());
+	const auto eye = Camera->GetTranslate();
+	const auto up = glm::vec3{ 0, 0, 1 };
+
+	const auto view = glm::lookAt(glm::vec3(eye.x, eye.y, eye.z), glm::vec3(target.x, target.y, target.z), up);
+
+	glm::mat4 projectionMatrix = glm::perspective(
+		glm::radians(50.f),
+		(float_t)io.DisplaySize.x / (float_t)io.DisplaySize.y,
+		Camera->GetViewFrustum().m_fNear, 
+		Camera->GetViewFrustum().m_fFar);
+
+
+	//ImGuizmo::RecomposeMatrixFromComponents((float*)&this->selectedNode->m_kLocal.m_Translate.x, &tmpRotation[0], matrixScale, (float*)matrix);
+	ImGuizmo::RecomposeMatrixFromComponents((float*)&SelectedNode->GetTranslate().x, &tmpRotation[0], matrixScale, (float*)matrix);
+	RECT rect;
+	GetWindowRect(FiestaOnlineTool::_Tool->GetWindowReference(), &rect);
+
+	ImGuizmo::SetRect((float_t)rect.left, (float_t)rect.top, (float_t)io.DisplaySize.x, (float_t)io.DisplaySize.y);
+	static float boundsSnap[] = { 0.1f, 0.1f, 0.1f };
+	ImGuizmo::Manipulate(&view[0][0], &projectionMatrix[0][0], ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::MODE::WORLD, (float*)matrix, nullptr, &boundsSnap[0]);
+
+	ImGuizmo::DecomposeMatrixToComponents((float*)matrix, (float*)&SelectedNode->GetTranslate().x , &tmpRotation[0],
+		matrixScale);
+
+	/*const auto it = this->rotationValues.find(SelectedNode);
+	it->second -= tmpRotation;
+
+	if (abs(it->second[0]) > 180.f)
+	{
+		it->second[0] = -it->second[0] + 2 * fmod(it->second[0], 180.f);
+	}
+
+	if (abs(it->second[1]) > 180.f)
+	{
+		it->second[1] = -it->second[1] + 2 * fmod(it->second[1], 180.f);
+	}
+
+	if (abs(it->second[2]) > 180.f)
+	{
+		it->second[2] = -it->second[2] + 2 * fmod(it->second[2], 180.f);
+	}
+
+	const auto angleAxis = ConvertQuatToAngleAxis(glm::quat(glm::radians(it->second)));*/
+	//SelectedNode->GetRotate().MakeRotation((float)angleAxis[0], NiPoint3(angleAxis[1], angleAxis[2], angleAxis[3]));
+	ImGui::EndFrame();
+	ImGui::Render();
+	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 }

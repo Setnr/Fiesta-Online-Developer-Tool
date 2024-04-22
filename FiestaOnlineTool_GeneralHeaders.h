@@ -6,6 +6,7 @@
 #include <NSBShaderLibLibType.h>
 #include <NSFParserLibLibType.h>
 #include <NiInputLibType.h>
+#include <NiViewMathLibType.h>
 
 #include <NiAnimation.h>
 #include <NiParticle.h>

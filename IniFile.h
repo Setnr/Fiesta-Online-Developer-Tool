@@ -114,7 +114,7 @@ public:
 	int HeightMap_width;
 	int HeightMap_height;
 
-	std::vector<TerrainLayer*> LayerList;
+	std::vector<std::shared_ptr<TerrainLayer>> LayerList;
 
 private:
 	bool LoadPGFile(std::ifstream& File) 
@@ -268,10 +268,9 @@ private:
 	bool LoadLayer(std::ifstream& File)
 	{
 		std::string line;
-		TerrainLayer* Layer = new TerrainLayer();
+		auto Layer = std::make_shared<TerrainLayer>();
 		if (!Layer->Load(File))
 		{
-			delete Layer;
 			std::string msg = _FilePath + "\Failed to Load a Layer";
 			NiMessageBox::DisplayMessage(msg.c_str(), "Error");
 			return false;

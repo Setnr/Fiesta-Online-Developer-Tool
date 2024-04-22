@@ -2,6 +2,13 @@
 #include "FiestaOnlineTool.h"
 #include "FiestaOnlineTool_GeneralHeaders.h"
 
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_internal.h"
+#define IMAPP_IMPL
+#include "ImGui/ImApp.h"
+#include "ImGui/ImGuizmo.h"
+
 void FiestaOnlineTool::OnIdle()
 {
     if(MeasureTime())

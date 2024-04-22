@@ -6,31 +6,34 @@
 #include <iostream>
 #include <string>
 #include <NiThread.h>
+
+#include "glm/glm.hpp"
+#include "glm/ext.hpp"
+
+#include <mutex>
 class EditorScene : public FiestaScene
 {
 public:
+	struct ObjectPosition 
+	{
+		NiPoint3 pos;
+		NiQuaternion quater;
+		float Scale;
+	};
+
 	EditorScene(std::string FilePath, std::string FileName);
-	~EditorScene() = default;
+	~EditorScene() 
+	{
+		kWorld.GetWorldScene()->DetachParent();
+		BaseNode = 0;
+	}
 	bool SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamerea) 
 	{
 		m_spScene = BaseNode;
 		m_spCamerea = Camera;
 		return true;
 	}
-	void Draw(NiRenderer* renderer) 
-	{
-		Camera->SetViewFrustum(kWorld.GetSkyFrustum());
-
-		NiVisibleArray m_kVisible;
-		NiCullingProcess m_spCuller(&m_kVisible);
-		NiDrawScene(Camera, kWorld.GetSkyNode(), m_spCuller);
-
-		Camera->SetViewFrustum(kWorld.GetWorldFrustum());
-		NiVisibleArray m_kVisible2;
-		NiCullingProcess m_spCuller2(&m_kVisible2);
-		NiDrawScene(Camera, kWorld.GetWorldScene(), m_spCuller2);
-		return;
-	}
+	void Draw(NiRenderer* renderer);
 	void Update(float fTime)
 	{
 		kWorld.GetSkyNode()->Update(fTime);
@@ -90,19 +93,32 @@ private:
 	bool LoadFog(std::ifstream& SHMD);
 	bool LoadBackGroundColor(std::ifstream& SHMD);
 	bool LoadFrustum(std::ifstream& SHMD);
-	bool LoadGlobalObjects(std::ifstream& SHMD);
-	bool LoadOneObject(std::ifstream& SHMD, std::string& path);
+	bool LoadGlobalObjects(std::ifstream& SHMD, std::vector<std::pair<std::string, std::vector<EditorScene::ObjectPosition>>>& ObjectList);
+	bool LoadOneObject(std::ifstream& SHMD, std::vector<ObjectPosition>& Positions);
 	bool LoadDirectionLightAmbient(std::ifstream& SHMD);
 	bool LoadDirectionLightDiffuse(std::ifstream& SHMD);
-
-	World kWorld;
+	void AttachGroundObj(NiNodePtr& Obj)
+	{
+		std::lock_guard<std::mutex> lock(WorldLock);
+		float angle, x, y, z;
+		Obj->GetRotate().ExtractAngleAndAxis(angle, x, y, z);
+		glm::vec3 anglesLocal = glm::degrees(glm::vec3{ eulerAngles(glm::angleAxis((float)angle, glm::vec3(x, y, z))) });
+		rotationValues.insert({ Obj, anglesLocal });
+		kWorld.AttachGroundObj(Obj);
+	}
 	NiColor BackgroundColor;
 
 	std::string _FilePath;
 	std::string _FileName;
 	IniFile _InitFile;
-	NiNodePtr terrain;
-	NiNodePtr TerrainParent;
+
+	std::mutex WorldLock;
+	World kWorld;
+
+	std::map<NiNode*, glm::vec3> rotationValues;
+
+	//std::mutex ObjectLoadLock;
+	//std::vector < std::string, LoadingData >
 };
 
 

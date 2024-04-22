@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\DebugDLL;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\VM\Gamebryo\Fiesta Online Tool\Detours;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\DebugDLL;$(LibraryPath)</LibraryPath>
     <OutDir>E:\VM\Gamebryo\GameClient</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -88,14 +88,14 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NIMAIN_IMPORT;NIDX9RENDERER_IMPORT;NISYSTEM_IMPORT;NSFPARSERLIB_IMPORT;NIINPUT_IMPORT;NSBSHADERLIB_IMPORT;_USRDLL;WIN32;_DEBUG;_CONSOLE;NIDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NIMAIN_IMPORT;NIDX9RENDERER_IMPORT;NISYSTEM_IMPORT;NSFPARSERLIB_IMPORT;NIINPUT_IMPORT;NSBSHADERLIB_IMPORT;NIVIEWMATH_IMPORT;_USRDLL;WIN32;_DEBUG;_CONSOLE;NIDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem23VC80D.lib;NiCollision23VC80D.lib;NiAnimation23VC80D.lib;NiParticle23VC80D.lib;NiMain23VC80D.lib;NiVisualTracker23VC80D.lib;NiInput23VC80D.lib;NiFont23VC80D.lib;NiCursor23VC80D.lib;NiD3DXEffectShaderLibDX923VC80D.lib;NSBShaderLibDX923VC80D.lib;NiBinaryShaderLibDX923VC80D.lib;NiD3D10BinaryShaderLibD3D1023VC80D.lib;NSFParserLibDX923VC80D.lib;legacy_stdio_definitions.lib;NiUserInterface23VC80D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem23VC80D.lib;NiCollision23VC80D.lib;NiAnimation23VC80D.lib;NiParticle23VC80D.lib;NiMain23VC80D.lib;NiVisualTracker23VC80D.lib;NiInput23VC80D.lib;NiFont23VC80D.lib;NiCursor23VC80D.lib;NiD3DXEffectShaderLibDX923VC80D.lib;NSBShaderLibDX923VC80D.lib;NiBinaryShaderLibDX923VC80D.lib;NiD3D10BinaryShaderLibD3D1023VC80D.lib;NSFParserLibDX923VC80D.lib;legacy_stdio_definitions.lib;NiUserInterface23VC80D.lib;NiViewMath23VC80D.lib;syelog.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -150,6 +150,18 @@
     <ClCompile Include="FiestaOnlineTool_UI.cpp" />
     <ClCompile Include="FiestaRenderer.cpp" />
     <ClCompile Include="FiestaScene.cpp" />
+    <ClCompile Include="ImGui\GraphEditor.cpp" />
+    <ClCompile Include="ImGui\ImCurveEdit.cpp" />
+    <ClCompile Include="ImGui\ImGradient.cpp" />
+    <ClCompile Include="ImGui\imgui.cpp" />
+    <ClCompile Include="ImGui\ImGuizmo.cpp" />
+    <ClCompile Include="ImGui\imgui_demo.cpp" />
+    <ClCompile Include="ImGui\imgui_draw.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="ImGui\imgui_tables.cpp" />
+    <ClCompile Include="ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="ImGui\ImSequencer.cpp" />
     <ClCompile Include="IngameWorld.cpp" />
     <ClCompile Include="IniFile.cpp" />
     <ClCompile Include="main.cpp" />
@@ -158,12 +170,31 @@
     <ClCompile Include="StartScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Detours\detours.h" />
+    <ClInclude Include="Detours\detver.h" />
+    <ClInclude Include="Detours\syelog.h" />
     <ClInclude Include="EditorScene.h" />
     <ClInclude Include="FiestaOnlineTool.h" />
     <ClInclude Include="FiestaOnlineTool_GeneralHeaders.h" />
     <ClInclude Include="FiestaRenderer.h" />
     <ClInclude Include="FiestaRendererTypeDef.h" />
     <ClInclude Include="FiestaScene.h" />
+    <ClInclude Include="ImGuiConstantFuncs.h" />
+    <ClInclude Include="ImGui\GraphEditor.h" />
+    <ClInclude Include="ImGui\ImApp.h" />
+    <ClInclude Include="ImGui\imconfig.h" />
+    <ClInclude Include="ImGui\ImCurveEdit.h" />
+    <ClInclude Include="ImGui\ImGradient.h" />
+    <ClInclude Include="ImGui\imgui.h" />
+    <ClInclude Include="ImGui\ImGuizmo.h" />
+    <ClInclude Include="ImGui\imgui_impl_dx9.h" />
+    <ClInclude Include="ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="ImGui\imgui_internal.h" />
+    <ClInclude Include="ImGui\ImSequencer.h" />
+    <ClInclude Include="ImGui\imstb_rectpack.h" />
+    <ClInclude Include="ImGui\imstb_textedit.h" />
+    <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="ImGui\ImZoomSlider.h" />
     <ClInclude Include="IngameWorld.h" />
     <ClInclude Include="IniFile.h" />
     <ClInclude Include="PgUtil.h" />
@@ -171,6 +202,9 @@
     <ClInclude Include="PgWinMgr.h" />
     <ClInclude Include="PgWinObj.h" />
     <ClInclude Include="StartScene.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ImGui\imgui.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -6,6 +6,9 @@ TerrainLayer::~TerrainLayer()
 {
 	if (pixldata)
 		NiDelete pixldata;
+
+	BlendTexture = 0;
+	BaseTexture = 0;
 }
 
 bool TerrainLayer::Load(std::ifstream& File)
