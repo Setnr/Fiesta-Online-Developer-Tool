@@ -114,25 +114,7 @@ bool World::InitCamera()
 	NiFrustum WorldFrustum(-0.25, 0.25, 0.1875, -0.1875, 1.0, 600000.0, m_bCameraOrtho);
 	m_kWorldFrustum = WorldFrustum;
 	m_spCamera->SetViewFrustum(m_kWorldFrustum); //World::SetCameraFOV
-	m_kCameraCtrl.InitDirection(ms_kUpDir, ms_kEastDir, ms_kNorthDir);
-	m_kCameraCtrl.InitZoomMinMax(40.0, 600.0);
-	m_kCameraCtrl.m_fAngleUDMax = 295.0;
-	m_kCameraCtrl.m_fAngleUDMin = 89.0;
-	m_kCameraCtrl.SetZoom(300.0);
-	m_kCameraCtrl.AddRotate(0.0, 35.0);
-	m_kCamOscillation.Clear();
-	m_bControllerMode = 0;
-	m_kLookAtDelta.x = 0.0;
-	m_kLookAtDelta.y = 0.0;
-	m_kLookAtDelta.z = 0.0;
-	m_kCameraPosDelta.x = 0.0;
-	m_kCameraPosDelta.y = 0.0;
-	m_kCameraPosDelta.z = 0.0;
-	m_dwOldTime = 0;
-	m_fAngleUDDelta = -1.0;
-	m_fAngleLRDelta = -1.0;
-	m_fDist = 0.0;
-	m_kLookAtPos = NiPoint3::ZERO;
+	
 
 	m_fCameraFOV = 50.0f;
 	float fTop = m_fCameraFOV / 180.0 * 0.5 * NI_PI;
@@ -142,7 +124,7 @@ bool World::InitCamera()
 	float v5 = 1600; /*TODO DYNAMIC*/
 	float v6 = 900;
 	float fTopb;
-	if (1600 >= (double)900)
+	if (900 >= (double)1600)
 	{
 		fTopb = v4 * (v6 / v5);
 		v4 = fTopb;
@@ -162,12 +144,11 @@ bool World::InitCamera()
 	this->m_kSkyFrustum.m_fLeft = v7;
 	this->m_kSkyFrustum.m_fRight = fRight;
 	this->m_kSkyFrustum.m_fTop = v4;
-	this->m_fNearPlaneRadius = (fRight + fRight) * 7.5;
 	return true;
 }
 bool World::InitSkyCtrl()
 {
-	return m_kSkyCtrl.Init();
+	return 1;
 }
 bool World::InitLightFog()
 {

@@ -7,7 +7,7 @@
 
 #include "NiPickable.h"
 
-#define PICKABLEOBJECTS 0
+#define PICKABLEOBJECTS 1
 class PgUtil 
 {
 public:
