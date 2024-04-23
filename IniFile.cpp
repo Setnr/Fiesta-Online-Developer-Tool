@@ -2,6 +2,7 @@
 #include "PgUtil.h"
 
 #include <NiMessageBox.h>
+#include <filesystem>
 TerrainLayer::~TerrainLayer()
 {
 	if (pixldata)
@@ -139,6 +140,8 @@ IniFile::IniFile(std::string FilePath)
 bool IniFile::Load()
 {
 	std::ifstream File;
+	if (!std::filesystem::exists(_FilePath))
+		return true;
 	File.open(_FilePath);
 
 	if (!File.is_open()) 

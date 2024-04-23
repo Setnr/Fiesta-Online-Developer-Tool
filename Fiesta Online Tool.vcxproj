@@ -165,6 +165,7 @@
     <ClCompile Include="IngameWorld.cpp" />
     <ClCompile Include="IniFile.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NiPickable.cpp" />
     <ClCompile Include="PgWin.cpp" />
     <ClCompile Include="SHMDLoad.cpp" />
     <ClCompile Include="StartScene.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="ImGui\ImZoomSlider.h" />
     <ClInclude Include="IngameWorld.h" />
     <ClInclude Include="IniFile.h" />
+    <ClInclude Include="NiPickable.h" />
     <ClInclude Include="PgUtil.h" />
     <ClInclude Include="PgWin.h" />
     <ClInclude Include="PgWinMgr.h" />

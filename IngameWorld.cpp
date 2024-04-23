@@ -133,6 +133,36 @@ bool World::InitCamera()
 	m_fAngleLRDelta = -1.0;
 	m_fDist = 0.0;
 	m_kLookAtPos = NiPoint3::ZERO;
+
+	m_fCameraFOV = 50.0f;
+	float fTop = m_fCameraFOV / 180.0 * 0.5 * NI_PI;
+	float fTopa = tan(fTop);
+	float v4 = fTopa;
+	float fRight = fTopa;
+	float v5 = 1600; /*TODO DYNAMIC*/
+	float v6 = 900;
+	float fTopb;
+	if (1600 >= (double)900)
+	{
+		fTopb = v4 * (v6 / v5);
+		v4 = fTopb;
+	}
+	else
+	{
+		fRight = v5 / v6 * v4;
+	}
+	float fTopc = -fRight;
+	float v7 = fTopc;
+	this->m_kWorldFrustum.m_fLeft = fTopc;
+	this->m_kWorldFrustum.m_fRight = fRight;
+	this->m_kWorldFrustum.m_fTop = v4;
+	float fTopd = -v4;
+	this->m_kWorldFrustum.m_fBottom = fTopd;
+	this->m_kSkyFrustum.m_fBottom = fTopd;
+	this->m_kSkyFrustum.m_fLeft = v7;
+	this->m_kSkyFrustum.m_fRight = fRight;
+	this->m_kSkyFrustum.m_fTop = v4;
+	this->m_fNearPlaneRadius = (fRight + fRight) * 7.5;
 	return true;
 }
 bool World::InitSkyCtrl()

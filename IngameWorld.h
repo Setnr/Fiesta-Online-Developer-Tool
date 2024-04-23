@@ -241,7 +241,9 @@ public:
 	NiNodePtr GetSkyNode() {
 		return m_spSkyScene;
 	}
-
+	NiNodePtr GetGroundObjNode() {
+		return m_spGroundObject;
+	}
 	void SetFogColor(NiColor kColor) 
 	{
 		NiFogProperty* fog = (NiFogProperty*) m_spWorldScene->GetProperty(NiProperty::FOG);
@@ -277,6 +279,8 @@ public:
 		m_spAmbientLight->SetAmbientColor(kColor);
 	}
 	NiCameraPtr GetCamera() { return m_spCamera; }
+
+	float GetFOV() { return this->m_fCameraFOV; }
 	static NiPoint3 ms_kUpDir; // idb
 	static NiPoint3 ms_kDownDir; // idb
 	static NiPoint3 ms_kNorthDir; // idb

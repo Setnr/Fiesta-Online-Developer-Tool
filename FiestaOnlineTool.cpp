@@ -59,9 +59,8 @@ void FiestaOnlineTool::OnIdle()
 
 void FiestaOnlineTool::DrawCursor()
 {
-    tagPOINT kPoint;
-    GetCursorPos(&kPoint);
-    ScreenToClient(this->GetRenderWindowReference(), &kPoint);
-    _Tool->cursor->SetPosition(0.0, kPoint.x + 5, kPoint.y + 9);
+    long X, Y;
+    FiestaOnlineTool::GetMousePosition(X, Y);
+    _Tool->cursor->SetPosition(0.0, X + 5, Y + 9);
     cursor->Draw();
 }

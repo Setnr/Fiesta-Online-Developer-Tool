@@ -26,6 +26,7 @@ public:
 		return NULL;
 	}
 	virtual void Draw(NiRenderer* renderer) {}
+	virtual void DrawImGui() {};
 	virtual void Update(float fTime)
 	{
 		this->UpdateCamera(fTime);

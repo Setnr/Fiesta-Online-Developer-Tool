@@ -4,10 +4,12 @@
 #include <NiApplication.h>
 #include <NiD3DShaderFactory.h>
 #include <NiViewMath.h>
+#include <NiPick.h>
 #include <iostream>
 #include <fstream>
 #include <thread>
 #include <future>
+#include <set>
 
 #include <chrono>
 
@@ -18,43 +20,8 @@
 #include "ImGuiConstantFuncs.h"
 
 #include "FiestaOnlineTool.h"
-float cameraView[16] =
-{ 1.f, 0.f, 0.f, 0.f,
-  0.f, 1.f, 0.f, 0.f,
-  0.f, 0.f, 1.f, 0.f,
-  0.f, 0.f, 0.f, 1.f };
-
-float cameraProjection[16];
-
-float objectMatrix[4][16] = {
-  { 1.f, 0.f, 0.f, 0.f,
-	0.f, 1.f, 0.f, 0.f,
-	0.f, 0.f, 1.f, 0.f,
-	0.f, 0.f, 0.f, 1.f },
-
-  { 1.f, 0.f, 0.f, 0.f,
-  0.f, 1.f, 0.f, 0.f,
-  0.f, 0.f, 1.f, 0.f,
-  2.f, 0.f, 0.f, 1.f },
-
-  { 1.f, 0.f, 0.f, 0.f,
-  0.f, 1.f, 0.f, 0.f,
-  0.f, 0.f, 1.f, 0.f,
-  2.f, 0.f, 2.f, 1.f },
-
-  { 1.f, 0.f, 0.f, 0.f,
-  0.f, 1.f, 0.f, 0.f,
-  0.f, 0.f, 1.f, 0.f,
-  0.f, 0.f, 2.f, 1.f }
-};
 
 
-bool isPerspective = true;
-float fov = 27.f;
-float viewWidth = 10.f; // for orthographic
-float camYAngle = 165.f / 180.f * 3.14159f;
-float camXAngle = 32.f / 180.f * 3.14159f;
-float camDistance = 8.f;
 glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 {
 	if (q.w == 1.f)
@@ -71,16 +38,8 @@ glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 	return { angle_rad, x, y, z };
 }
 
-void LoadTerrainThread(EditorScene* Scene)
-{
-	if (!Scene->LoadTerrain()) {
-		NiMessageBox::DisplayMessage("Failed to Load Terrain for Current Scene", "Error");
-	}
-}
-
 EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile(FilePath.substr(0, FilePath.length() - 5) + ".ini")
 {
-	auto start = std::chrono::steady_clock::now();
 	_FilePath = FilePath;
 	_FileName = FileName;
 
@@ -95,7 +54,14 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 	if (!kWorld.InitShadow())
 		return;
 
-	std::thread _Thread(LoadTerrainThread, this);
+	std::vector<std::shared_future<void>> _ThreadList;
+	{
+		auto future = std::async(std::launch::async, [this]
+			{
+				this->LoadTerrain();
+			});
+		_ThreadList.push_back(future.share());
+	}
 
 #define EditorSceneError(Msg) {NiMessageBox::DisplayMessage(Msg, "Error"); return;}
 	std::ifstream SHMD;
@@ -132,7 +98,6 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 	if (!LoadDirectionLightDiffuse(SHMD))
 		EditorSceneError("SHMD - Failed to Load GlobalObjects");
 
-	std::vector<std::shared_future<void>> _ThreadList;
 	
 	for (auto obj : ObjectList) 
 	{
@@ -143,16 +108,19 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 				{
 					if (!Obj)
 					{
-						Obj = PgUtil::LoadNifFile(obj.first.c_str(), NULL);
+						Obj = PgUtil::LoadNifFile(obj.first.c_str(), NULL, PICKABLEOBJECTS);
+						//Obj = PgUtil::LoadPickableNifFile(obj.first.c_str(), NULL);
 					}
 					else
 					{
-						Obj = (NiNode*)Obj->Clone();
+						Obj = (NiPickable*)Obj->Clone();
 					}
 					this->AttachGroundObj(Obj);
 					Obj->SetDefaultCopyType(Obj->COPY_EXACT);
 					Obj->SetTranslate(pos->pos);
-					Obj->SetRotate(pos->quater);
+					NiMatrix3 m;
+					pos->quater.ToRotation(m);
+					Obj->SetRotate(m);
 					Obj->SetScale(pos->Scale);
 					Sleep(2);
 				}
@@ -166,15 +134,17 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 		{
 			auto status = _ThreadList.at(_ThreadList.size() - 1).wait_for(20ms);
 			if (status == std::future_status::ready)
+			{
 				_ThreadList.pop_back();
+				continue;
+			}
 			Sleep(15);
 		}
 	}
-	_Thread.join();
 
 	Camera = kWorld.GetCamera();
 	
-	Camera->SetTranslate(NiPoint3(5576, 5768, 2500));
+	Camera->SetTranslate(NiPoint3(0, 0, 0));
 	Pitch = 1.57f * 2.0f;
 	Yaw = -1.57f;
 	Roll = 1.57f;
@@ -191,10 +161,9 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 
 	Camera->Update(0.0f);
 
-	float eye[] = { cosf(Pitch) * cosf(Roll) * camDistance, sinf(Roll) * camDistance, sinf(Pitch) * cosf(Roll) * camDistance };
-	float at[] = { 0.f, 0.f, 0.f };
-	float up[] = { 0.f, 1.f, 0.f };
-	LookAt(eye, at, up, cameraView);
+	NiStream s;
+	s.InsertObject(kWorld.GetWorldScene());
+	s.Save("./Fullyloaded.nif");
 
 	return;
 }
@@ -491,6 +460,10 @@ bool EditorScene::LoadTerrain()
 				}
 			}
 		}
+		kWorld.GetTerrainScene()->Update(0.0f);
+		kWorld.GetTerrainScene()->UpdateEffects();
+		kWorld.GetTerrainScene()->UpdateProperties();
+		kWorld.GetTerrainScene()->Update(0.0f);
 	}
 }
 
@@ -508,61 +481,143 @@ void EditorScene::Draw(NiRenderer* renderer)
 	NiDrawScene(Camera, kWorld.GetWorldScene(), m_spCuller2);
 
 
+	NiVisibleArray m_kVisibleTerrain;
+	NiCullingProcess m_spCullerTerrain(&m_kVisibleTerrain);
+	NiDrawScene(Camera, kWorld.GetTerrainScene(), m_spCullerTerrain);
+
+	DrawImGui();
+}
+
+void EditorScene::DrawImGui() 
+{
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	ImGuiIO& io = ImGui::GetIO();
-	ImGuizmo::BeginFrame();
+
+	DrawGizmo();
+
+	ImGui::EndFrame();
+	ImGui::Render();
+	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+}
+
+void EditorScene::DrawGizmo() 
+{
+	
+	if (!SelectedObj)
+		return;
+
+	/*
+	Huge Credits to Maki for helping me with this Code
+	by giving me his :)
+	*/
+
+
 	float_t matrix[16]{};
 	float matrixScale[3] = { 1.f, 1.f, 1.f };
 	glm::vec3 tmpRotation{};
-	NiNode* SelectedNode = rotationValues.begin()->first;
-	const auto target = NiViewMath::Dolly(100.f, Camera->GetTranslate(), Camera->GetRotate());
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuizmo::BeginFrame();
+	NiPickable* SelectedNode = SelectedObj;
+
+	const auto target = NiViewMath::Dolly(10.f, Camera->GetTranslate(), Camera->GetRotate());
 	const auto eye = Camera->GetTranslate();
 	const auto up = glm::vec3{ 0, 0, 1 };
 
 	const auto view = glm::lookAt(glm::vec3(eye.x, eye.y, eye.z), glm::vec3(target.x, target.y, target.z), up);
 
-	glm::mat4 projectionMatrix = glm::perspective(
-		glm::radians(50.f),
-		(float_t)io.DisplaySize.x / (float_t)io.DisplaySize.y,
-		Camera->GetViewFrustum().m_fNear, 
-		Camera->GetViewFrustum().m_fFar);
+	glm::mat4 projectionMatrix = glm::perspective(glm::radians(kWorld.GetFOV()),(((float_t)io.DisplaySize.x / (float_t)io.DisplaySize.y)),Camera->GetViewFrustum().m_fNear,Camera->GetViewFrustum().m_fFar);
 
+	ImGuizmo::RecomposeMatrixFromComponents(&SelectedNode->GetTranslate().x, &tmpRotation[0], matrixScale, (float*)matrix);
 
-	//ImGuizmo::RecomposeMatrixFromComponents((float*)&this->selectedNode->m_kLocal.m_Translate.x, &tmpRotation[0], matrixScale, (float*)matrix);
-	ImGuizmo::RecomposeMatrixFromComponents((float*)&SelectedNode->GetTranslate().x, &tmpRotation[0], matrixScale, (float*)matrix);
-	RECT rect;
-	GetWindowRect(FiestaOnlineTool::_Tool->GetWindowReference(), &rect);
+	ImGuizmo::SetRect((float_t)0, (float_t)0, (float_t)io.DisplaySize.x, (float_t)io.DisplaySize.y);
+	ImGuizmo::Manipulate(&view[0][0], &projectionMatrix[0][0], ImGuizmo::OPERATION::ROTATE, ImGuizmo::MODE::WORLD, (float*)matrix, nullptr, nullptr);
 
-	ImGuizmo::SetRect((float_t)rect.left, (float_t)rect.top, (float_t)io.DisplaySize.x, (float_t)io.DisplaySize.y);
-	static float boundsSnap[] = { 0.1f, 0.1f, 0.1f };
-	ImGuizmo::Manipulate(&view[0][0], &projectionMatrix[0][0], ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::MODE::WORLD, (float*)matrix, nullptr, &boundsSnap[0]);
+	ImGuizmo::DecomposeMatrixToComponents((float*)matrix, (float*)&SelectedNode->GetTranslate().x, &tmpRotation[0], matrixScale);
 
-	ImGuizmo::DecomposeMatrixToComponents((float*)matrix, (float*)&SelectedNode->GetTranslate().x , &tmpRotation[0],
-		matrixScale);
+	SelectedObjAngels -= tmpRotation;
 
-	/*const auto it = this->rotationValues.find(SelectedNode);
-	it->second -= tmpRotation;
-
-	if (abs(it->second[0]) > 180.f)
+	if (abs(SelectedObjAngels[0]) > 180.f)
 	{
-		it->second[0] = -it->second[0] + 2 * fmod(it->second[0], 180.f);
+		SelectedObjAngels[0] = -SelectedObjAngels[0] + 2 * fmod(SelectedObjAngels[0], 180.f);
 	}
 
-	if (abs(it->second[1]) > 180.f)
+	if (abs(SelectedObjAngels[1]) > 180.f)
 	{
-		it->second[1] = -it->second[1] + 2 * fmod(it->second[1], 180.f);
+		SelectedObjAngels[1] = -SelectedObjAngels[1] + 2 * fmod(SelectedObjAngels[1], 180.f);
 	}
 
-	if (abs(it->second[2]) > 180.f)
+	if (abs(SelectedObjAngels[2]) > 180.f)
 	{
-		it->second[2] = -it->second[2] + 2 * fmod(it->second[2], 180.f);
+		SelectedObjAngels[2] = -SelectedObjAngels[2] + 2 * fmod(SelectedObjAngels[2], 180.f);
 	}
 
-	const auto angleAxis = ConvertQuatToAngleAxis(glm::quat(glm::radians(it->second)));*/
-	//SelectedNode->GetRotate().MakeRotation((float)angleAxis[0], NiPoint3(angleAxis[1], angleAxis[2], angleAxis[3]));
-	ImGui::EndFrame();
-	ImGui::Render();
-	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+	glm::vec4 angleAxis = ConvertQuatToAngleAxis(glm::quat(glm::radians(SelectedObjAngels)));
+	NiMatrix3 m;
+	m.MakeRotation(angleAxis[0], angleAxis[1], angleAxis[2], angleAxis[3]);
+	
+	float angle, x, y, z;
+	SelectedNode->GetRotate().ExtractAngleAndAxis(angle, x, y, z);
+
+	SelectedNode->SetRotate(m);
+}
+
+void EditorScene::UpdateCamera(float fTime) 
+{
+	FiestaScene::UpdateCamera(fTime);
+	if (FiestaOnlineTool::IsLeftClick())
+	{
+		NiPoint3 kOrigin, kDir;
+		long X, Y;
+		FiestaOnlineTool::GetMousePosition(X, Y);
+		if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir)) 
+		{
+			NiPick _Pick;
+			_Pick.SetPickType(NiPick::FIND_ALL);
+			_Pick.SetSortType(NiPick::SORT);
+			_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+			_Pick.SetFrontOnly(true);
+			_Pick.SetReturnNormal(true);
+			_Pick.SetObserveAppCullFlag(true);
+			_Pick.SetTarget(kWorld.GetGroundObjNode());
+			if (_Pick.PickObjects(kOrigin, kDir, true)) 
+			{
+				NiPick::Results& results = _Pick.GetResults();
+
+				std::set<NiPickable*> PossibleObjects;
+
+				for (int i = 0; i < results.GetSize(); i++ ) 
+				{
+					auto record = results.GetAt(i);
+					auto obj = record->GetParent();
+					if (NiIsKindOf(NiPickable, obj))
+					{
+						PossibleObjects.insert((NiPickable*)obj);
+					}
+					else 
+					{
+						while (obj = obj->GetParent())
+						{
+							if (NiIsKindOf(NiPickable, obj))
+							{
+								PossibleObjects.insert((NiPickable*)obj);
+								break;
+							}
+						}
+					}
+				}
+				if (auto search = PossibleObjects.find(SelectedObj); search == PossibleObjects.end()) 
+				{
+					if(PossibleObjects.size() != 0)
+					{
+						SelectedObj = *PossibleObjects.begin();
+						float angle, x, y, z;
+						SelectedObj->GetRotate().ExtractAngleAndAxis(angle, x, y, z);
+						SelectedObjAngels = glm::degrees(glm::vec3{ eulerAngles(glm::angleAxis((float)angle, glm::vec3(x, y, z))) });
+
+					}
+				}
+			}
+		}
+	}
 }

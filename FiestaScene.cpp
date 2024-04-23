@@ -2,6 +2,7 @@
 #include "PgUtil.h"
 
 #include "FiestaOnlineTool.h"
+#include <NiViewMath.h>
 //const NiRTTI FiestaScene::ms_RTTI("FiestaScene", NULL);
 bool FiestaScene::SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamera)
 {
@@ -32,11 +33,9 @@ void FiestaScene::UpdateCamera(float fTime)
 				float fHeadingDelta = NI_PI * 0.375f * (float)(iX) / (float)uiAppWidth;
 				Pitch += fPitchDelta;
 				Yaw -= fHeadingDelta;
-
 				NiMatrix3 rotation;
 				rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
 				Camera->SetRotate(rotation);
-
 			}
 		}
 	}

@@ -76,6 +76,9 @@
     <ClCompile Include="ImGui\imgui_impl_dx9.cpp">
       <Filter>Includes\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="NiPickable.cpp">
+      <Filter>CustomNiClasses</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fiesta Online Tool">
@@ -110,6 +113,9 @@
     </Filter>
     <Filter Include="Includes\ImGui">
       <UniqueIdentifier>{fb40c854-25f6-4132-a472-972313f2dbb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CustomNiClasses">
+      <UniqueIdentifier>{f5f656b4-6a93-49ea-bc9e-355594815e38}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -206,6 +212,9 @@
     </ClInclude>
     <ClInclude Include="Detours\syelog.h">
       <Filter>Includes\Detours</Filter>
+    </ClInclude>
+    <ClInclude Include="NiPickable.h">
+      <Filter>CustomNiClasses</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

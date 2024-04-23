@@ -5,6 +5,9 @@
 #include <iostream>
 #include <NiGeometry.h>
 
+#include "NiPickable.h"
+
+#define PICKABLEOBJECTS 0
 class PgUtil 
 {
 public:
@@ -69,9 +72,13 @@ public:
         }
         return 0;
 	}
-    static NiNodePtr LoadNifFile(const char* File, NiTexturePalette* /*Currently Unused */) 
+    static NiNodePtr LoadNifFile(const char* File, NiTexturePalette* /*Currently Unused */, bool IsPickable = false) 
     {
-        NiNode* Node = NiNew NiNode;
+        NiNode* Node;
+        if (IsPickable)
+            Node = NiNew NiPickable;
+        else
+            Node = NiNew NiNode;
         NiStream kStream;
         bool bLoaded = kStream.Load(File);
         NIASSERT(bLoaded);

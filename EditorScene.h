@@ -11,6 +11,9 @@
 #include "glm/ext.hpp"
 
 #include <mutex>
+
+#include "NiPickable.h"
+
 class EditorScene : public FiestaScene
 {
 public:
@@ -34,12 +37,14 @@ public:
 		return true;
 	}
 	void Draw(NiRenderer* renderer);
+	void DrawImGui();
 	void Update(float fTime)
 	{
 		kWorld.GetSkyNode()->Update(fTime);
 		FiestaScene::Update(fTime);
 	}
 	bool LoadTerrain();
+	void UpdateCamera(float fTime) override;
 private:
 	void FlipVertical(NiPoint3* BlockPoints, int QuadsWide, int QuadsHigh)
 	{
@@ -99,13 +104,17 @@ private:
 	bool LoadDirectionLightDiffuse(std::ifstream& SHMD);
 	void AttachGroundObj(NiNodePtr& Obj)
 	{
-		std::lock_guard<std::mutex> lock(WorldLock);
-		float angle, x, y, z;
-		Obj->GetRotate().ExtractAngleAndAxis(angle, x, y, z);
-		glm::vec3 anglesLocal = glm::degrees(glm::vec3{ eulerAngles(glm::angleAxis((float)angle, glm::vec3(x, y, z))) });
-		rotationValues.insert({ Obj, anglesLocal });
+		std::lock_guard<std::mutex> lock(WorldLock);		
 		kWorld.AttachGroundObj(Obj);
 	}
+	void AttachGroundObj(NiPickablePtr& Obj)
+	{
+		NiNodePtr ptr = &*Obj;
+		std::lock_guard<std::mutex> lock(WorldLock);
+		kWorld.AttachGroundObj(ptr);
+	}
+	void DrawGizmo();
+
 	NiColor BackgroundColor;
 
 	std::string _FilePath;
@@ -115,7 +124,8 @@ private:
 	std::mutex WorldLock;
 	World kWorld;
 
-	std::map<NiNode*, glm::vec3> rotationValues;
+	NiPickablePtr SelectedObj;
+	glm::vec3 SelectedObjAngels;
 
 	//std::mutex ObjectLoadLock;
 	//std::vector < std::string, LoadingData >

@@ -64,6 +64,9 @@ public:
 		}
 		return ret;
 	}
+	static bool IsLeftClick() {
+		return _Tool->m_spMouse->ButtonWasPressed(NiInputMouse::NIM_LEFT);
+	}
 	static bool GetPositionDelta(int& iX, int& iY, int& iZ) 
 	{
 		if (_Tool) 
@@ -71,6 +74,17 @@ public:
 			return _Tool->m_spMouse->GetPositionDelta(iX, iY, iZ);
 		}
 		return false;
+	}
+	static bool GetMousePosition(long& X, long& Y) 
+	{
+		if (!_Tool)
+			return false;
+		tagPOINT kPoint;
+		GetCursorPos(&kPoint);
+		ScreenToClient(_Tool->GetRenderWindowReference(), &kPoint);
+		X = kPoint.x;
+		Y = kPoint.y;
+		return true;
 	}
 
 	static FiestaOnlineTool* _Tool;
