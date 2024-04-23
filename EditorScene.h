@@ -124,6 +124,7 @@ private:
 	std::mutex WorldLock;
 	World kWorld;
 
+
 	NiPickablePtr SelectedObj;
 	glm::vec3 SelectedObjAngels;
 

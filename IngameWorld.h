@@ -38,7 +38,6 @@ private:
 	NiNodePtr m_spBuildingCollidee;
 	NiNodePtr m_spUseCameraCollidee;
 	NiCameraPtr m_spCamera;
-	NiRenderer* m_pkRenderer;
 	float m_fCameraFOV;
 	bool m_bCameraOrtho;
 	NiFrustum m_kSkyFrustum;
@@ -101,7 +100,7 @@ public:
 			fDepth = 0.0;
 		fog->SetDepth(fDepth);
 	}
-	void SetFarFrumstum(float Frustum) 
+	void SetFarFrumstum(float Frustum)	
 	{
 		m_kWorldFrustum.m_fFar = Frustum;
 	}

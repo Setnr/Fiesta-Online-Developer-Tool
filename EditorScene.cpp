@@ -109,7 +109,6 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 					if (!Obj)
 					{
 						Obj = PgUtil::LoadNifFile(obj.first.c_str(), NULL, PICKABLEOBJECTS);
-						//Obj = PgUtil::LoadPickableNifFile(obj.first.c_str(), NULL);
 					}
 					else
 					{
@@ -170,7 +169,6 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 
 bool EditorScene::LoadTerrain()
 {
-
 	if (!_InitFile.Load())
 		return false;
 	if (_InitFile.FileType == "")return true;
@@ -460,10 +458,6 @@ bool EditorScene::LoadTerrain()
 				}
 			}
 		}
-		kWorld.GetTerrainScene()->Update(0.0f);
-		kWorld.GetTerrainScene()->UpdateEffects();
-		kWorld.GetTerrainScene()->UpdateProperties();
-		kWorld.GetTerrainScene()->Update(0.0f);
 	}
 }
 
@@ -479,11 +473,6 @@ void EditorScene::Draw(NiRenderer* renderer)
 	NiVisibleArray m_kVisible2;
 	NiCullingProcess m_spCuller2(&m_kVisible2);
 	NiDrawScene(Camera, kWorld.GetWorldScene(), m_spCuller2);
-
-
-	NiVisibleArray m_kVisibleTerrain;
-	NiCullingProcess m_spCullerTerrain(&m_kVisibleTerrain);
-	NiDrawScene(Camera, kWorld.GetTerrainScene(), m_spCullerTerrain);
 
 	DrawImGui();
 }
@@ -565,6 +554,9 @@ void EditorScene::DrawGizmo()
 void EditorScene::UpdateCamera(float fTime) 
 {
 	FiestaScene::UpdateCamera(fTime);
+	NiPoint3 translate(Camera->GetTranslate());
+	translate.z = 0;
+	kWorld.GetSkyNode()->SetTranslate(translate);
 	if (FiestaOnlineTool::IsLeftClick())
 	{
 		NiPoint3 kOrigin, kDir;
