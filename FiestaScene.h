@@ -11,7 +11,11 @@ class FiestaScene : public NiRefObject
 public:
 	FiestaScene() 
 	{
-		
+		Yaw = 0.0f;
+		Pitch = 0.0f;
+		Roll = 0.0f;
+		memset(&FPS, 0, sizeof(FPS));
+		values_offset = 0;
 	};
 	~FiestaScene() 
 	{
@@ -26,7 +30,9 @@ public:
 		return NULL;
 	}
 	virtual void Draw(NiRenderer* renderer) {}
-	virtual void DrawImGui() {};
+	virtual void DrawImGui();
+	void StartImGuiFrame();
+	void EndImGuiFrame();
 	virtual void Update(float fTime)
 	{
 		this->UpdateCamera(fTime);
@@ -42,6 +48,9 @@ protected:
 	float Pitch;
 	float Roll;
 	
+
+	float FPS[90];
+	int values_offset;
 
 };
 

@@ -4,6 +4,7 @@
 #include "PgWinMgr.h"
 #include "FiestaScene.h"
 
+#include "ImGui/imgui.h"
 
 class FiestaOnlineTool : public NiSample
 {
@@ -12,6 +13,7 @@ public:
 	~FiestaOnlineTool() 
 	{
 		ShowCursor(true);
+		exit(0);
 	}
 	virtual bool CreateRenderer();
 	virtual bool Initialize();
@@ -20,9 +22,13 @@ public:
 	virtual void ProcessInput();
 	virtual void Terminate() 
 	{
+		ImGuiIO& io = ImGui::GetIO();
+		ImGui::SaveIniSettingsToDisk(io.IniFilename);
+
 		m_spActionMap = 0;
 		m_spScene = 0;
 		_Scene = 0;
+		
 		NiApplication::Terminate();
 	}
 

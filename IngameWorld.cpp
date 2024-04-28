@@ -10,6 +10,7 @@ NiPoint3 World::ms_kDefaultDirectionalLightDir = NiPoint3(0.5, 0.69999999, -0.40
 
 World::~World() 
 {
+
 }
 
 bool World::InitScene() 
@@ -64,15 +65,15 @@ bool World::InitScene()
 	m_spGroundObjectCollidee->SetName("m_spGroundObjectCollidee");
 	m_spBuildingCollidee->SetName("m_spBuildingCollidee");
 
-
 	m_spBuildingScene->SetName("[PN]");
-	m_spBuildingScene->AttachChild(m_spGroundObject);
+
+
+	m_spBuildingScene->AttachChild(m_spGroundScene);
 	m_spBuildingScene->AttachChild(m_spBDNotAni);
 	m_spBuildingScene->AttachChild(m_spBDAni);
-	m_spGroundTerrain->AttachChild(m_spGroundObject);
-	m_spGroundObject->AttachChild(m_spGroundObjectCollidee);
+	m_spGroundScene->AttachChild(m_spGroundObject);
+	m_spGroundScene->AttachChild(m_spGroundObjectCollidee);
 	m_spGroundScene->AttachChild(m_spGroundTerrain);
-	m_spAllGroundScene->AttachChild(m_spGroundScene);
 	m_spAllGroundScene->AttachChild(m_spBuildingScene);
 	m_spNormalLightScene->AttachChild(m_spAllGroundScene);
 	m_spNormalLightScene->AttachChild(m_spDirectionalLightScene);

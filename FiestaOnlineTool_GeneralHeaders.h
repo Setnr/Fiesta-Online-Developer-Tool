@@ -16,11 +16,22 @@
 
 #include <NiDI8InputSystem.h>
 #include <NiDX9Renderer.h>
+#ifdef _DEBUG
 #pragma comment(lib, "NiDX9Renderer23VC80D.lib")
+#endif
+#ifdef _RELEASE
+#pragma comment(lib, "NiDX9Renderer23VC80R.lib")
+#endif
 #pragma comment(lib, "dxguid.lib")
 
+
 #include <NiD3D10Renderer.h>
+#ifdef _DEBUG
 #pragma comment(lib, "NiD3D10Renderer23VC80D.lib")
+#endif
+#ifdef _RELEASE
+#pragma comment(lib, "NiD3D10Renderer23VC80R.lib")
+#endif
 #include "PgUtil.h" 
 #include "PgWin.h"
 
@@ -37,10 +48,20 @@
 #include <NiD3DXEffectShaderLibType.h>
 #undef _LIB
 
-#if defined(WIN32)
+#if defined(WIN32) 
+#ifdef _DEBUG
 #pragma comment(lib, "NiBinaryShaderLibDX923VC80D.lib")
 #pragma comment(lib, "NiD3D10BinaryShaderLibD3D1023VC80D.lib")
 #pragma comment(lib, "NSBShaderLibDX923VC80D.lib")
 #pragma comment(lib, "NSFParserLibDX923VC80D.lib")
 #pragma comment(lib, "NiD3DXEffectShaderLibDX923VC80D.lib")
+#endif 
+#ifdef _RELEASE
+#pragma comment(lib, "NiBinaryShaderLibDX923VC80R.lib")
+#pragma comment(lib, "NiD3D10BinaryShaderLibD3D1023VC80R.lib")
+#pragma comment(lib, "NSBShaderLibDX923VC80R.lib")
+#pragma comment(lib, "NSFParserLibDX923VC80R.lib")
+#pragma comment(lib, "NiD3DXEffectShaderLibDX923VC80R.lib")
+#endif
+
 #endif

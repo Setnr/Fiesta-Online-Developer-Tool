@@ -11,6 +11,7 @@
 
 void FiestaOnlineTool::OnIdle()
 {
+
     if(MeasureTime())
     {
         /*Update FrameRate*/
@@ -41,7 +42,11 @@ void FiestaOnlineTool::OnIdle()
 
         /*Draw MainScene (GameWorld)*/
         _Scene->Draw(this->m_spRenderer);
-        
+
+        _Scene->StartImGuiFrame();
+        _Scene->DrawImGui();
+        _Scene->EndImGuiFrame();
+
         /*Draw Interface Windows*/
         Pgg_kWinMgr->Draw(m_spRenderer);
         /*Draw NiScreenElements Maybe needs Work so it Draws Player HP Hud and stuff*/
@@ -53,6 +58,7 @@ void FiestaOnlineTool::OnIdle()
         this->EndFrame();
         this->DisplayFrame();
         ++this->m_iClicks;
+        Sleep(1);
     }
     
 }

@@ -31,6 +31,7 @@ public:
 	};
 	struct RGBAColor {
 	public:
+		RGBAColor(){}
 		RGBAColor(unsigned char _r, unsigned char _g, unsigned char _b, unsigned char _a) {
 			r = _r;
 			g = _g;
@@ -89,7 +90,7 @@ public:
 	float UVScaleDiffuse;
 	float UVScaleBlend;
 
-	NiPixelData* pixldata;
+	NiPixelDataPtr pixldata;
 	NiSourceTexturePtr BlendTexture;
 	NiSourceTexturePtr BaseTexture;
 };

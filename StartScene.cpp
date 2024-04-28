@@ -10,6 +10,8 @@ DWORD WINAPI HandleLoading(void*  ptr)
 }
 StartScene::StartScene() 
 {
+    _procedure = NULL;
+    _Thread = NULL;
     Loaded = false;
     NiSortAdjustNodePtr sortNode = NiNew NiSortAdjustNode;
     sortNode->SetSortingMode(NiSortAdjustNode::SORTING_INHERIT);
@@ -21,6 +23,7 @@ StartScene::StartScene()
     NiNodePtr NiN = PgUtil::LoadNifFile(Path.c_str(), 0);
     BaseNode->AttachChild(NiN, 1);
 
+    return;
     _procedure = NiNew StartSceneBackgroundThread(this);
     _Thread = NiThread::Create(_procedure);
     NIASSERT(_Thread)

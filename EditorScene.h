@@ -14,6 +14,8 @@
 
 #include "NiPickable.h"
 
+#include "ImGui/imgui.h"
+
 class EditorScene : public FiestaScene
 {
 public:
@@ -27,7 +29,6 @@ public:
 	EditorScene(std::string FilePath, std::string FileName);
 	~EditorScene() 
 	{
-		kWorld.GetWorldScene()->DetachParent();
 		BaseNode = 0;
 	}
 	bool SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamerea) 
@@ -41,7 +42,9 @@ public:
 	void Update(float fTime)
 	{
 		kWorld.GetSkyNode()->Update(fTime);
-		FiestaScene::Update(fTime);
+		this->UpdateCamera(fTime);
+		kWorld.GetGroundCollidee()->Update(fTime);
+		//FiestaScene::Update(fTime);
 	}
 	bool LoadTerrain();
 	void UpdateCamera(float fTime) override;
@@ -94,7 +97,7 @@ private:
 	bool LoadSky(std::ifstream& SHMD);
 	bool LoadWater(std::ifstream& SHMD);
 	bool LoadGroundObject(std::ifstream& SHMD);
-	bool LoadGlobalLight(std::ifstream& SHMD);
+	bool LoadGlobalLight(std::ifstream& SHMD, std::string& GlobalLightPath);
 	bool LoadFog(std::ifstream& SHMD);
 	bool LoadBackGroundColor(std::ifstream& SHMD);
 	bool LoadFrustum(std::ifstream& SHMD);
@@ -105,16 +108,17 @@ private:
 	void AttachGroundObj(NiNodePtr& Obj)
 	{
 		std::lock_guard<std::mutex> lock(WorldLock);		
-		kWorld.AttachGroundObj(Obj);
+		kWorld.AttachGroundCollidee(Obj);
 	}
 	void AttachGroundObj(NiPickablePtr& Obj)
 	{
 		NiNodePtr ptr = &*Obj;
 		std::lock_guard<std::mutex> lock(WorldLock);
-		kWorld.AttachGroundObj(ptr);
+		kWorld.AttachGroundCollidee(ptr);
 	}
 	void DrawGizmo();
-
+	void DrawSHMDEditor();
+	void DrawSHMDHeader(std::string, NiNodePtr);
 	NiColor BackgroundColor;
 
 	std::string _FilePath;
@@ -127,7 +131,6 @@ private:
 
 	NiPickablePtr SelectedObj;
 	glm::vec3 SelectedObjAngels;
-
 	//std::mutex ObjectLoadLock;
 	//std::vector < std::string, LoadingData >
 };

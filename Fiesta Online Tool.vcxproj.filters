@@ -79,6 +79,9 @@
     <ClCompile Include="NiPickable.cpp">
       <Filter>CustomNiClasses</Filter>
     </ClCompile>
+    <ClCompile Include="ImGui\imgui_impl_dx10.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fiesta Online Tool">
@@ -215,6 +218,9 @@
     </ClInclude>
     <ClInclude Include="NiPickable.h">
       <Filter>CustomNiClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imgui_impl_dx10.h">
+      <Filter>Includes\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2,12 +2,13 @@
 #include "FiestaOnlineTool.h"
 #include "FiestaOnlineTool_GeneralHeaders.h"
 
-#include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_dx9.h"
+//#include "ImGui/imgui_impl_dx10.h"
 #include "ImGui/imgui_impl_win32.h"
 
 #include "Detours/detours.h"
-
+#include <NiDX9Select.h>
+#include <NiD3D10Select.h>
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 typedef LRESULT(__stdcall* WindProcHookDef)(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 auto WinProc_Org = (WindProcHookDef)(&NiApplication::WinProc);
@@ -27,17 +28,10 @@ FiestaOnlineTool::FiestaOnlineTool() : NiSample("DeveloperTools bei Set", 1600, 
 }
 bool FiestaOnlineTool::Initialize()
 {
-    /* 
-    Gamebryo doesnt allow to overwrite its WinProc Function
-    So i just hook it, aka fuck it.    
-    */
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
-    DetourAttach(&(PVOID&)WinProc_Org, &WinProc_Hook);
-    DetourTransactionCommit();
-
     NiSample::Initialize();
     Sorter = NiNew NiAlphaAccumulator();
+    Sorter->SetObserveNoSortHint(true);
+    Sorter->SetSortByClosestPoint(false);
     m_spRenderer->SetSorter(Sorter);
 
     _Scene = NiNew StartScene;
@@ -50,7 +44,7 @@ bool FiestaOnlineTool::Initialize()
     this->m_pkFrameRate->Init(true);
     this->m_pkFrameRate->SetColor(NiColor::BLACK);
     
-    EnableFrameRate(true);
+    //EnableFrameRate(true);
     this->SetMaxFrameRate(144.0f);
 
     NiRect<int> kRect;
@@ -59,10 +53,11 @@ bool FiestaOnlineTool::Initialize()
     kRect.m_right = m_spRenderer->GetDefaultBackBuffer()->GetWidth();
     kRect.m_bottom = m_spRenderer->GetDefaultBackBuffer()->GetHeight();
 
-    cursor = NiCursor::Create(this->m_spRenderer, kRect, NiCursor::IMMEDIATE, 8, 10, ".\\FiestaOnlineTool\\NorCursor.tga");
+    std::string FilePath = PgUtil::CreateFullFilePathFromBaseFolder(".\\FiestaOnlineTool\\NorCursor.tga");
+    cursor = NiCursor::Create(this->m_spRenderer, kRect, NiCursor::IMMEDIATE, 8, 10, FilePath.c_str());
     cursor->SetPosition(0.0f, 320, 240);
     cursor->Show(true);
-    ShowCursor(true);
+    ShowCursor(false);
 
     Pgg_kWinMgr = NiNew PgWinMgr;
     Pgg_kWinMgr->PgInit(m_spRenderer);
@@ -72,19 +67,28 @@ bool FiestaOnlineTool::Initialize()
     m_spScene->UpdateEffects();
     m_spCamera->Update(0.0f);
 
+    /*
+    Gamebryo doesnt allow to overwrite its WinProc Function
+    So i just hook it, aka fuck it.
+    */
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourAttach(&(PVOID&)WinProc_Org, &WinProc_Hook);
+    DetourTransactionCommit();
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO(); 
+    static std::string ImGuiIniFile = PgUtil::CreateFullFilePathFromBaseFolder(".\\FiestaOnlineTool\\imgui.ini");
+    io.IniFilename = ImGuiIniFile.c_str();
+    ImGui::LoadIniSettingsFromDisk(io.IniFilename);
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     ImGui_ImplWin32_Init(this->GetWindowReference());
     NiDX9Renderer* ptr = (NiDX9Renderer*)&*this->m_spRenderer;
     ImGui_ImplDX9_Init(ptr->GetD3DDevice());
-
     
-
     return true;
 }
 //No Fucking Clue what this it xD
@@ -259,26 +263,75 @@ bool FiestaOnlineTool::CreateRenderer(HWND hWnd)
 {
     if (false) //MAYBE I WILL NEVER USE D3DX10 xD So just hardcode it for D3DX9 for now
     {
-        NiD3D10Renderer::CreationParameters kParameters(hWnd);
 
-        NiD3D10RendererPtr spD3D10Renderer;
-
-        bool bResult = NiD3D10Renderer::Create(kParameters, spD3D10Renderer);
-
-        if (bResult)
-            m_spRenderer = spD3D10Renderer;
-
-        return bResult;
+        m_spRenderer = NiD3D10Select::CreateRenderer(this->GetWindowReference(), false, this->GetAppWindow()->GetWidth(), this->GetAppWindow()->GetHeight(), this->m_bMultiThread, this->m_bRefRast, this->m_bFullscreen);
+        return (m_spRenderer != NULL);
     }
     else
     {
         char Flag = NiDX9Renderer::USE_NOFLAGS;
-        //Flag = NiDX9Renderer::USE_STENCIL | NiDX9Renderer::USE_MULTITHREADED | NiDX9Renderer::USE_16BITBUFFERS | NiDX9Renderer::USE_FULLSCREEN;
-
+        Flag = NiDX9Renderer::USE_MULTITHREADED  ; //NiDX9Renderer::USE_STENCIL| NiDX9Renderer::USE_16BITBUFFERS | NiDX9Renderer::USE_FULLSCREEN;
+        //m_spRenderer = NiDX9Select::CreateRenderer(this->GetWindowReference(), this->GetWindowReference(), true, this->m_uiBitDepth, this->GetAppWindow()->GetWidth(), this->GetAppWindow()->GetHeight(), this->m_bStencil, this->m_bMultiThread, this->m_bRefRast, this->m_bSWVertex, this->m_bNVPerfHUD, this->m_bFullscreen);
         m_spRenderer = NiDX9Renderer::Create(1600, 900, Flag, hWnd, NULL, NULL);
+        if (m_spRenderer != NULL) 
+        {
+            std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
+            PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, 1.0f);
+        }
         return (m_spRenderer != NULL);
     }
     return false;
 }
 
 
+void PgUtil::LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, float Percent)
+{
+
+    NiColorA m_kBackGroundColor;
+    Renderer->SetBackgroundColor(m_kBackGroundColor);
+
+    NiTexture::FormatPrefs kPrefs;
+    kPrefs.m_eMipMapped = NiTexture::FormatPrefs::NO;
+
+    NiTexture* pkBGTexture = NiSourceTexture::Create(LoadingScreen.c_str(), kPrefs);
+    if (!pkBGTexture)
+        return;
+
+    NiScreenElementsPtr pkScreenPoly = NiNew NiScreenElements(
+        NiNew NiScreenElementsData(false, false, 1));
+    if (!pkScreenPoly)
+        return;
+
+    // We know that the polygon handle is zero and will use it directly in the
+    // vertex and texture coordinate assignments.
+    pkScreenPoly->Insert(4);
+
+    // Account for overscan for consoles.
+    pkScreenPoly->SetRectangle(0, 0.01f, 0.01f, 0.98f, 0.98f);
+
+    pkScreenPoly->UpdateBound();
+    pkScreenPoly->SetTextures(0, 0, 0.01f, 0.01f, 0.99f, 0.99f);
+
+    NiTexturingPropertyPtr pkTextProp = NiNew NiTexturingProperty;
+    if (!pkTextProp)
+        return;
+
+    pkTextProp->SetBaseTexture(pkBGTexture);
+    pkTextProp->SetBaseFilterMode(NiTexturingProperty::FILTER_BILERP);
+    pkTextProp->SetBaseClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
+    pkTextProp->SetApplyMode(NiTexturingProperty::APPLY_REPLACE);
+    pkScreenPoly->AttachProperty(pkTextProp);
+
+    pkScreenPoly->UpdateProperties();
+    pkScreenPoly->Update(0.0f);
+
+    Renderer->BeginFrame();
+    Renderer->BeginUsingDefaultRenderTargetGroup(7u);
+    Renderer->SetScreenSpaceCameraData();
+    pkScreenPoly->Draw(Renderer);
+
+    Renderer->EndUsingRenderTargetGroup();
+    Renderer->EndFrame();
+    Renderer->DisplayFrame();
+
+}

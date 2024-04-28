@@ -10,17 +10,16 @@
 #include <thread>
 #include <future>
 #include <set>
+#include <NiOptimize.h>
 
 #include <chrono>
 
-#include "ImGui/imgui.h"
 #include "ImGui/ImGuizmo.h"
-#include "ImGui/imgui_impl_dx9.h"
-#include "ImGui/imgui_impl_win32.h"
 #include "ImGuiConstantFuncs.h"
 
 #include "FiestaOnlineTool.h"
 
+ImGuizmo::OPERATION OperationMode;
 
 glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 {
@@ -81,7 +80,8 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 		EditorSceneError("SHMD - Failed to Load Water");
 	if (!LoadGroundObject(SHMD))
 		EditorSceneError("SHMD - Failed to Load GroundObject");
-	if(!LoadGlobalLight(SHMD))
+	std::string GlobalLightPath = _FilePath.substr(0, _FilePath.length() - _FileName.length()) + "GlobalLight.nif";
+	if(!LoadGlobalLight(SHMD, GlobalLightPath))
 		EditorSceneError("SHMD - Failed to Load GlobalLight");
 	if (!LoadFog(SHMD))
 		EditorSceneError("SHMD - Failed to Load Fog");
@@ -103,24 +103,31 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 	{
 		auto future = std::async(std::launch::async, [this, obj] 
 			{
-				NiNodePtr Obj;
+				NiNodePtr MainObj;
+				NiPickablePtr Obj;
 				for(auto pos = obj.second.begin(); pos < obj.second.end(); pos++)
 				{
-					if (!Obj)
+					std::string Path = PgUtil::CreateFullFilePathFromBaseFolder(obj.first);
+					if (!MainObj)
 					{
-						Obj = PgUtil::LoadNifFile(obj.first.c_str(), NULL, PICKABLEOBJECTS);
+						MainObj = PgUtil::LoadNifFile(Path.c_str(), NULL, PICKABLEOBJECTS);
+						
 					}
-					else
-					{
-						Obj = (NiPickable*)Obj->Clone();
-					}
+					Obj = (NiPickable*)MainObj->Clone();
+					
 					this->AttachGroundObj(Obj);
-					Obj->SetDefaultCopyType(Obj->COPY_EXACT);
+					
+					Obj->SetName(obj.first.c_str());
+					Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
 					Obj->SetTranslate(pos->pos);
 					NiMatrix3 m;
 					pos->quater.ToRotation(m);
 					Obj->SetRotate(m);
 					Obj->SetScale(pos->Scale);
+
+					Obj->DisableSorting();
+					Obj->SetSelectiveUpdateRigid(true);
+
 					Sleep(2);
 				}
 			});
@@ -138,6 +145,8 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 				continue;
 			}
 			Sleep(15);
+
+
 		}
 	}
 
@@ -157,11 +166,14 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 	BaseNode->UpdateEffects();
 	BaseNode->UpdateProperties();
 	BaseNode->Update(0.0);
-
+	NiOptimize::RemoveUnnecessaryVisControllers(BaseNode);
+	NiOptimize::RemoveDupProperties(BaseNode);
+	NiOptimize::RemoveUnnecessaryNormals(BaseNode);
+	NiOptimize::OptimizeSkinData(BaseNode, true, true, 0, false);
 	Camera->Update(0.0f);
 
 	NiStream s;
-	s.InsertObject(kWorld.GetWorldScene());
+	s.InsertObject(kWorld.GetTerrainScene());
 	s.Save("./Fullyloaded.nif");
 
 	return;
@@ -172,7 +184,7 @@ bool EditorScene::LoadTerrain()
 	if (!_InitFile.Load())
 		return false;
 	if (_InitFile.FileType == "")return true;
-	std::string HTDFilePath = PgUtil::CreateFullFilePathFromBaseFolder(_InitFile.HeightFileName);;
+	std::string HTDFilePath = PgUtil::CreateFullFilePathFromBaseFolder(_InitFile.HeightFileName);
 	std::ifstream HTDFile;
 	struct PointInfos
 	{
@@ -182,6 +194,8 @@ bool EditorScene::LoadTerrain()
 		int TR = -1;
 		float Height;
 		bool Used = false;
+		TerrainLayer::RGBAColor PixelColor;
+		NiColorA VertexColor;
 	};
 	struct Triangle 
 	{
@@ -235,11 +249,40 @@ bool EditorScene::LoadTerrain()
 			HTDFile.read((char*)&VertexMap[w][h].Height, sizeof(VertexMap[w][h].Height));
 	}
 
+	NiImageConverter* conv = NiImageConverter::GetImageConverter();
+	std::string VertexShadowPath = PgUtil::CreateFullFilePathFromBaseFolder(_InitFile.VertexColorTexture);
+	NiPixelDataPtr VertexShadowImage = conv->ReadImageFile(VertexShadowPath.c_str(), 0);
+
+	auto VertexColorArray = (TerrainLayer::RGBColor*)VertexShadowImage->GetPixels();
+	int PixelCounter = 0;
+	for (int h = 0; h < VertexShadowImage->GetHeight(); h++)
+	{
+		for (int w = 0; w < VertexShadowImage->GetWidth(); w++)
+		{
+			VertexMap[w][h].VertexColor = NiColorA(static_cast<float>(VertexColorArray[PixelCounter].r) / 255.0f, static_cast<float>(VertexColorArray[PixelCounter].g) / 255.f, static_cast<float>(VertexColorArray[PixelCounter].b) / 255.f, 1.0f);
+			PixelCounter++;
+		}
+	}
+
 	for (auto CurrentLayer : _InitFile.LayerList) 
 	{
-		for (int BlockX = 0; BlockX < (_InitFile.HeightMap_width - 1) / _InitFile.QuadsHigh; BlockX++)
+		auto ColorArray = (TerrainLayer::RGBAColor*)CurrentLayer->pixldata->GetPixels();
+		PixelCounter = 0;
+		for(int h = 0; h < CurrentLayer->pixldata->GetHeight(); h++)
 		{
-			for (int BlockY = 0; BlockY < (_InitFile.HeightMap_height - 1) / _InitFile.QuadsWide; BlockY++)
+			for (int w = 0; w < CurrentLayer->pixldata->GetWidth(); w++)
+			{
+				if(h < CurrentLayer->Height && w < CurrentLayer->Width)
+				{
+					VertexMap[w][h].PixelColor = ColorArray[PixelCounter];
+					PixelCounter++;
+				}
+			}
+		}
+
+		for (int BlockX = 0; BlockX < (_InitFile.HeightMap_width - 1) / _InitFile.QuadsHigh; BlockX++) //19
+		{
+			for (int BlockY = 0; BlockY < (_InitFile.HeightMap_height - 1) / _InitFile.QuadsWide; BlockY++) //19
 			{
 				std::vector<NiPoint3> VerticesList;
 				std::vector<NiPoint3> NormalList;
@@ -252,21 +295,19 @@ bool EditorScene::LoadTerrain()
 				{
 					for (int w = 0; w < _InitFile.QuadsWide; w++) 
 					{
-						auto ColorArray = (TerrainLayer::RGBAColor*)CurrentLayer->pixldata->GetPixels();
-					
-						int PreBlockXPart = BlockX * _InitFile.QuadsWide;
-						int CurrentBlockXPart = w;
-						int XPart = PreBlockXPart + CurrentBlockXPart;
+						int ActiveW = BlockX * _InitFile.QuadsWide + w;
+						int ActiveH = BlockY * _InitFile.QuadsHigh + h;
+						int PixelW = ActiveW - CurrentLayer->StartPos_X;
+						int PixelH = ActiveH - CurrentLayer->StartPos_Y;
+						if (!(PixelW >= 0 && PixelW < CurrentLayer->Width))
+							continue;
+						if (!(PixelH >= 0 && PixelH < CurrentLayer->Height))
+							continue;
 
-						int PreBlockYPart = BlockY * _InitFile.QuadsHigh * CurrentLayer->pixldata->GetWidth();
-						int CurrentBlockYPart = CurrentLayer->pixldata->GetWidth() * h;
-						int YPart = PreBlockYPart + CurrentBlockYPart;
-
-						int PointOffset = XPart + YPart;
-						if (ColorArray[PointOffset] > TerrainLayer::RGBColor(static_cast<char>(CurrentLayer->UVScaleDiffuse)))
+						PointInfos* PixelInfo = &VertexMap[PixelW][PixelH];
+						if (PixelInfo->PixelColor > TerrainLayer::RGBColor(static_cast<char>(CurrentLayer->UVScaleBlend)))
 						{
-							int ActiveW = BlockX * _InitFile.QuadsWide + w;
-							int ActiveH = BlockY * _InitFile.QuadsHigh + h;
+							
 							PointInfos* info = &VertexMap[ActiveW][ActiveH];
 							info->Used = true;
 							bool AddBL = true;
@@ -317,19 +358,20 @@ bool EditorScene::LoadTerrain()
 									}
 								}
 							}
-							float FirstWScale = (static_cast<float>(_InitFile.QuadsWide) / static_cast<float>(_InitFile.HeightMap_width - 1));
-							float FirstHScale = (static_cast<float>(_InitFile.QuadsHigh) / static_cast<float>(_InitFile.HeightMap_height - 1));
-							float SecondWScale = (1 / static_cast<float>(_InitFile.HeightMap_width - 1));
-							float SecondHScale = (1 / static_cast<float>(_InitFile.HeightMap_width - 1));
+							float FirstWScale = 1 / CurrentLayer->UVScaleDiffuse; // (static_cast<float>(_InitFile.QuadsWide) / static_cast<float>(_InitFile.HeightMap_width - 1));
+							float FirstHScale = 1 / CurrentLayer->UVScaleDiffuse; // (static_cast<float>(_InitFile.QuadsHigh) / static_cast<float>(_InitFile.HeightMap_height - 1));
+							float SecondWScale = (1 / static_cast<float>(CurrentLayer->Width - 1));
+							float SecondHScale = (1 / static_cast<float>(CurrentLayer->Height - 1));
+							
 							if (AddBL)
 							{
 								info->BL = TriCt;
 								TriCt++;
 								VerticesList.push_back(NiPoint3(ActiveW * _InitFile.OneBlock_width, ActiveH * _InitFile.OneBlock_height, info->Height));
 								NormalList.push_back(World::ms_kUpDir);
-								ColorList.push_back(NiColorA(1.00f, 1.00f, 1.00f, 1.0f));
-								TextureList1.push_back(NiPoint2(ActiveW * FirstWScale, ActiveH * FirstHScale));
-								TextureList2.push_back(NiPoint2(ActiveW * SecondWScale, ActiveH * SecondHScale));
+								ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
+								TextureList1.push_back(NiPoint2(PixelW * FirstWScale, PixelH * FirstHScale));
+								TextureList2.push_back(NiPoint2(PixelW * SecondWScale, PixelH * SecondHScale));
 							}
 							if (AddBR)
 							{
@@ -337,9 +379,9 @@ bool EditorScene::LoadTerrain()
 								TriCt++;
 								VerticesList.push_back(NiPoint3((ActiveW + 1) * _InitFile.OneBlock_width, ActiveH * _InitFile.OneBlock_height, VertexMap[ActiveW + 1][ActiveH].Height));
 								NormalList.push_back(World::ms_kUpDir);
-								ColorList.push_back(NiColorA(1.00f, 1.00f, 1.00f, 1.0f));
-								TextureList1.push_back(NiPoint2((ActiveW + 1) * FirstWScale, ActiveH * FirstHScale));
-								TextureList2.push_back(NiPoint2((ActiveW + 1) * SecondWScale, ActiveH * SecondHScale));
+								ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
+								TextureList1.push_back(NiPoint2((PixelW + 1) * FirstWScale, PixelH * FirstHScale));
+								TextureList2.push_back(NiPoint2((PixelW + 1) * SecondWScale, PixelH * SecondHScale));
 							}
 							if (AddTL)
 							{
@@ -347,9 +389,9 @@ bool EditorScene::LoadTerrain()
 								TriCt++;
 								VerticesList.push_back(NiPoint3(ActiveW * _InitFile.OneBlock_width, (ActiveH + 1) * _InitFile.OneBlock_height, VertexMap[ActiveW][ActiveH + 1].Height));
 								NormalList.push_back(World::ms_kUpDir);
-								ColorList.push_back(NiColorA(1.00f, 1.00f, 1.00f, 1.0f));
-								TextureList1.push_back(NiPoint2(ActiveW * FirstWScale, (ActiveH + 1) * FirstHScale));
-								TextureList2.push_back(NiPoint2(ActiveW * SecondWScale, (ActiveH + 1) * SecondHScale));
+								ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
+								TextureList1.push_back(NiPoint2(PixelW * FirstWScale, (PixelH + 1) * FirstHScale));
+								TextureList2.push_back(NiPoint2(PixelW * SecondWScale, (PixelH + 1) * SecondHScale));
 							}
 							if (AddTR)
 							{
@@ -357,9 +399,9 @@ bool EditorScene::LoadTerrain()
 								TriCt++;
 								VerticesList.push_back(NiPoint3((ActiveW + 1) * _InitFile.OneBlock_width, (ActiveH + 1) * _InitFile.OneBlock_height, VertexMap[ActiveW + 1][ActiveH + 1].Height));
 								NormalList.push_back(World::ms_kUpDir);
-								ColorList.push_back(NiColorA(1.00f, 1.00f, 1.00f, 1.0f));
-								TextureList1.push_back(NiPoint2((ActiveW + 1) * FirstWScale, (ActiveH + 1) * FirstHScale));
-								TextureList2.push_back(NiPoint2((ActiveW + 1)  * SecondWScale, (ActiveH + 1) * SecondHScale));
+								ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
+								TextureList1.push_back(NiPoint2((PixelW + 1) * FirstWScale, (PixelH + 1) * FirstHScale));
+								TextureList2.push_back(NiPoint2((PixelW + 1)  * SecondWScale, (PixelH + 1) * SecondHScale));
 							}
 							TriangleList.push_back(Triangle(info->BL, info->BR, info->TL));
 							TriangleList.push_back(Triangle(info->TL, info->BR, info->TR));
@@ -378,8 +420,9 @@ bool EditorScene::LoadTerrain()
 				NiPoint3* pkNormal = NiNew NiPoint3[(int)NormalList.size()];
 				NiColorA* pkColor = NiNew NiColorA[(int)ColorList.size()];
 				NiPoint2* pkTexture = NiNew NiPoint2[(int)TextureList1.size()];
-				unsigned short* pusTriList = (unsigned short*)NiNew NiPoint3[TriangleList.size() / 2];
-
+				
+				unsigned short* pusTriList = (unsigned short*)NiAlloc(char, 12 * (TriangleList.size() / 2));// NiNew NiPoint3[TriangleList.size() / 2];
+				
 				memcpy(pkVertix, &VerticesList[0], (int)VerticesList.size() * sizeof(NiPoint3));
 				memcpy(pkNormal, &NormalList[0], (int)NormalList.size() * sizeof(NiPoint3));
 				memcpy(pkColor, &ColorList[0], (int)ColorList.size() * sizeof(NiColorA));
@@ -391,7 +434,7 @@ bool EditorScene::LoadTerrain()
 
 				NiSourceTexturePtr BaseTexture = CurrentLayer->BaseTexture;
 				NiSourceTexturePtr BlendTexture = CurrentLayer->BlendTexture;
-
+				Shape->SetSortObject(false);
 
 				NiTexturingProperty::ShaderMap* BaseTextureMap = NiNew NiTexturingProperty::ShaderMap(BaseTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
 				BaseTextureMap->SetID(0);
@@ -401,7 +444,7 @@ bool EditorScene::LoadTerrain()
 				NiTexturingPropertyPtr pkTP = NiNew NiTexturingProperty();
 				NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
 
-				alphaprop->SetDestBlendMode(NiAlphaProperty::ALPHA_ZERO);
+				//alphaprop->SetDestBlendMode(NiAlphaProperty::ALPHA_ZERO);
 
 				BaseTextureMap->SetTexture(BaseTexture);
 				BlendTextureMap->SetTexture(BlendTexture);
@@ -424,7 +467,7 @@ bool EditorScene::LoadTerrain()
 				Shape->CalculateNormals();
 
 				Shape->ApplyAndSetActiveMaterial("PgTerrain");
-
+				NiOptimize::OptimizeTriShape(Shape);
 				Shape->Update(0.0);
 				Shape->UpdateEffects();
 				Shape->UpdateProperties();
@@ -460,7 +503,45 @@ bool EditorScene::LoadTerrain()
 		}
 	}
 }
+void __cdecl ShDrawVisibleArrayAppend(NiRenderer* ms_pkRenderer, NiVisibleArray& kVisibleSet)
+{
+	NiAccumulator* v1; // esi
+	unsigned int i; // esi
+	NiRenderer* pkRenderer; // [esp+10h] [ebp-14h]
+	NiPointer<NiAccumulator> spSorter; // [esp+14h] [ebp-10h]
+	pkRenderer = ms_pkRenderer;
+	if (pkRenderer)
+	{
+		v1 = pkRenderer->GetSorter();
+		spSorter = v1;
+		if (v1)
+		{
+			spSorter->RegisterObjectArray(kVisibleSet);
+		}
+		else
+		{
+			for (i = 0; i < kVisibleSet.GetCount(); ++i)
+			{
+				kVisibleSet.GetAt(i).RenderImmediate(ms_pkRenderer);
+			}
+		}
+	}
+}
+void ShDrawVisibleArray(NiRenderer* ms_pkRenderer, NiCamera* pkCamera, NiVisibleArray& kVisibleSet)
+{
+	NiAccumulator* v2; // esi
 
+	if (ms_pkRenderer && pkCamera)
+	{
+		v2 = ms_pkRenderer->GetSorter();
+		if (v2)
+			v2->StartAccumulating(pkCamera);
+		ShDrawVisibleArrayAppend(ms_pkRenderer,kVisibleSet);
+		if (v2)
+			v2->FinishAccumulating();
+		
+	}
+}
 void EditorScene::Draw(NiRenderer* renderer)
 {
 	Camera->SetViewFrustum(kWorld.GetSkyFrustum());
@@ -470,24 +551,29 @@ void EditorScene::Draw(NiRenderer* renderer)
 	NiDrawScene(Camera, kWorld.GetSkyNode(), m_spCuller);
 
 	Camera->SetViewFrustum(kWorld.GetWorldFrustum());
-	NiVisibleArray m_kVisible2;
-	NiCullingProcess m_spCuller2(&m_kVisible2);
-	NiDrawScene(Camera, kWorld.GetWorldScene(), m_spCuller2);
+	//NiVisibleArray m_kVisible2;
+	//NiCullingProcess m_spCuller2(&m_kVisible2);
+	//NiDrawScene(Camera, kWorld.GetWorldScene(), m_spCuller2);
+	
 
-	DrawImGui();
+	m_kVisible.SetGrowBy(1024);
+	m_kVisible.SetAllocatedSize(0x400);
+	//NiCullingProcess m_spCuller(&m_kVisible);
+	NiNodePtr WorldScene = kWorld.GetWorldScene();
+	renderer->SetCameraData(Camera);
+	m_kVisible.RemoveAll();
+	m_spCuller.Process(Camera, WorldScene, &m_kVisible);
+	ShDrawVisibleArray(renderer, Camera, m_kVisible);
+
 }
 
 void EditorScene::DrawImGui() 
 {
-	ImGui_ImplDX9_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
+	FiestaScene::DrawImGui();
+
+	DrawSHMDEditor();
 
 	DrawGizmo();
-
-	ImGui::EndFrame();
-	ImGui::Render();
-	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 }
 
 void EditorScene::DrawGizmo() 
@@ -520,7 +606,7 @@ void EditorScene::DrawGizmo()
 	ImGuizmo::RecomposeMatrixFromComponents(&SelectedNode->GetTranslate().x, &tmpRotation[0], matrixScale, (float*)matrix);
 
 	ImGuizmo::SetRect((float_t)0, (float_t)0, (float_t)io.DisplaySize.x, (float_t)io.DisplaySize.y);
-	ImGuizmo::Manipulate(&view[0][0], &projectionMatrix[0][0], ImGuizmo::OPERATION::ROTATE, ImGuizmo::MODE::WORLD, (float*)matrix, nullptr, nullptr);
+	ImGuizmo::Manipulate(&view[0][0], &projectionMatrix[0][0], OperationMode, ImGuizmo::MODE::WORLD, (float*)matrix, nullptr, nullptr);
 
 	ImGuizmo::DecomposeMatrixToComponents((float*)matrix, (float*)&SelectedNode->GetTranslate().x, &tmpRotation[0], matrixScale);
 
@@ -551,11 +637,108 @@ void EditorScene::DrawGizmo()
 	SelectedNode->SetRotate(m);
 }
 
+void EditorScene::DrawSHMDEditor()
+{
+	auto io = ImGui::GetIO();
+	auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
+
+
+	int h = 295;
+	int w = 578;
+	ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - w, io.DisplaySize.y - h));
+	ImGui::SetNextWindowSize(ImVec2(w, h));
+	
+
+	ImGui::Begin("SHMD-Editor",NULL, flags);
+
+
+	DrawSHMDHeader("Sky", kWorld.GetSkyNode());
+	DrawSHMDHeader("Water", kWorld.GetWaterNode());
+	DrawSHMDHeader("GroundObject", kWorld.GetGroundObjNode());
+	ImGui::ColorEdit3("Global Light", (float*) &kWorld.GetAmbientLightAmbientColor().r);
+	ImGui::ColorEdit3("Fog Color", (float*)&kWorld.GetFogColor().r);
+	
+	float depth = kWorld.GetFogDepth();
+	if (ImGui::DragFloat("Fog Alpha", &depth, 0.01, 0.f, 1.0f))
+		kWorld.SetFogDepth(depth);
+	ImGui::ColorEdit3("Background Color", (float*)&kWorld.GetBackgroundColor().r);
+	ImGui::DragFloat("Frustum", &kWorld.GetWorldFrustum().m_fFar, 10.0f,0.0f, 6000.0f);
+
+	ImGui::ColorEdit3("AmbientLight Color", (float*)&kWorld.GetMapDirectionalLightAmbientColor().r);
+	ImGui::ColorEdit3("DiffuseLight Color", (float*)&kWorld.GetMapDirectionalLightDiffuseColor().r);
+	DrawSHMDHeader("Pickable Objects", kWorld.GetGroundCollidee());
+
+	ImGui::End();
+
+	if (SelectedObj)
+	{
+		{
+			auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
+
+			int h2 = 123 + h;
+			int w2= 319;
+
+			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - w2, io.DisplaySize.y - h2));
+			ImGui::SetNextWindowSize(ImVec2(w2, h2 - h));
+
+			ImGui::Begin("Object-Editor", NULL, flags);
+			static int e = 0;
+			ImGui::RadioButton("Translate", &e, 0);
+			ImGui::SameLine();
+			ImGui::RadioButton("Rotate", &e, 1);
+			switch (e)
+			{
+			case 0:
+				OperationMode = ImGuizmo::OPERATION::TRANSLATE;
+				break;
+			case 1:
+			default:
+				OperationMode = ImGuizmo::OPERATION::ROTATE;
+				break;
+			}
+
+			
+
+			ImGui::DragFloat3("Position", (float*)& SelectedObj->GetTranslate().x);
+			ImGui::DragFloat3("Rotation", &SelectedObjAngels[0]);
+			float Scale = SelectedObj->GetScale();
+			if (ImGui::DragFloat("Scale", &Scale,0.01f,0.0f,5.0f))
+				SelectedObj->SetScale(Scale);
+			ImGui::End();
+		}
+	}
+}
+
+void EditorScene::DrawSHMDHeader(std::string Name, NiNodePtr Node)
+{
+	if (ImGui::CollapsingHeader(Name.c_str()))
+	{
+		bool compact = false;
+		int ChildCount = Node->GetChildCount();
+		for (int i = 0; i < ChildCount; i++)
+		{
+			auto Object = Node->GetAt(i);
+			if (NiIsKindOf(NiNode, Object))
+			{
+				ImGui::Text(Object->GetName(), "");
+				ImGui::SameLine();
+				if (ImGui::Button(std::string("Delete " + Name + std::to_string(i)).c_str()))
+				{
+					Node->DetachChildAt(i);
+					compact = true;
+				}
+			}
+		}
+		if (compact)
+			Node->CompactChildArray();
+	}
+}
+
 void EditorScene::UpdateCamera(float fTime) 
 {
 	FiestaScene::UpdateCamera(fTime);
 	NiPoint3 translate(Camera->GetTranslate());
-	translate.z = 0;
+	//translate.z = 0;
 	kWorld.GetSkyNode()->SetTranslate(translate);
 	if (FiestaOnlineTool::IsLeftClick())
 	{
@@ -571,7 +754,7 @@ void EditorScene::UpdateCamera(float fTime)
 			_Pick.SetFrontOnly(true);
 			_Pick.SetReturnNormal(true);
 			_Pick.SetObserveAppCullFlag(true);
-			_Pick.SetTarget(kWorld.GetGroundObjNode());
+			_Pick.SetTarget(kWorld.GetGroundCollidee());
 			if (_Pick.PickObjects(kOrigin, kDir, true)) 
 			{
 				NiPick::Results& results = _Pick.GetResults();

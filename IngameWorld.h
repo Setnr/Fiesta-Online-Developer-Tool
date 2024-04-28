@@ -46,12 +46,22 @@ private:
 	NiDirectionalLightPtr m_spDirectionalLight;
 	NiDirectionalLightPtr m_spMapDirectionalLight;
 
+	NiColor BackgroundColor;
+
 public:
 	bool InitScene();
 	bool InitCamera();
 	bool InitSkyCtrl();
 	bool InitLightFog();
 	bool InitShadow() { return true; }
+
+	void SetBackgroundColor(float r, float g, float b)
+	{
+		BackgroundColor = NiColor(r, g, b);
+	}
+	NiColor& GetBackgroundColor() {
+		return BackgroundColor;
+	}
 
 	void AttachSky(NiNodePtr sky)
 	{
@@ -72,6 +82,10 @@ public:
 	{
 		m_spGroundObjectCollidee->AttachChild(obj, 1);
 	}
+	NiNodePtr GetGroundCollidee()
+	{
+		return m_spGroundObjectCollidee;
+	}
 	void AttachGroundTerrain(NiTriShapePtr obj)
 	{
 		m_spGroundTerrain->AttachChild(obj, 1);
@@ -85,6 +99,10 @@ public:
 	NiNodePtr GetSkyNode() {
 		return m_spSkyScene;
 	}
+	NiNodePtr GetWaterNode() 
+	{
+		return m_spWaterScene;
+	}
 	NiNodePtr GetGroundObjNode() {
 		return m_spGroundObject;
 	}
@@ -92,6 +110,17 @@ public:
 	{
 		NiFogProperty* fog = (NiFogProperty*) m_spWorldScene->GetProperty(NiProperty::FOG);
 		fog->SetFogColor(kColor);
+		fog->SetFog(true);
+	}
+	const NiColor& GetFogColor()
+	{
+		NiFogProperty* fog = (NiFogProperty*)m_spWorldScene->GetProperty(NiProperty::FOG);
+		return fog->GetFogColor();
+	}
+	float GetFogDepth() 
+	{
+		NiFogProperty* fog = (NiFogProperty*)m_spWorldScene->GetProperty(NiProperty::FOG);
+		return fog->GetDepth();
 	}
 	void SetFogDepth(float fDepth)
 	{
@@ -99,6 +128,9 @@ public:
 		if (fDepth < 0.0)
 			fDepth = 0.0;
 		fog->SetDepth(fDepth);
+	}
+	void SetGlobalLight(NiNodePtr LightNode) {
+		this->m_spLightArea->AttachChild(LightNode);
 	}
 	void SetFarFrumstum(float Frustum)	
 	{
@@ -114,13 +146,25 @@ public:
 	{
 		m_spMapDirectionalLight->SetAmbientColor(kColor);
 	}
+	const NiColor& GetMapDirectionalLightAmbientColor()
+	{
+		return m_spMapDirectionalLight->GetAmbientColor();
+	}
 	void SetMapDirectionalLightDiffuseColor(NiColor kColor)
 	{
 		m_spMapDirectionalLight->SetDiffuseColor(kColor);
 	}
+	const NiColor& GetMapDirectionalLightDiffuseColor()
+	{
+		return m_spMapDirectionalLight->GetDiffuseColor();
+	}
 	void SetAmbientLightAmbientColor(NiColor kColor)
 	{
 		m_spAmbientLight->SetAmbientColor(kColor);
+	}
+	const NiColor& GetAmbientLightAmbientColor()
+	{
+		return m_spAmbientLight->GetAmbientColor();
 	}
 	NiCameraPtr GetCamera() { return m_spCamera; }
 

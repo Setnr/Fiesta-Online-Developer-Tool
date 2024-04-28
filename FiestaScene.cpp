@@ -3,6 +3,10 @@
 
 #include "FiestaOnlineTool.h"
 #include <NiViewMath.h>
+
+#include "ImGui/imgui_impl_dx9.h"
+#include "ImGui/imgui_impl_win32.h"
+
 //const NiRTTI FiestaScene::ms_RTTI("FiestaScene", NULL);
 bool FiestaScene::SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamera)
 {
@@ -64,3 +68,34 @@ void FiestaScene::UpdateCamera(float fTime)
 	Camera->Update(0.0f);
 }
 
+void FiestaScene::StartImGuiFrame()
+{
+	ImGui_ImplDX9_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+}
+void FiestaScene::EndImGuiFrame()
+{
+	ImGui::EndFrame();
+	ImGui::Render();
+	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+}
+
+void FiestaScene::DrawImGui() 
+{
+	auto io = ImGui::GetIO();
+	FPS[values_offset] = io.Framerate;
+	values_offset = (values_offset + 1) % IM_ARRAYSIZE(FPS);
+	float average = 0.0f;
+	for (int n = 0; n < IM_ARRAYSIZE(FPS); n++)
+		average += FPS[n];
+	average /= (float)IM_ARRAYSIZE(FPS);
+	auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground;
+
+	ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 150, 0));
+	ImGui::SetNextWindowSize(ImVec2(150,50));
+	ImGui::Begin("General", NULL, flags);
+	ImGui::Text("    %f FPS", io.Framerate);
+	ImGui::Text("AVG %f FPS", average);
+	ImGui::End();
+}

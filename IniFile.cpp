@@ -5,8 +5,6 @@
 #include <filesystem>
 TerrainLayer::~TerrainLayer()
 {
-	if (pixldata)
-		NiDelete pixldata;
 
 	BlendTexture = 0;
 	BaseTexture = 0;
@@ -26,13 +24,18 @@ bool TerrainLayer::Load(std::ifstream& File)
 		}
 		if (line == "#DiffuseFileName")
 		{
-			File >> DiffuseFileName;
-			DiffuseFileName = DiffuseFileName.substr(2, DiffuseFileName.length() - 3);
+			std::getline(File, line);
+			std::string Started = line.substr(line.find("\"") + 1);
+			DiffuseFileName = Started.substr(0, Started.find("\""));
+			//DiffuseFileName = line.substr(line.find("\"") + 1, line.length() - line.find("\"") - 1);
 		}
 		if (line == "#BlendFileName")
 		{
-			File >> BlendFileName;
-			BlendFileName = BlendFileName.substr(2, BlendFileName.length() - 3);
+			std::getline(File, line);
+
+			std::string Started = line.substr(line.find("\"") + 1);
+			BlendFileName = Started.substr(0, Started.find("\""));
+			//BlendFileName = line.substr(line.find("\"") + 1, line.length() - line.find("\"") - 1);
 		}	
 		if (line == "#StartPos_X")
 		{
@@ -109,7 +112,7 @@ void TerrainLayer::CreateTexture()
 			int YPartFlipped = ReadImage->GetWidth() * (ReadImage->GetHeight() - h - 1);
 			int PointOffsetFlipped = XPart + YPartFlipped;
 
-			PixelColorA[PointOffsetNormal] = RGBAColor(PixelColor[PointOffsetNormal].g);
+			PixelColorA[PointOffsetNormal] = RGBAColor(PixelColor[PointOffsetFlipped].g);
 		}
 	}
 

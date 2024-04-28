@@ -1,7 +1,7 @@
 #include "EditorScene.h"
 
 #include <fstream>
-
+#include <filesystem>
 bool EditorScene::CheckSHMDVersion(std::ifstream& SHMD) 
 {
 	std::string line;
@@ -23,10 +23,11 @@ bool EditorScene::LoadSky(std::ifstream& SHMD)
 	{
 		std::string FilePath;
 		SHMD >> FilePath;
-		FilePath = PgUtil::CreateFullFilePathFromBaseFolder(FilePath);
+		std::string FullFilePath = PgUtil::CreateFullFilePathFromBaseFolder(FilePath);
 
 		NiNodePtr sky;
-		PgUtil::LoadNodeNifFile(FilePath.c_str(), &sky, NULL);
+		PgUtil::LoadNodeNifFile(FullFilePath.c_str(), &sky, NULL);
+		sky->SetName(FilePath.c_str());
 		{
 			std::lock_guard<std::mutex> lock(WorldLock);
 			kWorld.AttachSky(sky); 
@@ -47,16 +48,35 @@ bool EditorScene::LoadWater(std::ifstream& SHMD)
 	{
 		std::string FilePath;
 		SHMD >> FilePath;
-		FilePath = PgUtil::CreateFullFilePathFromBaseFolder(FilePath);
+		std::string FullFilePath = PgUtil::CreateFullFilePathFromBaseFolder(FilePath);
 
 		NiNodePtr water;
-		PgUtil::LoadNodeNifFile(FilePath.c_str(), &water, NULL);
+		PgUtil::LoadNodeNifFile(FullFilePath.c_str(), &water, NULL);
+		water->SetName(FilePath.c_str());
 		{
 			std::lock_guard<std::mutex> lock(WorldLock);
 			kWorld.AttachWater(water);
 		}
 	}
 	return true;
+}
+
+void RemoveCDAndM(NiNodePtr& obj) 
+{
+	for (int i = 0; i < obj->GetChildCount(); i++) 
+	{
+		auto child = obj->GetAt(i);
+		if(NiIsKindOf(NiNode,child))
+		{
+			NiNodePtr p = (NiNode*)child;
+			RemoveCDAndM(p);
+		}
+		else 
+		{
+			if (child->GetName().Contains("#CD") || child->GetName().Contains("#M"))
+				obj->DetachChild(child);
+		}
+	}
 }
 
 bool EditorScene::LoadGroundObject(std::ifstream& SHMD)
@@ -71,10 +91,12 @@ bool EditorScene::LoadGroundObject(std::ifstream& SHMD)
 	{
 		std::string FilePath;
 		SHMD >> FilePath;
-		FilePath = PgUtil::CreateFullFilePathFromBaseFolder(FilePath);
+		std::string FullFilePath = PgUtil::CreateFullFilePathFromBaseFolder(FilePath);
 
 		NiNodePtr Ground;
-		PgUtil::LoadNodeNifFile(FilePath.c_str(), &Ground, NULL);
+		PgUtil::LoadNodeNifFile(FullFilePath.c_str(), &Ground, NULL);
+		Ground->SetName(FilePath.c_str());
+		RemoveCDAndM(Ground);
 		{
 			std::lock_guard<std::mutex> lock(WorldLock);
 			kWorld.AttachGroundObj(Ground); 
@@ -83,18 +105,25 @@ bool EditorScene::LoadGroundObject(std::ifstream& SHMD)
 	return true;
 }
 
-bool EditorScene::LoadGlobalLight(std::ifstream& SHMD)
+bool EditorScene::LoadGlobalLight(std::ifstream& SHMD, std::string& GlobalLightNifPath)
 {
 	std::string line;
 	SHMD >> line;
 	if (line != "GlobalLight")
 		return false;
 	float r, g, b;
+	if (std::filesystem::exists(GlobalLightNifPath))
+	{
+		NiNodePtr Light = PgUtil::LoadNifFile(GlobalLightNifPath.c_str());
+		std::lock_guard<std::mutex> lock(WorldLock);
+		kWorld.SetGlobalLight(Light);
+	}
 	SHMD >> r >> g >> b;
 	{
 		std::lock_guard<std::mutex> lock(WorldLock);
 		kWorld.SetAmbientLightAmbientColor(NiColor(r, g, b));
 	}
+	
 	return true;
 }
 
@@ -105,7 +134,7 @@ bool EditorScene::LoadFog(std::ifstream& SHMD)
 	if (line != "Fog")
 		return false;
 	float r, g, b, depth;
-	SHMD >> r >> g >> b >> depth;
+	SHMD >> depth >> r >> g >> b;
 	{ 
 		std::lock_guard<std::mutex> lock(WorldLock);
 		kWorld.SetFogColor(NiColor(r, g, b));
@@ -122,6 +151,7 @@ bool EditorScene::LoadBackGroundColor(std::ifstream& SHMD)
 		return false;
 	float r, g, b;
 	SHMD >> r >> g >> b;
+	kWorld.SetBackgroundColor(r, g, b);
 	/* Currently Unk Where to Put that Color*/
 	return true;
 }
@@ -141,20 +171,19 @@ bool EditorScene::LoadFrustum(std::ifstream& SHMD)
 	return true;
 }
 
- bool EditorScene::LoadGlobalObjects(std::ifstream& SHMD, std::vector<std::pair<std::string, std::vector<EditorScene::ObjectPosition>>>& ObjectList)
+bool EditorScene::LoadGlobalObjects(std::ifstream& SHMD, std::vector<std::pair<std::string, std::vector<EditorScene::ObjectPosition>>>& ObjectList)
 {
 	std::string line;
 	SHMD >> line;
 	while (line != "DataObjectLoadingEnd")
 	{
-		std::string Path = PgUtil::CreateFullFilePathFromBaseFolder(line);
 		std::vector<ObjectPosition> Positions;
 		if (!LoadOneObject(SHMD, Positions))
 		{
 			NiMessageBox::DisplayMessage("Failed to Load SHMD Object", "ERROR");
 			return false;
 		}
-		ObjectList.push_back({ Path,Positions });
+		ObjectList.push_back({ line,Positions });
 		SHMD >> line;
 	}
 	return true;

@@ -72,7 +72,7 @@ public:
         }
         return 0;
 	}
-    static NiNodePtr LoadNifFile(const char* File, NiTexturePalette* /*Currently Unused */, bool IsPickable = false) 
+    static NiNodePtr LoadNifFile(const char* File, NiTexturePalette*  = NULL/*Currently Unused */, bool IsPickable = false) 
     {
         NiNode* Node;
         if (IsPickable)
@@ -138,6 +138,9 @@ public:
         }
         return FolderPath;
     }
+
+    static void LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, float Percent);
+    
 
     static std::string FolderPath;
 };
