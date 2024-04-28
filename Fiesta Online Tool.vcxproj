@@ -169,10 +169,12 @@
     <ClCompile Include="ImGui\ImSequencer.cpp" />
     <ClCompile Include="IngameWorld.cpp" />
     <ClCompile Include="IniFile.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NiPickable.cpp" />
     <ClCompile Include="PgWin.cpp" />
     <ClCompile Include="SHMDLoad.cpp" />
+    <ClCompile Include="SHNManager.cpp" />
     <ClCompile Include="StartScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -204,11 +206,13 @@
     <ClInclude Include="ImGui\ImZoomSlider.h" />
     <ClInclude Include="IngameWorld.h" />
     <ClInclude Include="IniFile.h" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="NiPickable.h" />
     <ClInclude Include="PgUtil.h" />
     <ClInclude Include="PgWin.h" />
     <ClInclude Include="PgWinMgr.h" />
     <ClInclude Include="PgWinObj.h" />
+    <ClInclude Include="SHNManager.h" />
     <ClInclude Include="StartScene.h" />
   </ItemGroup>
   <ItemGroup>

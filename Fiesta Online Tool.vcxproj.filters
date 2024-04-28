@@ -82,6 +82,10 @@
     <ClCompile Include="ImGui\imgui_impl_dx10.cpp">
       <Filter>Includes\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="SHNManager.cpp">
+      <Filter>SHN</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fiesta Online Tool">
@@ -119,6 +123,9 @@
     </Filter>
     <Filter Include="CustomNiClasses">
       <UniqueIdentifier>{f5f656b4-6a93-49ea-bc9e-355594815e38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SHN">
+      <UniqueIdentifier>{2f682e59-3a7f-4982-aff7-9a807f5c0b6f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -222,6 +229,10 @@
     <ClInclude Include="ImGui\imgui_impl_dx10.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="SHNManager.h">
+      <Filter>SHN</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ImGui\imgui.ini">

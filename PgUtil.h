@@ -139,8 +139,9 @@ public:
         return FolderPath;
     }
 
-    static void LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, float Percent);
-    
+    static void LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, float Percent, bool Map);
+    static NiScreenElements* CreateProgressbar(bool Map, float Percent);
+
 
     static std::string FolderPath;
 };

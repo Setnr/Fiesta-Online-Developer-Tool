@@ -770,7 +770,11 @@ void EditorScene::UpdateCamera(float fTime)
 						PossibleObjects.insert((NiPickable*)obj);
 					}
 					else 
-					{
+					{ 
+						//We only earch Upwards, 
+						//if we search Downwards we can click the terrain and select the first 
+						//NiPickable which must not be the actually targeted Node
+						//Picking only works when compiled with the define of PICKABLEOBJECTS being true
 						while (obj = obj->GetParent())
 						{
 							if (NiIsKindOf(NiPickable, obj))

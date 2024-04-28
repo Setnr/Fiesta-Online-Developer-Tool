@@ -7,6 +7,9 @@
 #include "ImGui/imgui_impl_dx9.h"
 #include "ImGui/imgui_impl_win32.h"
 
+#include "Logger.h"
+
+
 //const NiRTTI FiestaScene::ms_RTTI("FiestaScene", NULL);
 bool FiestaScene::SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamera)
 {
@@ -97,5 +100,13 @@ void FiestaScene::DrawImGui()
 	ImGui::Begin("General", NULL, flags);
 	ImGui::Text("    %f FPS", io.Framerate);
 	ImGui::Text("AVG %f FPS", average);
+	ImGui::End();
+
+	ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - 150));
+	ImGui::SetNextWindowSize(ImVec2(500, 150));
+	ImGui::Begin("Logger", NULL, flags);
+	Logger::Draw();
+	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+		ImGui::SetScrollHereY(1.0f);
 	ImGui::End();
 }

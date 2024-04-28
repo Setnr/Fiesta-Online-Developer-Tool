@@ -9,6 +9,7 @@
 #include "Detours/detours.h"
 #include <NiDX9Select.h>
 #include <NiD3D10Select.h>
+#include "SHNManager.h"
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 typedef LRESULT(__stdcall* WindProcHookDef)(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 auto WinProc_Org = (WindProcHookDef)(&NiApplication::WinProc);
@@ -88,7 +89,11 @@ bool FiestaOnlineTool::Initialize()
     ImGui_ImplWin32_Init(this->GetWindowReference());
     NiDX9Renderer* ptr = (NiDX9Renderer*)&*this->m_spRenderer;
     ImGui_ImplDX9_Init(ptr->GetD3DDevice());
-    
+    std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
+    PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, 0.8f, false);
+    SHNManager::Init();
+    LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
+    PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, 1.f, false);
     return true;
 }
 //No Fucking Clue what this it xD
@@ -134,6 +139,8 @@ NiActionMapPtr FiestaOnlineTool::CreateInitActionMap()
         NiMessageBox::DisplayMessage("Failed to AddAction MouseClickActionLeft", "Error");
     }
 
+    std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
+    PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, .50f, false);
     return ActionMap;
 }
 bool FiestaOnlineTool::HandleMouseMovement(NiActionData* pkActionData)
@@ -251,6 +258,8 @@ bool FiestaOnlineTool::CreateInputSystem()
     // Open the mouse, keyboard, and and game pads
     m_spKeyboard = m_spInputSystem->OpenKeyboard();
     m_spMouse = m_spInputSystem->OpenMouse();
+    std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
+    PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, .70f, false);
     return true;
 }
 
@@ -276,7 +285,7 @@ bool FiestaOnlineTool::CreateRenderer(HWND hWnd)
         if (m_spRenderer != NULL) 
         {
             std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
-            PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, 1.0f);
+            PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, .20f,false);
         }
         return (m_spRenderer != NULL);
     }
@@ -284,7 +293,7 @@ bool FiestaOnlineTool::CreateRenderer(HWND hWnd)
 }
 
 
-void PgUtil::LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, float Percent)
+void PgUtil::LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, float Percent, bool Map = true)
 {
 
     NiColorA m_kBackGroundColor;
@@ -307,10 +316,10 @@ void PgUtil::LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, floa
     pkScreenPoly->Insert(4);
 
     // Account for overscan for consoles.
-    pkScreenPoly->SetRectangle(0, 0.01f, 0.01f, 0.98f, 0.98f);
+    pkScreenPoly->SetRectangle(0, 0.f, 0.f, 1.f, 1.f);
 
     pkScreenPoly->UpdateBound();
-    pkScreenPoly->SetTextures(0, 0, 0.01f, 0.01f, 0.99f, 0.99f);
+    pkScreenPoly->SetTextures(0, 0, 0.f, 0.f, 1.f, 1.f);
 
     NiTexturingPropertyPtr pkTextProp = NiNew NiTexturingProperty;
     if (!pkTextProp)
@@ -325,13 +334,76 @@ void PgUtil::LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, floa
     pkScreenPoly->UpdateProperties();
     pkScreenPoly->Update(0.0f);
 
+    NiScreenElementsPtr pkScreenProgressBar = CreateProgressbar(Map,Percent);
+
+
     Renderer->BeginFrame();
     Renderer->BeginUsingDefaultRenderTargetGroup(7u);
     Renderer->SetScreenSpaceCameraData();
+
     pkScreenPoly->Draw(Renderer);
+    if(pkScreenProgressBar)
+        pkScreenProgressBar->Draw(Renderer);
 
     Renderer->EndUsingRenderTargetGroup();
     Renderer->EndFrame();
     Renderer->DisplayFrame();
 
+}
+
+NiScreenElements* PgUtil::CreateProgressbar(bool Map, float Percent)
+{
+    NiTexture::FormatPrefs kPrefs;
+    kPrefs.m_eMipMapped = NiTexture::FormatPrefs::NO;
+    std::string LoadingScreen;
+    if (Map)
+        LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoadingTextColor.tga");
+    else
+        LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\ProgressBar.tga");
+
+    NiTexture* pkBGTexture = NiSourceTexture::Create(LoadingScreen.c_str(), kPrefs);
+    if (!pkBGTexture)
+        return NULL;
+
+    NiScreenElements* pkScreenPoly = NiNew NiScreenElements(
+        NiNew NiScreenElementsData(false, false, 1));
+    if (!pkScreenPoly)
+        return NULL;
+
+    // We know that the polygon handle is zero and will use it directly in the
+    // vertex and texture coordinate assignments.
+    pkScreenPoly->Insert(4);
+
+    // Account for overscan for consoles.
+    //pkScreenPoly->SetRectangle(0, 0.01f, 0.01f, 0.98f, 0.98f);
+    if (Map)
+    {
+        pkScreenPoly->SetRectangle(0, 0.0, 0.87900001, Percent, 0.121f);
+
+        pkScreenPoly->UpdateBound();
+        pkScreenPoly->SetTextures(0, 0, 0.f, 0.f, 1.f, 1.f);
+    }
+    else 
+    {
+        pkScreenPoly->SetRectangle(0, 0.27734751, 0.75520003, Percent * 0.5f, 0.015f);
+
+        pkScreenPoly->UpdateBound();
+        pkScreenPoly->SetTextures(0, 0, 0.f, 0.f, 1.f, 1.f);
+    }
+
+    
+    NiTexturingPropertyPtr pkTextProp = NiNew NiTexturingProperty;
+    if (!pkTextProp)
+        return NULL;
+
+    pkTextProp->SetBaseTexture(pkBGTexture);
+    pkTextProp->SetBaseFilterMode(NiTexturingProperty::FILTER_BILERP);
+    pkTextProp->SetBaseClampMode(NiTexturingProperty::CLAMP_S_CLAMP_T);
+    pkTextProp->SetApplyMode(NiTexturingProperty::APPLY_REPLACE);
+    pkScreenPoly->AttachProperty(pkTextProp);
+
+    pkScreenPoly->UpdateProperties();
+    pkScreenPoly->Update(0.0f);
+
+    return pkScreenPoly;
 }
