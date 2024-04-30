@@ -98,6 +98,9 @@ class IniFile
 {
 public:
 	IniFile(std::string FilePath);
+	~IniFile() {
+		LayerList.clear();
+	}
 	bool Load();
 
 

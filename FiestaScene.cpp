@@ -54,9 +54,9 @@ void FiestaScene::UpdateCamera(float fTime)
 	{
 		NiPoint3 CameraPosition = Camera->GetTranslate();
 		NiPoint3 MoveDirect(0.0f, 0.0f, 0.0f);
-
-		NiPoint3 WorldDirect = Camera->GetWorldDirection() * 32;
-		NiPoint3 RightDirect = Camera->GetWorldRightVector() * 32;
+		float DeltaTime = fTime - FiestaOnlineTool::GetLastUpdateTime();
+		NiPoint3 WorldDirect = Camera->GetWorldDirection() * 115.f * DeltaTime;
+		NiPoint3 RightDirect = Camera->GetWorldRightVector() * 115.f * DeltaTime;
 		
 		if(W_Key)
 			MoveDirect += WorldDirect;

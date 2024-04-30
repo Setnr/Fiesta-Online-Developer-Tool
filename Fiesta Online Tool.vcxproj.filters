@@ -86,6 +86,9 @@
       <Filter>SHN</Filter>
     </ClCompile>
     <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="md5\md5.cpp">
+      <Filter>Includes\md5</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fiesta Online Tool">
@@ -126,6 +129,9 @@
     </Filter>
     <Filter Include="SHN">
       <UniqueIdentifier>{2f682e59-3a7f-4982-aff7-9a807f5c0b6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\md5">
+      <UniqueIdentifier>{3e41024f-acce-4477-8d27-4d387e8eaf02}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -233,6 +239,12 @@
       <Filter>SHN</Filter>
     </ClInclude>
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="md5\md5.h">
+      <Filter>Includes\md5</Filter>
+    </ClInclude>
+    <ClInclude Include="SHNStruct.h">
+      <Filter>SHN</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ImGui\imgui.ini">

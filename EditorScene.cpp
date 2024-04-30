@@ -18,7 +18,7 @@
 #include "ImGuiConstantFuncs.h"
 
 #include "FiestaOnlineTool.h"
-
+#include "SHNManager.h"
 ImGuizmo::OPERATION OperationMode;
 
 glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
@@ -37,11 +37,11 @@ glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 	return { angle_rad, x, y, z };
 }
 
-EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile(FilePath.substr(0, FilePath.length() - 5) + ".ini")
+EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName, "ini"))
 {
-	_FilePath = FilePath;
-	_FileName = FileName;
 
+	std::string _FilePath = PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName,"shmd");
+	_Info = info;
 	if (!kWorld.InitScene())
 		return;
 	if (!kWorld.InitCamera())
@@ -64,7 +64,7 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 
 #define EditorSceneError(Msg) {NiMessageBox::DisplayMessage(Msg, "Error"); return;}
 	std::ifstream SHMD;
-	SHMD.open(FilePath, std::ios::in);
+	SHMD.open(_FilePath, std::ios::in);
 
 	if (!SHMD.is_open()) 
 	{
@@ -80,7 +80,7 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 		EditorSceneError("SHMD - Failed to Load Water");
 	if (!LoadGroundObject(SHMD))
 		EditorSceneError("SHMD - Failed to Load GroundObject");
-	std::string GlobalLightPath = _FilePath.substr(0, _FilePath.length() - _FileName.length()) + "GlobalLight.nif";
+	std::string GlobalLightPath = _FilePath.substr(0, _FilePath.length() - std::string(info->MapFolderName).length()) + "GlobalLight.nif";
 	if(!LoadGlobalLight(SHMD, GlobalLightPath))
 		EditorSceneError("SHMD - Failed to Load GlobalLight");
 	if (!LoadFog(SHMD))
@@ -150,18 +150,6 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 		}
 	}
 
-	Camera = kWorld.GetCamera();
-	
-	Camera->SetTranslate(NiPoint3(0, 0, 0));
-	Pitch = 1.57f * 2.0f;
-	Yaw = -1.57f;
-	Roll = 1.57f;
-	NiMatrix3 rotation;
-	rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
-
-	Camera->SetRotate(rotation);
-
-
 	BaseNode = kWorld.GetWorldScene();
 	BaseNode->UpdateEffects();
 	BaseNode->UpdateProperties();
@@ -170,11 +158,39 @@ EditorScene::EditorScene(std::string FilePath, std::string FileName) : _InitFile
 	NiOptimize::RemoveDupProperties(BaseNode);
 	NiOptimize::RemoveUnnecessaryNormals(BaseNode);
 	NiOptimize::OptimizeSkinData(BaseNode, true, true, 0, false);
-	Camera->Update(0.0f);
 
-	NiStream s;
-	s.InsertObject(kWorld.GetTerrainScene());
-	s.Save("./Fullyloaded.nif");
+	Camera = kWorld.GetCamera();
+	NiPick _Pick;
+	_Pick.SetTarget(kWorld.GetWorldScene());
+	_Pick.SetPickType(NiPick::FIND_ALL);
+	_Pick.SetSortType(NiPick::SORT);
+	_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+	_Pick.SetFrontOnly(false);
+	_Pick.SetReturnNormal(true);
+	_Pick.SetObserveAppCullFlag(true);
+	NiPoint3 kOrigin(info->RegenX, info->RegenY, 0.f);
+	if (_Pick.PickObjects(kOrigin, World::ms_kUpDir,true))
+	{
+		NiPick::Results& results = _Pick.GetResults();
+		for (int i = 0; i < results.GetSize(); i++)
+		{
+			auto result = results.GetAt(i);
+			if(result->GetIntersection().z > kOrigin.z)
+				kOrigin.z = result->GetIntersection().z;
+		}
+		
+	}
+	kOrigin.z += 100.f;
+	Camera->SetTranslate(kOrigin);
+	Pitch = 1.57f * 2.0f;
+	Yaw = -1.57f;
+	Roll = 1.57f;
+	NiMatrix3 rotation;
+	rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
+
+	Camera->SetRotate(rotation);
+	Camera->Update(0.0f);
+	CanSwitch = true;
 
 	return;
 }
@@ -551,25 +567,14 @@ void EditorScene::Draw(NiRenderer* renderer)
 	NiDrawScene(Camera, kWorld.GetSkyNode(), m_spCuller);
 
 	Camera->SetViewFrustum(kWorld.GetWorldFrustum());
-	//NiVisibleArray m_kVisible2;
-	//NiCullingProcess m_spCuller2(&m_kVisible2);
-	//NiDrawScene(Camera, kWorld.GetWorldScene(), m_spCuller2);
-	
-
-	m_kVisible.SetGrowBy(1024);
-	m_kVisible.SetAllocatedSize(0x400);
-	//NiCullingProcess m_spCuller(&m_kVisible);
-	NiNodePtr WorldScene = kWorld.GetWorldScene();
-	renderer->SetCameraData(Camera);
-	m_kVisible.RemoveAll();
-	m_spCuller.Process(Camera, WorldScene, &m_kVisible);
-	ShDrawVisibleArray(renderer, Camera, m_kVisible);
-
+	NiVisibleArray m_kVisible2;
+	NiCullingProcess m_spCuller2(&m_kVisible2);
+	NiDrawScene(Camera, kWorld.GetWorldScene(), m_spCuller2);
 }
 
 void EditorScene::DrawImGui() 
 {
-	FiestaScene::DrawImGui();
+	StartScene::DrawImGui();
 
 	DrawSHMDEditor();
 
@@ -764,7 +769,7 @@ void EditorScene::UpdateCamera(float fTime)
 				for (int i = 0; i < results.GetSize(); i++ ) 
 				{
 					auto record = results.GetAt(i);
-					auto obj = record->GetParent();
+					auto obj = record->GetAVObject();
 					if (NiIsKindOf(NiPickable, obj))
 					{
 						PossibleObjects.insert((NiPickable*)obj);

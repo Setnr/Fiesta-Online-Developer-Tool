@@ -2,9 +2,6 @@
 #include "FiestaOnlineTool.h"
 #include "FiestaOnlineTool_GeneralHeaders.h"
 
-#include "ImGui/imgui_impl_dx9.h"
-//#include "ImGui/imgui_impl_dx10.h"
-#include "ImGui/imgui_impl_win32.h"
 
 #include "Detours/detours.h"
 #include <NiDX9Select.h>
@@ -45,7 +42,7 @@ bool FiestaOnlineTool::Initialize()
     this->m_pkFrameRate->Init(true);
     this->m_pkFrameRate->SetColor(NiColor::BLACK);
     
-    //EnableFrameRate(true);
+    EnableFrameRate(true);
     this->SetMaxFrameRate(144.0f);
 
     NiRect<int> kRect;

@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <filesystem>
+#include "Logger.h"
 bool EditorScene::CheckSHMDVersion(std::ifstream& SHMD) 
 {
 	std::string line;
@@ -63,19 +64,29 @@ bool EditorScene::LoadWater(std::ifstream& SHMD)
 
 void RemoveCDAndM(NiNodePtr& obj) 
 {
+	std::vector<NiAVObjectPtr> Removes;
 	for (int i = 0; i < obj->GetChildCount(); i++) 
 	{
-		auto child = obj->GetAt(i);
-		if(NiIsKindOf(NiNode,child))
+		NiAVObjectPtr child = obj->GetAt(i);
+		if (!child)
+			continue;
+		if(NiIsKindOf(NiGeometry,child))
 		{
-			NiNodePtr p = (NiNode*)child;
+			auto Name = child->GetName();
+			if (Name.Contains("#CD") || Name.Contains("#M"))
+			{
+				Removes.push_back(child);
+			}
+		}
+		else if(NiIsKindOf(NiNode,child))
+		{
+			NiNodePtr p = (NiNode*)(NiAVObject*)child;
 			RemoveCDAndM(p);
 		}
-		else 
-		{
-			if (child->GetName().Contains("#CD") || child->GetName().Contains("#M"))
-				obj->DetachChild(child);
-		}
+	}
+	for (auto rem : Removes)
+	{
+		obj->DetachChild(rem);
 	}
 }
 
@@ -93,8 +104,7 @@ bool EditorScene::LoadGroundObject(std::ifstream& SHMD)
 		SHMD >> FilePath;
 		std::string FullFilePath = PgUtil::CreateFullFilePathFromBaseFolder(FilePath);
 
-		NiNodePtr Ground;
-		PgUtil::LoadNodeNifFile(FullFilePath.c_str(), &Ground, NULL);
+		NiNodePtr Ground = PgUtil::LoadNifFile(FullFilePath.c_str(), NULL);
 		Ground->SetName(FilePath.c_str());
 		RemoveCDAndM(Ground);
 		{

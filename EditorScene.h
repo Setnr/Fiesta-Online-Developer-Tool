@@ -1,5 +1,5 @@
 #pragma once
-#include "FiestaScene.h"
+#include "StartScene.h"
 #include "IngameWorld.h"
 #include "IniFile.h"
 
@@ -15,8 +15,9 @@
 #include "NiPickable.h"
 
 #include "ImGui/imgui.h"
+#include "SHNStruct.h"
 
-class EditorScene : public FiestaScene
+class EditorScene : public StartScene
 {
 public:
 	struct ObjectPosition 
@@ -26,7 +27,7 @@ public:
 		float Scale;
 	};
 
-	EditorScene(std::string FilePath, std::string FileName);
+	EditorScene(MapInfo* info);
 	~EditorScene() 
 	{
 		BaseNode = 0;
@@ -44,7 +45,6 @@ public:
 		kWorld.GetSkyNode()->Update(fTime);
 		this->UpdateCamera(fTime);
 		kWorld.GetGroundCollidee()->Update(fTime);
-		//FiestaScene::Update(fTime);
 	}
 	bool LoadTerrain();
 	void UpdateCamera(float fTime) override;
@@ -121,18 +121,14 @@ private:
 	void DrawSHMDHeader(std::string, NiNodePtr);
 	NiColor BackgroundColor;
 
-	std::string _FilePath;
-	std::string _FileName;
+	MapInfo* _Info;
 	IniFile _InitFile;
 
 	std::mutex WorldLock;
 	World kWorld;
 
-
 	NiPickablePtr SelectedObj;
 	glm::vec3 SelectedObjAngels;
-	//std::mutex ObjectLoadLock;
-	//std::vector < std::string, LoadingData >
 };
 
 

@@ -5,7 +5,10 @@
 #include "FiestaScene.h"
 
 #include "ImGui/imgui.h"
+#include <mutex>
 
+#include "ImGui/imgui_impl_dx9.h"
+#include "ImGui/imgui_impl_win32.h"
 class FiestaOnlineTool : public NiSample
 {
 public:
@@ -13,7 +16,6 @@ public:
 	~FiestaOnlineTool() 
 	{
 		ShowCursor(true);
-		exit(0);
 	}
 	virtual bool CreateRenderer();
 	virtual bool Initialize();
@@ -28,8 +30,12 @@ public:
 		m_spActionMap = 0;
 		m_spScene = 0;
 		_Scene = 0;
-		
-		NiApplication::Terminate();
+
+		ImGui_ImplDX9_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+
+		NiSample::Terminate();
 	}
 
 	void CheckInterfaceForHit();
@@ -92,10 +98,17 @@ public:
 		Y = kPoint.y;
 		return true;
 	}
-
+	static void UpdateScene(FiestaScenePtr Scene);
 	static FiestaOnlineTool* _Tool;
+	void UpdateSceneInternal(FiestaScenePtr Scene);
+	static float GetLastUpdateTime() {
+		return _Tool->_LastUpdateTime();
+	}
+	float _LastUpdateTime() {
+		return m_fLastUpdateTime;
+	}
 private: 
-
+	std::mutex SceneLock;
 	FiestaScenePtr _Scene;
 
 	static bool HandleMouseMovement(NiActionData* pkActionData);

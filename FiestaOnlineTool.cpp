@@ -8,10 +8,9 @@
 #define IMAPP_IMPL
 #include "ImGui/ImApp.h"
 #include "ImGui/ImGuizmo.h"
-
+#include "Logger.h"
 void FiestaOnlineTool::OnIdle()
 {
-
     if(MeasureTime())
     {
         /*Update FrameRate*/
@@ -22,30 +21,29 @@ void FiestaOnlineTool::OnIdle()
         }
 
         //MainWorldScene
-        if (_Scene->UpdateScene()) 
         {
-            _Scene = _Scene->GetNewScene();
-            _Scene->SetupScene(m_spScene, m_spCamera);
+            std::lock_guard<std::mutex> lock(SceneLock);
+            float Time = NiGetCurrentTimeInSec();
+            _Scene->Update(Time);
+            m_fLastUpdateTime = Time;
+            //Interface Scene
+            Pgg_kWinMgr->Update();
+
+            /*Prepare Framerendering*/
+            this->UpdateFrame();
+            this->BeginFrame();
+            m_spRenderer->BeginUsingDefaultRenderTargetGroup(7u);
+            /*Set BackgroundColor of Renderer*/
+            NiColorA m_kBackGroundColor;
+            this->m_spRenderer->SetBackgroundColor(m_kBackGroundColor);
+
+            /*Draw MainScene (GameWorld)*/
+            _Scene->Draw(this->m_spRenderer);
+
+            _Scene->StartImGuiFrame();
+            _Scene->DrawImGui();
+            _Scene->EndImGuiFrame();
         }
-        _Scene->Update(NiGetCurrentTimeInSec());
-
-        //Interface Scene
-        Pgg_kWinMgr->Update();
-
-        /*Prepare Framerendering*/
-        this->UpdateFrame();
-        this->BeginFrame();
-        m_spRenderer->BeginUsingDefaultRenderTargetGroup(7u);
-        /*Set BackgroundColor of Renderer*/
-        NiColorA m_kBackGroundColor;
-        this->m_spRenderer->SetBackgroundColor(m_kBackGroundColor);
-
-        /*Draw MainScene (GameWorld)*/
-        _Scene->Draw(this->m_spRenderer);
-
-        _Scene->StartImGuiFrame();
-        _Scene->DrawImGui();
-        _Scene->EndImGuiFrame();
 
         /*Draw Interface Windows*/
         Pgg_kWinMgr->Draw(m_spRenderer);
@@ -58,9 +56,8 @@ void FiestaOnlineTool::OnIdle()
         this->EndFrame();
         this->DisplayFrame();
         ++this->m_iClicks;
-        Sleep(1);
+        Sleep(1);   
     }
-    
 }
 
 void FiestaOnlineTool::DrawCursor()
@@ -69,4 +66,15 @@ void FiestaOnlineTool::DrawCursor()
     FiestaOnlineTool::GetMousePosition(X, Y);
     _Tool->cursor->SetPosition(0.0, X + 5, Y + 9);
     cursor->Draw();
+}
+
+void FiestaOnlineTool::UpdateScene(FiestaScenePtr Scene)
+{
+    _Tool->UpdateSceneInternal(Scene);
+}
+void FiestaOnlineTool::UpdateSceneInternal(FiestaScenePtr Scene)
+{
+    std::lock_guard<std::mutex> lock(SceneLock);
+    if(Scene->CanBeSwitched())
+        _Scene = Scene;
 }

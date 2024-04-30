@@ -2,17 +2,13 @@
 #include "PgUtil.h"
 #include <NiThread.h>
 #include "EditorScene.h"
-DWORD WINAPI HandleLoading(void*  ptr)
-{
-    StartScene* p = (StartScene * )ptr;
-    p->RunThread();
-    return 1;
-}
+#include "SHNManager.h"
+#include <future>
+#include "FiestaOnlineTool.h"
+
 StartScene::StartScene() 
 {
-    _procedure = NULL;
-    _Thread = NULL;
-    Loaded = false;
+
     NiSortAdjustNodePtr sortNode = NiNew NiSortAdjustNode;
     sortNode->SetSortingMode(NiSortAdjustNode::SORTING_INHERIT);
     BaseNode = sortNode;
@@ -23,47 +19,44 @@ StartScene::StartScene()
     NiNodePtr NiN = PgUtil::LoadNifFile(Path.c_str(), 0);
     BaseNode->AttachChild(NiN, 1);
 
+    SetupScene(BaseNode, Camera);
+    CanSwitch = true;
     return;
-    _procedure = NiNew StartSceneBackgroundThread(this);
-    _Thread = NiThread::Create(_procedure);
-    NIASSERT(_Thread)
-    _Thread->SetPriority(NiThread::NORMAL);
-    _Thread->Resume();
 }
 
-void StartScene::RunThread()
+
+
+
+void StartScene::DrawImGui() 
 {
-    char FileNameBuffer[MAX_PATH];
-    char FilePathBuffer[MAX_PATH];
-    OPENFILENAMEA l = { 0x0 };
-
-    ZeroMemory(FileNameBuffer, sizeof(FileNameBuffer));
-    ZeroMemory(FilePathBuffer, sizeof(FilePathBuffer));
-    ZeroMemory(&l, sizeof(l));
-
-    l.lStructSize = sizeof(OPENFILENAMEA);
-    l.hwndOwner = NULL;
-    l.lpstrFilter = "SHMD-File\0*.shmd";
-    l.lpstrFile = FilePathBuffer;
-    l.nMaxFile = MAX_PATH;
-    l.lpstrTitle = "Open SHMD-File";
-    l.lpstrDefExt = "shmd";
-    l.lpstrFileTitle = FileNameBuffer;
-    l.nMaxFileTitle = MAX_PATH;
-    l.lpstrInitialDir = NULL;
-    l.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | 0x02000000;
-
-    if (GetOpenFileNameA(&l))
+    FiestaScene::DrawImGui();
+    static std::future<void> future;
+    auto shn = SHNManager::Get(SHNManager::MapInfo);
+    ImGui::Begin("Load MapInfo");
+    if(shn->DrawHeader())
     {
+        for (unsigned int i = 0; i < shn->GetRows(); i++)
+        {
+            shn->DrawRow(i);
+            if (!future.valid() || future.wait_for(std::chrono::milliseconds(0)) != std::future_status::timeout)
+            {
+                if (ImGui::Button(std::string("Load##" + std::to_string(i)).c_str()))
+                {
 
-        LoadedScene = NiNew EditorScene(FilePathBuffer, FileNameBuffer);
-        LoadingFinished();
+                    future = std::async(std::launch::async, [this, shn, i]
+                        {
+                            MapInfo* info = shn->GetRow<MapInfo>(i);
+
+                            auto LoadedScene = NiNew EditorScene(info);
+                            FiestaOnlineTool::UpdateScene(LoadedScene);
+
+                        });
+
+                }
+            }
+        }
+        ImGui::EndTable();
     }
-    else
-    {
-        DWORD error = CommDlgExtendedError();
-        char ErrorMessage[1024];
-        NiSprintf(ErrorMessage, sizeof(ErrorMessage), "Failed to create OpenFileDialog with Error %x", error);
-        NiMessageBox::DisplayMessage(ErrorMessage, "Error");
-    }
+    ImGui::End();
 }
+

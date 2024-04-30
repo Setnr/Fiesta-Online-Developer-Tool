@@ -5,7 +5,7 @@
 #include <filesystem>
 TerrainLayer::~TerrainLayer()
 {
-
+	pixldata = 0;
 	BlendTexture = 0;
 	BaseTexture = 0;
 }
@@ -80,12 +80,12 @@ bool TerrainLayer::Load(std::ifstream& File)
 
 void TerrainLayer::CreateTexture()
 {
-	NiImageConverter* conv = NiImageConverter::GetImageConverter();
+	NiImageConverterPtr conv = NiImageConverter::GetImageConverter();
 
 	std::string acFileName = PgUtil::CreateFullFilePathFromBaseFolder(BlendFileName);
 	std::cout << "BlendFileName for Texture " << acFileName << std::endl;
 
-	NiPixelData* ReadImage = conv->ReadImageFile(acFileName.c_str(), 0);
+	NiPixelDataPtr ReadImage = conv->ReadImageFile(acFileName.c_str(), 0);
 	if (ReadImage->GetPixelFormat() != NiPixelFormat::RGB24)
 	{
 		NiMessageBox::DisplayMessage("NiPixelData From ReadImage in Layer::CreateTexture Has Wrong NiPixelFormat", "Error");

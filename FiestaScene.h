@@ -11,6 +11,7 @@ class FiestaScene : public NiRefObject
 public:
 	FiestaScene() 
 	{
+		CanSwitch = false;
 		Yaw = 0.0f;
 		Pitch = 0.0f;
 		Roll = 0.0f;
@@ -21,14 +22,6 @@ public:
 	{
 	}
 	virtual bool SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamerea);
-	virtual bool UpdateScene()
-	{
-		return 0;
-	}
-	virtual FiestaScene* GetNewScene() 
-	{
-		return NULL;
-	}
 	virtual void Draw(NiRenderer* renderer) {}
 	virtual void DrawImGui();
 	void StartImGuiFrame();
@@ -39,7 +32,7 @@ public:
 		BaseNode->Update(fTime);
 	}
 	virtual void UpdateCamera(float fTime);
-	
+	bool CanBeSwitched() { return CanSwitch; }
 protected:
 	NiNodePtr BaseNode;
 	NiCameraPtr Camera;
@@ -47,10 +40,9 @@ protected:
 	float Yaw;
 	float Pitch;
 	float Roll;
-	
 
 	float FPS[90];
 	int values_offset;
-
+	std::atomic<bool> CanSwitch;
 };
 

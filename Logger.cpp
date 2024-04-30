@@ -3,7 +3,7 @@
 Logger Logger::_Logger;
 
 Logger::Logger() {
-	Info("StartUp DeveloperTools by Set");
+	LogInfo("StartUp DeveloperTools by Set");
 }
 
 void Logger::Log(ImColor col, std::string msg)

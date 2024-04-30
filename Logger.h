@@ -20,6 +20,7 @@ public:
 
 #include <format>
 #include <chrono>
+
 #ifdef _DEBUG
 constexpr std::string GetFunctionNameWithClass(const char* s)
 {
@@ -36,15 +37,14 @@ constexpr std::string GetFunctionNameWithClass(const char* s)
 }
 
 #define __FUNCNAME__ GetFunctionNameWithClass(__FUNCSIG__)
-
 #define Msg(info) std::string("[" + std::format("{:%T}", std::chrono::system_clock::now()) + "] "  + __FUNCNAME__ + " -> " + info)
+#define LogDebug(info) Logger::_Logger.Log(ImColor(0.0f,1.0f,1.0f),Msg(info))
 
-#define Debug(info) Logger::_Logger.Log(ImColor(0.0f,1.0f,1.0f),Msg(info))
 #else
 #define Msg(info) std::string("[" + std::format("{:%T}", std::chrono::system_clock::now()) + "] " + " -> " + info)
-#define Debug(info) 
+#define LogDebug(info) 
 #endif
 
-#define Error(info) Logger::_Logger.Log(ImColor(1.0f,0.0f,0.0f),Msg(info))
-#define Warning(info) Logger::_Logger.Log(ImColor(1.0f,0.8f,0.0f),Msg(info))
-#define Info(info) Logger::_Logger.Log(ImColor(1.f,0.706f,.035f),Msg(info))
+#define LogError(info) Logger::_Logger.Log(ImColor(1.0f,0.0f,0.0f),Msg(info))
+#define LogWarning(info) Logger::_Logger.Log(ImColor(1.0f,0.8f,0.0f),Msg(info))
+#define LogInfo(info) Logger::_Logger.Log(ImColor(1.f,0.706f,.035f),Msg(info))

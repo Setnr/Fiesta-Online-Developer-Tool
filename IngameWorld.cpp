@@ -94,7 +94,6 @@ bool World::InitScene()
 	m_spShadowScene->AttachProperty(alpha);
 	m_spShadowScene->AttachProperty(Vertex);
 	m_spShadowScene->AttachProperty(Fog);
-
 	Vertex = NiNew NiVertexColorProperty;
 	NiMaterialPropertyPtr Material = NiNew NiMaterialProperty;
 	Fog = NiNew NiFogProperty;
