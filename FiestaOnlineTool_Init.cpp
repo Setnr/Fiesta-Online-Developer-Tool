@@ -24,6 +24,14 @@ FiestaOnlineTool::FiestaOnlineTool() : NiSample("DeveloperTools bei Set", 1600, 
         _Tool = this;
 
 }
+
+bool FiestaOnlineTool::OnDefault(NiEventRef pEventRecord) 
+{
+    bool r = NiApplication::OnDefault(pEventRecord);
+    // Test if this enables Keys in ImGui - Failed
+    //ImGui_ImplWin32_WndProcHandler(pEventRecord->hWnd, pEventRecord->uiMsg, pEventRecord->wParam, pEventRecord->lParam);
+    return r;
+}
 bool FiestaOnlineTool::Initialize()
 {
     NiSample::Initialize();
@@ -83,7 +91,7 @@ bool FiestaOnlineTool::Initialize()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    ImGui_ImplWin32_Init(this->GetWindowReference());
+    ImGui_ImplWin32_Init(this->GetRenderWindowReference());
     NiDX9Renderer* ptr = (NiDX9Renderer*)&*this->m_spRenderer;
     ImGui_ImplDX9_Init(ptr->GetD3DDevice());
     std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
@@ -103,7 +111,7 @@ NiActionMapPtr FiestaOnlineTool::CreateNewActionMap(const char* pcName) {
 NiActionMapPtr FiestaOnlineTool::CreateInitActionMap()
 {
     NiActionMapPtr ActionMap = CreateNewActionMap("StartScreenActionMap");
-
+   
     if (!ActionMap->AddAction("MouseMoveActionX", NiAction::MOUSE_AXIS_X,
         NiAction::MOUSE_AXIS_X, 0, 0, 0, 0,
         (void*)FiestaOnlineTool::HandleMouseMovement))

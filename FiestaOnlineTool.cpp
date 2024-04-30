@@ -19,7 +19,6 @@ void FiestaOnlineTool::OnIdle()
             m_pkFrameRate->TakeSample();
             m_pkFrameRate->Update();
         }
-
         //MainWorldScene
         {
             std::lock_guard<std::mutex> lock(SceneLock);

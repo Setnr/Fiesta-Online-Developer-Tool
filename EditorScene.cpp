@@ -39,7 +39,7 @@ glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 
 EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName, "ini"))
 {
-
+	auto start = std::chrono::steady_clock::now();
 	std::string _FilePath = PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName,"shmd");
 	_Info = info;
 	if (!kWorld.InitScene())
@@ -191,7 +191,11 @@ EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(
 	Camera->SetRotate(rotation);
 	Camera->Update(0.0f);
 	CanSwitch = true;
-
+	auto diff = std::chrono::steady_clock::now() - start;
+	std::ostringstream oss;
+	oss << "Successfully Loaded " <<info->MapName << "(" 
+		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
+	LogInfo(oss.str());
 	return;
 }
 

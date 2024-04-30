@@ -37,7 +37,7 @@ public:
 
 		NiSample::Terminate();
 	}
-
+	virtual bool OnDefault(NiEventRef pEventRecord);
 	void CheckInterfaceForHit();
 	void CheckInterfaceForClick();
 	void UpdateInterface();
@@ -107,6 +107,7 @@ public:
 	float _LastUpdateTime() {
 		return m_fLastUpdateTime;
 	}
+
 private: 
 	std::mutex SceneLock;
 	FiestaScenePtr _Scene;
