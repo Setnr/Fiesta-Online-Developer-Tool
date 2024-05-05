@@ -25,19 +25,24 @@ bool FiestaScene::SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamera)
 
 void FiestaScene::UpdateCamera(float fTime)
 {
-	
-	if (FiestaOnlineTool::GetRotateCamera())
-	{
-		int iX, iY, iZ;
-		if (FiestaOnlineTool::GetPositionDelta(iX, iY, iZ))
-		{
 
+	auto& io = ImGui::GetIO();
+	if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
+	{
+		Camera->Update(0.0f);
+		return;
+	}
+
+	if(ImGui::IsMouseDown(ImGuiMouseButton_Right))
+	{
+		if (io.MouseDelta.x || io.MouseDelta.y)
+		{
 			unsigned int uiAppHeight = NiApplication::ms_pkApplication->GetAppWindow()->GetHeight();
 			unsigned int uiAppWidth = NiApplication::ms_pkApplication->GetAppWindow()->GetWidth();
 			if (uiAppHeight > 0 && uiAppWidth > 0)
 			{
-				float fPitchDelta = NI_PI * 0.375f * (float)(iY) / (float)uiAppHeight;
-				float fHeadingDelta = NI_PI * 0.375f * (float)(iX) / (float)uiAppWidth;
+				float fPitchDelta = NI_PI * 0.375f * (float)(io.MouseDelta.y) / (float)uiAppHeight;
+				float fHeadingDelta = NI_PI * 0.375f * (float)(io.MouseDelta.x) / (float)uiAppWidth;
 				Pitch += fPitchDelta;
 				Yaw -= fHeadingDelta;
 				NiMatrix3 rotation;
@@ -46,12 +51,13 @@ void FiestaScene::UpdateCamera(float fTime)
 			}
 		}
 	}
-	bool W_Key = false;
-	bool S_Key = false;
-	bool A_Key = false;
-	bool D_Key = false;
-	if (FiestaOnlineTool::IsMoveKeyPressed(W_Key, S_Key, A_Key,D_Key)) 
+	bool W_Key = ImGui::IsKeyDown((ImGuiKey)0x57);
+	bool S_Key = ImGui::IsKeyDown((ImGuiKey)0x53);
+	bool A_Key = ImGui::IsKeyDown((ImGuiKey)0x41);
+	bool D_Key = ImGui::IsKeyDown((ImGuiKey)0x44);
+	if (W_Key || S_Key || A_Key || D_Key) 
 	{
+		
 		NiPoint3 CameraPosition = Camera->GetTranslate();
 		NiPoint3 MoveDirect(0.0f, 0.0f, 0.0f);
 		float DeltaTime = fTime - FiestaOnlineTool::GetLastUpdateTime();
@@ -109,4 +115,5 @@ void FiestaScene::DrawImGui()
 	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
 		ImGui::SetScrollHereY(1.0f);
 	ImGui::End();
+
 }

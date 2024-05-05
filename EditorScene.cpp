@@ -19,6 +19,7 @@
 
 #include "FiestaOnlineTool.h"
 #include "SHNManager.h"
+#include "NiFileLoader.h"
 ImGuizmo::OPERATION OperationMode;
 
 glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
@@ -523,45 +524,7 @@ bool EditorScene::LoadTerrain()
 		}
 	}
 }
-void __cdecl ShDrawVisibleArrayAppend(NiRenderer* ms_pkRenderer, NiVisibleArray& kVisibleSet)
-{
-	NiAccumulator* v1; // esi
-	unsigned int i; // esi
-	NiRenderer* pkRenderer; // [esp+10h] [ebp-14h]
-	NiPointer<NiAccumulator> spSorter; // [esp+14h] [ebp-10h]
-	pkRenderer = ms_pkRenderer;
-	if (pkRenderer)
-	{
-		v1 = pkRenderer->GetSorter();
-		spSorter = v1;
-		if (v1)
-		{
-			spSorter->RegisterObjectArray(kVisibleSet);
-		}
-		else
-		{
-			for (i = 0; i < kVisibleSet.GetCount(); ++i)
-			{
-				kVisibleSet.GetAt(i).RenderImmediate(ms_pkRenderer);
-			}
-		}
-	}
-}
-void ShDrawVisibleArray(NiRenderer* ms_pkRenderer, NiCamera* pkCamera, NiVisibleArray& kVisibleSet)
-{
-	NiAccumulator* v2; // esi
 
-	if (ms_pkRenderer && pkCamera)
-	{
-		v2 = ms_pkRenderer->GetSorter();
-		if (v2)
-			v2->StartAccumulating(pkCamera);
-		ShDrawVisibleArrayAppend(ms_pkRenderer,kVisibleSet);
-		if (v2)
-			v2->FinishAccumulating();
-		
-	}
-}
 void EditorScene::Draw(NiRenderer* renderer)
 {
 	Camera->SetViewFrustum(kWorld.GetSkyFrustum());
@@ -706,8 +669,6 @@ void EditorScene::DrawSHMDEditor()
 				break;
 			}
 
-			
-
 			ImGui::DragFloat3("Position", (float*)& SelectedObj->GetTranslate().x);
 			ImGui::DragFloat3("Rotation", &SelectedObjAngels[0]);
 			float Scale = SelectedObj->GetScale();
@@ -716,6 +677,59 @@ void EditorScene::DrawSHMDEditor()
 			ImGui::End();
 		}
 	}
+	static NiFileLoader loader;
+	if (loader.DrawImGui()) 
+	{
+		NiNodePtr obj = loader.Load();
+		if (NiIsKindOf(NiPickable, obj))
+			SelectedObj = (NiPickable*)(NiNode*)obj;
+		
+	}
+
+	if (ImGui::BeginPopupContextVoid(0, ImGuiPopupFlags_MouseButtonMiddle))
+	{
+		if (ImGui::Selectable("Add Sky"))
+			loader.Prepare(kWorld.GetSkyNode());
+		if (ImGui::Selectable("Add Water"))
+			loader.Prepare(kWorld.GetWaterNode());
+		if (ImGui::Selectable("Add Object"))
+			loader.Prepare(kWorld.GetGroundObjNode());
+		if (ImGui::Selectable("Add Pickable"))
+		{
+			NiPoint3 kOrigin, kDir;
+			long X, Y;
+			FiestaOnlineTool::GetMousePosition(X, Y);
+			if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
+			{
+				NiPick _Pick;
+				_Pick.SetPickType(NiPick::FIND_FIRST);
+				_Pick.SetSortType(NiPick::SORT);
+				_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+				_Pick.SetFrontOnly(true);
+				_Pick.SetReturnNormal(true);
+				_Pick.SetObserveAppCullFlag(true);
+				_Pick.SetTarget(kWorld.GetTerrainScene());
+				if (_Pick.PickObjects(kOrigin, kDir, true))
+				{
+					NiPick::Results& results = _Pick.GetResults();
+					for (int i = 0; i < results.GetSize(); i++)
+					{
+						auto result = results.GetAt(i);
+						loader.Prepare(kWorld.GetGroundCollidee(), PICKABLEOBJECTS, result->GetIntersection());
+					}
+
+				}
+			}
+		}
+		if(SelectedObj)
+			if (ImGui::Selectable("Delete Selected Obj"))
+			{
+				SelectedObj->GetParent()->DetachChild(SelectedObj);
+				SelectedObj = NULL;
+			}
+		ImGui::EndPopup();
+	}
+
 }
 
 void EditorScene::DrawSHMDHeader(std::string Name, NiNodePtr Node)
@@ -731,7 +745,7 @@ void EditorScene::DrawSHMDHeader(std::string Name, NiNodePtr Node)
 			{
 				ImGui::Text(Object->GetName(), "");
 				ImGui::SameLine();
-				if (ImGui::Button(std::string("Delete " + Name + std::to_string(i)).c_str()))
+				if (ImGui::Button(std::string("Delete##" + Name + std::to_string(i)).c_str()))
 				{
 					Node->DetachChildAt(i);
 					compact = true;
@@ -747,9 +761,10 @@ void EditorScene::UpdateCamera(float fTime)
 {
 	FiestaScene::UpdateCamera(fTime);
 	NiPoint3 translate(Camera->GetTranslate());
-	//translate.z = 0;
 	kWorld.GetSkyNode()->SetTranslate(translate);
-	if (FiestaOnlineTool::IsLeftClick())
+
+	auto& io = ImGui::GetIO();
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 	{
 		NiPoint3 kOrigin, kDir;
 		long X, Y;

@@ -193,6 +193,7 @@
     <ClInclude Include="ImGui\ImApp.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\ImCurveEdit.h" />
+    <ClInclude Include="ImGui\imfilebrowser.h" />
     <ClInclude Include="ImGui\ImGradient.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\ImGuizmo.h" />
@@ -209,6 +210,8 @@
     <ClInclude Include="IniFile.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="md5\md5.h" />
+    <ClInclude Include="NiFileLoader.h" />
+    <ClInclude Include="NiInputConverter.h" />
     <ClInclude Include="NiPickable.h" />
     <ClInclude Include="PgUtil.h" />
     <ClInclude Include="PgWin.h" />

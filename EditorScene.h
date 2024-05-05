@@ -43,8 +43,7 @@ public:
 	void Update(float fTime)
 	{
 		kWorld.GetSkyNode()->Update(fTime);
-		this->UpdateCamera(fTime);
-		kWorld.GetGroundCollidee()->Update(fTime);
+		FiestaScene::Update(fTime);
 	}
 	bool LoadTerrain();
 	void UpdateCamera(float fTime) override;

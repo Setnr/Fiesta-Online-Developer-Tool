@@ -245,6 +245,15 @@
     <ClInclude Include="SHNStruct.h">
       <Filter>SHN</Filter>
     </ClInclude>
+    <ClInclude Include="NiInputConverter.h">
+      <Filter>CustomNiClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="NiFileLoader.h">
+      <Filter>CustomNiClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGui\imfilebrowser.h">
+      <Filter>Includes\ImGui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ImGui\imgui.ini">
