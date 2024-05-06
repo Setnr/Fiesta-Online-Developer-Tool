@@ -36,18 +36,21 @@ void FiestaOnlineTool::OnIdle()
             NiColorA m_kBackGroundColor;
             this->m_spRenderer->SetBackgroundColor(m_kBackGroundColor);
 
+
             /*Draw MainScene (GameWorld)*/
             _Scene->Draw(this->m_spRenderer);
 
             _Scene->StartImGuiFrame();
             _Scene->DrawImGui();
             _Scene->EndImGuiFrame();
+
         }
 
         /*Draw Interface Windows*/
         Pgg_kWinMgr->Draw(m_spRenderer);
         /*Draw NiScreenElements Maybe needs Work so it Draws Player HP Hud and stuff*/
         this->RenderScreenItems();
+
         /*Draws the Cursor*/
         DrawCursor();
 

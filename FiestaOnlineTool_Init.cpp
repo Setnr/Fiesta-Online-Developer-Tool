@@ -5,7 +5,6 @@
 #include <NiDX9Select.h>
 #include <NiD3D10Select.h>
 #include "SHNManager.h"
-#include "NiInputConverter.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 FiestaOnlineTool::FiestaOnlineTool() : NiApplication("DeveloperTools bei Set", 1600, 900)

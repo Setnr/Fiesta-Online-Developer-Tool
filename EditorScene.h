@@ -109,6 +109,12 @@ private:
 		std::lock_guard<std::mutex> lock(WorldLock);		
 		kWorld.AttachGroundCollidee(Obj);
 	}
+	void SaveSHMD();
+	void SaveSHMDEntry(std::ofstream&, NiNodePtr, const char*);
+	void SaveSHMDLight(std::ofstream&, NiColor, const char*);
+	void SaveSHMDFog(std::ofstream&, float, NiColor);
+	void SaveSHMDFrustum(std::ofstream&, NiFrustum);
+	void SaveSHMDGroundObjects(std::ofstream&, NiNodePtr);
 	void AttachGroundObj(NiPickablePtr& Obj)
 	{
 		NiNodePtr ptr = &*Obj;

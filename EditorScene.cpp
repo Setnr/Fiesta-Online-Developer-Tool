@@ -150,7 +150,6 @@ EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(
 
 		}
 	}
-
 	BaseNode = kWorld.GetWorldScene();
 	BaseNode->UpdateEffects();
 	BaseNode->UpdateProperties();
@@ -197,6 +196,7 @@ EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(
 	oss << "Successfully Loaded " <<info->MapName << "(" 
 		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
 	LogInfo(oss.str());
+	
 	return;
 }
 
@@ -634,7 +634,7 @@ void EditorScene::DrawSHMDEditor()
 	if (ImGui::DragFloat("Fog Alpha", &depth, 0.01, 0.f, 1.0f))
 		kWorld.SetFogDepth(depth);
 	ImGui::ColorEdit3("Background Color", (float*)&kWorld.GetBackgroundColor().r);
-	ImGui::DragFloat("Frustum", &kWorld.GetWorldFrustum().m_fFar, 10.0f,0.0f, 6000.0f);
+	ImGui::DragFloat("Frustum", &kWorld.GetWorldFrustum().m_fFar, 10.0f,0.0f);
 
 	ImGui::ColorEdit3("AmbientLight Color", (float*)&kWorld.GetMapDirectionalLightAmbientColor().r);
 	ImGui::ColorEdit3("DiffuseLight Color", (float*)&kWorld.GetMapDirectionalLightDiffuseColor().r);
@@ -719,6 +719,20 @@ void EditorScene::DrawSHMDEditor()
 					}
 
 				}
+				else 
+				{
+					_Pick.SetTarget(kWorld.GetWorldScene());
+					if (_Pick.PickObjects(kOrigin, kDir, true))
+					{
+						NiPick::Results& results = _Pick.GetResults();
+						for (int i = 0; i < results.GetSize(); i++)
+						{
+							auto result = results.GetAt(i);
+							loader.Prepare(kWorld.GetGroundCollidee(), PICKABLEOBJECTS, result->GetIntersection());
+						}
+
+					}
+				}
 			}
 		}
 		if(SelectedObj)
@@ -727,6 +741,8 @@ void EditorScene::DrawSHMDEditor()
 				SelectedObj->GetParent()->DetachChild(SelectedObj);
 				SelectedObj = NULL;
 			}
+		if (ImGui::Selectable("Save SHMD"))
+			this->SaveSHMD();
 		ImGui::EndPopup();
 	}
 
@@ -772,13 +788,13 @@ void EditorScene::UpdateCamera(float fTime)
 		if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir)) 
 		{
 			NiPick _Pick;
-			_Pick.SetPickType(NiPick::FIND_ALL);
+			_Pick.SetPickType(NiPick::FIND_FIRST);
 			_Pick.SetSortType(NiPick::SORT);
 			_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
 			_Pick.SetFrontOnly(true);
 			_Pick.SetReturnNormal(true);
 			_Pick.SetObserveAppCullFlag(true);
-			_Pick.SetTarget(kWorld.GetGroundCollidee());
+			_Pick.SetTarget(kWorld.GetWorldScene());
 			if (_Pick.PickObjects(kOrigin, kDir, true)) 
 			{
 				NiPick::Results& results = _Pick.GetResults();
@@ -823,4 +839,94 @@ void EditorScene::UpdateCamera(float fTime)
 			}
 		}
 	}
+}
+
+void EditorScene::SaveSHMD() 
+{
+	auto start = std::chrono::steady_clock::now();
+	std::string _FilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "sdt.shmd");
+	std::ofstream file;
+	file.open(_FilePath);
+	file << std::fixed << std::setprecision(6);
+	file << "shmd0_5" << std::endl;
+	SaveSHMDEntry(file, kWorld.GetSkyNode(), "Sky");
+	SaveSHMDEntry(file, kWorld.GetWaterNode(), "Water");
+	SaveSHMDEntry(file, kWorld.GetGroundObjNode(), "GroundObject");
+	SaveSHMDLight(file, kWorld.GetAmbientLightAmbientColor(), "GlobalLight");
+	SaveSHMDFog(file, kWorld.GetFogDepth(), kWorld.GetFogColor());
+	SaveSHMDLight(file, kWorld.GetBackgroundColor(), "BackGroundColor");
+	SaveSHMDFrustum(file, kWorld.GetWorldFrustum());
+	SaveSHMDGroundObjects(file, kWorld.GetGroundCollidee());
+	SaveSHMDLight(file, kWorld.GetMapDirectionalLightAmbientColor(), "DirectionLightAmbient");
+	SaveSHMDLight(file, kWorld.GetMapDirectionalLightDiffuseColor(), "DirectionLightDiffuse");
+	file.close();
+	auto diff = std::chrono::steady_clock::now() - start;
+	std::ostringstream oss;
+	oss << "Successfully safed " << _Info->MapName << "("
+		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
+	LogInfo(oss.str());
+}
+
+void EditorScene::SaveSHMDEntry(std::ofstream& file, NiNodePtr objNode, const char* Name)
+{
+	objNode->CompactChildArray();
+	file << Name << " " << std::to_string(objNode->GetChildCount()) << std::endl;
+	for (int i = 0; i < objNode->GetChildCount(); i++)
+	{
+		file << objNode->GetAt(i)->GetName() << std::endl;
+	}
+}
+
+void EditorScene::SaveSHMDLight(std::ofstream& file , NiColor color, const char* name) 
+{
+	file << name << " " << color.r << " " << color.g << " " << color.b << std::endl;
+}
+void EditorScene::SaveSHMDFog(std::ofstream&file , float depth, NiColor color) 
+{
+	file << "Fog " << depth << " " << color.r << " " << color.g << " " << color.b << std::endl;
+}
+void EditorScene::SaveSHMDFrustum(std::ofstream& file, NiFrustum frustum) 
+{
+	file << "Frustum " << frustum.m_fFar << std::endl;
+}
+void EditorScene::SaveSHMDGroundObjects(std::ofstream& file, NiNodePtr node) 
+{
+	node->CompactChildArray();
+	std::map<std::string, std::vector<NiNodePtr>> ObjectMap;
+	for (int i = 0; i < node->GetChildCount(); i++) 
+	{
+		auto child = node->GetAt(i);
+		if (!NiIsKindOf(NiNode, child))
+			continue;
+		auto& Name = child->GetName();
+		if (Name.Contains("resmap")) 
+		{
+			auto it = ObjectMap.find(std::string(Name));
+			if (it == ObjectMap.end()) 
+			{
+				std::vector<NiNodePtr> vec;
+				vec.push_back((NiNode*)child);
+				ObjectMap.insert({ std::string(Name), vec });
+			}
+			else 
+			{
+				it->second.push_back((NiNode*)child);
+			}
+		}
+	}
+	for (auto Info : ObjectMap) 
+	{
+		file << Info.first << " " << std::to_string(Info.second.size()) << std::endl;
+		for (auto obj : Info.second) 
+		{
+			NiPoint3 trans = obj->GetTranslate();
+			NiMatrix3 matrix = obj->GetRotate();
+			NiQuaternion quater;
+			quater.FromRotation(matrix);
+			float scale = obj->GetScale();
+
+			file << trans.x << " " << trans.y << " " << trans.z << " " << quater.m_fX << " " << quater.m_fY << " " << quater.m_fZ << " " << quater.m_fW << " "<<scale << std::endl;
+		}
+	}
+	file << "DataObjectLoadingEnd" << std::endl;
 }
