@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#define SettingsPath ".\\FiestaOnlineTool\\Settings.ini"
 NiSmartPointer(FiestaScene);
 class FiestaScene : public NiRefObject
 {
@@ -24,6 +25,7 @@ public:
 	virtual bool SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamerea);
 	virtual void Draw(NiRenderer* renderer) {}
 	virtual void DrawImGui();
+	virtual void CreateMenuBar() {};
 	void StartImGuiFrame();
 	void EndImGuiFrame();
 	virtual void Update(float fTime)

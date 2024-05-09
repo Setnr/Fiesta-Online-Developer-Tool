@@ -105,6 +105,7 @@ private:
 		}
 		return buf;
 	}
+	
 	void DumpStructure();
 	std::string FIELD_TYPELISTtoString(HEAD::FIELD::TYPE_LIST type);
 	

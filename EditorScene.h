@@ -17,6 +17,7 @@
 #include "ImGui/imgui.h"
 #include "SHNStruct.h"
 
+
 class EditorScene : public StartScene
 {
 public:
@@ -47,6 +48,7 @@ public:
 	}
 	bool LoadTerrain();
 	void UpdateCamera(float fTime) override;
+	virtual void CreateMenuBar();
 private:
 	void FlipVertical(NiPoint3* BlockPoints, int QuadsWide, int QuadsHigh)
 	{

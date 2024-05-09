@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugLib|Win32">
+      <Configuration>DebugLib</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugLib|x64">
+      <Configuration>DebugLib</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Lib|Win32">
+      <Configuration>Release Lib</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Lib|x64">
+      <Configuration>Release Lib</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
@@ -15,6 +31,22 @@
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ShippingLib|Win32">
+      <Configuration>ShippingLib</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ShippingLib|x64">
+      <Configuration>ShippingLib</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Shipping|Win32">
+      <Configuration>Shipping</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Shipping|x64">
+      <Configuration>Shipping</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -32,7 +64,34 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -45,7 +104,34 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -60,37 +146,93 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\VM\Gamebryo\Fiesta Online Tool\Detours;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\DebugDLL;$(LibraryPath)</LibraryPath>
+    <OutDir>E:\VM\Gamebryo\EditorTool</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|Win32'">
+    <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\VM\Gamebryo\Fiesta Online Tool\Detours;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\DebugLib;$(LibraryPath)</LibraryPath>
     <OutDir>E:\VM\Gamebryo\GameClient</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\VM\Gamebryo\Fiesta Online Tool\md5;E:\VM\Gamebryo\Fiesta Online Tool\Detours;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\ReleaseDLL;$(LibraryPath)</LibraryPath>
+    <OutDir>E:\VM\Gamebryo\EditorTool</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
+    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\VM\Gamebryo\Fiesta Online Tool\md5;E:\VM\Gamebryo\Fiesta Online Tool\Detours;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\ShippingDLL;$(LibraryPath)</LibraryPath>
+    <OutDir>E:\VM\Gamebryo\EditorTool</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|Win32'">
+    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\VM\Gamebryo\Fiesta Online Tool\md5;E:\VM\Gamebryo\Fiesta Online Tool\Detours;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\ReleaseDLL;$(LibraryPath)</LibraryPath>
+    <OutDir>E:\VM\Gamebryo\GameClient</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
+    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\VM\Gamebryo\Fiesta Online Tool\md5;E:\VM\Gamebryo\Fiesta Online Tool\Detours;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\ShippingLib;$(LibraryPath)</LibraryPath>
     <OutDir>E:\VM\Gamebryo\GameClient</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|x64'">
+    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|x64'">
+    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|x64'">
     <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NIMAIN_IMPORT;NIDX9RENDERER_IMPORT;NISYSTEM_IMPORT;NSFPARSERLIB_IMPORT;NIINPUT_IMPORT;NSBSHADERLIB_IMPORT;NIVIEWMATH_IMPORT;NIOPTIMIZATION_IMPORT;NIPORTAL_IMPORT;_USRDLL;WIN32;_DEBUG;_CONSOLE;NIDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;WIN32;_DEBUG;_CONSOLE;NIDEBUG;_CRT_SECURE_NO_WARNINGS;NIMAIN_IMPORT;NIDX9RENDERER_IMPORT;NISYSTEM_IMPORT;NSFPARSERLIB_IMPORT;NIINPUT_IMPORT;NSBSHADERLIB_IMPORT;NIVIEWMATH_IMPORT;NIOPTIMIZATION_IMPORT;NIPORTAL_IMPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -98,6 +240,26 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem23VC80D.lib;NiCollision23VC80D.lib;NiAnimation23VC80D.lib;NiParticle23VC80D.lib;NiMain23VC80D.lib;NiVisualTracker23VC80D.lib;NiInput23VC80D.lib;NiFont23VC80D.lib;NiCursor23VC80D.lib;NiD3DXEffectShaderLibDX923VC80D.lib;NSBShaderLibDX923VC80D.lib;NiBinaryShaderLibDX923VC80D.lib;NiD3D10BinaryShaderLibD3D1023VC80D.lib;NSFParserLibDX923VC80D.lib;legacy_stdio_definitions.lib;NiUserInterface23VC80D.lib;NiViewMath23VC80D.lib;NiOptimization23VC80D.lib;NiPortal23VC80D.lib;syelog.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_USRDLL;WIN32;_DEBUG;_CONSOLE;NIDEBUG;_CRT_SECURE_NO_WARNINGS;_COMPILENILIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiCollision.lib;NiAnimation.lib;NiParticle.lib;NiMain.lib;NiVisualTracker.lib;NiInput.lib;NiFont.lib;NiCursor.lib;NiD3DXEffectShaderLibDX9.lib;NSBShaderLibDX9.lib;NiBinaryShaderLibDX9.lib;NiD3D10BinaryShaderLibD3D10.lib;NSFParserLibDX9.lib;legacy_stdio_definitions.lib;NiUserInterface.lib;NiViewMath.lib;NiOptimization.lib;NiPortal.lib;syelog.lib;detours.lib;NiSystem.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -106,7 +268,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NIMAIN_IMPORT;NIDX9RENDERER_IMPORT;NISYSTEM_IMPORT;NSFPARSERLIB_IMPORT;NIINPUT_IMPORT;NSBSHADERLIB_IMPORT;NIVIEWMATH_IMPORT;NIOPTIMIZATION_IMPORT;NIPORTAL_IMPORT;_USRDLL;WIN32;_RELEASE;_CONSOLE;NIRELEASE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NIRELEASE;_CRT_SECURE_NO_WARNINGS;NIMAIN_IMPORT;NIDX9RENDERER_IMPORT;NISYSTEM_IMPORT;NSFPARSERLIB_IMPORT;NIINPUT_IMPORT;NSBSHADERLIB_IMPORT;NIVIEWMATH_IMPORT;NIOPTIMIZATION_IMPORT;NIPORTAL_IMPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -116,6 +278,60 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem23VC80R.lib;NiCollision23VC80R.lib;NiAnimation23VC80R.lib;NiParticle23VC80R.lib;NiMain23VC80R.lib;NiVisualTracker23VC80R.lib;NiInput23VC80R.lib;NiFont23VC80R.lib;NiCursor23VC80R.lib;NiD3DXEffectShaderLibDX923VC80R.lib;NSBShaderLibDX923VC80R.lib;NiBinaryShaderLibDX923VC80R.lib;NiD3D10BinaryShaderLibD3D1023VC80R.lib;NSFParserLibDX923VC80R.lib;legacy_stdio_definitions.lib;NiUserInterface23VC80R.lib;NiViewMath23VC80R.lib;NiOptimization23VC80R.lib;NiPortal23VC80R.lib;syelog.lib;Detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NISHIPPING;_CRT_SECURE_NO_WARNINGS;NIMAIN_IMPORT;NIDX9RENDERER_IMPORT;NISYSTEM_IMPORT;NSFPARSERLIB_IMPORT;NIINPUT_IMPORT;NSBSHADERLIB_IMPORT;NIVIEWMATH_IMPORT;NIOPTIMIZATION_IMPORT;NIPORTAL_IMPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem23VC80S.lib;NiCollision23VC80S.lib;NiAnimation23VC80S.lib;NiParticle23VC80S.lib;NiMain23VC80S.lib;NiVisualTracker23VC80S.lib;NiInput23VC80S.lib;NiFont23VC80S.lib;NiCursor23VC80S.lib;NiD3DXEffectShaderLibDX923VC80S.lib;NSBShaderLibDX923VC80S.lib;NiBinaryShaderLibDX923VC80S.lib;NiD3D10BinaryShaderLibD3D1023VC80S.lib;NSFParserLibDX923VC80S.lib;legacy_stdio_definitions.lib;NiUserInterface23VC80S.lib;NiPortal23VC80S.lib;syelog.lib;Detours.lib;NiMetricsOutput23VC80S.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NIRELEASE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem23VC80R.lib;NiCollision23VC80R.lib;NiAnimation23VC80R.lib;NiParticle23VC80R.lib;NiMain23VC80R.lib;NiVisualTracker23VC80R.lib;NiInput23VC80R.lib;NiFont23VC80R.lib;NiCursor23VC80R.lib;NiD3DXEffectShaderLibDX923VC80R.lib;NSBShaderLibDX923VC80R.lib;NiBinaryShaderLibDX923VC80R.lib;NiD3D10BinaryShaderLibD3D1023VC80R.lib;NSFParserLibDX923VC80R.lib;legacy_stdio_definitions.lib;NiUserInterface23VC80R.lib;NiViewMath23VC80R.lib;NiOptimization23VC80R.lib;NiPortal23VC80R.lib;syelog.lib;Detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NISHIPPING;_COMPILENILIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem.lib;NiCollision.lib;NiAnimation.lib;NiParticle.lib;NiMain.lib;NiVisualTracker.lib;NiInput.lib;NiFont.lib;NiCursor.lib;NiD3DXEffectShaderLibDX9.lib;NSBShaderLibDX9.lib;NiBinaryShaderLibDX9.lib;NiD3D10BinaryShaderLibD3D10.lib;NSFParserLibDX9.lib;legacy_stdio_definitions.lib;NiUserInterface.lib;NiPortal.lib;syelog.lib;Detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -130,7 +346,67 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -174,6 +450,7 @@
     <ClCompile Include="md5\md5.cpp" />
     <ClCompile Include="NiPickable.cpp" />
     <ClCompile Include="PgWin.cpp" />
+    <ClCompile Include="SetupScene.cpp" />
     <ClCompile Include="SHMDLoad.cpp" />
     <ClCompile Include="SHNManager.cpp" />
     <ClCompile Include="StartScene.cpp" />
@@ -217,6 +494,7 @@
     <ClInclude Include="PgWin.h" />
     <ClInclude Include="PgWinMgr.h" />
     <ClInclude Include="PgWinObj.h" />
+    <ClInclude Include="SetupScene.h" />
     <ClInclude Include="SHNManager.h" />
     <ClInclude Include="SHNStruct.h" />
     <ClInclude Include="StartScene.h" />

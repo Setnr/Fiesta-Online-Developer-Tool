@@ -139,6 +139,7 @@ public:
         }
         return FolderPath;
     }
+    static std::string FolderPath;
     static std::string CreateMapFolderPath(char KingdomMap, std::string MapName, std::string FileType) 
     {
         std::string BasePath = CreateFullFilePathFromBaseFolder("") + "\\resmap\\";
@@ -166,6 +167,16 @@ public:
     static void LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, float Percent, bool Map);
     static NiScreenElements* CreateProgressbar(bool Map, float Percent);
 
-
-    static std::string FolderPath;
+    static std::string CreateFullFilePathFromApplicationFolder(std::string File)
+    {
+        if (!File.empty())
+        {
+            if (File.at(0) == '.')
+                return ApplicationPath + File.substr(1);
+            else
+                return ApplicationPath + "\\" + File;
+        }
+        return ApplicationPath;
+    }
+    static std::string ApplicationPath;
 };

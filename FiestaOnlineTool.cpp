@@ -36,10 +36,10 @@ void FiestaOnlineTool::OnIdle()
             NiColorA m_kBackGroundColor;
             this->m_spRenderer->SetBackgroundColor(m_kBackGroundColor);
 
-
+            NiDX9RendererPtr renderer = (NiDX9Renderer *)(NiRenderer*)this->m_spRenderer;
+            renderer->GetRenderState()->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, 0);
             /*Draw MainScene (GameWorld)*/
             _Scene->Draw(this->m_spRenderer);
-
             _Scene->StartImGuiFrame();
             _Scene->DrawImGui();
             _Scene->EndImGuiFrame();

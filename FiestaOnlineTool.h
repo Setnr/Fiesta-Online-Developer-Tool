@@ -1,4 +1,5 @@
 #pragma once
+
 #include <NiApplication.h>
 #include <NiCursor.h>
 #include "PgWinMgr.h"
@@ -9,6 +10,7 @@
 
 #include "ImGui/imgui_impl_dx9.h"
 #include "ImGui/imgui_impl_win32.h"
+
 class FiestaOnlineTool : public NiApplication
 {
 public:
@@ -64,7 +66,16 @@ public:
 	float _LastUpdateTime() {
 		return m_fLastUpdateTime;
 	}
-
+	static void DisableCursor()
+	{
+		if (_Tool)
+			_Tool->cursor->Show(false);
+	}
+	static void EnableCursor()
+	{
+		if (_Tool)
+			_Tool->cursor->Show(true);
+	}
 private: 
 	std::mutex SceneLock;
 	FiestaScenePtr _Scene;
@@ -122,5 +133,6 @@ private:
 	bool MoveCamera;
 	void EnableCameraMove() { MoveCamera = true; }
 	void DisableCameraMove() { MoveCamera = false; }
+	void LoadSettings();
 	float m_fLastUpdateTime;
 };

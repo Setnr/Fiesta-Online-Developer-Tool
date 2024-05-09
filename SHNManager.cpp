@@ -18,7 +18,7 @@ void SHNManager::Init()
 bool CDataReader::Load(std::string& FileName)
 {
 	_FileName = FileName;
-	std::string Path = PgUtil::CreateFullFilePathFromBaseFolder(".\\ressystem\\" + FileName + ".shn");
+    std::string Path = PgUtil::CreateFullFilePathFromBaseFolder(".\\ressystem\\" + FileName + ".shn");
 	if (!std::filesystem::exists(Path))
 	{
         LogError("Faild to Load " + FileName);

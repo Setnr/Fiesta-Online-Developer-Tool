@@ -89,6 +89,9 @@
     <ClCompile Include="md5\md5.cpp">
       <Filter>Includes\md5</Filter>
     </ClCompile>
+    <ClCompile Include="SetupScene.cpp">
+      <Filter>Scenes\SetupScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Fiesta Online Tool">
@@ -132,6 +135,9 @@
     </Filter>
     <Filter Include="Includes\md5">
       <UniqueIdentifier>{3e41024f-acce-4477-8d27-4d387e8eaf02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\SetupScene">
+      <UniqueIdentifier>{d58da2ef-b14c-499a-902c-9101e89ae509}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -253,6 +259,9 @@
     </ClInclude>
     <ClInclude Include="ImGui\imfilebrowser.h">
       <Filter>Includes\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="SetupScene.h">
+      <Filter>Scenes\SetupScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

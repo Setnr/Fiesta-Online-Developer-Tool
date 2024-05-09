@@ -5,7 +5,53 @@
 #include <NiDX9Select.h>
 #include <NiD3D10Select.h>
 #include "SHNManager.h"
+#include <filesystem>
+#include <iostream>
+#include <fstream>
+#include "SetupScene.h"
+class DLLLoader
+{
 
+};
+NiDeclareSDM(DLLLoader, )
+bool DLLLoaderSDM::ms_bInitialized = false;
+DLLLoaderSDM::DLLLoaderSDM() 
+{
+    char Path[513];
+    GetModuleFileNameA(NULL, Path, sizeof(Path));
+    std::string s = std::filesystem::path(Path).parent_path().string();
+#ifdef NIRELEASE
+    AddDllDirectory(L"\\FiestaOnlineTool\\Dlls");
+#endif
+#ifdef NIDEBUG
+    s += "\\DebugDLLS";
+#endif
+
+    SetDllDirectoryA(s.c_str());
+    static int siCounter = 0; 
+    if (siCounter++ == 0) {
+        NiStaticDataManager::AddLibrary(DLLLoaderSDM::Init, DLLLoaderSDM::Shutdown);
+    }
+}
+
+void DLLLoaderSDM::Init()
+{
+    char Path[513];
+    GetModuleFileNameA(NULL, Path, sizeof(Path));
+    std::string s = std::filesystem::path(Path).parent_path().string();
+#ifdef NIRELEASE
+    AddDllDirectory(L"\\FiestaOnlineTool\\Dlls");
+#endif
+#ifdef NIDEBUG
+    s += "\\DebugDLLS";
+#endif
+
+    SetDllDirectoryA(s.c_str());
+}
+void DLLLoaderSDM::Shutdown()
+{
+
+}
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 FiestaOnlineTool::FiestaOnlineTool() : NiApplication("DeveloperTools bei Set", 1600, 900)
 {
@@ -21,15 +67,22 @@ bool FiestaOnlineTool::OnDefault(NiEventRef pEventRecord)
 }
 bool FiestaOnlineTool::Initialize()
 {
+    LoadSettings();
+    bool LoadSetupScene = PgUtil::CreateFullFilePathFromBaseFolder("") != "";
     NiApplication::Initialize();
-    this->RegisterShaderParsers();
-    this->RegisterShaderLibraries();
     Sorter = NiNew NiAlphaAccumulator();
     Sorter->SetObserveNoSortHint(true);
     Sorter->SetSortByClosestPoint(false);
     m_spRenderer->SetSorter(Sorter);
 
-    _Scene = NiNew StartScene;
+    if (LoadSetupScene)
+    {
+        _Scene = NiNew StartScene;
+        this->RegisterShaderParsers();
+        this->RegisterShaderLibraries();
+    }
+    else
+        _Scene = NiNew StartUpScene;
 
     _Scene->SetupScene(m_spScene, m_spCamera);
 
@@ -48,7 +101,7 @@ bool FiestaOnlineTool::Initialize()
     kRect.m_right = m_spRenderer->GetDefaultBackBuffer()->GetWidth();
     kRect.m_bottom = m_spRenderer->GetDefaultBackBuffer()->GetHeight();
 
-    std::string FilePath = PgUtil::CreateFullFilePathFromBaseFolder(".\\FiestaOnlineTool\\NorCursor.tga");
+    std::string FilePath = PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\NorCursor.tga");
     cursor = NiCursor::Create(this->m_spRenderer, kRect, NiCursor::IMMEDIATE, 8, 10, FilePath.c_str());
     cursor->SetPosition(0.0f, 320, 240);
     cursor->Show(true);
@@ -65,7 +118,7 @@ bool FiestaOnlineTool::Initialize()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); 
-    static std::string ImGuiIniFile = PgUtil::CreateFullFilePathFromBaseFolder(".\\FiestaOnlineTool\\imgui.ini");
+    static std::string ImGuiIniFile = PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\imgui.ini");
     io.IniFilename = ImGuiIniFile.c_str();
     ImGui::LoadIniSettingsFromDisk(io.IniFilename);
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
@@ -74,14 +127,16 @@ bool FiestaOnlineTool::Initialize()
     ImGui_ImplWin32_Init(this->GetRenderWindowReference());
     NiDX9Renderer* ptr = (NiDX9Renderer*)&*this->m_spRenderer;
     ImGui_ImplDX9_Init(ptr->GetD3DDevice());
-    std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
-    PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, 0.8f, false);
-    SHNManager::Init();
-    LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
-    PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, 1.f, false);
+    if(LoadSetupScene)
+    {
+        std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
+        PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, 0.8f, false);
+        SHNManager::Init();
+        LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
+        PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, 1.f, false);
+    }
     return true;
 }
-
 
 bool FiestaOnlineTool::CreateRenderer()
 {
@@ -217,4 +272,31 @@ NiScreenElements* PgUtil::CreateProgressbar(bool Map, float Percent)
     pkScreenPoly->Update(0.0f);
 
     return pkScreenPoly;
+}
+
+void FiestaOnlineTool::LoadSettings() 
+{
+    std::ifstream Settings;
+    std::string Path = PgUtil::CreateFullFilePathFromApplicationFolder(SettingsPath);
+    if (!std::filesystem::exists(Path)) 
+    {
+        NiMessageBox::DisplayMessage("Settings-File does not exist", "Error");
+        return;
+    }
+    Settings.open(Path, std::ios::in);
+
+    if (!Settings.is_open())
+    {
+        NiMessageBox::DisplayMessage("Failed to open Settings-File", "Error");
+        return;
+    }
+    std::string line;
+    while (Settings >> line) 
+    {
+        if (line == "#ClientPath")
+        {
+            Settings >> PgUtil::FolderPath;
+        }
+
+    }
 }

@@ -4,13 +4,13 @@
 #include <NiApplication.h>
 #include <NiD3DShaderFactory.h>
 #include <NiViewMath.h>
+#include <NiOptimize.h>
 #include <NiPick.h>
 #include <iostream>
 #include <fstream>
 #include <thread>
 #include <future>
 #include <set>
-#include <NiOptimize.h>
 
 #include <chrono>
 
@@ -20,6 +20,8 @@
 #include "FiestaOnlineTool.h"
 #include "SHNManager.h"
 #include "NiFileLoader.h"
+
+#include <NiStaticDataManager.h>
 ImGuizmo::OPERATION OperationMode;
 
 glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
@@ -40,6 +42,7 @@ glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 
 EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName, "ini"))
 {
+	ShowLoadMenu = false;
 	auto start = std::chrono::steady_clock::now();
 	std::string _FilePath = PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName,"shmd");
 	_Info = info;
@@ -548,6 +551,22 @@ void EditorScene::DrawImGui()
 	DrawGizmo();
 }
 
+void EditorScene::CreateMenuBar()
+{
+	if (ImGui::BeginMenu("File"))
+	{
+		if (ImGui::MenuItem("Load Map"))
+		{
+			ShowLoadMenu = true;
+		}
+		if (ImGui::MenuItem("Save Map"))
+		{
+			SaveSHMD();
+		}
+		ImGui::EndMenu();
+	}
+}
+
 void EditorScene::DrawGizmo() 
 {
 	
@@ -614,16 +633,27 @@ void EditorScene::DrawSHMDEditor()
 	auto io = ImGui::GetIO();
 	auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
 
-
 	int h = 295;
 	int w = 578;
 	ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - w, io.DisplaySize.y - h));
 	ImGui::SetNextWindowSize(ImVec2(w, h));
 	
 
-	ImGui::Begin("SHMD-Editor",NULL, flags);
-
-
+	ImGui::Begin("SHMD-Editor", NULL, flags); 
+	ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted("Move with WASD");
+		ImGui::TextUnformatted("Press Shift to Move faster");
+		ImGui::TextUnformatted("Right Click to Rotate Cam");
+		ImGui::TextUnformatted("Left Click to Select a World Object");
+		ImGui::TextUnformatted("Middle Mouse to open Menu");
+		ImGui::TextUnformatted("Copyright Gamebryo / Gamgio / IDK");
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
 	DrawSHMDHeader("Sky", kWorld.GetSkyNode());
 	DrawSHMDHeader("Water", kWorld.GetWaterNode());
 	DrawSHMDHeader("GroundObject", kWorld.GetGroundObjNode());
@@ -741,11 +771,8 @@ void EditorScene::DrawSHMDEditor()
 				SelectedObj->GetParent()->DetachChild(SelectedObj);
 				SelectedObj = NULL;
 			}
-		if (ImGui::Selectable("Save SHMD"))
-			this->SaveSHMD();
 		ImGui::EndPopup();
 	}
-
 }
 
 void EditorScene::DrawSHMDHeader(std::string Name, NiNodePtr Node)
@@ -866,7 +893,6 @@ void EditorScene::SaveSHMD()
 		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
 	LogInfo(oss.str());
 }
-
 void EditorScene::SaveSHMDEntry(std::ofstream& file, NiNodePtr objNode, const char* Name)
 {
 	objNode->CompactChildArray();
@@ -876,7 +902,6 @@ void EditorScene::SaveSHMDEntry(std::ofstream& file, NiNodePtr objNode, const ch
 		file << objNode->GetAt(i)->GetName() << std::endl;
 	}
 }
-
 void EditorScene::SaveSHMDLight(std::ofstream& file , NiColor color, const char* name) 
 {
 	file << name << " " << color.r << " " << color.g << " " << color.b << std::endl;

@@ -9,7 +9,6 @@
 
 #include "Logger.h"
 
-
 //const NiRTTI FiestaScene::ms_RTTI("FiestaScene", NULL);
 bool FiestaScene::SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamera)
 {
@@ -32,17 +31,36 @@ void FiestaScene::UpdateCamera(float fTime)
 		Camera->Update(0.0f);
 		return;
 	}
-
-	if(ImGui::IsMouseDown(ImGuiMouseButton_Right))
+	static POINT CursorPos;
+	static bool UpdateMouse = false;
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) 
 	{
-		if (io.MouseDelta.x || io.MouseDelta.y)
+		GetCursorPos(&CursorPos);
+		UpdateMouse = true;
+		FiestaOnlineTool::DisableCursor();
+	}
+	if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+	{
+		UpdateMouse = false;
+		FiestaOnlineTool::EnableCursor();
+	}
+	if(ImGui::IsMouseDown(ImGuiMouseButton_Right) && UpdateMouse)
+	{
+		POINT CurrentCursorPos;
+		GetCursorPos(&CurrentCursorPos);
+		CurrentCursorPos.x = CurrentCursorPos.x - CursorPos.x;
+		CurrentCursorPos.y = CurrentCursorPos.y - CursorPos.y;
+		SetCursorPos(CursorPos.x, CursorPos.y);
+
+		if (CurrentCursorPos.x || CurrentCursorPos.y)
 		{
 			unsigned int uiAppHeight = NiApplication::ms_pkApplication->GetAppWindow()->GetHeight();
 			unsigned int uiAppWidth = NiApplication::ms_pkApplication->GetAppWindow()->GetWidth();
 			if (uiAppHeight > 0 && uiAppWidth > 0)
 			{
-				float fPitchDelta = NI_PI * 0.375f * (float)(io.MouseDelta.y) / (float)uiAppHeight;
-				float fHeadingDelta = NI_PI * 0.375f * (float)(io.MouseDelta.x) / (float)uiAppWidth;
+				float fPitchDelta = NI_PI * 0.375f * ((float)CurrentCursorPos.y) / (float)uiAppHeight;
+				float fHeadingDelta = NI_PI * 0.375f * ((float)CurrentCursorPos.x) / (float)uiAppWidth;
+				
 				Pitch += fPitchDelta;
 				Yaw -= fHeadingDelta;
 				NiMatrix3 rotation;
@@ -55,7 +73,9 @@ void FiestaScene::UpdateCamera(float fTime)
 	bool S_Key = ImGui::IsKeyDown((ImGuiKey)0x53);
 	bool A_Key = ImGui::IsKeyDown((ImGuiKey)0x41);
 	bool D_Key = ImGui::IsKeyDown((ImGuiKey)0x44);
-	if (W_Key || S_Key || A_Key || D_Key) 
+	bool E_Key = ImGui::IsKeyDown((ImGuiKey)0x45);
+	bool Q_Key = ImGui::IsKeyDown((ImGuiKey)0x51);
+	if (W_Key || S_Key || A_Key || D_Key || E_Key || Q_Key)
 	{
 		
 		NiPoint3 CameraPosition = Camera->GetTranslate();
@@ -75,8 +95,13 @@ void FiestaScene::UpdateCamera(float fTime)
 			MoveDirect += RightDirect;
 		if (A_Key)
 			MoveDirect -=  RightDirect;
+		if (Q_Key)
+			CameraPosition.z += 115.f * DeltaTime * SpeedUp;
+		if (E_Key)
+			CameraPosition.z -= 115.f * DeltaTime * SpeedUp;
 		Camera->SetTranslate(CameraPosition + MoveDirect);
 	}
+
 	Camera->Update(0.0f);
 }
 
@@ -86,6 +111,7 @@ void FiestaScene::StartImGuiFrame()
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 }
+
 void FiestaScene::EndImGuiFrame()
 {
 	ImGui::EndFrame();
@@ -95,6 +121,7 @@ void FiestaScene::EndImGuiFrame()
 
 void FiestaScene::DrawImGui() 
 {
+	
 	auto io = ImGui::GetIO();
 	FPS[values_offset] = io.Framerate;
 	values_offset = (values_offset + 1) % IM_ARRAYSIZE(FPS);
@@ -104,8 +131,8 @@ void FiestaScene::DrawImGui()
 	average /= (float)IM_ARRAYSIZE(FPS);
 	auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground;
 
-	ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 150, 0));
-	ImGui::SetNextWindowSize(ImVec2(150,50));
+	ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 150, 50));
+	ImGui::SetNextWindowSize(ImVec2(150,100));
 	ImGui::Begin("General", NULL, flags);
 	ImGui::Text("    %f FPS", io.Framerate);
 	ImGui::Text("AVG %f FPS", average);
@@ -119,4 +146,9 @@ void FiestaScene::DrawImGui()
 		ImGui::SetScrollHereY(1.0f);
 	ImGui::End();
 
+	if (ImGui::BeginMainMenuBar())
+	{
+		this->CreateMenuBar();
+		ImGui::EndMainMenuBar();
+	}
 }

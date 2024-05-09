@@ -12,8 +12,6 @@ public:
 	{
 	}
 
-
-
 	void UpdateCamera(float fTime) {}
 	void Draw(NiRenderer* renderer)
 	{
@@ -25,6 +23,9 @@ public:
 		NiDrawScene(Camera, BaseNode, m_spCuller);
 	}
 	virtual void DrawImGui();
+	virtual void CreateMenuBar();
+protected:
+	bool ShowLoadMenu;
 };
 
 

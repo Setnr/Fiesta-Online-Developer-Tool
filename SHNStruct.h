@@ -1,9 +1,14 @@
 #pragma once
-#pragma pack(push,1)
-struct SHNRow 
+
+#define SHN2k16 false
+#define SHNV2 true
+struct SHNRow
 {
 	unsigned short ColLen;
 };
+#if SHNV2
+#pragma pack(push,1)
+
 struct Abstate  : SHNRow {
 	short ID;
 	char InxName[32];
@@ -1196,3 +1201,21 @@ struct WorldMapAvatarInfo  : SHNRow {
 	char NormalDn;
 };
 #pragma pack(pop)
+
+#endif
+
+#if SHN2k16
+struct MapInfo : SHNRow
+{
+	short ID;
+	char MapName[12];
+	char Name[32];
+	int IsWMLink;
+	unsigned int RegenX;
+	unsigned int RegenY;
+	char KingdomMap;
+	char MapFolderName[12];
+	char InSide;
+	unsigned int Sight;
+};
+#endif
