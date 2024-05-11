@@ -403,3 +403,7 @@ FodyWeavers.xsd
 /Interface/Dlls
 /DebugLib
 /Interface/ShippingDLls
+/Interface/ReleaseDLLs
+/Shipping
+/Release Lib
+/ShippingLib

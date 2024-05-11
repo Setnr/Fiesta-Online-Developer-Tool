@@ -3,8 +3,7 @@
 #include "PgUtil.h"
 #include <NiApplication.h>
 #include <NiD3DShaderFactory.h>
-#include <NiViewMath.h>
-#include <NiOptimize.h>
+
 #include <NiPick.h>
 #include <iostream>
 #include <fstream>
@@ -157,10 +156,6 @@ EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(
 	BaseNode->UpdateEffects();
 	BaseNode->UpdateProperties();
 	BaseNode->Update(0.0);
-	NiOptimize::RemoveUnnecessaryVisControllers(BaseNode);
-	NiOptimize::RemoveDupProperties(BaseNode);
-	NiOptimize::RemoveUnnecessaryNormals(BaseNode);
-	NiOptimize::OptimizeSkinData(BaseNode, true, true, 0, false);
 
 	Camera = kWorld.GetCamera();
 	NiPick _Pick;
@@ -491,7 +486,6 @@ bool EditorScene::LoadTerrain()
 				Shape->CalculateNormals();
 
 				Shape->ApplyAndSetActiveMaterial("PgTerrain");
-				NiOptimize::OptimizeTriShape(Shape);
 				Shape->Update(0.0);
 				Shape->UpdateEffects();
 				Shape->UpdateProperties();
@@ -586,7 +580,8 @@ void EditorScene::DrawGizmo()
 	ImGuizmo::BeginFrame();
 	NiPickable* SelectedNode = SelectedObj;
 
-	const auto target = NiViewMath::Dolly(10.f, Camera->GetTranslate(), Camera->GetRotate());
+	
+	NiPoint3 target = Camera->GetTranslate() + Camera->GetWorldDirection() * 10.f;
 	const auto eye = Camera->GetTranslate();
 	const auto up = glm::vec3{ 0, 0, 1 };
 

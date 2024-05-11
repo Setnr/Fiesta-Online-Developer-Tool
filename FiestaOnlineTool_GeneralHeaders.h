@@ -64,6 +64,7 @@
 #include "StartScene.h"
 
 #include <NiD3DShaderProgramFactory.h>
+#include <NiD3DShader.h>
 
 #define _LIB
 #include <NSBShaderLib.h>

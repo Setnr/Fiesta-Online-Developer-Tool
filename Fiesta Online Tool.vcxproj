@@ -188,7 +188,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|Win32'">
     <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\VM\Gamebryo\Fiesta Online Tool\Detours;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\DebugLib;$(LibraryPath)</LibraryPath>
-    <OutDir>E:\VM\Gamebryo\GameClient</OutDir>
+    <OutDir>E:\VM\Gamebryo\EditorTool</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
@@ -202,13 +202,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|Win32'">
     <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\VM\Gamebryo\Fiesta Online Tool\md5;E:\VM\Gamebryo\Fiesta Online Tool\Detours;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\ReleaseDLL;$(LibraryPath)</LibraryPath>
-    <OutDir>E:\VM\Gamebryo\GameClient</OutDir>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\VM\Gamebryo\Fiesta Online Tool\md5;E:\VM\Gamebryo\Fiesta Online Tool\Detours;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\ReleaseLib;$(LibraryPath)</LibraryPath>
+    <OutDir>E:\VM\Gamebryo\EditorTool</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
     <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;E:\VM\Gamebryo\Fiesta Online Tool\md5;E:\VM\Gamebryo\Fiesta Online Tool\Detours;E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Lib\VC80\ShippingLib;$(LibraryPath)</LibraryPath>
-    <OutDir>E:\VM\Gamebryo\GameClient</OutDir>
+    <OutDir>E:\VM\Gamebryo\EditorTool</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
@@ -257,7 +257,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiCollision.lib;NiAnimation.lib;NiParticle.lib;NiMain.lib;NiVisualTracker.lib;NiInput.lib;NiFont.lib;NiCursor.lib;NiD3DXEffectShaderLibDX9.lib;NSBShaderLibDX9.lib;NiBinaryShaderLibDX9.lib;NiD3D10BinaryShaderLibD3D10.lib;NSFParserLibDX9.lib;legacy_stdio_definitions.lib;NiUserInterface.lib;NiViewMath.lib;NiOptimization.lib;NiPortal.lib;syelog.lib;detours.lib;NiSystem.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;NiSample.lib;NiApplication.lib;NiCollision.lib;NiAnimation.lib;NiParticle.lib;NiMain.lib;NiVisualTracker.lib;NiInput.lib;NiFont.lib;NiCursor.lib;NiD3DXEffectShaderLibDX9.lib;NSBShaderLibDX9.lib;NiBinaryShaderLibDX9.lib;NiD3D10BinaryShaderLibD3D10.lib;NSFParserLibDX9.lib;NiUserInterface.lib;NiViewMath.lib;NiOptimization.lib;NiPortal.lib;syelog.lib;detours.lib;NiSystem.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
     </Link>
@@ -304,7 +304,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NIRELEASE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NIRELEASE;_CRT_SECURE_NO_WARNINGS;_COMPILENILIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -313,7 +313,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem23VC80R.lib;NiCollision23VC80R.lib;NiAnimation23VC80R.lib;NiParticle23VC80R.lib;NiMain23VC80R.lib;NiVisualTracker23VC80R.lib;NiInput23VC80R.lib;NiFont23VC80R.lib;NiCursor23VC80R.lib;NiD3DXEffectShaderLibDX923VC80R.lib;NSBShaderLibDX923VC80R.lib;NiBinaryShaderLibDX923VC80R.lib;NiD3D10BinaryShaderLibD3D1023VC80R.lib;NSFParserLibDX923VC80R.lib;legacy_stdio_definitions.lib;NiUserInterface23VC80R.lib;NiViewMath23VC80R.lib;NiOptimization23VC80R.lib;NiPortal23VC80R.lib;syelog.lib;Detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem.lib;NiCollision.lib;NiAnimation.lib;NiParticle.lib;NiMain.lib;NiVisualTracker.lib;NiInput.lib;NiFont.lib;NiCursor.lib;NiD3DXEffectShaderLibDX9.lib;NSBShaderLibDX9.lib;NiBinaryShaderLibDX9.lib;NiD3D10BinaryShaderLibD3D10.lib;NSFParserLibDX9.lib;legacy_stdio_definitions.lib;NiUserInterface.lib;NiViewMath.lib;NiOptimization.lib;NiPortal.lib;syelog.lib;Detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
@@ -322,7 +322,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NISHIPPING;_COMPILENILIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NISHIPPING;_COMPILENILIB;_CRT_SECURE_NO_WARNINGS;STRICT;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>

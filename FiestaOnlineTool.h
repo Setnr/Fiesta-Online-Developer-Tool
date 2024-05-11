@@ -7,9 +7,9 @@
 
 #include "ImGui/imgui.h"
 #include <mutex>
-
 #include "ImGui/imgui_impl_dx9.h"
 #include "ImGui/imgui_impl_win32.h"
+#include "FiestaOnlineTool_GeneralHeaders.h"
 
 class FiestaOnlineTool : public NiApplication
 {
@@ -79,44 +79,13 @@ public:
 private: 
 	std::mutex SceneLock;
 	FiestaScenePtr _Scene;
+	static unsigned int ShaderErrorCallback(const char* pacError,NiShaderError eError, bool bRecoverable);
+	virtual bool RunShaderParser();
+	static unsigned int RunParser(const char* pcLibFile, NiRenderer* pkRenderer, const char* pcDirectory,bool bRecurseSubFolders);
+	virtual bool RegisterShaderLibraries();
+	static bool LibraryClassCreate(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char* apcDirectories[], bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary);
+	static bool EffectLibraryClassCreate(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char* apcDirectories[], bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary);
 
-	virtual bool RegisterShaderParsers() 
-	{
-		std::string acProgramPath =PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\");
-
-		if (!NiShaderFactory::LoadAndRunParserLibrary(".\\NSFParserLibDX9" NI_DLL_SUFFIX ".dll", 
-			acProgramPath.c_str(), true))
-		{
-			NiMessageBox("Failed to load shader library!", "ERROR");
-			return false;
-		}
-		return true;
-	}
-	virtual bool RegisterShaderLibraries() 
-	{
-		int iDirectoryCount = 1;
-		char* apcDirectories[1];
-
-		apcDirectories[0] = (char*)PgUtil::FolderPath.c_str();
-		std::string acProgramPath = PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\");
-
-		NiShaderFactory::AddShaderProgramFileDirectory(acProgramPath.c_str());
-		
-
-		if (!NiShaderFactory::LoadAndRegisterShaderLibrary(".\\NSBShaderLibDX9" NI_DLL_SUFFIX ".dll", 
-			iDirectoryCount, apcDirectories,true))
-		{
-			NiMessageBox("Failed to load shader library!", "ERROR");
-			return false;
-		}
-		if (!NiShaderFactory::LoadAndRegisterShaderLibrary(".\\NiD3DXEffectShaderLibDX9" NI_DLL_SUFFIX ".dll", 
-			iDirectoryCount, apcDirectories,true))
-		{
-			NiMessageBox("Failed to load shader library!", "ERROR");
-			return false;
-		}
-		return true;
-	}
 	void DrawCursor();
 	NiAlphaAccumulatorPtr Sorter;
 

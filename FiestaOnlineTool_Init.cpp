@@ -9,49 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include "SetupScene.h"
-class DLLLoader
-{
 
-};
-NiDeclareSDM(DLLLoader, )
-bool DLLLoaderSDM::ms_bInitialized = false;
-DLLLoaderSDM::DLLLoaderSDM() 
-{
-    char Path[513];
-    GetModuleFileNameA(NULL, Path, sizeof(Path));
-    std::string s = std::filesystem::path(Path).parent_path().string();
-#ifdef NIRELEASE
-    AddDllDirectory(L"\\FiestaOnlineTool\\Dlls");
-#endif
-#ifdef NIDEBUG
-    s += "\\DebugDLLS";
-#endif
-
-    SetDllDirectoryA(s.c_str());
-    static int siCounter = 0; 
-    if (siCounter++ == 0) {
-        NiStaticDataManager::AddLibrary(DLLLoaderSDM::Init, DLLLoaderSDM::Shutdown);
-    }
-}
-
-void DLLLoaderSDM::Init()
-{
-    char Path[513];
-    GetModuleFileNameA(NULL, Path, sizeof(Path));
-    std::string s = std::filesystem::path(Path).parent_path().string();
-#ifdef NIRELEASE
-    AddDllDirectory(L"\\FiestaOnlineTool\\Dlls");
-#endif
-#ifdef NIDEBUG
-    s += "\\DebugDLLS";
-#endif
-
-    SetDllDirectoryA(s.c_str());
-}
-void DLLLoaderSDM::Shutdown()
-{
-
-}
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 FiestaOnlineTool::FiestaOnlineTool() : NiApplication("DeveloperTools bei Set", 1600, 900)
 {
@@ -78,7 +36,8 @@ bool FiestaOnlineTool::Initialize()
     if (LoadSetupScene)
     {
         _Scene = NiNew StartScene;
-        this->RegisterShaderParsers();
+        NiShaderFactory::RegisterErrorCallback(ShaderErrorCallback);
+        this->RunShaderParser();
         this->RegisterShaderLibraries();
     }
     else
@@ -93,7 +52,7 @@ bool FiestaOnlineTool::Initialize()
     this->m_pkFrameRate->SetColor(NiColor::BLACK);
     
     //EnableFrameRate(true);
-    this->SetMaxFrameRate(144.0f);
+    this->SetMaxFrameRate(144.f);
 
     NiRect<int> kRect;
     kRect.m_left = 0;
@@ -151,6 +110,7 @@ bool FiestaOnlineTool::CreateRenderer()
         Flag = NiDX9Renderer::USE_MULTITHREADED  ; //NiDX9Renderer::USE_STENCIL| NiDX9Renderer::USE_16BITBUFFERS | NiDX9Renderer::USE_FULLSCREEN;
         //m_spRenderer = NiDX9Select::CreateRenderer(this->GetWindowReference(), this->GetWindowReference(), true, this->m_uiBitDepth, this->GetAppWindow()->GetWidth(), this->GetAppWindow()->GetHeight(), this->m_bStencil, this->m_bMultiThread, this->m_bRefRast, this->m_bSWVertex, this->m_bNVPerfHUD, this->m_bFullscreen);
         m_spRenderer = NiDX9Renderer::Create(this->m_pkAppWindow->GetWidth(), this->m_pkAppWindow->GetHeight(), Flag, this->m_pkAppWindow->GetWindowReference(), this->m_pkAppWindow->GetRenderWindowReference());
+        
         if (m_spRenderer != NULL) 
         {
             std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
@@ -299,4 +259,136 @@ void FiestaOnlineTool::LoadSettings()
         }
 
     }
+}
+
+
+#ifdef _COMPILENILIB
+FILE _iob[3];
+extern "C" FILE * __cdecl __iob_func(void)
+{
+    _iob[0] = *stdin;
+
+    _iob[0] = *stderr;
+
+    _iob[0] = *stdout;
+
+    return _iob;
+
+}
+#endif
+
+unsigned int FiestaOnlineTool::RunParser(const char* pcLibFile, NiRenderer* pkRenderer, const char* pcDirectory, bool bRecurseSubFolders)
+{
+#ifdef _COMPILENILIB
+    return NSFParserLib_RunShaderParser(pcDirectory, bRecurseSubFolders);
+#else
+    return true;
+#endif
+}
+unsigned int FiestaOnlineTool::ShaderErrorCallback(const char* pcError,
+    NiShaderError eError, bool bRecoverable)
+{
+    NiMessageBox(pcError, "Shader Error");
+    LogError(pcError);
+
+    return 0;
+}
+bool FiestaOnlineTool::RunShaderParser()
+{
+#ifdef _COMPILENILIB
+    std::string acProgramPath = PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\");
+
+    NiShaderFactory::RegisterRunParserCallback(RunParser);
+    unsigned int uiCount = NiShaderFactory::LoadAndRunParserLibrary(0, acProgramPath.c_str(), true);
+    return true;
+#else
+    std::string acProgramPath = PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\");
+
+    if (!NiShaderFactory::LoadAndRunParserLibrary(".\\NSFParserLibDX9" NI_DLL_SUFFIX ".dll",
+        acProgramPath.c_str(), true))
+    {
+        NiMessageBox("Failed to load shader library!", "ERROR");
+        return false;
+    }
+    return true;
+#endif
+
+}
+
+bool FiestaOnlineTool::RegisterShaderLibraries() 
+{
+#ifdef _COMPILENILIB
+    std::string acProgramPath = PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\");
+
+    NiShaderFactory::RegisterClassCreationCallback(LibraryClassCreate);
+    char* pacShaderDir = (char*)acProgramPath.c_str();
+    NiShaderFactory::AddShaderProgramFileDirectory(pacShaderDir);
+
+    if (!NiShaderFactory::LoadAndRegisterShaderLibrary("NSBShaderLibDX9" NI_DLL_SUFFIX ".dll",1, &pacShaderDir, true))
+    {
+        NiMessageBox("Failed to load shader library!", "ERROR");
+        return false;
+    }
+
+    auto inst = NiD3DShaderProgramFactory::GetInstance();
+    inst->AddProgramDirectory(acProgramPath.c_str());
+
+    NiShaderFactory::RegisterClassCreationCallback(EffectLibraryClassCreate);
+    if (!NiShaderFactory::LoadAndRegisterShaderLibrary("NiD3DXEffectShaderLibDX9" NI_DLL_SUFFIX ".dll", //".\\NiD3DXEffectShaderLibDX9" NI_DLL_SUFFIX ".dll"
+        1, &pacShaderDir, true))
+    {
+        NiMessageBox("Failed to load shader library!", "ERROR");
+        return false;
+    }
+    return true;
+#else
+    int iDirectoryCount = 1;
+    char* apcDirectories[1];
+
+    apcDirectories[0] = (char*)PgUtil::FolderPath.c_str();
+    std::string acProgramPath = PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\");
+
+    NiShaderFactory::AddShaderProgramFileDirectory(acProgramPath.c_str());
+
+
+    if (!NiShaderFactory::LoadAndRegisterShaderLibrary(".\\NSBShaderLibDX9" NI_DLL_SUFFIX ".dll",
+        iDirectoryCount, apcDirectories, true))
+    {
+        NiMessageBox("Failed to load shader library!", "ERROR");
+        return false;
+    }
+    if (!NiShaderFactory::LoadAndRegisterShaderLibrary(".\\NiD3DXEffectShaderLibDX9" NI_DLL_SUFFIX ".dll",
+        iDirectoryCount, apcDirectories, true))
+    {
+        NiMessageBox("Failed to load shader library!", "ERROR");
+        return false;
+    }
+    return true;
+#endif
+}
+
+bool FiestaOnlineTool::LibraryClassCreate(const char* pcLibFile,
+    NiRenderer* pkRenderer, int iDirectoryCount, char* apcDirectories[],
+    bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary)
+{
+    *ppkLibrary = NULL;
+#ifdef _COMPILENILIB
+    return NSBShaderLib_LoadShaderLibrary(pkRenderer, iDirectoryCount,
+        apcDirectories, bRecurseSubFolders, ppkLibrary);
+#else
+    return true;
+#endif
+
+}
+bool FiestaOnlineTool::EffectLibraryClassCreate(const char* pcLibFile,
+    NiRenderer* pkRenderer, int iDirectoryCount, char* apcDirectories[],
+    bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary)
+{
+    *ppkLibrary = NULL;
+#ifdef _COMPILENILIB
+    return NiD3DXEffectShaderLib_LoadShaderLibrary(pkRenderer, iDirectoryCount,
+        apcDirectories, bRecurseSubFolders, ppkLibrary);
+#else
+return true;
+#endif
 }
