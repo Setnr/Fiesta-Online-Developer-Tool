@@ -12,7 +12,10 @@ void SHNManager::Init()
 	auto reader = std::make_shared<CDataReader>();
 	std::string Name = "MapInfo";
 	reader->Load(Name);
+    Manager.CheckSHN<struct MapInfo>(reader);
 	Manager.Add(SHNType::MapInfo,reader);
+
+
 }
 
 bool CDataReader::Load(std::string& FileName)

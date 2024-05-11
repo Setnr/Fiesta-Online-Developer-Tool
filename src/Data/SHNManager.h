@@ -16,11 +16,22 @@ public:
 	T* GetRow(unsigned int row)
 	{
 		SHNRow* srow = (SHNRow*)SHNStart;
+
 		for (int j = 0; j < row; j++)
 		{
 			srow = (SHNRow*)((int)srow + srow->ColLen);
 		}
 		return (T*)srow;
+	}
+	unsigned short GetRowLen(unsigned int row) 
+	{
+		SHNRow* srow = (SHNRow*)SHNStart;
+
+		for (int j = 0; j < row; j++)
+		{
+			srow = (SHNRow*)((int)srow + srow->ColLen);
+		}
+		return srow->ColLen;
 	}
 private:
 	struct HEAD
@@ -201,6 +212,20 @@ public:
 	}
 	static std::shared_ptr<CDataReader> Get(SHNType type);
 	std::shared_ptr<CDataReader> InternalGet(SHNType type);
+
+	template<class T>
+	void CheckSHN(std::shared_ptr<CDataReader> reader)
+	{
+		if (sizeof(T) != reader->GetRowLen(0)) 
+		{
+#if SHNV2
+			LogError("SHN Size Missmatch, this build is for V2");
+#endif
+#if SHN2k16
+			LogError("SHN Size Missmatch, this build is for 2k16");
+#endif
+		}
+	}
 private:
 	std::map<SHNType, std::shared_ptr<CDataReader>> SHNList;
 };
