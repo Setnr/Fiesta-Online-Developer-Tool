@@ -32,6 +32,7 @@ public:
 	~EditorScene() 
 	{
 		BaseNode = 0;
+		SelectedObj = NULL;
 	}
 	bool SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamerea) 
 	{
