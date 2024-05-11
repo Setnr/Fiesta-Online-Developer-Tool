@@ -185,7 +185,7 @@ bool EditorScene::LoadGlobalObjects(std::ifstream& SHMD, std::vector<std::pair<s
 {
 	std::string line;
 	SHMD >> line;
-	while (line != "DataObjectLoadingEnd")
+	while (line != "DataObjectLoadingEnd" && !SHMD.eof())
 	{
 		std::vector<ObjectPosition> Positions;
 		if (!LoadOneObject(SHMD, Positions))
@@ -214,6 +214,8 @@ bool EditorScene::LoadOneObject(std::ifstream& SHMD, std::vector<ObjectPosition>
 
 bool EditorScene::LoadDirectionLightAmbient(std::ifstream& SHMD)
 {
+	if (SHMD.eof())
+		return true;
 	std::string line;
 	SHMD >> line;
 	if (line != "DirectionLightAmbient")
@@ -229,6 +231,8 @@ bool EditorScene::LoadDirectionLightAmbient(std::ifstream& SHMD)
 
 bool EditorScene::LoadDirectionLightDiffuse(std::ifstream& SHMD)
 {
+	if (SHMD.eof())
+		return true;
 	std::string line;
 	SHMD >> line;
 	if (line != "DirectionLightDiffuse")

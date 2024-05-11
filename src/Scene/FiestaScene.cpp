@@ -69,6 +69,20 @@ void FiestaScene::UpdateCamera(float fTime)
 			}
 		}
 	}
+	float DeltaTime = fTime - FiestaOnlineTool::GetLastUpdateTime();
+	if (io.MouseWheel != 0.0f) 
+	{
+		NiPoint3 CameraPosition = Camera->GetTranslate();
+		NiPoint3 MoveDirect(0.0f, 0.0f, 0.0f);
+
+		float SpeedUp = io.MouseWheel;
+		if (io.KeyShift)
+			SpeedUp *= 5.0f;
+		NiPoint3 WorldDirect = Camera->GetWorldDirection() * 115.f * DeltaTime * SpeedUp;
+
+		MoveDirect += WorldDirect;
+		Camera->SetTranslate(CameraPosition + MoveDirect);
+	}
 	bool W_Key = ImGui::IsKeyDown((ImGuiKey)0x57);
 	bool S_Key = ImGui::IsKeyDown((ImGuiKey)0x53);
 	bool A_Key = ImGui::IsKeyDown((ImGuiKey)0x41);
@@ -80,7 +94,6 @@ void FiestaScene::UpdateCamera(float fTime)
 		
 		NiPoint3 CameraPosition = Camera->GetTranslate();
 		NiPoint3 MoveDirect(0.0f, 0.0f, 0.0f);
-		float DeltaTime = fTime - FiestaOnlineTool::GetLastUpdateTime();
 		float SpeedUp = 3.0f;
 		if (io.KeyShift)
 			SpeedUp = 10.0f;

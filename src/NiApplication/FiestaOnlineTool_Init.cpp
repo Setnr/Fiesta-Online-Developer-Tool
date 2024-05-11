@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <iostream>
 #include <fstream>
+#include <string>
 #include "SetupScene.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
@@ -19,14 +20,15 @@ FiestaOnlineTool::FiestaOnlineTool() : NiApplication("DeveloperTools bei Set", 1
 
 bool FiestaOnlineTool::OnDefault(NiEventRef pEventRecord)
 {
-    bool r = NiApplication::OnDefault(pEventRecord);
     ImGui_ImplWin32_WndProcHandler(pEventRecord->hWnd, pEventRecord->uiMsg, pEventRecord->wParam, pEventRecord->lParam);
+    bool r = NiApplication::OnDefault(pEventRecord);
     return r;
 }
 bool FiestaOnlineTool::Initialize()
 {
     LoadSettings();
-    bool LoadSetupScene = PgUtil::CreateFullFilePathFromBaseFolder("") != "";
+    auto Path = PgUtil::CreateFullFilePathFromBaseFolder("");
+    bool LoadSetupScene = std::filesystem::exists(std::filesystem::path(Path));
     NiApplication::Initialize();
     Sorter = NiNew NiAlphaAccumulator();
     Sorter->SetObserveNoSortHint(true);
@@ -255,7 +257,8 @@ void FiestaOnlineTool::LoadSettings()
     {
         if (line == "#ClientPath")
         {
-            Settings >> PgUtil::FolderPath;
+            std::getline(Settings, PgUtil::FolderPath);
+            PgUtil::FolderPath = PgUtil::FolderPath.substr(1);
         }
 
     }

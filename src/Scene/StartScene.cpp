@@ -28,7 +28,7 @@ void StartScene::DrawImGui()
 {
     FiestaScene::DrawImGui();
     static std::future<void> future;
-    auto shn = SHNManager::Get(SHNManager::MapInfo);
+    auto shn = SHNManager::Get(SHNManager::MapInfoType);
 
     if(ShowLoadMenu)
     {

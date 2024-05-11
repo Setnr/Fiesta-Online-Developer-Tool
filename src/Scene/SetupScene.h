@@ -6,12 +6,14 @@
 #include "ImGui/imfilebrowser.h"
 #include <iostream>
 #include <fstream>
+#include "Logger.h"
 class SetupLoader
 {
 public:
 	SetupLoader() : fileDialog(ImGuiFileBrowserFlags_SelectDirectory)
 	{
-		fileDialog.SetTitle("Select Game-Client");
+		fileDialog.SetTitle("Select Game-Client-Folder");
+		fileDialog.SetTypeFilters({ ".exe", ".bin" });
 		fileDialog.SetPwd(PgUtil::CreateFullFilePathFromBaseFolder(""));
 	}
 	~SetupLoader() = default;
@@ -29,6 +31,12 @@ public:
 	void UpdateSettingsFile()
 	{
 		std::string File = fileDialog.GetSelected().string();
+		if (File.find(".exe") != std::string::npos || File.find(".bin") != std::string::npos)
+		{
+			NiMessageBox::DisplayMessage("Please Select the Folder!", "Info");
+			fileDialog.ClearSelected();
+			return;
+		}
 		std::ofstream Settings;
 		std::string Path = PgUtil::CreateFullFilePathFromApplicationFolder(SettingsPath);
 

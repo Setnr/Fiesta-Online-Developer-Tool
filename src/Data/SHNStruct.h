@@ -1,7 +1,7 @@
 #pragma once
 
-#define SHN2k16 false
-#define SHNV2 true
+#define SHN2k16 true
+#define SHNV2 false
 struct SHNRow
 {
 	unsigned short ColLen;

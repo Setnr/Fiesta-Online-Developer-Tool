@@ -163,7 +163,7 @@ public:
 		ItemShopView,
 		ItemViewInfo,
 		KingdomQuestDesc,
-		MapInfo,
+		MapInfoType,
 		MapViewInfo,
 		MHEmotion,
 		MiniHouse,
@@ -216,7 +216,7 @@ public:
 	template<class T>
 	void CheckSHN(std::shared_ptr<CDataReader> reader)
 	{
-		if (sizeof(T) != reader->GetRowLen(0)) 
+		if (sizeof(T) != reader->GetRowLen(0) + 2) 
 		{
 #if SHNV2
 			LogError("SHN Size Missmatch, this build is for V2");

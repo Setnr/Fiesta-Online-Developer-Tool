@@ -717,9 +717,9 @@ void EditorScene::DrawSHMDEditor()
 			loader.Prepare(kWorld.GetSkyNode());
 		if (ImGui::Selectable("Add Water"))
 			loader.Prepare(kWorld.GetWaterNode());
-		if (ImGui::Selectable("Add Object"))
+		if (ImGui::Selectable("Add Global Object"))
 			loader.Prepare(kWorld.GetGroundObjNode());
-		if (ImGui::Selectable("Add Pickable"))
+		if (ImGui::Selectable("Add Movable Object"))
 		{
 			NiPoint3 kOrigin, kDir;
 			long X, Y;
@@ -761,11 +761,34 @@ void EditorScene::DrawSHMDEditor()
 			}
 		}
 		if(SelectedObj)
+		{
+			if (ImGui::Selectable("Copy Selected Obj")) 
+			{
+				if(NiIsKindOf(NiPickable,SelectedObj))
+				{
+					NiPickablePtr Obj = (NiPickable*)SelectedObj->Clone();
+
+					this->AttachGroundObj(Obj);
+
+					Obj->SetName(SelectedObj->GetName());
+					Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
+
+					Obj->SetSelectiveUpdateRigid(true);
+					auto node = kWorld.GetGroundCollidee();
+					node->UpdateEffects();
+					node->UpdateProperties();
+					node->Update(0.0);
+					SelectedObj = Obj;
+				}
+				else
+					LogError("Can´t clone selcted Object");
+			}
 			if (ImGui::Selectable("Delete Selected Obj"))
 			{
 				SelectedObj->GetParent()->DetachChild(SelectedObj);
 				SelectedObj = NULL;
 			}
+		}
 		ImGui::EndPopup();
 	}
 }
@@ -919,7 +942,7 @@ void EditorScene::SaveSHMDGroundObjects(std::ofstream& file, NiNodePtr node)
 		if (!NiIsKindOf(NiNode, child))
 			continue;
 		auto& Name = child->GetName();
-		if (Name.Contains("resmap")) 
+		if (Name.ContainsNoCase("resmap"))
 		{
 			auto it = ObjectMap.find(std::string(Name));
 			if (it == ObjectMap.end()) 
