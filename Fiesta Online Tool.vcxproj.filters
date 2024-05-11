@@ -1,271 +1,232 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="FiestaRenderer.cpp">
-      <Filter>FIestaRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="FiestaOnlineTool.cpp">
-      <Filter>Fiesta Online Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="PgWin.cpp">
-      <Filter>Interface</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>FIestaRenderer</Filter>
-    </ClCompile>
-    <ClCompile Include="FiestaScene.cpp">
-      <Filter>Scenes\BaseScene</Filter>
-    </ClCompile>
-    <ClCompile Include="StartScene.cpp">
-      <Filter>Scenes\StartScene</Filter>
-    </ClCompile>
-    <ClCompile Include="EditorScene.cpp">
-      <Filter>Scenes\EditorScene</Filter>
-    </ClCompile>
-    <ClCompile Include="IngameWorld.cpp">
-      <Filter>Scenes\EditorScene</Filter>
-    </ClCompile>
-    <ClCompile Include="FiestaOnlineTool_Init.cpp">
-      <Filter>Fiesta Online Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="FiestaOnlineTool_StaticDefines.cpp">
-      <Filter>Fiesta Online Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="FiestaOnlineTool_UI.cpp">
-      <Filter>Fiesta Online Tool</Filter>
-    </ClCompile>
-    <ClCompile Include="SHMDLoad.cpp">
-      <Filter>Scenes\EditorScene</Filter>
-    </ClCompile>
-    <ClCompile Include="IniFile.cpp">
-      <Filter>Scenes\EditorScene\IniFile</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\GraphEditor.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\ImCurveEdit.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\ImGradient.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_demo.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_draw.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_tables.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_widgets.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\ImGuizmo.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\ImSequencer.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_win32.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_dx9.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="NiPickable.cpp">
-      <Filter>CustomNiClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_dx10.cpp">
-      <Filter>Includes\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="SHNManager.cpp">
-      <Filter>SHN</Filter>
-    </ClCompile>
-    <ClCompile Include="Logger.cpp" />
-    <ClCompile Include="md5\md5.cpp">
-      <Filter>Includes\md5</Filter>
-    </ClCompile>
-    <ClCompile Include="SetupScene.cpp">
-      <Filter>Scenes\SetupScene</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Fiesta Online Tool">
-      <UniqueIdentifier>{bb9fc71e-3509-4f26-a92b-acdc15155d6f}</UniqueIdentifier>
+    <Filter Include="CustomNi">
+      <UniqueIdentifier>{f019bf48-6e44-4865-bbe8-47593e6b01b8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FIestaRenderer">
-      <UniqueIdentifier>{f6e5c635-6649-4c6f-8d31-ca5b6d66719e}</UniqueIdentifier>
+    <Filter Include="Data">
+      <UniqueIdentifier>{27a54eac-2273-4e6f-afc1-1d580eee0d2e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface">
-      <UniqueIdentifier>{219b8528-5768-47fa-8c14-f67c9e8cc575}</UniqueIdentifier>
+    <Filter Include="Logger">
+      <UniqueIdentifier>{7e290fbc-bea5-4e45-82a7-bfe10211ffbe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scenes">
-      <UniqueIdentifier>{7950002a-1ced-4ad7-9ec0-c76f4489c8f9}</UniqueIdentifier>
+    <Filter Include="NiApplication">
+      <UniqueIdentifier>{b7b53076-83a1-4196-ad74-80c0a8c02a11}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scenes\BaseScene">
-      <UniqueIdentifier>{97b91627-f845-4ad9-8c08-1b31d93c9ab3}</UniqueIdentifier>
+    <Filter Include="NiInterface">
+      <UniqueIdentifier>{875efb01-ce01-4971-8264-8fd1359da94c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scenes\StartScene">
-      <UniqueIdentifier>{3c4d4f8b-d7da-431a-836c-9281e91432d7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scenes\EditorScene">
-      <UniqueIdentifier>{57826ec9-bc66-4db8-8d1c-16e497b677c9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scenes\EditorScene\IniFile">
-      <UniqueIdentifier>{fa9d5ea4-bfe0-4656-8eb3-266e96377044}</UniqueIdentifier>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{f2d3b8df-00a9-4805-ae1b-50a230d9ad8f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Includes">
-      <UniqueIdentifier>{c04e5eb4-d03f-408b-866e-a12b546a8fae}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Includes\Detours">
-      <UniqueIdentifier>{22a9b56f-99d4-4a07-b813-f23064083735}</UniqueIdentifier>
+      <UniqueIdentifier>{0fd2d1a5-6ca8-49db-b822-eb10f1db8b70}</UniqueIdentifier>
     </Filter>
     <Filter Include="Includes\ImGui">
-      <UniqueIdentifier>{fb40c854-25f6-4132-a472-972313f2dbb5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CustomNiClasses">
-      <UniqueIdentifier>{f5f656b4-6a93-49ea-bc9e-355594815e38}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SHN">
-      <UniqueIdentifier>{2f682e59-3a7f-4982-aff7-9a807f5c0b6f}</UniqueIdentifier>
+      <UniqueIdentifier>{f1c32c6a-fe6b-44bc-91a0-f9bc2d443021}</UniqueIdentifier>
     </Filter>
     <Filter Include="Includes\md5">
-      <UniqueIdentifier>{3e41024f-acce-4477-8d27-4d387e8eaf02}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scenes\SetupScene">
-      <UniqueIdentifier>{d58da2ef-b14c-499a-902c-9101e89ae509}</UniqueIdentifier>
+      <UniqueIdentifier>{71149a9a-d42e-4c3e-a3ea-deb05d9d03f8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FiestaRenderer.h">
-      <Filter>FIestaRenderer</Filter>
+    <ClInclude Include="src\CustomNi\NiFileLoader.h">
+      <Filter>CustomNi</Filter>
     </ClInclude>
-    <ClInclude Include="FiestaOnlineTool.h">
-      <Filter>Fiesta Online Tool</Filter>
+    <ClInclude Include="src\CustomNi\NiPickable.h">
+      <Filter>CustomNi</Filter>
     </ClInclude>
-    <ClInclude Include="FiestaRendererTypeDef.h">
-      <Filter>FIestaRenderer</Filter>
+    <ClInclude Include="src\Data\IngameWorld.h">
+      <Filter>Data</Filter>
     </ClInclude>
-    <ClInclude Include="PgWin.h">
-      <Filter>Interface</Filter>
+    <ClInclude Include="src\Data\IniFile.h">
+      <Filter>Data</Filter>
     </ClInclude>
-    <ClInclude Include="PgWinMgr.h">
-      <Filter>Interface</Filter>
+    <ClInclude Include="src\Data\SHNManager.h">
+      <Filter>Data</Filter>
     </ClInclude>
-    <ClInclude Include="PgWinObj.h">
-      <Filter>Interface</Filter>
+    <ClInclude Include="src\Data\SHNStruct.h">
+      <Filter>Data</Filter>
     </ClInclude>
-    <ClInclude Include="PgUtil.h" />
-    <ClInclude Include="FiestaScene.h">
-      <Filter>Scenes\BaseScene</Filter>
+    <ClInclude Include="src\Logger\Logger.h">
+      <Filter>Logger</Filter>
     </ClInclude>
-    <ClInclude Include="StartScene.h">
-      <Filter>Scenes\StartScene</Filter>
+    <ClInclude Include="src\NiApplication\FiestaOnlineTool.h">
+      <Filter>NiApplication</Filter>
     </ClInclude>
-    <ClInclude Include="EditorScene.h">
-      <Filter>Scenes\EditorScene</Filter>
+    <ClInclude Include="src\NiApplication\FiestaOnlineTool_GeneralHeaders.h">
+      <Filter>NiApplication</Filter>
     </ClInclude>
-    <ClInclude Include="IngameWorld.h">
-      <Filter>Scenes\EditorScene</Filter>
+    <ClInclude Include="src\Scene\EditorScene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="FiestaOnlineTool_GeneralHeaders.h">
-      <Filter>Fiesta Online Tool</Filter>
+    <ClInclude Include="src\Scene\FiestaScene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="IniFile.h">
-      <Filter>Scenes\EditorScene\IniFile</Filter>
+    <ClInclude Include="src\Scene\SetupScene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\GraphEditor.h">
+    <ClInclude Include="src\Scene\StartScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ImGuiConstantFuncs.h" />
+    <ClInclude Include="src\PgUtil.h" />
+    <ClInclude Include="src\NiInterface\PgWin.h">
+      <Filter>NiInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NiInterface\PgWinMgr.h">
+      <Filter>NiInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NiInterface\PgWinObj.h">
+      <Filter>NiInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\ImGui\GraphEditor.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\ImApp.h">
+    <ClInclude Include="Includes\ImGui\ImApp.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imconfig.h">
+    <ClInclude Include="Includes\ImGui\imconfig.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\ImCurveEdit.h">
+    <ClInclude Include="Includes\ImGui\ImCurveEdit.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\ImGradient.h">
+    <ClInclude Include="Includes\ImGui\imfilebrowser.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui.h">
+    <ClInclude Include="Includes\ImGui\ImGradient.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui_internal.h">
+    <ClInclude Include="Includes\ImGui\imgui.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\ImGuizmo.h">
+    <ClInclude Include="Includes\ImGui\imgui_impl_dx9.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\ImSequencer.h">
+    <ClInclude Include="Includes\ImGui\imgui_impl_dx10.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imstb_rectpack.h">
+    <ClInclude Include="Includes\ImGui\imgui_impl_win32.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imstb_textedit.h">
+    <ClInclude Include="Includes\ImGui\imgui_internal.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imstb_truetype.h">
+    <ClInclude Include="Includes\ImGui\ImGuizmo.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\ImZoomSlider.h">
+    <ClInclude Include="Includes\ImGui\ImSequencer.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_win32.h">
+    <ClInclude Include="Includes\ImGui\imstb_rectpack.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_dx9.h">
+    <ClInclude Include="Includes\ImGui\imstb_textedit.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGuiConstantFuncs.h">
-      <Filter>Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="Detours\detours.h">
-      <Filter>Includes\Detours</Filter>
-    </ClInclude>
-    <ClInclude Include="Detours\detver.h">
-      <Filter>Includes\Detours</Filter>
-    </ClInclude>
-    <ClInclude Include="Detours\syelog.h">
-      <Filter>Includes\Detours</Filter>
-    </ClInclude>
-    <ClInclude Include="NiPickable.h">
-      <Filter>CustomNiClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_dx10.h">
+    <ClInclude Include="Includes\ImGui\imstb_truetype.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="SHNManager.h">
-      <Filter>SHN</Filter>
+    <ClInclude Include="Includes\ImGui\ImZoomSlider.h">
+      <Filter>Includes\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Logger.h" />
-    <ClInclude Include="md5\md5.h">
+    <ClInclude Include="Includes\md5\md5.h">
       <Filter>Includes\md5</Filter>
     </ClInclude>
-    <ClInclude Include="SHNStruct.h">
-      <Filter>SHN</Filter>
-    </ClInclude>
-    <ClInclude Include="NiInputConverter.h">
-      <Filter>CustomNiClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="NiFileLoader.h">
-      <Filter>CustomNiClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imfilebrowser.h">
-      <Filter>Includes\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="SetupScene.h">
-      <Filter>Scenes\SetupScene</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ImGui\imgui.ini">
+    <ClCompile Include="src\CustomNi\NiPickable.cpp">
+      <Filter>CustomNi</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\IngameWorld.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\IniFile.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\SHNManager.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logger\Logger.cpp">
+      <Filter>Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NiApplication\FiestaOnlineTool.cpp">
+      <Filter>NiApplication</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NiApplication\FiestaOnlineTool_Init.cpp">
+      <Filter>NiApplication</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NiApplication\FiestaOnlineTool_StaticDefines.cpp">
+      <Filter>NiApplication</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NiApplication\FiestaOnlineTool_UI.cpp">
+      <Filter>NiApplication</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\EditorScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\FiestaScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\SetupScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\SHMDLoad.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\StartScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\NiInterface\PgWin.cpp">
+      <Filter>NiInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\GraphEditor.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\ImCurveEdit.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\ImGradient.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\imgui.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\imgui_demo.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\imgui_draw.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\imgui_impl_dx9.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\imgui_impl_dx10.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\imgui_impl_win32.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\imgui_tables.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\imgui_widgets.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\ImGuizmo.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\ImGui\ImSequencer.cpp">
+      <Filter>Includes\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\md5\md5.cpp">
+      <Filter>Includes\md5</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Includes\ImGui\imgui.ini">
       <Filter>Includes\ImGui</Filter>
     </None>
   </ItemGroup>
