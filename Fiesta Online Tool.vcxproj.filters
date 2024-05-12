@@ -28,6 +28,12 @@
     <Filter Include="Includes\md5">
       <UniqueIdentifier>{71149a9a-d42e-4c3e-a3ea-deb05d9d03f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Settings">
+      <UniqueIdentifier>{2d363652-3d43-49e3-aaf4-66379ddaa891}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\Ini">
+      <UniqueIdentifier>{232af55f-3883-490d-b370-c9cce28da9fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CustomNi\NiFileLoader.h">
@@ -134,6 +140,15 @@
     <ClInclude Include="Includes\md5\md5.h">
       <Filter>Includes\md5</Filter>
     </ClInclude>
+    <ClInclude Include="src\Settings\Settings.h">
+      <Filter>Data\Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Ini\ini.h">
+      <Filter>Includes\Ini</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Ini\INIReader.h">
+      <Filter>Includes\Ini</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">
@@ -223,6 +238,15 @@
     </ClCompile>
     <ClCompile Include="Includes\md5\md5.cpp">
       <Filter>Includes\md5</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Settings\Settings.cpp">
+      <Filter>Data\Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Ini\ini.c">
+      <Filter>Includes\Ini</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Ini\INIReader.cpp">
+      <Filter>Includes\Ini</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

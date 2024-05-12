@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include "Logger.h"
+#include "Settings.h"
 class SetupLoader
 {
 public:
@@ -37,13 +38,9 @@ public:
 			fileDialog.ClearSelected();
 			return;
 		}
-		std::ofstream Settings;
-		std::string Path = PgUtil::CreateFullFilePathFromApplicationFolder(SettingsPath);
-
-		Settings.open(Path, std::ios::out);
-		Settings << "#ClientPath " << File;
-		Settings.close();
-
+		Settings::SetClientPath(File);
+		Settings::SaveSettings();
+	
 		NiMessageBox::DisplayMessage("Updated Settings\n Restart Tool now!", "Info");
 		fileDialog.ClearSelected();
 		return;

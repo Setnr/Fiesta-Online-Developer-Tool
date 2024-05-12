@@ -26,6 +26,9 @@ public:
 	virtual void CreateMenuBar();
 protected:
 	bool ShowLoadMenu;
+	bool ShowSettingsMenu;
+	void ShowMapInfo();
+	void ShowSettings();
 };
 
 

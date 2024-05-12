@@ -10,9 +10,11 @@
 #include <fstream>
 #include <string>
 #include "SetupScene.h"
+#include "Settings.h"
+#include <NiDX9SystemDesc.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
-FiestaOnlineTool::FiestaOnlineTool() : NiApplication("DeveloperTools bei Set", 1600, 900)
+FiestaOnlineTool::FiestaOnlineTool() : NiApplication("DeveloperTools bei Set", Settings::WindowWidth(), Settings::WindowHeight())
 {
     if (!_Tool)
         _Tool = this;
@@ -26,9 +28,8 @@ bool FiestaOnlineTool::OnDefault(NiEventRef pEventRecord)
 }
 bool FiestaOnlineTool::Initialize()
 {
-    LoadSettings();
     auto Path = PgUtil::CreateFullFilePathFromBaseFolder("");
-    bool LoadSetupScene = std::filesystem::exists(std::filesystem::path(Path));
+    bool LoadSetupScene = !Settings::FirstStartUp();
     NiApplication::Initialize();
     Sorter = NiNew NiAlphaAccumulator();
     Sorter->SetObserveNoSortHint(true);
@@ -101,26 +102,27 @@ bool FiestaOnlineTool::Initialize()
 
 bool FiestaOnlineTool::CreateRenderer()
 {
-    if (false) //MAYBE I WILL NEVER USE D3DX10 xD So just hardcode it for D3DX9 for now
+    char Flag = NiDX9Renderer::USE_NOFLAGS;
+    Flag = NiDX9Renderer::USE_MULTITHREADED; //NiDX9Renderer::USE_STENCIL| NiDX9Renderer::USE_16BITBUFFERS | NiDX9Renderer::USE_FULLSCREEN;
+
+    
+    //m_spRenderer = NiDX9Select::CreateRenderer(this->GetWindowReference(), this->GetWindowReference(), true, this->m_uiBitDepth, this->GetAppWindow()->GetWidth(), this->GetAppWindow()->GetHeight(), this->m_bStencil, this->m_bMultiThread, this->m_bRefRast, this->m_bSWVertex, this->m_bNVPerfHUD, this->m_bFullscreen);
+
+
+    m_spRenderer = NiDX9Renderer::Create(this->m_pkAppWindow->GetWidth(), this->m_pkAppWindow->GetHeight(), Flag, this->m_pkAppWindow->GetWindowReference(), this->m_pkAppWindow->GetRenderWindowReference());
+    if (m_spRenderer == NULL)
+        NiMessageBox::DisplayMessage("Failed to Create Renderer, \ntry to downscale your Resolution in Settings.ini", "Error");
+    if (Settings::FullScreen())
     {
-        m_spRenderer = NiD3D10Select::CreateRenderer(this->GetWindowReference(), false, this->GetAppWindow()->GetWidth(), this->GetAppWindow()->GetHeight(), this->m_bMultiThread, this->m_bRefRast, this->m_bFullscreen);
-        return (m_spRenderer != NULL);
-    }
-    else
-    {
-        char Flag = NiDX9Renderer::USE_NOFLAGS;
-        Flag = NiDX9Renderer::USE_MULTITHREADED  ; //NiDX9Renderer::USE_STENCIL| NiDX9Renderer::USE_16BITBUFFERS | NiDX9Renderer::USE_FULLSCREEN;
-        //m_spRenderer = NiDX9Select::CreateRenderer(this->GetWindowReference(), this->GetWindowReference(), true, this->m_uiBitDepth, this->GetAppWindow()->GetWidth(), this->GetAppWindow()->GetHeight(), this->m_bStencil, this->m_bMultiThread, this->m_bRefRast, this->m_bSWVertex, this->m_bNVPerfHUD, this->m_bFullscreen);
-        m_spRenderer = NiDX9Renderer::Create(this->m_pkAppWindow->GetWidth(), this->m_pkAppWindow->GetHeight(), Flag, this->m_pkAppWindow->GetWindowReference(), this->m_pkAppWindow->GetRenderWindowReference());
+        Flag = Flag | NiDX9Renderer::USE_FULLSCREEN;
         
-        if (m_spRenderer != NULL) 
-        {
-            std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
-            PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, .20f,false);
-        }
-        return (m_spRenderer != NULL);
     }
-    return false;
+    if (m_spRenderer != NULL)
+    {
+        std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
+        PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, .20f, false);
+    }
+    return (m_spRenderer != NULL);
 }
 void PgUtil::LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, float Percent, bool Map = true)
 {
@@ -236,33 +238,6 @@ NiScreenElements* PgUtil::CreateProgressbar(bool Map, float Percent)
     return pkScreenPoly;
 }
 
-void FiestaOnlineTool::LoadSettings() 
-{
-    std::ifstream Settings;
-    std::string Path = PgUtil::CreateFullFilePathFromApplicationFolder(SettingsPath);
-    if (!std::filesystem::exists(Path)) 
-    {
-        NiMessageBox::DisplayMessage("Settings-File does not exist", "Error");
-        return;
-    }
-    Settings.open(Path, std::ios::in);
-
-    if (!Settings.is_open())
-    {
-        NiMessageBox::DisplayMessage("Failed to open Settings-File", "Error");
-        return;
-    }
-    std::string line;
-    while (Settings >> line) 
-    {
-        if (line == "#ClientPath")
-        {
-            std::getline(Settings, PgUtil::FolderPath);
-            PgUtil::FolderPath = PgUtil::FolderPath.substr(1);
-        }
-
-    }
-}
 
 
 #ifdef _COMPILENILIB

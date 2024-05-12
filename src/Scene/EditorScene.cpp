@@ -547,12 +547,9 @@ void EditorScene::DrawImGui()
 
 void EditorScene::CreateMenuBar()
 {
+	StartScene::CreateMenuBar();
 	if (ImGui::BeginMenu("File"))
 	{
-		if (ImGui::MenuItem("Load Map"))
-		{
-			ShowLoadMenu = true;
-		}
 		if (ImGui::MenuItem("Save Map"))
 		{
 			SaveSHMD();
@@ -889,7 +886,8 @@ void EditorScene::UpdateCamera(float fTime)
 void EditorScene::SaveSHMD() 
 {
 	auto start = std::chrono::steady_clock::now();
-	std::string _FilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "sdt.shmd");
+	std::filesystem::copy(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd"), PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
+	std::string _FilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd");
 	std::ofstream file;
 	file.open(_FilePath);
 	file << std::fixed << std::setprecision(6);

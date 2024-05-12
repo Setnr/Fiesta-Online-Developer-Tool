@@ -4,7 +4,7 @@
 #include <NiCursor.h>
 #include "PgWinMgr.h"
 #include "FiestaScene.h"
-
+#include <atomic>
 #include "ImGui/imgui.h"
 #include <mutex>
 #include "ImGui/imgui_impl_dx9.h"
@@ -102,6 +102,5 @@ private:
 	bool MoveCamera;
 	void EnableCameraMove() { MoveCamera = true; }
 	void DisableCameraMove() { MoveCamera = false; }
-	void LoadSettings();
 	float m_fLastUpdateTime;
 };

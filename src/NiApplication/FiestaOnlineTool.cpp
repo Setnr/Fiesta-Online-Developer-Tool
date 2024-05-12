@@ -60,6 +60,7 @@ void FiestaOnlineTool::OnIdle()
         this->DisplayFrame();
         ++this->m_iClicks;
     }
+
 }
 
 void FiestaOnlineTool::DrawCursor()
