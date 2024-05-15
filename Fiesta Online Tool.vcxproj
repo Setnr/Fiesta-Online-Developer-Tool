@@ -88,6 +88,7 @@
     <ClInclude Include="src\Scene\EditorScene.h" />
     <ClInclude Include="src\Scene\FiestaScene.h" />
     <ClInclude Include="src\Scene\SetupScene.h" />
+    <ClInclude Include="src\Scene\SHBDScene.h" />
     <ClInclude Include="src\Scene\StartScene.h" />
     <ClInclude Include="src\Settings\Settings.h" />
   </ItemGroup>
@@ -122,6 +123,7 @@
     <ClCompile Include="src\Scene\EditorScene.cpp" />
     <ClCompile Include="src\Scene\FiestaScene.cpp" />
     <ClCompile Include="src\Scene\SetupScene.cpp" />
+    <ClCompile Include="src\Scene\SHBDScene.cpp" />
     <ClCompile Include="src\Scene\SHMDLoad.cpp" />
     <ClCompile Include="src\Scene\StartScene.cpp" />
     <ClCompile Include="src\Settings\Settings.cpp" />

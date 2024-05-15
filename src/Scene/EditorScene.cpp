@@ -815,7 +815,7 @@ void EditorScene::DrawSHMDHeader(std::string Name, NiNodePtr Node)
 	}
 }
 
-void EditorScene::UpdateCamera(float fTime) 
+void EditorScene::UpdateCamera(float fTime)
 {
 	FiestaScene::UpdateCamera(fTime);
 	NiPoint3 translate(Camera->GetTranslate());

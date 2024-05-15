@@ -30,7 +30,6 @@ public:
 	void EndImGuiFrame();
 	virtual void Update(float fTime)
 	{
-		this->UpdateCamera(fTime);
 		BaseNode->Update(fTime);
 	}
 	virtual void UpdateCamera(float fTime);

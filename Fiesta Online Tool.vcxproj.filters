@@ -149,6 +149,9 @@
     <ClInclude Include="Includes\Ini\INIReader.h">
       <Filter>Includes\Ini</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene\SHBDScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">
@@ -247,6 +250,9 @@
     </ClCompile>
     <ClCompile Include="Includes\Ini\INIReader.cpp">
       <Filter>Includes\Ini</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\SHBDScene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

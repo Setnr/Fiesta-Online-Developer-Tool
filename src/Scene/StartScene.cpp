@@ -8,7 +8,7 @@
 #include "Settings.h"
 #include "ImGui/imgui.h"
 #include "ImGui/imfilebrowser.h"
-
+#include "SHBDScene.h"
 StartScene::StartScene() 
 {
     NiSortAdjustNodePtr sortNode = NiNew NiSortAdjustNode;
@@ -61,7 +61,7 @@ void StartScene::ShowMapInfo()
                 shn->DrawRow(i);
                 if (!future.valid() || future.wait_for(std::chrono::milliseconds(0)) != std::future_status::timeout)
                 {
-                    if (ImGui::Button(std::string("Load##" + std::to_string(i)).c_str()))
+                    if (ImGui::Button(std::string("Load SHMD##" + std::to_string(i)).c_str()))
                     {
                         ImGui::SetWindowFocus("");
                         ShowLoadMenu = false;
@@ -70,6 +70,21 @@ void StartScene::ShowMapInfo()
                                 MapInfo* info = shn->GetRow<MapInfo>(i);
 
                                 auto LoadedScene = NiNew EditorScene(info);
+                                FiestaOnlineTool::UpdateScene(LoadedScene);
+
+                            });
+
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(std::string("Load SHBD##" + std::to_string(i)).c_str()))
+                    {
+                        ImGui::SetWindowFocus("");
+                        ShowLoadMenu = false;
+                        future = std::async(std::launch::async, [this, shn, i]
+                            {
+                                MapInfo* info = shn->GetRow<MapInfo>(i);
+
+                                auto LoadedScene = NiNew SHBDScene(info);
                                 FiestaOnlineTool::UpdateScene(LoadedScene);
 
                             });

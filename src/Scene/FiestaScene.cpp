@@ -26,14 +26,9 @@ void FiestaScene::UpdateCamera(float fTime)
 {
 
 	auto& io = ImGui::GetIO();
-	if (ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow))
-	{
-		Camera->Update(0.0f);
-		return;
-	}
 	static POINT CursorPos;
 	static bool UpdateMouse = false;
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) 
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
 	{
 		GetCursorPos(&CursorPos);
 		UpdateMouse = true;
@@ -70,19 +65,7 @@ void FiestaScene::UpdateCamera(float fTime)
 		}
 	}
 	float DeltaTime = fTime - FiestaOnlineTool::GetLastUpdateTime();
-	if (io.MouseWheel != 0.0f) 
-	{
-		NiPoint3 CameraPosition = Camera->GetTranslate();
-		NiPoint3 MoveDirect(0.0f, 0.0f, 0.0f);
 
-		float SpeedUp = io.MouseWheel;
-		if (io.KeyShift)
-			SpeedUp *= 5.0f;
-		NiPoint3 WorldDirect = Camera->GetWorldDirection() * 115.f * DeltaTime * SpeedUp;
-
-		MoveDirect += WorldDirect;
-		Camera->SetTranslate(CameraPosition + MoveDirect);
-	}
 	bool W_Key = ImGui::IsKeyDown((ImGuiKey)0x57);
 	bool S_Key = ImGui::IsKeyDown((ImGuiKey)0x53);
 	bool A_Key = ImGui::IsKeyDown((ImGuiKey)0x41);

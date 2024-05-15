@@ -17,6 +17,7 @@
 #include "ImGui/imgui.h"
 #include "SHNStruct.h"
 
+NiSmartPointer(EditorScene);
 
 class EditorScene : public StartScene
 {
@@ -50,6 +51,15 @@ public:
 	bool LoadTerrain();
 	void UpdateCamera(float fTime) override;
 	virtual void CreateMenuBar();
+	bool GetOneBlockSize(float* width, float* height)
+	{
+		*width = _InitFile.OneBlock_width;
+		*height = _InitFile.OneBlock_height;
+		if (_InitFile.OneBlock_width > 0.0f && _InitFile.OneBlock_height > 0.0f)
+			return true;
+		return false;
+	}
+	World kWorld;
 private:
 	void FlipVertical(NiPoint3* BlockPoints, int QuadsWide, int QuadsHigh)
 	{
@@ -133,7 +143,6 @@ private:
 	IniFile _InitFile;
 
 	std::mutex WorldLock;
-	World kWorld;
 
 	NiPickablePtr SelectedObj;
 	glm::vec3 SelectedObjAngels;

@@ -24,6 +24,7 @@ void FiestaOnlineTool::OnIdle()
             std::lock_guard<std::mutex> lock(SceneLock);
             float Time = NiGetCurrentTimeInSec();
             _Scene->Update(Time);
+            _Scene->UpdateCamera(Time);
             m_fLastUpdateTime = Time;
             //Interface Scene
             Pgg_kWinMgr->Update();
