@@ -32,6 +32,7 @@ Settings::Settings() : _FirstStartUp(false)
 	_WindowWidth = reader.GetInteger("Window", "Width", 1600);
 	_WindowHeight = reader.GetInteger("Window", "Height", 900);
 	_FullScreen = reader.GetBoolean("Window", "FullScreen", false);
+	_FPSCap = reader.GetReal("Window", "FPSCap", 144.f);
 }
 
 void Settings::SaveSettings() 
@@ -53,6 +54,7 @@ void Settings::SaveSettings()
 		file << "FullScreen = true" << std::endl;
 	else
 		file << "FullScreen = false" << std::endl;
+	file << "FPSCap = " << _Settings._FPSCap << std::endl;
 
 	file.close();
 

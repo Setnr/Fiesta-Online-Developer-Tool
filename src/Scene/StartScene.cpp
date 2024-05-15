@@ -138,6 +138,9 @@ void StartScene::ShowSettings()
             Settings::SetResolution(std::string(items[Selecteditem]));
             LogInfo("To apply Resoultion Changes please restart the Tool");
         }
+        float fps = FiestaOnlineTool::GetFPSCap();
+        if (ImGui::DragFloat("FPS Cap", &fps, 1.f, 30.f, 144.f))
+            FiestaOnlineTool::SetFPSCap(fps);
         /*bool FullScreen = Settings::FullScreen();
         if (ImGui::Checkbox("FullScreen", &FullScreen))
         {

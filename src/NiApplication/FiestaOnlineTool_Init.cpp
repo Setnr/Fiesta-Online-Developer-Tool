@@ -55,7 +55,7 @@ bool FiestaOnlineTool::Initialize()
     this->m_pkFrameRate->SetColor(NiColor::BLACK);
     
     //EnableFrameRate(true);
-    this->SetMaxFrameRate(144.f);
+    this->SetMaxFrameRate(Settings::FPSCap());
 
     NiRect<int> kRect;
     kRect.m_left = 0;

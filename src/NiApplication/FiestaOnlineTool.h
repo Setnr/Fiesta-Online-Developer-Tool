@@ -10,6 +10,7 @@
 #include "ImGui/imgui_impl_dx9.h"
 #include "ImGui/imgui_impl_win32.h"
 #include "FiestaOnlineTool_GeneralHeaders.h"
+#include "Settings.h"
 
 class FiestaOnlineTool : public NiApplication
 {
@@ -56,6 +57,19 @@ public:
 		X = kPoint.x;
 		Y = kPoint.y;
 		return true;
+	}
+	static float GetFPSCap() 
+	{
+		if (!_Tool)
+			return 0.0f;
+		return _Tool->GetMaxFrameRate();
+	}
+	static void SetFPSCap(float fps)
+	{
+		if (!_Tool)
+			return ;
+		Settings::SetFPSCap(fps);
+		_Tool->SetMaxFrameRate(fps);
 	}
 	static void UpdateScene(FiestaScenePtr Scene);
 	static FiestaOnlineTool* _Tool;
