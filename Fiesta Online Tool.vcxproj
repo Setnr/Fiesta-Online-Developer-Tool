@@ -75,6 +75,7 @@
     <ClInclude Include="src\CustomNi\NiPickable.h" />
     <ClInclude Include="src\Data\IngameWorld.h" />
     <ClInclude Include="src\Data\IniFile.h" />
+    <ClInclude Include="src\Data\SHBD\SHBD.h" />
     <ClInclude Include="src\Data\SHNManager.h" />
     <ClInclude Include="src\Data\SHNStruct.h" />
     <ClInclude Include="src\ImGuiConstantFuncs.h" />
@@ -112,6 +113,7 @@
     <ClCompile Include="src\CustomNi\NiPickable.cpp" />
     <ClCompile Include="src\Data\IngameWorld.cpp" />
     <ClCompile Include="src\Data\IniFile.cpp" />
+    <ClCompile Include="src\Data\SHBD\SHBD.cpp" />
     <ClCompile Include="src\Data\SHNManager.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -262,38 +264,38 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
+    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\DebugDLL;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|Win32'">
-    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
+    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\DebugLib;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
+    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\ReleaseDLL;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
-    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
+    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\ShippingDLL;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|Win32'">
-    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
+    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\ReleaseLib;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
-    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
+    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;$(IncludePath)</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\ShippingLib;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>

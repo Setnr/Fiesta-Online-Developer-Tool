@@ -16,6 +16,7 @@
 
 #include "ImGui/imgui.h"
 #include "SHNStruct.h"
+#include "SHBD.h"
 
 NiSmartPointer(EditorScene);
 
@@ -146,6 +147,8 @@ private:
 
 	NiPickablePtr SelectedObj;
 	glm::vec3 SelectedObjAngels;
+
+	
 };
 
 

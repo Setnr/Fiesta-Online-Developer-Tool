@@ -34,6 +34,9 @@
     <Filter Include="Includes\Ini">
       <UniqueIdentifier>{232af55f-3883-490d-b370-c9cce28da9fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\SHBD">
+      <UniqueIdentifier>{7d99ffca-03c8-416e-8ded-40356de3ee57}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CustomNi\NiFileLoader.h">
@@ -152,6 +155,9 @@
     <ClInclude Include="src\Scene\SHBDScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Data\SHBD\SHBD.h">
+      <Filter>Data\SHBD</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">
@@ -253,6 +259,9 @@
     </ClCompile>
     <ClCompile Include="src\Scene\SHBDScene.cpp">
       <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\SHBD\SHBD.cpp">
+      <Filter>Data\SHBD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

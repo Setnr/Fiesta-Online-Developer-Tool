@@ -39,7 +39,7 @@ glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 	return { angle_rad, x, y, z };
 }
 
-EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName, "ini"))
+EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName, "ini")) 
 {
 	ShowLoadMenu = false;
 	auto start = std::chrono::steady_clock::now();

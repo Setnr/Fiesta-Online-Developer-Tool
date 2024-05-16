@@ -4,7 +4,7 @@
 #include "Logger.h"
 
 #include <filesystem>
-SHBDScene::SHBDScene(MapInfo* Info) 
+SHBDScene::SHBDScene(MapInfo* Info) : _SHBD(Info)
 {
 	CanSwitch = false;
 	ShowLoadMenu = false;
@@ -19,25 +19,6 @@ SHBDScene::SHBDScene(MapInfo* Info)
 	//point -= NiPoint3::UNIT_Z;
 	//Camera->LookAtWorldPoint(point, NiPoint3(0.0, 1.0, 0.0));
 
-	std::string SHBDFilePath = PgUtil::CreateMapFolderPath(Info->KingdomMap, Info->MapFolderName, "shbd");
-	std::ifstream SHBDFile;
-	SHBDFile.open(SHBDFilePath, std::ios::binary);
-	if (!SHBDFile.is_open())
-	{
-		LogError("Failed to open SHBD for " + Info->MapFolderName);
-		return ;
-	}
-	SHBDFile.read((char*)& _SHBDData.MapSize, sizeof(_SHBDData.MapSize));
-	SHBDFile.read((char*)&_SHBDData.SHBDSize, sizeof(_SHBDData.SHBDSize));
-	SHBDData.reserve(_SHBDData.SHBDSize * _SHBDData.MapSize + 1);
-	for (int i = 0; i < _SHBDData.SHBDSize * _SHBDData.MapSize; i++)
-	{
-		char data;
-		SHBDFile.read(&data, sizeof(data));
-		SHBDData.push_back(data);
-	}
-	SHBDFile.close();
-
 	float BlockWidth = 0;
 	float BlockHeight = 0;
 	if(!_Editor->GetOneBlockSize(&BlockWidth, &BlockHeight))
@@ -46,13 +27,24 @@ SHBDScene::SHBDScene(MapInfo* Info)
 		BlockWidth = 50.f;
 		BlockHeight = 50.f;
 	}
-
-	PixelSize = _SHBDData.MapSize * BlockWidth / _SHBDData.SHBDSize;
+	TextureSize = 64;
+	while (true)
+	{
+		if (_SHBD.GetSHBDSize() <= TextureSize)
+			break;
+		if (TextureSize > 8192)
+		{
+			LogError("Workable Size does not match up");
+			return;
+		}
+		TextureSize *= 2;
+	}
+	PixelSize = _SHBD.GetMapSize() * BlockWidth / _SHBD.GetSHBDSize();
 	BrushSize = 0;
 	NiPoint3 BL(0.f, 0.f, 1.f);
-	NiPoint3 BR(_SHBDData.MapSize * BlockWidth, 0.f, 1.f);
-	NiPoint3 TL(0.f, _SHBDData.MapSize * BlockHeight, 1.f);
-	NiPoint3 TR(_SHBDData.MapSize * BlockWidth, _SHBDData.MapSize * BlockHeight, 1.f);
+	NiPoint3 BR(TextureSize * PixelSize, 0.f, 1.f);
+	NiPoint3 TL(0.f, TextureSize * PixelSize, 1.f);
+	NiPoint3 TR(TextureSize * PixelSize, TextureSize * PixelSize, 1.f);
 	struct Triangle
 	{
 		unsigned short one;
@@ -63,7 +55,7 @@ SHBDScene::SHBDScene(MapInfo* Info)
 	std::vector<NiPoint3> NormalList = { World::ms_kUpDir ,World::ms_kUpDir ,World::ms_kUpDir ,World::ms_kUpDir };
 	std::vector<NiColorA> ColorList = {NiColorA(0.f,1.0f,0.f,1.f), NiColorA(0.f,1.0f,0.f,1.f),NiColorA(0.f,1.0f,0.f,1.f), NiColorA(0.f,1.0f,0.f,1.f)};
 	std::vector<NiPoint2> TextureList1 = { NiPoint2(0.f,0.f),NiPoint2(1.f,0.f),NiPoint2(0.f,1.f),NiPoint2(1.f,1.f)};
-	std::vector<NiPoint2> TextureList2 = { NiPoint2(0.f,0.f),NiPoint2(0.25f * static_cast<float>(_SHBDData.MapSize),0.f ),NiPoint2(0.f,0.25f * static_cast<float>(_SHBDData.MapSize)),NiPoint2(0.25f * static_cast<float>(_SHBDData.MapSize),0.25f * static_cast<float>(_SHBDData.MapSize)) }; //2048 
+	std::vector<NiPoint2> TextureList2 = { NiPoint2(0.f,0.f),NiPoint2(0.25f * static_cast<float>(_SHBD.GetMapSize()),0.f ),NiPoint2(0.f,0.25f * static_cast<float>(_SHBD.GetMapSize())),NiPoint2(0.25f * static_cast<float>(_SHBD.GetMapSize()),0.25f * static_cast<float>(_SHBD.GetMapSize())) }; //2048 
 	std::vector<Triangle> TriangleList;
 
 	for (int i = 0; i < TextureList2.size(); i++)
@@ -93,7 +85,9 @@ SHBDScene::SHBDScene(MapInfo* Info)
 	kPrefs.m_ePixelLayout = NiTexture::FormatPrefs::TRUE_COLOR_32;
 	kPrefs.m_eMipMapped = NiTexture::FormatPrefs::NO;
 
-	SHBDDataTexture = NiDynamicTexture::Create(_SHBDData.SHBDSize, _SHBDData.SHBDSize, kPrefs);
+
+
+	SHBDDataTexture = NiDynamicTexture::Create(TextureSize, TextureSize, kPrefs);
 
 
 	NiTexturingPropertyPtr spText = NiNew NiTexturingProperty;
@@ -129,16 +123,15 @@ SHBDScene::SHBDScene(MapInfo* Info)
 	CanSwitch = true;
 
 	const NiPixelFormat* SHBDTexturePixelFormat = SHBDDataTexture->GetPixelFormat();
-
 	Blocked = (0xCD << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_RED)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_RED);
 	Blocked |= (0x0 << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_BLUE)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_BLUE);
 	Blocked |= (0xA0 << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_ALPHA)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_ALPHA);
-	
+
 	Walkable = (0x0 << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_RED)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_RED);
 	Walkable |= (0xCD << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_GREEN)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_GREEN);
 	Walkable |= (0x0 << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_BLUE)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_BLUE);
 	Walkable |= (0xA0 << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_ALPHA)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_ALPHA);
-	
+
 	BrushColor = (0xFF << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_RED)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_RED);
 	BrushColor |= (0xA2 << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_GREEN)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_GREEN);
 	BrushColor |= (0x0 << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_BLUE)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_BLUE);
@@ -251,19 +244,22 @@ void SHBDScene::CreateBrushTexture(NiPoint3& BrushPositon)
 
 	bool initmap = false;
 	auto it = OffsetMap.find(BrushTextureColorPtr);
+	std::vector<char> SHBDData = _SHBD.GetDataRefrence();
 	if (it == OffsetMap.end())
 	{
-		OffsetMap.insert({ BrushTextureColorPtr , std::vector<std::pair<unsigned int*, unsigned int>> ()});
-		for (int i = 0; i < SHBDData.size(); i++)
+		OffsetMap.insert({ BrushTextureColorPtr , std::vector<std::pair<unsigned int*, unsigned int>>() });
+		for (int h = 0; h < _SHBD.GetSHBDSize(); h++)
 		{
-			char data = SHBDData[i];
-			for (int j = 0; j < 8; j++)
+			int i = _SHBD.GetMapSize() * h;
+			for (int w = 0; w < _SHBD.GetSHBDSize(); w++)
 			{
-				if ((data >> j) & 0x1)
-					*BrushTextureColorPtr = Blocked;
+				unsigned int* NewPtr = BrushTextureColorPtr + (h * TextureSize) + w;
+				int offset = i + (w / 8);
+				int Shift = w % 8;
+				if ((SHBDData[offset] >> Shift) & 0x1)
+					*NewPtr = Blocked;
 				else
-					*BrushTextureColorPtr = Walkable;
-				BrushTextureColorPtr++;
+					*NewPtr = Walkable;
 			}
 		}
 		SHBDDataTexture->UnLock();
@@ -272,8 +268,8 @@ void SHBDScene::CreateBrushTexture(NiPoint3& BrushPositon)
 
 	int middlew = BrushPositon.x / PixelSize;
 	int middleh = BrushPositon.y / PixelSize;
-	
-	for (auto vec : it->second) 
+
+	for (auto vec : it->second)
 	{
 		*vec.first = vec.second;
 	}
@@ -281,10 +277,10 @@ void SHBDScene::CreateBrushTexture(NiPoint3& BrushPositon)
 
 	for (int h = middleh - BrushSize; h <= middleh + BrushSize; h++)
 	{
-		int i = _SHBDData.MapSize * h;
-		for (int w = middlew - BrushSize; w <= middlew + BrushSize; w++) 
+		int i = _SHBD.GetMapSize() * h;
+		for (int w = middlew - BrushSize; w <= middlew + BrushSize; w++)
 		{
-			unsigned int* NewPtr = BrushTextureColorPtr + (h * _SHBDData.SHBDSize) + w;
+			unsigned int* NewPtr = BrushTextureColorPtr + (h * TextureSize) + w;
 			if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
 			{
 
@@ -300,9 +296,9 @@ void SHBDScene::CreateBrushTexture(NiPoint3& BrushPositon)
 					SHBDData[offset] &= ~(1 << Shift);
 					*NewPtr = Walkable;
 				}
-				for (auto s = OffsetMap.begin(); s!=OffsetMap.end(); s++)
-				{				
-					unsigned int* OtherMapPtr = s->first + (h * _SHBDData.SHBDSize) + w;
+				for (auto s = OffsetMap.begin(); s != OffsetMap.end(); s++)
+				{
+					unsigned int* OtherMapPtr = s->first + (h * TextureSize) + w;
 					s->second.push_back({ OtherMapPtr ,*NewPtr });
 				}
 			}
@@ -371,25 +367,5 @@ void SHBDScene::CreateMenuBar()
 
 void SHBDScene::SaveSHBD()
 {
-	auto start = std::chrono::steady_clock::now();
-	std::string SHBDFilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd");
-	std::ofstream SHBDFile;
-	if (std::filesystem::exists(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak")))
-		std::filesystem::remove(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak"));
-	std::filesystem::copy(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd"), PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak"));
-	SHBDFile.open(SHBDFilePath, std::ios::binary);
-	if (!SHBDFile.is_open())
-	{
-		LogError("Failed to open and save SHBD for " + _Info->MapFolderName);
-		return;
-	}
-	SHBDFile.write((char*)&_SHBDData, sizeof(_SHBDData));
-	for (int i = 0; i < SHBDData.size(); i++)
-		SHBDFile.write(&SHBDData[i], sizeof(char));
-	SHBDFile.close();
-	auto diff = std::chrono::steady_clock::now() - start;
-	std::ostringstream oss;
-	oss << "Successfully safed SHBD for " << _Info->MapName << "("
-		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
-	LogInfo(oss.str());
+	_SHBD.Save();
 }

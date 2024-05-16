@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EditorScene.h"
-
+#include "SHBD.h"
 #include <map>
 NiSmartPointer(SHBDScene);
 class SHBDScene : public StartScene 
@@ -29,7 +29,6 @@ private:
 	EditorScenePtr _Editor;
 	NiCameraPtr _SHBDCamera;
 	NiNodePtr EditorScenePtr;
-	std::vector<char> SHBDData;
 	NiDynamicTexturePtr SHBDDataTexture;
 	MapInfo* _Info;
 	void CreateBrushTexture(NiPoint3& BrushPositon);
@@ -38,12 +37,11 @@ private:
 	unsigned int Walkable;
 	unsigned int BrushColor;
 
-	struct SHBDDataStruct {
-		unsigned int MapSize;
-		unsigned int SHBDSize;
-	} _SHBDData;
+	ShineBlockData _SHBD;
+
 	float PixelSize;
 	bool MoveStatus;
 	int BrushSize;
+	int TextureSize;
 	std::map<unsigned int*, std::vector<std::pair<unsigned int*, unsigned int>>> OffsetMap;
 };
