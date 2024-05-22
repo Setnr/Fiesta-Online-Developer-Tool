@@ -39,7 +39,7 @@ Welcome to the Fiesta Online Developer Tool repository! This tool is designed to
 ### SHBD Editor
 
 1. SHBD Editor Tool Part<br></br>
-   ![SHBD Editor](./Images/shbd.jpg)
+   ![SHBD Editor](./Images/SHBD.jpg)
 
 ## Usage
 
