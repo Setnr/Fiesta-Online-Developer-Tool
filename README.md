@@ -15,7 +15,6 @@ Welcome to the Fiesta Online Developer Tool repository! This tool is designed to
 ### SHBD Editor Submodule
 
 - **Loading and Editing SHBD Files**: With the new SHBD Editor submodule, you can now load and edit SHBD files as well.
-- **Additional Functionality**: [Describe any additional features specific to SHBD editing here.]
 
 ## Screenshots
 
