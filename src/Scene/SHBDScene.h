@@ -8,7 +8,7 @@ class SHBDScene : public StartScene
 {
 public:
 	SHBDScene(MapInfo* info);
-	//SHBDScene(EditorScenePtr _EditorScene);
+	
 	bool SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamerea)
 	{
 		_Editor->SetupScene(m_spScene, m_spCamerea);
@@ -29,7 +29,9 @@ private:
 	EditorScenePtr _Editor;
 	NiCameraPtr _SHBDCamera;
 	NiNodePtr EditorScenePtr;
-	NiDynamicTexturePtr SHBDDataTexture;
+
+	std::vector<std::vector<NiPixelDataPtr>> TextureConnector;
+	std::pair<int, int> ResetPoint;
 	MapInfo* _Info;
 	void CreateBrushTexture(NiPoint3& BrushPositon);
 	void SaveSHBD();
@@ -42,6 +44,5 @@ private:
 	float PixelSize;
 	bool MoveStatus;
 	int BrushSize;
-	int TextureSize;
-	std::map<unsigned int*, std::vector<std::pair<unsigned int*, unsigned int>>> OffsetMap;
+	int TextureSize = 128;
 };

@@ -27,102 +27,13 @@ SHBDScene::SHBDScene(MapInfo* Info) : _SHBD(Info)
 		BlockWidth = 50.f;
 		BlockHeight = 50.f;
 	}
-	TextureSize = 64;
-	while (true)
-	{
-		if (_SHBD.GetSHBDSize() <= TextureSize)
-			break;
-		if (TextureSize > 8192)
-		{
-			LogError("Workable Size does not match up");
-			return;
-		}
-		TextureSize *= 2;
-	}
+
+	BaseNode = NiNew NiNode;
+	std::vector<char> SHBDData = _SHBD.GetDataRefrence();
 	PixelSize = _SHBD.GetMapSize() * BlockWidth / _SHBD.GetSHBDSize();
 	BrushSize = 0;
-	NiPoint3 BL(0.f, 0.f, 1.f);
-	NiPoint3 BR(TextureSize * PixelSize, 0.f, 1.f);
-	NiPoint3 TL(0.f, TextureSize * PixelSize, 1.f);
-	NiPoint3 TR(TextureSize * PixelSize, TextureSize * PixelSize, 1.f);
-	struct Triangle
-	{
-		unsigned short one;
-		unsigned short two;
-		unsigned short three;
-	};
-	std::vector<NiPoint3> VerticesList = {BL,BR,TL,TR};
-	std::vector<NiPoint3> NormalList = { World::ms_kUpDir ,World::ms_kUpDir ,World::ms_kUpDir ,World::ms_kUpDir };
-	std::vector<NiColorA> ColorList = {NiColorA(0.f,1.0f,0.f,1.f), NiColorA(0.f,1.0f,0.f,1.f),NiColorA(0.f,1.0f,0.f,1.f), NiColorA(0.f,1.0f,0.f,1.f)};
-	std::vector<NiPoint2> TextureList1 = { NiPoint2(0.f,0.f),NiPoint2(1.f,0.f),NiPoint2(0.f,1.f),NiPoint2(1.f,1.f)};
-	std::vector<NiPoint2> TextureList2 = { NiPoint2(0.f,0.f),NiPoint2(0.25f * static_cast<float>(_SHBD.GetMapSize()),0.f ),NiPoint2(0.f,0.25f * static_cast<float>(_SHBD.GetMapSize())),NiPoint2(0.25f * static_cast<float>(_SHBD.GetMapSize()),0.25f * static_cast<float>(_SHBD.GetMapSize())) }; //2048 
-	std::vector<Triangle> TriangleList;
 
-	for (int i = 0; i < TextureList2.size(); i++)
-		TextureList1.push_back(TextureList2.at(i));
-
-	TriangleList.push_back(Triangle(0, 1, 2));
-	TriangleList.push_back(Triangle(2, 1, 3));
-
-	NiPoint3* pkVertix = NiNew NiPoint3[(int)VerticesList.size()];
-	NiPoint3* pkNormal = NiNew NiPoint3[(int)NormalList.size()];
-	NiColorA* pkColor = NiNew NiColorA[(int)ColorList.size()];
-	NiPoint2* pkTexture = NiNew NiPoint2[(int)TextureList1.size()];
-
-	unsigned short* pusTriList = (unsigned short*)NiAlloc(char, 12 * (TriangleList.size() / 2));// NiNew NiPoint3[TriangleList.size() / 2];
-
-	memcpy(pkVertix, &VerticesList[0], (int)VerticesList.size() * sizeof(NiPoint3));
-	memcpy(pkNormal, &NormalList[0], (int)NormalList.size() * sizeof(NiPoint3));
-	memcpy(pkColor, &ColorList[0], (int)ColorList.size() * sizeof(NiColorA));
-	memcpy(pkTexture, &TextureList1[0], (int)TextureList1.size() * sizeof(NiPoint2));
-	memcpy(pusTriList, &TriangleList[0], (int)TriangleList.size() * 3 * sizeof(unsigned short));
-
-	NiTriShapeDataPtr data = NiNew NiTriShapeData((unsigned short)VerticesList.size(), pkVertix, pkNormal, pkColor, pkTexture, 2, NiGeometryData::DataFlags::NBT_METHOD_NONE, (unsigned short)TriangleList.size(), pusTriList);
-	NiTriShapePtr Shape = NiNew NiTriShape(data);
-
-	NiTexture::FormatPrefs kPrefs;
-	kPrefs.m_eAlphaFmt = NiTexture::FormatPrefs::SMOOTH;
-	kPrefs.m_ePixelLayout = NiTexture::FormatPrefs::TRUE_COLOR_32;
-	kPrefs.m_eMipMapped = NiTexture::FormatPrefs::NO;
-
-
-
-	SHBDDataTexture = NiDynamicTexture::Create(TextureSize, TextureSize, kPrefs);
-
-
-	NiTexturingPropertyPtr spText = NiNew NiTexturingProperty;
-	spText->SetBaseTexture(SHBDDataTexture);
-	spText->SetBaseFilterMode(NiTexturingProperty::FILTER_BILERP);
-	spText->SetApplyMode(NiTexturingProperty::APPLY_REPLACE);
-
-	NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
-	alphaprop->SetAlphaBlending(true);
-	alphaprop->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
-	
-
-	Shape->AttachProperty(spText);
-	Shape->AttachProperty(alphaprop);
-
-	Shape->CalculateNormals();
-
-	Shape->Update(0.0);
-	Shape->UpdateEffects();
-	Shape->UpdateProperties();
-	Shape->Update(0.0);
-
-	if (std::filesystem::exists(PgUtil::CreateMapFolderPath(Info->KingdomMap, Info->MapFolderName, "test.nif")))
-		std::filesystem::remove(PgUtil::CreateMapFolderPath(Info->KingdomMap, Info->MapFolderName, "test.nif"));
-	BaseNode = NiNew NiNode;
-	BaseNode->AttachChild(Shape);
-
-	NiPoint3 CameraTranslate = Camera->GetTranslate();
-	BaseNode->SetTranslate(NiPoint3(0.f,0.f, CameraTranslate.z - 10.f));
-	BaseNode->UpdateEffects();
-	BaseNode->UpdateProperties();
-	BaseNode->Update(0.0);
-	CanSwitch = true;
-
-	const NiPixelFormat* SHBDTexturePixelFormat = SHBDDataTexture->GetPixelFormat();
+	const NiPixelFormat* SHBDTexturePixelFormat = &NiPixelFormat::RGBA32;
 	Blocked = (0xCD << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_RED)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_RED);
 	Blocked |= (0x0 << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_BLUE)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_BLUE);
 	Blocked |= (0xA0 << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_ALPHA)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_ALPHA);
@@ -137,8 +48,125 @@ SHBDScene::SHBDScene(MapInfo* Info) : _SHBD(Info)
 	BrushColor |= (0x0 << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_BLUE)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_BLUE);
 	BrushColor |= (0xFF << SHBDTexturePixelFormat->GetShift(NiPixelFormat::COMP_ALPHA)) & SHBDTexturePixelFormat->GetMask(NiPixelFormat::COMP_ALPHA);
 
-	NiPoint3 Intersect(0.f, 0.f, 0.f);
-	CreateBrushTexture(Intersect);
+	std::vector<NiPoint3> NormalList = { World::ms_kUpDir ,World::ms_kUpDir ,World::ms_kUpDir ,World::ms_kUpDir };
+	std::vector<NiColorA> ColorList = { NiColorA(0.f,1.0f,0.f,1.f), NiColorA(0.f,1.0f,0.f,1.f),NiColorA(0.f,1.0f,0.f,1.f), NiColorA(0.f,1.0f,0.f,1.f) };
+	std::vector<NiPoint2> TextureList1 = { NiPoint2(0.f,0.f),NiPoint2(1.f,0.f),NiPoint2(0.f,1.f),NiPoint2(1.f,1.f) };
+	std::vector<NiPoint2> TextureList2 = { NiPoint2(0.f,0.f),NiPoint2(0.5f,0.f),NiPoint2(0.f,0.5f),NiPoint2(0.5f,0.5f) }; //2048 
+	for (int i = 0; i < TextureList2.size(); i++)
+		TextureList1.push_back(TextureList2.at(i));
+	struct Triangle
+	{
+		unsigned short one;
+		unsigned short two;
+		unsigned short three;
+	};
+	std::vector<Triangle> TriangleList;
+
+	TriangleList.push_back(Triangle(0, 1, 2));
+	TriangleList.push_back(Triangle(2, 1, 3));
+
+
+	NiTexture::FormatPrefs kPrefs;
+	kPrefs.m_eAlphaFmt = NiTexture::FormatPrefs::SMOOTH;
+	kPrefs.m_ePixelLayout = NiTexture::FormatPrefs::TRUE_COLOR_32;
+	kPrefs.m_eMipMapped = NiTexture::FormatPrefs::NO;
+
+	NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
+	alphaprop->SetAlphaBlending(true);
+	alphaprop->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
+
+
+	int TextureCt = _SHBD.GetSHBDSize() / TextureSize;
+	if (_SHBD.GetSHBDSize() % TextureSize != 0)
+		TextureCt++;
+		
+	for (int TextureH = 0; TextureH < TextureCt; TextureH++) 
+	{
+		std::vector<NiPixelDataPtr> TextureList;
+		for (int TextureW = 0; TextureW < TextureCt; TextureW++)
+		{
+			NiPoint3 BL(TextureW * TextureSize * PixelSize, TextureH * TextureSize * PixelSize, 1.f);
+			NiPoint3 BR((TextureW + 1) * TextureSize * PixelSize, TextureH * TextureSize * PixelSize, 1.f);
+			NiPoint3 TL(TextureW * TextureSize * PixelSize, (TextureH + 1) * TextureSize * PixelSize, 1.f);
+			NiPoint3 TR((TextureW + 1)* TextureSize* PixelSize, (TextureH + 1)* TextureSize* PixelSize, 1.f);
+
+			std::vector<NiPoint3> VerticesList = { BL,BR,TL,TR };
+
+			NiPoint3* pkVertix = NiNew NiPoint3[4];
+			memcpy(pkVertix, &VerticesList[0], (int)VerticesList.size() * sizeof(NiPoint3));
+
+			NiPoint3* pkNormal = NiNew NiPoint3[(int)NormalList.size()];
+			NiColorA* pkColor = NiNew NiColorA[(int)ColorList.size()];
+			NiPoint2* pkTexture = NiNew NiPoint2[(int)TextureList1.size()];
+
+			unsigned short* pusTriList = (unsigned short*)NiAlloc(char, 12 * (TriangleList.size() / 2));// NiNew NiPoint3[TriangleList.size() / 2];
+
+
+			memcpy(pkNormal, &NormalList[0], (int)NormalList.size() * sizeof(NiPoint3));
+			memcpy(pkColor, &ColorList[0], (int)ColorList.size() * sizeof(NiColorA));
+			memcpy(pkTexture, &TextureList1[0], (int)TextureList1.size() * sizeof(NiPoint2));
+			memcpy(pusTriList, &TriangleList[0], (int)TriangleList.size() * 3 * sizeof(unsigned short));
+
+
+			NiTriShapeDataPtr data = NiNew NiTriShapeData((unsigned short)VerticesList.size(), pkVertix, pkNormal, pkColor, pkTexture, 2, NiGeometryData::DataFlags::NBT_METHOD_NONE, (unsigned short)TriangleList.size(), pusTriList);
+			NiTriShapePtr BlockShape = NiNew NiTriShape(data);
+			BlockShape->AttachProperty(alphaprop);
+			BlockShape->CalculateNormals();
+
+			NiPixelData* pixel = NiNew NiPixelData(TextureSize, TextureSize, NiPixelFormat::RGBA32);
+			
+			auto pixeloffset = (unsigned int*)pixel->GetPixels();
+			TextureList.push_back(pixel);
+			for (int h = 0; h < TextureSize; h++)
+			{
+				for (int w = 0; w < TextureSize; w++)
+				{
+					unsigned int* NewPtr = (pixeloffset + (h * pixel->GetWidth()) + w);
+					int hges = h + TextureH * TextureSize;
+					int wges = w + TextureW * TextureSize;
+
+					int index = hges * _SHBD.GetSHBDSize() + wges;
+
+					size_t charIndex = index / 8;
+					size_t bitIndex = index % 8;
+
+					if((SHBDData[charIndex] >> bitIndex) & 0x1)
+						*pixeloffset = Blocked;
+					else
+						*pixeloffset = Walkable;
+
+					pixeloffset++;
+				}
+			}
+
+			NiSourceTexturePtr texture = NiSourceTexture::Create(pixel, kPrefs);
+			texture->SetStatic(false);
+			NiTexturingPropertyPtr Texture = NiNew NiTexturingProperty;
+			Texture->SetBaseTexture(texture);
+			Texture->SetBaseFilterMode(NiTexturingProperty::FILTER_NEAREST);
+			Texture->SetApplyMode(NiTexturingProperty::APPLY_REPLACE);
+			
+
+			BlockShape->AttachProperty(Texture);
+			BaseNode->AttachChild(BlockShape);
+		}
+		TextureConnector.push_back(TextureList);
+	}
+
+
+	if (std::filesystem::exists(PgUtil::CreateMapFolderPath(Info->KingdomMap, Info->MapFolderName, "test.nif")))
+		std::filesystem::remove(PgUtil::CreateMapFolderPath(Info->KingdomMap, Info->MapFolderName, "test.nif"));
+
+
+	NiPoint3 CameraTranslate = Camera->GetTranslate();
+	BaseNode->SetTranslate(NiPoint3(0.f,0.f, CameraTranslate.z - 10.f));
+	BaseNode->UpdateEffects();
+	BaseNode->UpdateProperties();
+	BaseNode->Update(0.0);
+	CanSwitch = true;
+
+	//NiPoint3 Intersect(0.f, 0.f, 0.f);
+	//CreateBrushTexture(Intersect);
 	LogInfo("Successfully Added SHBD");
 }
 
@@ -239,75 +267,75 @@ void SHBDScene::UpdateCamera(float fTime)
 
 void SHBDScene::CreateBrushTexture(NiPoint3& BrushPositon)
 {
-	int BrushTexturePitch = 0;
-	unsigned int* BrushTextureColorPtr = (unsigned int*)(SHBDDataTexture->Lock(BrushTexturePitch));
 
-	bool initmap = false;
-	auto it = OffsetMap.find(BrushTextureColorPtr);
 	std::vector<char> SHBDData = _SHBD.GetDataRefrence();
-	if (it == OffsetMap.end())
+
+	for (int h = ResetPoint.second - BrushSize; h <= ResetPoint.second + BrushSize && h < _SHBD.GetSHBDSize(); h++)
 	{
-		OffsetMap.insert({ BrushTextureColorPtr , std::vector<std::pair<unsigned int*, unsigned int>>() });
-		for (int h = 0; h < _SHBD.GetSHBDSize(); h++)
+		if (h < 0)
+			continue;
+		int i = _SHBD.GetMapSize() * h;
+		for (int w = ResetPoint.first - BrushSize; w <= ResetPoint.first + BrushSize && w < _SHBD.GetSHBDSize(); w++)
 		{
-			int i = _SHBD.GetMapSize() * h;
-			for (int w = 0; w < _SHBD.GetSHBDSize(); w++)
-			{
-				unsigned int* NewPtr = BrushTextureColorPtr + (h * TextureSize) + w;
-				int offset = i + (w / 8);
-				int Shift = w % 8;
-				if ((SHBDData[offset] >> Shift) & 0x1)
-					*NewPtr = Blocked;
-				else
-					*NewPtr = Walkable;
-			}
+			if(w < 0)
+				continue;
+			int TextureH = h / TextureSize;
+			int TextureW = w / TextureSize;
+			NiPixelDataPtr pixleData = TextureConnector[TextureH][TextureW];
+			pixleData->MarkAsChanged();
+			int TextureInternH = h % TextureSize;
+			int TextureInternW = w % TextureSize;
+			unsigned int* NewPtr = ((unsigned int*)pixleData->GetPixels()) + (TextureInternH * pixleData->GetWidth()) + TextureInternW;
+			
+			int hges = h;
+			int wges = w;
+
+			int index = hges * _SHBD.GetSHBDSize() + wges;
+
+			size_t charIndex = index / 8;
+			size_t bitIndex = index % 8;
+
+			if ((SHBDData[charIndex] >> bitIndex) & 0x1)
+				*NewPtr = Blocked;
+			else
+				*NewPtr = Walkable;
 		}
-		SHBDDataTexture->UnLock();
-		return;
 	}
 
 	int middlew = BrushPositon.x / PixelSize;
 	int middleh = BrushPositon.y / PixelSize;
 
-	for (auto vec : it->second)
+	for (int h = middleh - BrushSize; h <= middleh + BrushSize && h < _SHBD.GetSHBDSize(); h++)
 	{
-		*vec.first = vec.second;
-	}
-	it->second.clear();
-
-	for (int h = middleh - BrushSize; h <= middleh + BrushSize; h++)
-	{
+		if (h < 0)
+			continue;
 		int i = _SHBD.GetMapSize() * h;
-		for (int w = middlew - BrushSize; w <= middlew + BrushSize; w++)
+		
+		for (int w = middlew - BrushSize; w <= middlew + BrushSize && w < _SHBD.GetSHBDSize(); w++)
 		{
-			unsigned int* NewPtr = BrushTextureColorPtr + (h * TextureSize) + w;
+			if (w < 0)
+				continue;
+			int TextureH = h / TextureSize;
+			int TextureW = w / TextureSize;
+			NiPixelDataPtr pixleData = TextureConnector[TextureH][TextureW];
+			pixleData->MarkAsChanged();
+			int TextureInternH = h % TextureSize;
+			int TextureInternW = w % TextureSize;
+			unsigned int* NewPtr = ((unsigned int*)pixleData->GetPixels()) + (TextureInternH * pixleData->GetWidth()) + TextureInternW;
 			if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
 			{
-
 				int offset = i + (w / 8);
 				int Shift = w % 8;
-				if (MoveStatus)
-				{
-					SHBDData[offset] |= (1 << Shift);
-					*NewPtr = Blocked;
-				}
-				else
-				{
-					SHBDData[offset] &= ~(1 << Shift);
-					*NewPtr = Walkable;
-				}
-				for (auto s = OffsetMap.begin(); s != OffsetMap.end(); s++)
-				{
-					unsigned int* OtherMapPtr = s->first + (h * TextureSize) + w;
-					s->second.push_back({ OtherMapPtr ,*NewPtr });
-				}
+
+				_SHBD.UpdateSHBDData(offset, Shift, MoveStatus);
+				
 			}
-			it->second.push_back({ NewPtr, *NewPtr });
 			*NewPtr = BrushColor;
 		}
 	}
-
-	SHBDDataTexture->UnLock();
+	ResetPoint = std::pair<int, int>(middlew, middleh);
+	
+	
 }
 
 void SHBDScene::DrawImGui()
@@ -341,7 +369,7 @@ void SHBDScene::DrawImGui()
 	if (ImGui::Checkbox("Set Blocked Area", &MoveStatus))
 		UpdateTexture = false;
 	bool Remove = !MoveStatus;
-	if (ImGui::Checkbox("Rmove Blocked Area", &Remove))
+	if (ImGui::Checkbox("Remove Blocked Area", &Remove))
 		MoveStatus = false;
 	if(ImGui::SliderInt("BrushSize", &BrushSize, 0, 100))
 		UpdateTexture = false;

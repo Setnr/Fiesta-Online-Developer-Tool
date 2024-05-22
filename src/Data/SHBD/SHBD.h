@@ -61,9 +61,20 @@ public:
 			<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
 		LogInfo(oss.str());
 	}
-	unsigned int GetMapSize() { return MapSize; }
-	unsigned int GetSHBDSize() { return SHBDSize; }
+	int GetMapSize() { return MapSize; }
+	int GetSHBDSize() { return SHBDSize; }
 	std::vector<char>& GetDataRefrence() { return Data; }
+	void UpdateSHBDData(int offset, int Shift, bool Status) 
+	{
+		if (Status)
+		{
+			Data[offset] |= (1 << Shift);
+		}
+		else
+		{
+			Data[offset] &= ~(1 << Shift);
+		}
+	}
 private:
 	MapInfo* _Info;
 	unsigned int MapSize;
