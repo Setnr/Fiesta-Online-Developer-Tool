@@ -47,3 +47,6 @@ To get started with the Fiesta Online Developer Tool, simply download the latest
 ## License
 
 This tool is provided under an open-source license. Please refer to the LICENSE file in this repository for more information.
+
+
+At this point, I want to shout out Maki for helping me a lot with understanding the fundamentals and providing me with some coding help for various parts of the code. I also want to shout out Spiike for doing a lot of alpha testing.

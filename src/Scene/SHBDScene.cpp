@@ -158,16 +158,22 @@ SHBDScene::SHBDScene(MapInfo* Info) : _SHBD(Info)
 		std::filesystem::remove(PgUtil::CreateMapFolderPath(Info->KingdomMap, Info->MapFolderName, "test.nif"));
 
 
-	NiPoint3 CameraTranslate = Camera->GetTranslate();
-	BaseNode->SetTranslate(NiPoint3(0.f,0.f, CameraTranslate.z - 10.f));
-	BaseNode->UpdateEffects();
-	BaseNode->UpdateProperties();
-	BaseNode->Update(0.0);
+	ResetSHBD();
 	CanSwitch = true;
 
 	//NiPoint3 Intersect(0.f, 0.f, 0.f);
 	//CreateBrushTexture(Intersect);
 	LogInfo("Successfully Added SHBD");
+}
+
+bool SHBDScene::ResetSHBD() 
+{
+	NiPoint3 CameraTranslate = Camera->GetTranslate();
+	BaseNode->SetTranslate(NiPoint3(0.f, 0.f, CameraTranslate.z - 10.f));
+	BaseNode->UpdateEffects();
+	BaseNode->UpdateProperties();
+	BaseNode->Update(0.0);
+	return true;
 }
 
 void SHBDScene::Draw(NiRenderer* renderer)
@@ -261,6 +267,8 @@ void SHBDScene::UpdateCamera(float fTime)
 
 		Camera->SetTranslate(CameraPosition + MoveDirect);
 	}
+	if (_Editor->ResetCamera())
+		ResetSHBD();
 }
 
 
@@ -362,6 +370,7 @@ void SHBDScene::DrawImGui()
 		ImGui::TextUnformatted("Move with WASD");
 		ImGui::TextUnformatted("Press Shift to Move faster");
 		ImGui::TextUnformatted("Right Click to Rotate Cam");
+		ImGui::TextUnformatted("Press R to Reset the Camera");
 		ImGui::TextUnformatted("Copyright Gamebryo / Gamgio / IDK");
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();

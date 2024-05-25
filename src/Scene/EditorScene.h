@@ -60,6 +60,7 @@ public:
 			return true;
 		return false;
 	}
+	bool ResetCamera(bool ForceReset = false);
 	World kWorld;
 private:
 	void FlipVertical(NiPoint3* BlockPoints, int QuadsWide, int QuadsHigh)

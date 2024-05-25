@@ -131,7 +131,6 @@ EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(
 					Obj->DisableSorting();
 					Obj->SetSelectiveUpdateRigid(true);
 
-					Sleep(2);
 				}
 			});
 		_ThreadList.push_back(future.share());
@@ -147,9 +146,7 @@ EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(
 				_ThreadList.pop_back();
 				continue;
 			}
-			Sleep(15);
-
-
+			Sleep(2);
 		}
 	}
 	BaseNode = kWorld.GetWorldScene();
@@ -157,37 +154,7 @@ EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(
 	BaseNode->UpdateProperties();
 	BaseNode->Update(0.0);
 
-	Camera = kWorld.GetCamera();
-	NiPick _Pick;
-	_Pick.SetTarget(kWorld.GetWorldScene());
-	_Pick.SetPickType(NiPick::FIND_ALL);
-	_Pick.SetSortType(NiPick::SORT);
-	_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
-	_Pick.SetFrontOnly(false);
-	_Pick.SetReturnNormal(true);
-	_Pick.SetObserveAppCullFlag(true);
-	NiPoint3 kOrigin(info->RegenX, info->RegenY, 0.f);
-	if (_Pick.PickObjects(kOrigin, World::ms_kUpDir,true))
-	{
-		NiPick::Results& results = _Pick.GetResults();
-		for (int i = 0; i < results.GetSize(); i++)
-		{
-			auto result = results.GetAt(i);
-			if(result->GetIntersection().z > kOrigin.z)
-				kOrigin.z = result->GetIntersection().z;
-		}
-		
-	}
-	kOrigin.z += 100.f;
-	Camera->SetTranslate(kOrigin);
-	Pitch = 1.57f * 2.0f;
-	Yaw = -1.57f;
-	Roll = 1.57f;
-	NiMatrix3 rotation;
-	rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
-
-	Camera->SetRotate(rotation);
-	Camera->Update(0.0f);
+	ResetCamera(true);
 	CanSwitch = true;
 	auto diff = std::chrono::steady_clock::now() - start;
 	std::ostringstream oss;
@@ -195,6 +162,10 @@ EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(
 		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
 	LogInfo(oss.str());
 	
+	NiStream s;
+	s.InsertObject(kWorld.GetTerrainScene());
+	s.Save(PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName, "TestNif.nif").c_str());
+
 	return;
 }
 
@@ -267,6 +238,37 @@ bool EditorScene::LoadTerrain()
 		for (int w = 0; w < _InitFile.HeightMap_width; w++)
 			HTDFile.read((char*)&VertexMap[w][h].Height, sizeof(VertexMap[w][h].Height));
 	}
+	HTDFile.close();
+	std::string HTDGFilePath = HTDFilePath + "g";
+	if (std::filesystem::exists(HTDGFilePath)) 
+	{
+		std::ifstream HTDGFile;
+		HTDGFile.open(HTDGFilePath, std::ios::binary);
+		if (!HTDGFile.is_open())
+		{
+			NiMessageBox::DisplayMessage("Failed to open HTDG", "Error");
+			return false;
+		}
+		int HTDGPointCounter;
+		HTDGFile.read((char*)&HTDGPointCounter, sizeof(HTDGPointCounter));
+		if (_InitFile.HeightMap_height * _InitFile.HeightMap_width != HTDGPointCounter) 
+		{
+			LogError("HTDG Size MissMatch");
+		}
+		else 
+		{
+			float Value = 0.f;
+			for (int h = 0; h < _InitFile.HeightMap_height; h++)
+			{
+				for (int w = 0; w < _InitFile.HeightMap_width; w++)
+				{
+					HTDGFile.read((char*)&Value, sizeof(Value));
+					VertexMap[w][h].Height += Value;
+				}
+			}
+		}
+		HTDGFile.close();
+	}
 
 	NiImageConverter* conv = NiImageConverter::GetImageConverter();
 	std::string VertexShadowPath = PgUtil::CreateFullFilePathFromBaseFolder(_InitFile.VertexColorTexture);
@@ -278,7 +280,7 @@ bool EditorScene::LoadTerrain()
 	{
 		for (int w = 0; w < VertexShadowImage->GetWidth(); w++)
 		{
-			VertexMap[w][h].VertexColor = NiColorA(static_cast<float>(VertexColorArray[PixelCounter].r) / 255.0f, static_cast<float>(VertexColorArray[PixelCounter].g) / 255.f, static_cast<float>(VertexColorArray[PixelCounter].b) / 255.f, 1.0f);
+			VertexMap[w][VertexShadowImage->GetHeight() - h - 1].VertexColor = NiColorA(static_cast<float>(VertexColorArray[PixelCounter].r) / 255.0f, static_cast<float>(VertexColorArray[PixelCounter].g) / 255.f, static_cast<float>(VertexColorArray[PixelCounter].b) / 255.f, 1.0f);
 			PixelCounter++;
 		}
 	}
@@ -642,6 +644,7 @@ void EditorScene::DrawSHMDEditor()
 		ImGui::TextUnformatted("Right Click to Rotate Cam");
 		ImGui::TextUnformatted("Left Click to Select a World Object");
 		ImGui::TextUnformatted("Middle Mouse to open Menu");
+		ImGui::TextUnformatted("Press R to Reset the Camera");
 		ImGui::TextUnformatted("Copyright Gamebryo / Gamgio / IDK");
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
@@ -881,11 +884,53 @@ void EditorScene::UpdateCamera(float fTime)
 			}
 		}
 	}
+	ResetCamera();
 }
 
+bool EditorScene::ResetCamera(bool ForceReset) 
+{
+	bool ResetCamera = ImGui::IsKeyPressed((ImGuiKey)0x52);
+	if (!ResetCamera && !ForceReset)
+		return false;
+	Camera = kWorld.GetCamera();
+	NiPick _Pick;
+	_Pick.SetTarget(kWorld.GetWorldScene());
+	_Pick.SetPickType(NiPick::FIND_ALL);
+	_Pick.SetSortType(NiPick::SORT);
+	_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+	_Pick.SetFrontOnly(false);
+	_Pick.SetReturnNormal(true);
+	_Pick.SetObserveAppCullFlag(true);
+	NiPoint3 kOrigin(_Info->RegenX, _Info->RegenY, 0.f);
+	if (_Pick.PickObjects(kOrigin, World::ms_kUpDir, true))
+	{
+		NiPick::Results& results = _Pick.GetResults();
+		for (int i = 0; i < results.GetSize(); i++)
+		{
+			auto result = results.GetAt(i);
+			if (result->GetIntersection().z > kOrigin.z)
+				kOrigin.z = result->GetIntersection().z;
+		}
+
+	}
+	kOrigin.z += 100.f;
+	Camera->SetTranslate(kOrigin);
+	Pitch = 1.57f * 2.0f;
+	Yaw = -1.57f;
+	Roll = 1.57f;
+	NiMatrix3 rotation;
+	rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
+
+	Camera->SetRotate(rotation);
+	Camera->Update(0.0f);
+	return true;
+}
 void EditorScene::SaveSHMD() 
 {
 	auto start = std::chrono::steady_clock::now();
+	if (std::filesystem::exists(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak")))
+		std::filesystem::remove(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
+
 	std::filesystem::copy(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd"), PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
 	std::string _FilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd");
 	std::ofstream file;

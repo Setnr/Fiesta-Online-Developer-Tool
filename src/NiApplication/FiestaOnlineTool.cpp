@@ -32,7 +32,9 @@ void FiestaOnlineTool::OnIdle()
             /*Prepare Framerendering*/
             this->UpdateFrame();
             this->BeginFrame();
+
             m_spRenderer->BeginUsingDefaultRenderTargetGroup(7u);
+
             /*Set BackgroundColor of Renderer*/
             NiColorA m_kBackGroundColor;
             this->m_spRenderer->SetBackgroundColor(m_kBackGroundColor);
@@ -45,7 +47,6 @@ void FiestaOnlineTool::OnIdle()
             _Scene->StartImGuiFrame();
             _Scene->DrawImGui();
             _Scene->EndImGuiFrame();
-
         }
 
         /*Draw Interface Windows*/
@@ -58,7 +59,9 @@ void FiestaOnlineTool::OnIdle()
 
         m_spRenderer->EndUsingRenderTargetGroup();
         this->EndFrame();
+
         this->DisplayFrame();
+        
         ++this->m_iClicks;
     }
 

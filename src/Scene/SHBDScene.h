@@ -26,6 +26,7 @@ public:
 	void DrawImGui();
 	void CreateMenuBar();
 private:
+	bool ResetSHBD();
 	EditorScenePtr _Editor;
 	NiCameraPtr _SHBDCamera;
 	NiNodePtr EditorScenePtr;

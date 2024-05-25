@@ -9,6 +9,7 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imfilebrowser.h"
 #include "SHBDScene.h"
+#include <algorithm>
 StartScene::StartScene() 
 {
     NiSortAdjustNodePtr sortNode = NiNew NiSortAdjustNode;
@@ -56,7 +57,12 @@ void StartScene::ShowMapInfo()
             for (unsigned int i = 0; i < shn->GetRows(); i++)
             {
                 MapInfo* info = shn->GetRow<MapInfo>(i);
-                if (std::string(info->MapName).find(buffer) == std::string::npos)
+                std::string MapName = info->MapName;
+                std::transform(MapName.begin(), MapName.end(), MapName.begin(), ::tolower);
+                std::string BufferStr = buffer;
+                std::transform(BufferStr.begin(), BufferStr.end(), BufferStr.begin(), ::tolower);
+
+                if (MapName.find(BufferStr) == std::string::npos)
                     continue;
                 shn->DrawRow(i);
                 if (!future.valid() || future.wait_for(std::chrono::milliseconds(0)) != std::future_status::timeout)
