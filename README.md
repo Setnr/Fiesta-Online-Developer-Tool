@@ -2,6 +2,13 @@
 
 Welcome to the Fiesta Online Developer Tool repository! This tool is designed to aid developers and modders in working with Fiesta Online game files. Please note that this tool is provided "as is" without any warranties or guarantees, and the developer does not claim any copyright over it.
 
+## Disclaimer
+
+Please be aware that the Fiesta Online Developer Tool will replace a shader in the original game client. This replacement is necessary because the tool uses a newer version of the Gamebryo engine, which requires some adjustments. 
+
+As far as testing has shown, this change should not affect the game client's functionality in any way. However, please use the tool at your own risk and ensure you have backups of your original game files before making any modifications.
+
+
 ## Features
 
 ### SHMD Editor Submodule

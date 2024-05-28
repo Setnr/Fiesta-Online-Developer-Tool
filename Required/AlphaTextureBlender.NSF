@@ -1,0 +1,143 @@
+// AlphaTextureBlender shader file.
+// This shader is a fixed function implementation of a texture blender
+//
+
+NSFShader AlphaTextureBlender
+{
+    "This blends Texture1 and Texture2
+    by the alpha of AlphaBlendMap.
+    All texture coordinates wrap.
+    The alpha values represent the
+    fraction of Texture2 used.  Hence,
+    a value of 1.0 is equivalent to 
+    using Texture2 as the base map."
+    
+    // Attribute list
+    Attributes
+    {
+        Attrib_Texture      Texture1        Artist      0
+        Attrib_Texture      Texture2        Artist      1
+        Attrib_Texture      AlphaBlendMap   Artist      2
+    }
+
+    PackingDef PosNormUV0
+    {
+
+        PD_Stream   0
+			PDP_Position    0   PDT_Float3
+			PDP_Normal      3   PDT_Float3
+			PDP_TexCoord0   7   PDT_Float2
+    }
+
+    // Implementation
+    Implementation FixedFunction
+    {
+        "This implementation is intended for any hardware capable of 3 textures per pass"
+        
+        // Requirements for this implementation
+        Requirements
+        {
+            Platform    = DX8|DX9|XBOX
+            VSVersion   = v0.0           
+            UserVersion = v0.0
+            PSVersion   = v0.0
+            UsesNiRenderState = true
+            UsesNiLightState = true
+        }
+        
+        // Packing Definition it uses
+        PackingDef  PosNormUV0
+        
+        // 'Global' render states
+        RenderStates
+        {
+            AlphaBlendEnable    = true
+//          SrcBlend            = SrcAlpha
+//          DestBlend           = InvSrcAlpha
+            SrcBlend            = One
+            DestBlend           = Zero
+            Lighting            = true
+        }
+
+        // First pass
+        Pass Pass0
+        {   
+          
+            // Texture stage 0
+            Stage 0 T1Stage
+            {
+                TSS_ColorOp     = TOP_SelectArg1
+                TSS_ColorArg1   = TA_Texture
+                TSS_ColorArg2   = TA_Diffuse
+                TSS_AlphaOp     = TOP_Disable
+                TSS_Texture     = <Texture1>
+                TSS_TexCoordIndex = UseMapIndex
+            }
+            
+            // Texture stage 1
+            Stage 1 AlphaStage
+            {
+                TSS_ColorOp     = TOP_SelectArg1
+                TSS_ColorArg1   = TA_Current
+                TSS_ColorArg2   = TA_Diffuse
+                TSS_AlphaOp     = TOP_SelectArg1
+                TSS_AlphaArg1   = TA_Texture
+                TSS_Texture     = <AlphaBlendMap>
+                TSS_TexCoordIndex = UseMapIndex
+            }
+            
+            // Texture stage 2
+            Stage 2 T2BlendStage
+            {
+                TSS_ColorOp     = TOP_BlendCurrentAlpha
+                TSS_ColorArg1   = TA_Texture
+                TSS_ColorArg2   = TA_Current
+                TSS_AlphaOp     = TOP_SelectArg1
+                TSS_AlphaArg1   = TA_Current
+                TSS_Texture     = <Texture2>
+                TSS_TexCoordIndex = UseMapIndex
+            }
+            
+            Stage 3 VertexColorStage 
+            {
+                TSS_ColorOp = TOP_Modulate
+                TSS_ColorArg1   = TA_Current
+                TSS_ColorArg2   = TA_Diffuse
+                TSS_AlphaOp = TOP_SelectArg1
+                TSS_AlphaArg1   = TA_Current
+            }
+            
+
+            // Sampler stage 0
+            Sampler 0   T1Sampler
+            {
+                TSAMP_AddressU  = TADDR_Wrap
+                TSAMP_AddressV  = TADDR_Wrap
+                TSAMP_AddressW  = TADDR_Wrap
+                TSAMP_MagFilter = TEXF_Linear
+                TSAMP_MinFilter = TEXF_Linear
+                TSAMP_MipFilter = TEXF_Point
+            }
+            // Sampler stage 1
+            Sampler 1   AlphaSampler
+            {
+                TSAMP_AddressU  = TADDR_Wrap
+                TSAMP_AddressV  = TADDR_Wrap
+                TSAMP_AddressW  = TADDR_Wrap
+                TSAMP_MagFilter = TEXF_Linear
+                TSAMP_MinFilter = TEXF_Linear
+                TSAMP_MipFilter = TEXF_Point
+            }
+            // Sampler stage 2
+            Sampler 2   T2Sampler
+            {
+                TSAMP_AddressU  = TADDR_Wrap
+                TSAMP_AddressV  = TADDR_Wrap
+                TSAMP_AddressW  = TADDR_Wrap
+                TSAMP_MagFilter = TEXF_Linear
+                TSAMP_MinFilter = TEXF_Linear
+                TSAMP_MipFilter = TEXF_Point
+            }
+        }
+    }
+}

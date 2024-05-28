@@ -139,14 +139,16 @@ private:
 	void DrawGizmo();
 	void DrawSHMDEditor();
 	void DrawSHMDHeader(std::string, NiNodePtr);
+	void SelectObject();
 	NiColor BackgroundColor;
-
+	
 	MapInfo* _Info;
 	IniFile _InitFile;
 
 	std::mutex WorldLock;
 
 	NiPickablePtr SelectedObj;
+	NiPickablePtr CopyObj = NULL;
 	glm::vec3 SelectedObjAngels;
 
 	

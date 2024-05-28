@@ -162,10 +162,6 @@ EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(
 		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
 	LogInfo(oss.str());
 	
-	NiStream s;
-	s.InsertObject(kWorld.GetTerrainScene());
-	s.Save(PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName, "TestNif.nif").c_str());
-
 	return;
 }
 
@@ -526,6 +522,7 @@ bool EditorScene::LoadTerrain()
 
 void EditorScene::Draw(NiRenderer* renderer)
 {
+	//Camera->SetViewPort(NiRect<float>(0.f, 0.5f, 0.5f, 0.f));
 	Camera->SetViewFrustum(kWorld.GetSkyFrustum());
 
 	NiVisibleArray m_kVisible;
@@ -645,6 +642,9 @@ void EditorScene::DrawSHMDEditor()
 		ImGui::TextUnformatted("Left Click to Select a World Object");
 		ImGui::TextUnformatted("Middle Mouse to open Menu");
 		ImGui::TextUnformatted("Press R to Reset the Camera");
+		ImGui::TextUnformatted("Ctrl + C to Copy the Currently Selected Object");
+		ImGui::TextUnformatted("Ctrl + V to Paste the Copied Object");
+		ImGui::TextUnformatted("Del to remove the selcted or hoverd Object");
 		ImGui::TextUnformatted("Copyright Gamebryo / Gamgio / IDK");
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
@@ -791,6 +791,66 @@ void EditorScene::DrawSHMDEditor()
 		}
 		ImGui::EndPopup();
 	}
+	if (SelectedObj && (
+				ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x43) 
+				||  ImGui::IsKeyPressed((ImGuiKey)VK_CONTROL) && ImGui::IsKeyDown((ImGuiKey)0x43) 
+			)
+		)  // ctrl c
+	{
+		CopyObj = SelectedObj;
+	}
+
+	if (CopyObj && (
+				ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x56)
+				|| ImGui::IsKeyPressed((ImGuiKey)VK_CONTROL) && ImGui::IsKeyDown((ImGuiKey)0x56)
+			)
+		)   // ctrl v
+	{
+		NiPoint3 kOrigin, kDir;
+		long X, Y;
+		FiestaOnlineTool::GetMousePosition(X, Y);
+		if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
+		{
+			NiPick _Pick;
+			_Pick.SetPickType(NiPick::FIND_FIRST);
+			_Pick.SetSortType(NiPick::SORT);
+			_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+			_Pick.SetFrontOnly(true);
+			_Pick.SetReturnNormal(true);
+			_Pick.SetObserveAppCullFlag(true);
+			_Pick.SetTarget(kWorld.GetTerrainScene());
+			if (_Pick.PickObjects(kOrigin, kDir, true))
+			{
+				NiPick::Results& results = _Pick.GetResults();
+				NiPickablePtr Obj = (NiPickable*)CopyObj->Clone();
+
+				this->AttachGroundObj(Obj);
+
+				Obj->SetName(SelectedObj->GetName());
+				Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
+
+				Obj->SetSelectiveUpdateRigid(true);
+				auto node = kWorld.GetGroundCollidee();
+				node->UpdateEffects();
+				node->UpdateProperties();
+				node->Update(0.0);
+				SelectedObj = Obj;
+				SelectedObj->SetTranslate(results.GetAt(0)->GetIntersection());
+			}
+		}
+	}
+	if (ImGui::IsKeyPressed((ImGuiKey)VK_DELETE)) 
+	{
+		if(!SelectedObj)
+		{
+			SelectObject();
+		}
+		if(SelectedObj)
+		{
+			SelectedObj->GetParent()->DetachChild(SelectedObj);
+			SelectedObj = NULL;
+		}
+	}
 }
 
 void EditorScene::DrawSHMDHeader(std::string Name, NiNodePtr Node)
@@ -827,64 +887,68 @@ void EditorScene::UpdateCamera(float fTime)
 	auto& io = ImGui::GetIO();
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 	{
-		NiPoint3 kOrigin, kDir;
-		long X, Y;
-		FiestaOnlineTool::GetMousePosition(X, Y);
-		if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir)) 
+		SelectObject();
+	}
+	ResetCamera();
+}
+
+void EditorScene::SelectObject() {
+	NiPoint3 kOrigin, kDir;
+	long X, Y;
+	FiestaOnlineTool::GetMousePosition(X, Y);
+	if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
+	{
+		NiPick _Pick;
+		_Pick.SetPickType(NiPick::FIND_FIRST);
+		_Pick.SetSortType(NiPick::SORT);
+		_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+		_Pick.SetFrontOnly(true);
+		_Pick.SetReturnNormal(true);
+		_Pick.SetObserveAppCullFlag(true);
+		_Pick.SetTarget(kWorld.GetWorldScene());
+		if (_Pick.PickObjects(kOrigin, kDir, true))
 		{
-			NiPick _Pick;
-			_Pick.SetPickType(NiPick::FIND_FIRST);
-			_Pick.SetSortType(NiPick::SORT);
-			_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
-			_Pick.SetFrontOnly(true);
-			_Pick.SetReturnNormal(true);
-			_Pick.SetObserveAppCullFlag(true);
-			_Pick.SetTarget(kWorld.GetWorldScene());
-			if (_Pick.PickObjects(kOrigin, kDir, true)) 
+			NiPick::Results& results = _Pick.GetResults();
+
+			std::set<NiPickable*> PossibleObjects;
+
+			for (int i = 0; i < results.GetSize(); i++)
 			{
-				NiPick::Results& results = _Pick.GetResults();
-
-				std::set<NiPickable*> PossibleObjects;
-
-				for (int i = 0; i < results.GetSize(); i++ ) 
+				auto record = results.GetAt(i);
+				auto obj = record->GetAVObject();
+				if (NiIsKindOf(NiPickable, obj))
 				{
-					auto record = results.GetAt(i);
-					auto obj = record->GetAVObject();
-					if (NiIsKindOf(NiPickable, obj))
+					PossibleObjects.insert((NiPickable*)obj);
+				}
+				else
+				{
+					//We only earch Upwards, 
+					//if we search Downwards we can click the terrain and select the first 
+					//NiPickable which must not be the actually targeted Node
+					//Picking only works when compiled with the define of PICKABLEOBJECTS being true
+					while (obj = obj->GetParent())
 					{
-						PossibleObjects.insert((NiPickable*)obj);
-					}
-					else 
-					{ 
-						//We only earch Upwards, 
-						//if we search Downwards we can click the terrain and select the first 
-						//NiPickable which must not be the actually targeted Node
-						//Picking only works when compiled with the define of PICKABLEOBJECTS being true
-						while (obj = obj->GetParent())
+						if (NiIsKindOf(NiPickable, obj))
 						{
-							if (NiIsKindOf(NiPickable, obj))
-							{
-								PossibleObjects.insert((NiPickable*)obj);
-								break;
-							}
+							PossibleObjects.insert((NiPickable*)obj);
+							break;
 						}
 					}
 				}
-				if (auto search = PossibleObjects.find(SelectedObj); search == PossibleObjects.end()) 
+			}
+			if (auto search = PossibleObjects.find(SelectedObj); search == PossibleObjects.end())
+			{
+				if (PossibleObjects.size() != 0)
 				{
-					if(PossibleObjects.size() != 0)
-					{
-						SelectedObj = *PossibleObjects.begin();
-						float angle, x, y, z;
-						SelectedObj->GetRotate().ExtractAngleAndAxis(angle, x, y, z);
-						SelectedObjAngels = glm::degrees(glm::vec3{ eulerAngles(glm::angleAxis((float)angle, glm::vec3(x, y, z))) });
+					SelectedObj = *PossibleObjects.begin();
+					float angle, x, y, z;
+					SelectedObj->GetRotate().ExtractAngleAndAxis(angle, x, y, z);
+					SelectedObjAngels = glm::degrees(glm::vec3{ eulerAngles(glm::angleAxis((float)angle, glm::vec3(x, y, z))) });
 
-					}
 				}
 			}
 		}
 	}
-	ResetCamera();
 }
 
 bool EditorScene::ResetCamera(bool ForceReset) 

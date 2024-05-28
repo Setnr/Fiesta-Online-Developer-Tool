@@ -526,7 +526,8 @@ copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settin
       <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"
 copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
-copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"</Command>
+copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
+copy ".\Required\AlphaTextureBlender.NSF" ".\Build\$(Configuration)\FiestaOnlineTool\AlphaTextureBlender.NSF"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
