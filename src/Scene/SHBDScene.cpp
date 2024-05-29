@@ -128,12 +128,15 @@ SHBDScene::SHBDScene(MapInfo* Info) : _SHBD(Info)
 					int index = hges * _SHBD.GetSHBDSize() + wges;
 
 					size_t charIndex = index / 8;
-					size_t bitIndex = index % 8;
+					if(charIndex < SHBDData.size())
+					{
+						size_t bitIndex = index % 8;
 
-					if((SHBDData[charIndex] >> bitIndex) & 0x1)
-						*pixeloffset = Blocked;
-					else
-						*pixeloffset = Walkable;
+						if ((SHBDData[charIndex] >> bitIndex) & 0x1)
+							*pixeloffset = Blocked;
+						else
+							*pixeloffset = Walkable;
+					}
 
 					pixeloffset++;
 				}
@@ -192,7 +195,7 @@ void SHBDScene::Draw(NiRenderer* renderer)
 
 void SHBDScene::UpdateCamera(float fTime)
 {
-	auto& io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 
 	FiestaScene::UpdateCamera(fTime);
 	float DeltaTime = fTime - FiestaOnlineTool::GetLastUpdateTime();
@@ -301,12 +304,15 @@ void SHBDScene::CreateBrushTexture(NiPoint3& BrushPositon)
 			int index = hges * _SHBD.GetSHBDSize() + wges;
 
 			size_t charIndex = index / 8;
-			size_t bitIndex = index % 8;
+			if(charIndex < SHBDData.size())
+			{
+				size_t bitIndex = index % 8;
 
-			if ((SHBDData[charIndex] >> bitIndex) & 0x1)
-				*NewPtr = Blocked;
-			else
-				*NewPtr = Walkable;
+				if ((SHBDData[charIndex] >> bitIndex) & 0x1)
+					*NewPtr = Blocked;
+				else
+					*NewPtr = Walkable;
+			}
 		}
 	}
 
@@ -349,7 +355,7 @@ void SHBDScene::CreateBrushTexture(NiPoint3& BrushPositon)
 void SHBDScene::DrawImGui()
 { 
 	StartScene::DrawImGui(); 
-	auto io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 	auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
 
 	int h = 110;

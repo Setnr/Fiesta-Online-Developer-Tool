@@ -42,8 +42,10 @@ void FiestaOnlineTool::OnIdle()
             /*Draw MainScene (GameWorld)*/
             _Scene->Draw(this->m_spRenderer);
 
-            NiDX9RendererPtr renderer = (NiDX9Renderer*)(NiRenderer*)this->m_spRenderer;
+            NiDX9RendererPtr renderer = (NiDX9Renderer*)(NiRenderer*)this->m_spRenderer; //Reset some TextureStage Shit to fix some broken Rendering
             renderer->GetRenderState()->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, 0);
+            renderer->GetRenderState()->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+            renderer->GetRenderState()->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
             _Scene->StartImGuiFrame();
             _Scene->DrawImGui();
             _Scene->EndImGuiFrame();

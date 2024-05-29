@@ -87,7 +87,7 @@ bool FiestaOnlineTool::Initialize()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     ImGui_ImplWin32_Init(this->GetRenderWindowReference());
-    NiDX9Renderer* ptr = (NiDX9Renderer*)&*this->m_spRenderer;
+    NiDX9Renderer* ptr = (NiDX9Renderer*)(NiRenderer*)this->m_spRenderer;
     ImGui_ImplDX9_Init(ptr->GetD3DDevice());
     if(LoadSetupScene)
     {

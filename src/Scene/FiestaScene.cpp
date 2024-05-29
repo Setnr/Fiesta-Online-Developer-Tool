@@ -25,7 +25,7 @@ bool FiestaScene::SetupScene(NiNodePtr& m_spScene, NiCameraPtr& m_spCamera)
 void FiestaScene::UpdateCamera(float fTime)
 {
 
-	auto& io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 	static POINT CursorPos;
 	static bool UpdateMouse = false;
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
@@ -118,7 +118,7 @@ void FiestaScene::EndImGuiFrame()
 void FiestaScene::DrawImGui() 
 {
 	
-	auto io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 	FPS[values_offset] = io.Framerate;
 	values_offset = (values_offset + 1) % IM_ARRAYSIZE(FPS);
 	float average = 0.0f;

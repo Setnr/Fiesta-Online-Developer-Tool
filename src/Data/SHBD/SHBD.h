@@ -66,6 +66,8 @@ public:
 	std::vector<char>& GetDataRefrence() { return Data; }
 	void UpdateSHBDData(int offset, int Shift, bool Status) 
 	{
+		if (offset >= Data.size())
+			return;
 		if (Status)
 		{
 			Data[offset] |= (1 << Shift);

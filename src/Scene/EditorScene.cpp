@@ -621,7 +621,7 @@ void EditorScene::DrawGizmo()
 
 void EditorScene::DrawSHMDEditor()
 {
-	auto io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 	auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
 
 	int h = 295;
@@ -884,7 +884,7 @@ void EditorScene::UpdateCamera(float fTime)
 	NiPoint3 translate(Camera->GetTranslate());
 	kWorld.GetSkyNode()->SetTranslate(translate);
 
-	auto& io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 	{
 		SelectObject();

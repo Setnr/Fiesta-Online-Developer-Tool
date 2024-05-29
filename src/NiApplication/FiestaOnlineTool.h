@@ -117,4 +117,5 @@ private:
 	void EnableCameraMove() { MoveCamera = true; }
 	void DisableCameraMove() { MoveCamera = false; }
 	float m_fLastUpdateTime;
+
 };

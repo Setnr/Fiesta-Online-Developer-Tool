@@ -151,7 +151,6 @@ private:
 	NiPickablePtr CopyObj = NULL;
 	glm::vec3 SelectedObjAngels;
 
-	
 };
 
 
