@@ -20,6 +20,7 @@ public:
 	static void SetResolution(std::string Resoultion);
 	static void SetFullScreen(bool b) { _Settings._FullScreen = b; }
 	static void SetFPSCap(float f) { _Settings._FPSCap = f; }
+	static void SetPasteDelay(float f) { _Settings._PasteDelay = f; }
 	static std::string GetResoultion() 
 	{
 		return std::string( std::to_string(_Settings._WindowWidth) + " x " + std::to_string(_Settings._WindowHeight));
@@ -32,5 +33,6 @@ private:
 	Setting(int, WindowHeight, _WindowHeight);
 	Setting(bool, FullScreen, _FullScreen);
 	Setting(float, FPSCap, _FPSCap);
+	Setting(float, PasteDelay, _PasteDelay);
 
 };

@@ -806,36 +806,41 @@ void EditorScene::DrawSHMDEditor()
 			)
 		)   // ctrl v
 	{
-		NiPoint3 kOrigin, kDir;
-		long X, Y;
-		FiestaOnlineTool::GetMousePosition(X, Y);
-		if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
+		static float LastPasteTime;
+		if(LastPasteTime + Settings::PasteDelay() < NiGetCurrentTimeInSec())
 		{
-			NiPick _Pick;
-			_Pick.SetPickType(NiPick::FIND_FIRST);
-			_Pick.SetSortType(NiPick::SORT);
-			_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
-			_Pick.SetFrontOnly(true);
-			_Pick.SetReturnNormal(true);
-			_Pick.SetObserveAppCullFlag(true);
-			_Pick.SetTarget(kWorld.GetTerrainScene());
-			if (_Pick.PickObjects(kOrigin, kDir, true))
+			LastPasteTime = NiGetCurrentTimeInSec();
+			NiPoint3 kOrigin, kDir;
+			long X, Y;
+			FiestaOnlineTool::GetMousePosition(X, Y);
+			if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
 			{
-				NiPick::Results& results = _Pick.GetResults();
-				NiPickablePtr Obj = (NiPickable*)CopyObj->Clone();
+				NiPick _Pick;
+				_Pick.SetPickType(NiPick::FIND_FIRST);
+				_Pick.SetSortType(NiPick::SORT);
+				_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+				_Pick.SetFrontOnly(true);
+				_Pick.SetReturnNormal(true);
+				_Pick.SetObserveAppCullFlag(true);
+				_Pick.SetTarget(kWorld.GetTerrainScene());
+				if (_Pick.PickObjects(kOrigin, kDir, true))
+				{
+					NiPick::Results& results = _Pick.GetResults();
+					NiPickablePtr Obj = (NiPickable*)CopyObj->Clone();
 
-				this->AttachGroundObj(Obj);
+					this->AttachGroundObj(Obj);
 
-				Obj->SetName(SelectedObj->GetName());
-				Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
+					Obj->SetName(SelectedObj->GetName());
+					Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
 
-				Obj->SetSelectiveUpdateRigid(true);
-				auto node = kWorld.GetGroundCollidee();
-				node->UpdateEffects();
-				node->UpdateProperties();
-				node->Update(0.0);
-				SelectedObj = Obj;
-				SelectedObj->SetTranslate(results.GetAt(0)->GetIntersection());
+					Obj->SetSelectiveUpdateRigid(true);
+					auto node = kWorld.GetGroundCollidee();
+					node->UpdateEffects();
+					node->UpdateProperties();
+					node->Update(0.0);
+					SelectedObj = Obj;
+					SelectedObj->SetTranslate(results.GetAt(0)->GetIntersection());
+				}
 			}
 		}
 	}
@@ -885,7 +890,7 @@ void EditorScene::UpdateCamera(float fTime)
 	kWorld.GetSkyNode()->SetTranslate(translate);
 
 	ImGuiIO& io = ImGui::GetIO();
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGuizmo::IsOver())
 	{
 		SelectObject();
 	}
@@ -899,10 +904,10 @@ void EditorScene::SelectObject() {
 	if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
 	{
 		NiPick _Pick;
-		_Pick.SetPickType(NiPick::FIND_FIRST);
+		_Pick.SetPickType(NiPick::FIND_ALL);
 		_Pick.SetSortType(NiPick::SORT);
 		_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
-		_Pick.SetFrontOnly(true);
+		//_Pick.SetFrontOnly(true);
 		_Pick.SetReturnNormal(true);
 		_Pick.SetObserveAppCullFlag(true);
 		_Pick.SetTarget(kWorld.GetWorldScene());

@@ -147,11 +147,15 @@ void StartScene::ShowSettings()
         float fps = FiestaOnlineTool::GetFPSCap();
         if (ImGui::DragFloat("FPS Cap", &fps, 1.f, 30.f, 144.f))
             FiestaOnlineTool::SetFPSCap(fps);
+
         /*bool FullScreen = Settings::FullScreen();
         if (ImGui::Checkbox("FullScreen", &FullScreen))
         {
             Settings::SetFullScreen(FullScreen);
         }*/
+        float PasteDelay = Settings::PasteDelay();
+        if (ImGui::DragFloat("Paste Delay", &PasteDelay, 0.05f, 0.f, 1.5f))
+            Settings::SetPasteDelay(PasteDelay);
         if (ImGui::Button("Safe Settings"))
         {
             Settings::SaveSettings();
