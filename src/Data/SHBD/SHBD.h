@@ -82,4 +82,5 @@ private:
 	unsigned int MapSize;
 	unsigned int SHBDSize;
 	std::vector<char> Data;
+
 };

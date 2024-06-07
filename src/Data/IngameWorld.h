@@ -4,14 +4,26 @@
 #include <set>
 #include <map>
 #include <list>
+#include <mutex>
 #include "PgUtil.h"
 
-class World 
+#include "../Data/SHNStruct.h"
+#include "../Data/IniFile.h"
+#include "../Data/SHBD/SHBD.h"
+
+NiSmartPointer(World);
+class World : public NiRefObject
 {
 public:
-	~World();
+	World(MapInfo* MapInfo);
+	~World() 
+	{
+		
+	};
+
 private:
 
+#pragma region WorldStructureNodes
 	NiNodePtr m_spLightArea;
 	NiNodePtr m_spFog;
 	NiNodePtr m_spWorldScene;
@@ -47,14 +59,20 @@ private:
 	NiDirectionalLightPtr m_spMapDirectionalLight;
 
 	NiColor BackgroundColor;
-
+#pragma endregion
 public:
+#pragma region Init
 	bool InitScene();
 	bool InitCamera();
 	bool InitSkyCtrl();
 	bool InitLightFog();
 	bool InitShadow() { return true; }
 
+	bool LoadTerrain();
+	bool LoadSHMD();
+	bool LoadSHBD();
+#pragma endregion
+#pragma region SetterAndGetter
 	void SetBackgroundColor(float r, float g, float b)
 	{
 		BackgroundColor = NiColor(r, g, b);
@@ -76,6 +94,8 @@ public:
 	}
 	void AttachGroundObj(NiNodePtr& obj)
 	{
+		static std::mutex AttachGroundObjLock;
+		std::lock_guard<std::mutex> lock(AttachGroundObjLock);
 		m_spGroundObject->AttachChild(obj, 1);
 	}
 	void AttachGroundCollidee(NiNodePtr obj)
@@ -169,10 +189,57 @@ public:
 	NiCameraPtr GetCamera() { return m_spCamera; }
 
 	float GetFOV() { return this->m_fCameraFOV; }
+
+	bool WasLoadedSuccessfully() { return LoadedSuccessfully; }
+	bool HasMapInfo() { return _Info != nullptr; }
+	MapInfo* GetMapInfo() { return _Info; }
+	void SetSHBDVisiblity(bool visible) 
+	{
+		if (SHBDNode && GetGroundObjNode())
+		{
+			if (visible)
+				GetGroundObjNode()->AttachChild(SHBDNode);
+			else
+				GetGroundObjNode()->DetachChild(SHBDNode);
+		}
+	}
+	NiNodePtr GetSHBDNode() { return SHBDNode; }
+#pragma endregion
+#pragma region GlobalStatics
 	static NiPoint3 ms_kUpDir; // idb
 	static NiPoint3 ms_kDownDir; // idb
 	static NiPoint3 ms_kNorthDir; // idb
 	static NiPoint3 ms_kEastDir; // idb
 	static NiPoint3 ms_kWestDir; // idb
 	static NiPoint3 ms_kDefaultDirectionalLightDir; // idb
+#pragma endregion
+
+	void ResetSHBD(NiPoint3 SpawnPoint);
+	void SaveSHBD();
+	void SaveSHMD();
+	void SaveSHMDEntry(std::ofstream&, NiNodePtr, const char*);
+	void SaveSHMDLight(std::ofstream&, NiColor, const char*);
+	void SaveSHMDFog(std::ofstream&, float, NiColor);
+	void SaveSHMDFrustum(std::ofstream&, NiFrustum);
+	void SaveSHMDGroundObjects(std::ofstream&, NiNodePtr);
+	void SaveSHMDGlobalGroundObjects(std::ofstream&, NiNodePtr);
+	NiPoint3 GetSpawnPoint();
+	void CreateBrushTexture(NiPoint3& BrushPositon, int BrushSize, bool MoveStatus);
+
+
+private:
+	bool LoadedSuccessfully = false;
+	MapInfo* _Info;
+	IniFile _InitFile;
+
+	ShineBlockData _SHBD;
+	NiNodePtr SHBDNode;
+	std::vector<std::vector<NiPixelDataPtr>> TextureConnector;
+	std::pair<int, int> ResetPoint;
+
+	unsigned int Blocked;
+	unsigned int Walkable;
+	unsigned int BrushColor;
+	int TextureSize = 128;
+	float PixelSize;
 };

@@ -1,173 +1,233 @@
 #include "IngameWorld.h"
-
-NiPoint3 World::ms_kUpDir = NiPoint3(0.0, 0.0, 1.0); 
-NiPoint3 World::ms_kDownDir = NiPoint3(0.0, 0.0, -1.0); 
-NiPoint3 World::ms_kNorthDir = NiPoint3(0.0, 1.0, 0.0); 
-NiPoint3 World::ms_kEastDir = NiPoint3(1.0, 0.0, 0.0); 
-NiPoint3 World::ms_kWestDir = NiPoint3(-1.0, 0.0, 0.0); 
-NiPoint3 World::ms_kDefaultDirectionalLightDir = NiPoint3(0.5, 0.69999999, -0.40000001); 
-
-
-World::~World() 
+#include "../Logger/Logger.h"
+#include <chrono>
+World::World(MapInfo* MapInfo) : _Info(MapInfo) , _InitFile(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "ini")) , _SHBD(_Info)
 {
+	auto start = std::chrono::steady_clock::now();
+	if (!InitScene())
+		return;
+	if (!InitCamera())
+		return;
+	if (!InitSkyCtrl())
+		return;
+	if (!InitLightFog())
+		return;
+	if (!InitShadow())
+		return;
 
+	if (!LoadTerrain())
+		return;
+	if (!LoadSHMD())
+		return;
+	if (!LoadSHBD())
+		return;
+
+	if (!GetWorldScene())
+		return;
+
+	GetWorldScene()->UpdateEffects();
+	GetWorldScene()->UpdateProperties();
+	GetWorldScene()->Update(0.0);
+
+	auto diff = std::chrono::steady_clock::now() - start;
+	std::ostringstream oss;
+	oss << "Successfully Loaded " << _Info->MapName << "("
+		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
+	LogInfo(oss.str());
 }
 
-bool World::InitScene() 
+void World::CreateBrushTexture(NiPoint3& BrushPositon, int BrushSize, bool MoveStatus)
 {
-	m_spLightArea = NiNew NiNode;
-	m_spFog = NiNew NiNode;
-	m_spWorldScene = NiNew NiNode;
-	m_spCharScene = NiNew NiNode;
-	m_spDropItemScene = NiNew NiNode;
-	m_spGroundScene = NiNew NiNode;
-	m_spShadowScene = NiNew NiNode;;
-	m_spGroundObject = NiNew NiNode;
-	m_spDirectionalLightScene = NiNew NiNode;
-	m_spMinihouseScene = NiNew NiNode;
-	m_spNormalLightScene = NiNew NiNode;
-	m_spAbstateCharScene = NiNew NiNode;
-	m_spWeatherEffectScene = NiNew NiNode;
-	m_spGroundTerrain = NiNew NiSortAdjustNode;
-	m_spAllGroundScene = NiNew NiNode;
-	m_spBuildingScene = NiNew NiSortAdjustNode;
-	m_spBDAni = NiNew NiNode;
-	m_spBDNotAni = NiNew NiNode;
-	m_spSkyScene = NiNew NiNode;
-	m_spWaterScene = NiNew NiNode;
-	m_spEffectScene = NiNew NiNode;
-	m_spGroundCollidee = NiNew NiNode;
-	m_spGroundObjectCollidee = NiNew NiNode;
-	m_spBuildingCollidee = NiNew NiNode;
-	m_spUseCameraCollidee = NiNew NiNode;
 
+	std::vector<char> SHBDData = _SHBD.GetDataRefrence();
 
-
-	m_spLightArea->SetName("m_spLightArea");
-	m_spFog->SetName("m_spFog");
-	m_spWorldScene->SetName("m_spWorldScene");
-	m_spCharScene->SetName("m_spCharScene");
-	m_spDropItemScene->SetName("m_spDropItemScene");
-	m_spGroundScene->SetName("m_spGroundScene");
-	m_spShadowScene->SetName("m_spShadowScene");
-	m_spGroundObject->SetName("m_spGroundObject");
-	m_spDirectionalLightScene->SetName("m_spDirectionalLightScene");
-	m_spMinihouseScene->SetName("m_spMinihouseScene");
-	m_spNormalLightScene->SetName("m_spNormalLightScene");
-	m_spAbstateCharScene->SetName("m_spAbstateCharScene");
-	m_spWeatherEffectScene->SetName("m_spWeatherEffectScene");
-	m_spGroundTerrain->SetName("m_spGroundTerrain");
-	m_spAllGroundScene->SetName("m_spAllGroundScene");
-	m_spBuildingScene->SetName("m_spBuildingScene");
-	m_spSkyScene->SetName("m_spSkyScene");
-	m_spWaterScene->SetName("m_spWaterScene");
-	m_spGroundCollidee->SetName("m_spGroundCollidee");
-	m_spGroundObjectCollidee->SetName("m_spGroundObjectCollidee");
-	m_spBuildingCollidee->SetName("m_spBuildingCollidee");
-
-	m_spBuildingScene->SetName("[PN]");
-
-
-	m_spBuildingScene->AttachChild(m_spGroundScene);
-	m_spBuildingScene->AttachChild(m_spBDNotAni);
-	m_spBuildingScene->AttachChild(m_spBDAni);
-	m_spGroundScene->AttachChild(m_spGroundObject);
-	m_spGroundScene->AttachChild(m_spGroundObjectCollidee);
-	m_spGroundScene->AttachChild(m_spGroundTerrain);
-	m_spAllGroundScene->AttachChild(m_spBuildingScene);
-	m_spNormalLightScene->AttachChild(m_spAllGroundScene);
-	m_spNormalLightScene->AttachChild(m_spDirectionalLightScene);
-	m_spDirectionalLightScene->AttachChild(m_spCharScene);
-	m_spNormalLightScene->AttachChild(m_spShadowScene);
-	m_spNormalLightScene->AttachChild(m_spDropItemScene);
-	m_spDirectionalLightScene->AttachChild(m_spMinihouseScene);
-	m_spNormalLightScene->AttachChild(m_spWaterScene);
-	m_spNormalLightScene->AttachChild(m_spEffectScene);
-	m_spWorldScene->AttachChild(m_spNormalLightScene);
-	m_spWorldScene->AttachChild(m_spAbstateCharScene);
-	m_spWorldScene->AttachChild(m_spLightArea);
-	m_spWorldScene->AttachChild(m_spFog);
-
-	NiAlphaPropertyPtr alpha = NiNew NiAlphaProperty;
-	NiVertexColorPropertyPtr Vertex = NiNew NiVertexColorProperty;
-	NiFogPropertyPtr Fog = NiNew NiFogProperty;
-	m_spShadowScene->AttachProperty(alpha);
-	m_spShadowScene->AttachProperty(Vertex);
-	m_spShadowScene->AttachProperty(Fog);
-	Vertex = NiNew NiVertexColorProperty;
-	NiMaterialPropertyPtr Material = NiNew NiMaterialProperty;
-	Fog = NiNew NiFogProperty;
-	m_spWorldScene->AttachProperty(Vertex);
-	m_spWorldScene->AttachProperty(Material);
-	m_spWorldScene->AttachProperty(Fog);
-
-	NiZBufferPropertyPtr ZBuff = NiNew NiZBufferProperty;
-	m_spSkyScene->AttachProperty(ZBuff);
-	return true;
-}
-bool World::InitCamera() 
-{
-	m_spCamera = NiNew NiCamera;
-	m_bCameraOrtho = false;
-	NiFrustum SkyFrustum(-0.25, 0.25, 0.1875, -0.1875, 1.0, 6000.0, m_bCameraOrtho);
-	m_kSkyFrustum = SkyFrustum;
-	NiFrustum WorldFrustum(-0.25, 0.25, 0.1875, -0.1875, 1.0, 6000.0, m_bCameraOrtho);
-	m_kWorldFrustum = WorldFrustum;
-	m_spCamera->SetViewFrustum(m_kWorldFrustum); //World::SetCameraFOV
-	
-
-	m_fCameraFOV = 50.0f;
-	float fTop = m_fCameraFOV / 180.0 * 0.5 * NI_PI;
-	float fTopa = tan(fTop);
-	float v4 = fTopa;
-	float fRight = fTopa;
-	float v5 = 1600; /*TODO DYNAMIC*/
-	float v6 = 900;
-	float fTopb;
-	if (900 >= (double)1600)
+	for (int h = ResetPoint.second - BrushSize; h <= ResetPoint.second + BrushSize && h < _SHBD.GetSHBDSize(); h++)
 	{
-		fTopb = v4 * (v6 / v5);
-		v4 = fTopb;
+		if (h < 0)
+			continue;
+		int i = _SHBD.GetMapSize() * h;
+		for (int w = ResetPoint.first - BrushSize; w <= ResetPoint.first + BrushSize && w < _SHBD.GetSHBDSize(); w++)
+		{
+			if (w < 0)
+				continue;
+			int TextureH = h / TextureSize;
+			int TextureW = w / TextureSize;
+			NiPixelDataPtr pixleData = TextureConnector[TextureH][TextureW];
+			pixleData->MarkAsChanged();
+			int TextureInternH = h % TextureSize;
+			int TextureInternW = w % TextureSize;
+			unsigned int* NewPtr = ((unsigned int*)pixleData->GetPixels()) + (TextureInternH * pixleData->GetWidth()) + TextureInternW;
+
+			int hges = h;
+			int wges = w;
+
+			int index = hges * _SHBD.GetSHBDSize() + wges;
+
+			size_t charIndex = index / 8;
+			if (charIndex < SHBDData.size())
+			{
+				size_t bitIndex = index % 8;
+
+				if ((SHBDData[charIndex] >> bitIndex) & 0x1)
+					*NewPtr = Blocked;
+				else
+					*NewPtr = Walkable;
+			}
+		}
 	}
-	else
+
+	int middlew = BrushPositon.x / PixelSize;
+	int middleh = BrushPositon.y / PixelSize;
+
+	for (int h = middleh - BrushSize; h <= middleh + BrushSize && h < _SHBD.GetSHBDSize(); h++)
 	{
-		fRight = v5 / v6 * v4;
+		if (h < 0)
+			continue;
+		int i = _SHBD.GetMapSize() * h;
+
+		for (int w = middlew - BrushSize; w <= middlew + BrushSize && w < _SHBD.GetSHBDSize(); w++)
+		{
+			if (w < 0)
+				continue;
+			int TextureH = h / TextureSize;
+			int TextureW = w / TextureSize;
+			NiPixelDataPtr pixleData = TextureConnector[TextureH][TextureW];
+			pixleData->MarkAsChanged();
+			int TextureInternH = h % TextureSize;
+			int TextureInternW = w % TextureSize;
+			unsigned int* NewPtr = ((unsigned int*)pixleData->GetPixels()) + (TextureInternH * pixleData->GetWidth()) + TextureInternW;
+			if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+			{
+				int offset = i + (w / 8);
+				int Shift = w % 8;
+
+				_SHBD.UpdateSHBDData(offset, Shift, MoveStatus);
+
+			}
+			*NewPtr = BrushColor;
+		}
 	}
-	float fTopc = -fRight;
-	float v7 = fTopc;
-	this->m_kWorldFrustum.m_fLeft = fTopc;
-	this->m_kWorldFrustum.m_fRight = fRight;
-	this->m_kWorldFrustum.m_fTop = v4;
-	float fTopd = -v4;
-	this->m_kWorldFrustum.m_fBottom = fTopd;
-	this->m_kSkyFrustum.m_fBottom = fTopd;
-	this->m_kSkyFrustum.m_fLeft = v7;
-	this->m_kSkyFrustum.m_fRight = fRight;
-	this->m_kSkyFrustum.m_fTop = v4;
-	return true;
+	ResetPoint = std::pair<int, int>(middlew, middleh);
+
+
 }
-bool World::InitSkyCtrl()
+
+void World::SaveSHBD() 
 {
-	return 1;
+	_SHBD.Save();
 }
-bool World::InitLightFog()
+
+void World::SaveSHMD() 
 {
-	m_spAmbientLight = NiNew NiAmbientLight;
-	m_spAmbientLight->SetAmbientColor(NiColor(0.2, .2, .2));
-	m_spAmbientLight->SetDiffuseColor(NiColor::WHITE);
-	m_spAmbientLight->SetSpecularColor(NiColor::BLACK);
-	m_spAmbientLight->AttachAffectedNode(m_spNormalLightScene);
-	m_spNormalLightScene->AttachChild(m_spAmbientLight);
-	m_spDirectionalLight = NiNew NiDirectionalLight;
-	m_spDirectionalLight->SetDimmer(1.0);
-	m_spDirectionalLight->SetAmbientColor(NiColor::BLACK);
-	m_spDirectionalLight->SetDiffuseColor(NiColor::WHITE);
-	m_spDirectionalLight->SetSpecularColor(NiColor::BLACK);
-	m_spDirectionalLight->AttachAffectedNode(m_spDirectionalLightScene);
-	m_spDirectionalLightScene->AttachChild(m_spDirectionalLight);
-	m_spMapDirectionalLight = NiNew NiDirectionalLight;
-	m_spMapDirectionalLight->SetAmbientColor(NiColor(.75, .75, .75));
-	m_spMapDirectionalLight->SetDiffuseColor(NiColor::WHITE);
-	m_spMapDirectionalLight->SetSpecularColor(NiColor::WHITE);
-	return 1;
+	auto start = std::chrono::steady_clock::now();
+	if (std::filesystem::exists(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak")))
+		std::filesystem::remove(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
+
+	std::filesystem::copy(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd"), PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
+	std::string _FilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd");
+	std::ofstream file;
+	file.open(_FilePath);
+	file << std::fixed << std::setprecision(6);
+	file << "shmd0_5" << std::endl;
+	SaveSHMDEntry(file, GetSkyNode(), "Sky");
+	SaveSHMDEntry(file, GetWaterNode(), "Water");
+	SaveSHMDGlobalGroundObjects(file, GetGroundObjNode());
+	SaveSHMDLight(file, GetAmbientLightAmbientColor(), "GlobalLight");
+	SaveSHMDFog(file, GetFogDepth(), GetFogColor());
+	SaveSHMDLight(file, GetBackgroundColor(), "BackGroundColor");
+	SaveSHMDFrustum(file, GetWorldFrustum());
+	SaveSHMDGroundObjects(file, GetGroundObjNode());
+	SaveSHMDLight(file, GetMapDirectionalLightAmbientColor(), "DirectionLightAmbient");
+	SaveSHMDLight(file, GetMapDirectionalLightDiffuseColor(), "DirectionLightDiffuse");
+	file.close();
+	auto diff = std::chrono::steady_clock::now() - start;
+	std::ostringstream oss;
+	oss << "Successfully safed " << _Info->MapName << "("
+		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
+	LogInfo(oss.str());
+}
+
+void World::SaveSHMDEntry(std::ofstream& file, NiNodePtr objNode, const char* Name)
+{
+	objNode->CompactChildArray();
+	file << Name << " " << std::to_string(objNode->GetChildCount()) << std::endl;
+	for (int i = 0; i < objNode->GetChildCount(); i++)
+	{
+		file << objNode->GetAt(i)->GetName() << std::endl;
+	}
+}
+void World::SaveSHMDLight(std::ofstream& file, NiColor color, const char* name)
+{
+	file << name << " " << color.r << " " << color.g << " " << color.b << std::endl;
+}
+void World::SaveSHMDFog(std::ofstream& file, float depth, NiColor color)
+{
+	file << "Fog " << depth << " " << color.r << " " << color.g << " " << color.b << std::endl;
+}
+void World::SaveSHMDFrustum(std::ofstream& file, NiFrustum frustum)
+{
+	file << "Frustum " << frustum.m_fFar << std::endl;
+}
+void World::SaveSHMDGroundObjects(std::ofstream& file, NiNodePtr node)
+{
+	node->CompactChildArray();
+	std::map<std::string, std::vector<NiNodePtr>> ObjectMap;
+	for (int i = 0; i < node->GetChildCount(); i++)
+	{
+		auto child = node->GetAt(i);
+		if (!NiIsKindOf(NiPickable, child))
+			continue;
+		NiPickable* ptr = (NiPickable*)child;
+		auto it = ObjectMap.find(ptr->GetSHMDPath());
+		if (it == ObjectMap.end())
+		{
+			std::vector<NiNodePtr> vec;
+			vec.push_back((NiNode*)child);
+			ObjectMap.insert({ std::string(ptr->GetSHMDPath()), vec });
+		}
+		else
+		{
+			it->second.push_back((NiNode*)child);
+		}
+	}
+	for (auto Info : ObjectMap)
+	{
+		file << Info.first << " " << std::to_string(Info.second.size()) << std::endl;
+		for (auto obj : Info.second)
+		{
+			NiPoint3 trans = obj->GetTranslate();
+			NiMatrix3 matrix = obj->GetRotate();
+			NiQuaternion quater;
+			quater.FromRotation(matrix);
+			float scale = obj->GetScale();
+
+			file << trans.x << " " << trans.y << " " << trans.z << " " << quater.m_fX << " " << quater.m_fY << " " << quater.m_fZ << " " << quater.m_fW << " " << scale << std::endl;
+		}
+	}
+	file << "DataObjectLoadingEnd" << std::endl;
+}
+
+void World::SaveSHMDGlobalGroundObjects(std::ofstream& file, NiNodePtr objNode)
+{
+	objNode->CompactChildArray();
+	objNode->CompactChildArray();
+	std::vector<NiNodePtr> ObjectMap;
+	for (int i = 0; i < objNode->GetChildCount(); i++)
+	{
+		auto child = objNode->GetAt(i);
+		if (!NiIsKindOf(NiNode, child))
+			continue;
+		auto& Name = child->GetName();
+		if (Name.ContainsNoCase("resmap"))
+		{
+			NiNodePtr ptr = (NiNode*)child;
+			ObjectMap.push_back(ptr);
+		}
+	}
+	file << "GroundObject" << " " << std::to_string(ObjectMap.size()) << std::endl;
+	for (auto Info : ObjectMap)
+	{
+		file << Info->GetName() << std::endl;
+		
+	}
 }

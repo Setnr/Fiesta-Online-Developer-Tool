@@ -1,0 +1,537 @@
+#pragma once
+#include "EditScene.h"
+
+#include <future>
+#include "../Data/SHNManager.h"
+
+#include "ImGui/ImGuizmo.h"
+#include "ImGuiConstantFuncs.h"
+#include "NiFileLoader.h"
+
+#include <NiPick.h>
+#include "FiestaOnlineTool.h"
+
+
+ImGuizmo::OPERATION OperationMode = ImGuizmo::OPERATION::TRANSLATE;
+glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
+{
+	if (q.w == 1.f)
+	{
+		return { 0.f, 1.f, 0.f, 0.f };
+	}
+
+	float_t angle_rad = acos(q.w) * 2;
+
+	float_t x = q.x / sin(angle_rad / 2);
+	float_t y = q.y / sin(angle_rad / 2);
+	float_t z = q.z / sin(angle_rad / 2);
+
+	return { angle_rad, x, y, z };
+}
+
+void EditScene::DrawImGui()
+{
+    FiestaScene::DrawImGui();
+	DrawGeneralInfoWindow();
+	switch (CurrentEditMode)
+	{
+	case EditMode::SHBD:
+		DrawSHBDEditor();
+		break;
+
+	case EditMode::SHMD:
+		DrawSHMDWindow();
+		DrawGizmo();
+		MiddleMouseButtonMenu();
+	default:
+		break;
+	}
+
+    if (ShowLoadMenu)
+        ShowMapInfo();
+	if (ShowSettingsMenu)
+		ShowSettings();
+	if (ShowAbout)
+		ShowAboutWindow();
+}
+
+void EditScene::CreateMenuBar()
+{
+    if (ImGui::BeginMenu("File"))
+    {
+        if (ImGui::MenuItem("Load Map"))
+        {
+            ShowLoadMenu = true;
+        }
+        if (ImGui::MenuItem("Settings"))
+        {
+            ShowSettingsMenu = true;
+        }
+        if (ImGui::MenuItem("Save SHMD", 0, false, kWorld != NULL))
+        {
+            kWorld->SaveSHMD();
+        }
+        if (ImGui::MenuItem("Save SHBD", 0, false, kWorld != NULL))
+        {
+            kWorld->SaveSHBD();
+        }
+        ImGui::EndMenu();
+	}
+	ImGui::SameLine(ImGui::GetWindowWidth() - 130);
+	std::string mode = GetEditMode();
+	ImVec2 size(100, 20);
+	if (ImGui::Button(mode.c_str(),size)) 
+	{
+		ImGui::OpenPopup("ChangeEditMode");
+	}
+	ImGui::SameLine(ImGui::GetWindowWidth() - 130);
+	if (ImGui::BeginPopup("ChangeEditMode")) 
+	{
+		if (ImGui::Button("None"))
+		{
+			UpdateEditMode(EditMode::None);
+			ImGui::CloseCurrentPopup();
+		}
+		if (ImGui::Button("SHMD"))
+		{
+			UpdateEditMode(EditMode::SHMD);
+			ImGui::CloseCurrentPopup();
+		}
+		if (ImGui::Button("SHBD"))
+		{
+			UpdateEditMode(EditMode::SHBD);
+			ImGui::CloseCurrentPopup();
+		}
+		
+		ImGui::EndPopup();
+	}
+	if (ImGui::IsKeyPressed((ImGuiKey)VK_TAB, false))
+	{
+		int m = (int)CurrentEditMode;
+		m++;
+		UpdateEditMode((EditMode)m);
+	}
+	ImGui::SameLine(ImGui::GetWindowWidth() - 30);
+	ImGui::Text("(?)");
+	if (ImGui::IsItemClicked()) 
+	{
+		ShowAbout = true;
+	}
+}
+
+void EditScene::ShowMapInfo()
+{
+    static std::future<void> future;
+    auto shn = SHNManager::Get(SHNManager::MapInfoType);
+    if (ImGui::Begin("Load MapInfo", &ShowLoadMenu));
+    {
+        static char buffer[15];
+        ImGui::InputText("Filter Maps", buffer, sizeof(buffer));
+
+        if (shn->DrawHeader())
+        {
+            for (unsigned int i = 0; i < shn->GetRows(); i++)
+            {
+                MapInfo* info = shn->GetRow<MapInfo>(i);
+                std::string MapName = info->MapName;
+                std::transform(MapName.begin(), MapName.end(), MapName.begin(), ::tolower);
+                std::string BufferStr = buffer;
+                std::transform(BufferStr.begin(), BufferStr.end(), BufferStr.begin(), ::tolower);
+
+                if (MapName.find(BufferStr) == std::string::npos)
+                    continue;
+                shn->DrawRow(i);
+                if (!future.valid() || future.wait_for(std::chrono::milliseconds(0)) != std::future_status::timeout)
+                {
+                    if (ImGui::Button(std::string("Load Map##" + std::to_string(i)).c_str()))
+                    {
+                        ImGui::SetWindowFocus("");
+                        ShowLoadMenu = false;
+                        future = std::async(std::launch::async, [this, shn, i]
+                            {
+                                MapInfo* info = shn->GetRow<MapInfo>(i);
+                                LoadMap(info);
+
+                            });
+
+                    }
+                   
+                }
+            }
+            ImGui::EndTable();
+        }
+        ImGui::End();
+    }
+}
+
+void EditScene::ShowAboutWindow() 
+{
+	ImGuiIO& io = ImGui::GetIO();
+	ImVec2 Size(500, 250);
+	ImVec2 Pos(io.DisplaySize.x / 2 - Size.x / 2, io.DisplaySize.y / 2 - Size.y / 2);
+	ImGui::SetNextWindowPos(Pos);
+	ImGui::SetNextWindowSize(Size);
+	if (ImGui::Begin("About", &ShowAbout,ImGuiWindowFlags_NoCollapse)) 
+	{
+		ImGui::Text("Fiesta Online DeveloperTool by SetNr12");
+		ImGui::Text("Switch Current Mode with Tab");
+		ImGui::Text("Press R to Reset the Camera");
+		ImGui::Text("Controls for the current mode:");
+		ImGui::Text("");
+		switch (CurrentEditMode)
+		{
+		case SHMD:
+			ImGui::Text("Move Camera with WASD");
+			ImGui::Text("Rotate Camera with Right Click");
+			ImGui::Text("Open SHMDMenu with Middle Mouse Click");
+			ImGui::Text("Select Objects with Left Click");
+			ImGui::Text("Copy and Paste with ctrl + c/v");
+			ImGui::Text("Move Up/Down with Q/E");
+			break;
+		case SHBD:
+			ImGui::Text("Move Camera with WASD");
+			ImGui::Text("Rotate Camera with Right Click");
+			ImGui::Text("Move Up/Down with Q/E");
+			ImGui::Text("Scroll to Move SHBD Up/Down");
+			ImGui::Text("Change SHBD with Left Click");
+			break;
+
+		case None:
+		default:
+			ImGui::Text("Select a Mode to see the matching controls");
+			break;
+		}
+		ImGui::End();
+	}
+}
+
+void EditScene::MiddleMouseButtonMenu()
+{
+	static NiFileLoader loader;
+	if (loader.DrawImGui())
+	{
+		NiNodePtr obj = loader.Load();
+		if (NiIsKindOf(NiPickable, obj))
+			SelectedObj = (NiPickable*)(NiNode*)obj;
+
+	}
+	if (ImGui::BeginPopupContextVoid(0, ImGuiPopupFlags_MouseButtonMiddle))
+	{
+		if (ImGui::Selectable("Add Sky"))
+			loader.Prepare(kWorld->GetSkyNode());
+		if (ImGui::Selectable("Add Water"))
+			loader.Prepare(kWorld->GetWaterNode());
+		if (ImGui::Selectable("Add Global Object"))
+			loader.Prepare(kWorld->GetGroundObjNode());
+		if (ImGui::Selectable("Add Movable Object"))
+		{
+			NiPoint3 kOrigin, kDir;
+			long X, Y;
+			FiestaOnlineTool::GetMousePosition(X, Y);
+			if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
+			{
+				NiPick _Pick;
+				_Pick.SetPickType(NiPick::FIND_FIRST);
+				_Pick.SetSortType(NiPick::SORT);
+				_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+				_Pick.SetFrontOnly(true);
+				_Pick.SetReturnNormal(true);
+				_Pick.SetObserveAppCullFlag(true);
+				_Pick.SetTarget(kWorld->GetTerrainScene());
+				if (_Pick.PickObjects(kOrigin, kDir, true))
+				{
+					NiPick::Results& results = _Pick.GetResults();
+					for (int i = 0; i < results.GetSize(); i++)
+					{
+						auto result = results.GetAt(i);
+						loader.Prepare(kWorld->GetGroundCollidee(), PICKABLEOBJECTS, result->GetIntersection());
+					}
+
+				}
+				else
+				{
+					_Pick.SetTarget(kWorld->GetWorldScene());
+					if (_Pick.PickObjects(kOrigin, kDir, true))
+					{
+						NiPick::Results& results = _Pick.GetResults();
+						for (int i = 0; i < results.GetSize(); i++)
+						{
+							auto result = results.GetAt(i);
+							loader.Prepare(kWorld->GetGroundCollidee(), PICKABLEOBJECTS, result->GetIntersection());
+						}
+
+					}
+				}
+			}
+		}
+		if (SelectedObj)
+		{
+			if (ImGui::Selectable("Copy Selected Obj"))
+			{
+				if (NiIsKindOf(NiPickable, SelectedObj))
+				{
+					NiPickablePtr Obj = (NiPickable*)SelectedObj->Clone();
+					NiNodePtr ptr = (NiNode*)&*Obj;
+					kWorld->AttachGroundObj(ptr);
+
+					Obj->SetName(SelectedObj->GetName());
+					Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
+
+					Obj->SetSelectiveUpdateRigid(true);
+					auto node = kWorld->GetGroundCollidee();
+					node->UpdateEffects();
+					node->UpdateProperties();
+					node->Update(0.0);
+					SelectedObj = Obj;
+				}
+				else
+					LogError("Can´t clone selcted Object");
+			}
+			if (ImGui::Selectable("Delete Selected Obj"))
+			{
+				SelectedObj->GetParent()->DetachChild(SelectedObj);
+				SelectedObj = NULL;
+			}
+		}
+		ImGui::EndPopup();
+	}
+}
+
+void EditScene::DrawGizmo() 
+{
+	if (!SelectedObj)
+		return;
+
+	/*
+	Huge Credits to Maki for helping me with this Code
+	by giving me his :)
+	*/
+
+
+	float_t matrix[16]{};
+	float matrixScale[3] = { 1.f, 1.f, 1.f };
+	glm::vec3 tmpRotation{};
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuizmo::BeginFrame();
+	NiPickable* SelectedNode = SelectedObj;
+
+
+	NiPoint3 target = Camera->GetTranslate() + Camera->GetWorldDirection() * 10.f;
+	const auto eye = Camera->GetTranslate();
+	const auto up = glm::vec3{ 0, 0, 1 };
+
+	const auto view = glm::lookAt(glm::vec3(eye.x, eye.y, eye.z), glm::vec3(target.x, target.y, target.z), up);
+
+	glm::mat4 projectionMatrix = glm::perspective(glm::radians(kWorld->GetFOV()), (((float_t)io.DisplaySize.x / (float_t)io.DisplaySize.y)), Camera->GetViewFrustum().m_fNear, Camera->GetViewFrustum().m_fFar);
+
+	ImGuizmo::RecomposeMatrixFromComponents(&SelectedNode->GetTranslate().x, &tmpRotation[0], matrixScale, (float*)matrix);
+
+	ImGuizmo::SetRect((float_t)0, (float_t)0, (float_t)io.DisplaySize.x, (float_t)io.DisplaySize.y);
+	ImGuizmo::Manipulate(&view[0][0], &projectionMatrix[0][0], OperationMode, ImGuizmo::MODE::WORLD, (float*)matrix, nullptr, nullptr);
+
+	ImGuizmo::DecomposeMatrixToComponents((float*)matrix, (float*)&SelectedNode->GetTranslate().x, &tmpRotation[0], matrixScale);
+
+	SelectedObjAngels -= tmpRotation;
+
+	if (abs(SelectedObjAngels[0]) > 180.f)
+	{
+		SelectedObjAngels[0] = -SelectedObjAngels[0] + 2 * fmod(SelectedObjAngels[0], 180.f);
+	}
+
+	if (abs(SelectedObjAngels[1]) > 180.f)
+	{
+		SelectedObjAngels[1] = -SelectedObjAngels[1] + 2 * fmod(SelectedObjAngels[1], 180.f);
+	}
+
+	if (abs(SelectedObjAngels[2]) > 180.f)
+	{
+		SelectedObjAngels[2] = -SelectedObjAngels[2] + 2 * fmod(SelectedObjAngels[2], 180.f);
+	}
+
+	glm::vec4 angleAxis = ConvertQuatToAngleAxis(glm::quat(glm::radians(SelectedObjAngels)));
+	NiMatrix3 m;
+	m.MakeRotation(angleAxis[0], angleAxis[1], angleAxis[2], angleAxis[3]);
+
+	float angle, x, y, z;
+	SelectedNode->GetRotate().ExtractAngleAndAxis(angle, x, y, z);
+
+	SelectedNode->SetRotate(m);
+}
+
+void EditScene::ShowSettings() 
+{
+	static ImGui::FileBrowser fileDialog(ImGuiFileBrowserFlags_SelectDirectory);
+	fileDialog.Display();
+	if (fileDialog.HasSelected())
+	{
+		std::string File = fileDialog.GetSelected().string();
+		if (File.find(".exe") != std::string::npos || File.find(".bin") != std::string::npos)
+		{
+			NiMessageBox::DisplayMessage("Please Select the Folder!", "Info");
+			fileDialog.ClearSelected();
+			return;
+		}
+		Settings::SetClientPath(File);
+		fileDialog.ClearSelected();
+	}
+	if (ImGui::Begin("Settings", &ShowSettingsMenu));
+	{
+		std::string ClientPath = "ClientPath: " + PgUtil::CreateFullFilePathFromBaseFolder("");
+		ImGui::Text(ClientPath.c_str()); ImGui::SameLine();
+		if (ImGui::Button("PlaceHolder"))
+		{
+			fileDialog.SetTitle("Select Game-Client-Folder");
+			fileDialog.SetTypeFilters({ ".exe", ".bin" });
+			fileDialog.SetPwd(PgUtil::CreateFullFilePathFromBaseFolder(""));
+			fileDialog.Open();
+		}
+		static const char* items[]{ "640 x 360","1024 x 576","1138 x 640", "1600 x 900","1920 x 1080", "2560 x 1440" };
+		int Selecteditem = 0;
+
+		for (int i = 0; i < IM_ARRAYSIZE(items); i++)
+		{
+			if (std::string(items[i]) == Settings::GetResoultion())
+				Selecteditem = i;
+		}
+		if (ImGui::Combo("ScreenResolution", &Selecteditem, items, IM_ARRAYSIZE(items)))
+		{
+			Settings::SetResolution(std::string(items[Selecteditem]));
+			LogInfo("To apply Resoultion Changes please restart the Tool");
+		}
+		float fps = FiestaOnlineTool::GetFPSCap();
+		if (ImGui::DragFloat("FPS Cap", &fps, 1.f, 30.f, 144.f))
+			FiestaOnlineTool::SetFPSCap(fps);
+		/*bool FullScreen = Settings::FullScreen();
+		if (ImGui::Checkbox("FullScreen", &FullScreen))
+		{
+			Settings::SetFullScreen(FullScreen);
+		}*/
+		if (ImGui::Button("Safe Settings"))
+		{
+			Settings::SaveSettings();
+			//FiestaOnlineTool::RecreateRenderer = true;
+		}
+		ImGui::End();
+	}
+}
+
+void EditScene::DrawGeneralInfoWindow() 
+{
+
+}
+
+void EditScene::DrawSHMDWindow() 
+{
+	ImGuiIO& io = ImGui::GetIO();
+	auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
+
+	int h = 295;
+	int w = 578;
+	ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - w, io.DisplaySize.y - h));
+	ImGui::SetNextWindowSize(ImVec2(w, h));
+
+
+	ImGui::Begin("SHMD-Editor", NULL, flags);
+	DrawSHMDHeader("Sky", kWorld->GetSkyNode());
+	DrawSHMDHeader("Water", kWorld->GetWaterNode());
+	DrawSHMDHeader("GroundObject", kWorld->GetGroundObjNode());
+	ImGui::ColorEdit3("Global Light", (float*)&kWorld->GetAmbientLightAmbientColor().r);
+	ImGui::ColorEdit3("Fog Color", (float*)&kWorld->GetFogColor().r);
+
+	float depth = kWorld->GetFogDepth();
+	if (ImGui::DragFloat("Fog Alpha", &depth, 0.01, 0.f, 1.0f))
+		kWorld->SetFogDepth(depth);
+	ImGui::ColorEdit3("Background Color", (float*)&kWorld->GetBackgroundColor().r);
+	ImGui::DragFloat("Frustum", &kWorld->GetWorldFrustum().m_fFar, 10.0f, 0.0f);
+
+	ImGui::ColorEdit3("AmbientLight Color", (float*)&kWorld->GetMapDirectionalLightAmbientColor().r);
+	ImGui::ColorEdit3("DiffuseLight Color", (float*)&kWorld->GetMapDirectionalLightDiffuseColor().r);
+	
+
+	ImGui::End();
+
+	if (SelectedObj)
+	{
+		{
+			auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
+
+			int h2 = 123 + h;
+			int w2 = 319;
+
+			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - w2, io.DisplaySize.y - h2));
+			ImGui::SetNextWindowSize(ImVec2(w2, h2 - h));
+
+			ImGui::Begin("Object-Editor", NULL, flags);
+			static int e = 0;
+			ImGui::RadioButton("Translate", &e, 0);
+			ImGui::SameLine();
+			ImGui::RadioButton("Rotate", &e, 1);
+			switch (e)
+			{
+			case 0:
+				OperationMode = ImGuizmo::OPERATION::TRANSLATE;
+				break;
+			case 1:
+			default:
+				OperationMode = ImGuizmo::OPERATION::ROTATE;
+				break;
+			}
+
+			ImGui::DragFloat3("Position", (float*)&SelectedObj->GetTranslate().x);
+			ImGui::DragFloat3("Rotation", &SelectedObjAngels[0]);
+			float Scale = SelectedObj->GetScale();
+			if (ImGui::DragFloat("Scale", &Scale, 0.01f, 0.0f, 5.0f))
+				SelectedObj->SetScale(Scale);
+			ImGui::End();
+		}
+	}
+}
+
+void EditScene::DrawSHBDEditor() 
+{
+	ImGuiIO& io = ImGui::GetIO();
+	auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
+
+	int h = 110;
+	int w = 200;
+	ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - w, io.DisplaySize.y - h));
+	ImGui::SetNextWindowSize(ImVec2(w, h));
+
+	bool UpdateTexture = true;
+	ImGui::Begin("SHBD-Editor", NULL, flags);
+
+	if (ImGui::Checkbox("Set Blocked Area", &MoveStatus))
+		UpdateTexture = false;
+	bool Remove = !MoveStatus;
+	if (ImGui::Checkbox("Remove Blocked Area", &Remove))
+		MoveStatus = false;
+	if (ImGui::SliderInt("BrushSize", &BrushSize, 0, 100))
+		UpdateTexture = false;
+
+	ImGui::End();
+}
+
+void EditScene::DrawSHMDHeader(std::string Name, NiNodePtr Node)
+{
+	if (ImGui::CollapsingHeader(Name.c_str()))
+	{
+		bool compact = false;
+		int ChildCount = Node->GetChildCount();
+		for (int i = 0; i < ChildCount; i++)
+		{
+			auto Object = Node->GetAt(i);
+			if (NiIsKindOf(NiNode, Object) && !NiIsKindOf(NiPickable,Object))
+			{
+				ImGui::Text(Object->GetName(), "");
+				ImGui::SameLine();
+				if (ImGui::Button(std::string("Delete##" + Name + std::to_string(i)).c_str()))
+				{
+					Node->DetachChildAt(i);
+					compact = true;
+				}
+			}
+		}
+		if (compact)
+			Node->CompactChildArray();
+	}
+}

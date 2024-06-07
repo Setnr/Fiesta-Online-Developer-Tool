@@ -619,7 +619,7 @@ void EditorScene::DrawGizmo()
 	SelectedNode->SetRotate(m);
 }
 
-void EditorScene::DrawSHMDEditor()
+void EditorScene::ja ()
 {
 	ImGuiIO& io = ImGui::GetIO();
 	auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
@@ -663,8 +663,7 @@ void EditorScene::DrawSHMDEditor()
 
 	ImGui::ColorEdit3("AmbientLight Color", (float*)&kWorld.GetMapDirectionalLightAmbientColor().r);
 	ImGui::ColorEdit3("DiffuseLight Color", (float*)&kWorld.GetMapDirectionalLightDiffuseColor().r);
-	DrawSHMDHeader("Pickable Objects", kWorld.GetGroundCollidee());
-
+	
 	ImGui::End();
 
 	if (SelectedObj)

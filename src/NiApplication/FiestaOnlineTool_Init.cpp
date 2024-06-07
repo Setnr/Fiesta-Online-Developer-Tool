@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "EditScene.h"
 #include "SetupScene.h"
 #include "Settings.h"
 #include <NiDX9SystemDesc.h>
@@ -38,7 +39,7 @@ bool FiestaOnlineTool::Initialize()
 
     if (LoadSetupScene)
     {
-        _Scene = NiNew StartScene;
+        _Scene = NiNew EditScene;
         NiShaderFactory::RegisterErrorCallback(ShaderErrorCallback);
         this->RunShaderParser();
         this->RegisterShaderLibraries();
@@ -46,7 +47,7 @@ bool FiestaOnlineTool::Initialize()
     else
         _Scene = NiNew StartUpScene;
 
-    _Scene->SetupScene(m_spScene, m_spCamera);
+    //_Scene->SetupScene(m_spScene, m_spCamera);
 
     MoveCamera = false;
 

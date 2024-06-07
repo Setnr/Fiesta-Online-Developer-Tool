@@ -81,7 +81,6 @@ bool CDataReader::DrawHeader()
     {
         ImGui::TableSetupColumn(this->Header.Field[i].Name);
     }
-    ImGui::TableSetupColumn("");
     ImGui::TableHeadersRow();
     return true;
 }

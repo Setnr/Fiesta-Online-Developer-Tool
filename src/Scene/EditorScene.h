@@ -122,7 +122,7 @@ private:
 	void AttachGroundObj(NiNodePtr& Obj)
 	{
 		std::lock_guard<std::mutex> lock(WorldLock);		
-		kWorld.AttachGroundCollidee(Obj);
+		kWorld.AttachGroundObj(Obj);
 	}
 	void SaveSHMD();
 	void SaveSHMDEntry(std::ofstream&, NiNodePtr, const char*);
@@ -134,7 +134,7 @@ private:
 	{
 		NiNodePtr ptr = &*Obj;
 		std::lock_guard<std::mutex> lock(WorldLock);
-		kWorld.AttachGroundCollidee(ptr);
+		kWorld.AttachGroundObj(ptr);
 	}
 	void DrawGizmo();
 	void DrawSHMDEditor();

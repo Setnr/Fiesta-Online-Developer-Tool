@@ -45,5 +45,6 @@ protected:
 	float FPS[90];
 	int values_offset;
 	std::atomic<bool> CanSwitch;
+
 };
 

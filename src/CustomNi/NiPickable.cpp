@@ -8,4 +8,5 @@ void NiPickable::CopyMembers(
     NiPickable* pDest, NiCloningProcess& kCloning)
 {
     NiNode::CopyMembers(pDest, kCloning);
+    pDest->SetSHMDPath(GetSHMDPath());
 }

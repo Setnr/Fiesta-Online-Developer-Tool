@@ -76,21 +76,21 @@
     <ClInclude Include="src\Data\IngameWorld.h" />
     <ClInclude Include="src\Data\IniFile.h" />
     <ClInclude Include="src\Data\SHBD\SHBD.h" />
+    <ClInclude Include="src\Data\SHMD\SHMD.h" />
     <ClInclude Include="src\Data\SHNManager.h" />
     <ClInclude Include="src\Data\SHNStruct.h" />
     <ClInclude Include="src\ImGuiConstantFuncs.h" />
     <ClInclude Include="src\Logger\Logger.h" />
     <ClInclude Include="src\NiApplication\FiestaOnlineTool.h" />
     <ClInclude Include="src\NiApplication\FiestaOnlineTool_GeneralHeaders.h" />
+    <ClInclude Include="src\NiInterface\NiViewPort\NiViewPort.h" />
     <ClInclude Include="src\NiInterface\PgWin.h" />
     <ClInclude Include="src\NiInterface\PgWinMgr.h" />
     <ClInclude Include="src\NiInterface\PgWinObj.h" />
     <ClInclude Include="src\PgUtil.h" />
-    <ClInclude Include="src\Scene\EditorScene.h" />
+    <ClInclude Include="src\Scene\EditScene.h" />
     <ClInclude Include="src\Scene\FiestaScene.h" />
     <ClInclude Include="src\Scene\SetupScene.h" />
-    <ClInclude Include="src\Scene\SHBDScene.h" />
-    <ClInclude Include="src\Scene\StartScene.h" />
     <ClInclude Include="src\Settings\Settings.h" />
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +112,7 @@
     <ClCompile Include="Includes\md5\md5.cpp" />
     <ClCompile Include="src\CustomNi\NiPickable.cpp" />
     <ClCompile Include="src\Data\IngameWorld.cpp" />
+    <ClCompile Include="src\Data\IngameWorldInit.cpp" />
     <ClCompile Include="src\Data\IniFile.cpp" />
     <ClCompile Include="src\Data\SHBD\SHBD.cpp" />
     <ClCompile Include="src\Data\SHNManager.cpp" />
@@ -122,12 +123,11 @@
     <ClCompile Include="src\NiApplication\FiestaOnlineTool_StaticDefines.cpp" />
     <ClCompile Include="src\NiApplication\FiestaOnlineTool_UI.cpp" />
     <ClCompile Include="src\NiInterface\PgWin.cpp" />
-    <ClCompile Include="src\Scene\EditorScene.cpp" />
+    <ClCompile Include="src\Scene\EditScene.cpp" />
+    <ClCompile Include="src\Scene\EditSceneControlls.cpp" />
+    <ClCompile Include="src\Scene\EditSceneImGui.cpp" />
     <ClCompile Include="src\Scene\FiestaScene.cpp" />
     <ClCompile Include="src\Scene\SetupScene.cpp" />
-    <ClCompile Include="src\Scene\SHBDScene.cpp" />
-    <ClCompile Include="src\Scene\SHMDLoad.cpp" />
-    <ClCompile Include="src\Scene\StartScene.cpp" />
     <ClCompile Include="src\Settings\Settings.cpp" />
   </ItemGroup>
   <ItemGroup>
