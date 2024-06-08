@@ -47,4 +47,4 @@ constexpr std::string GetFunctionNameWithClass(const char* s)
 
 #define LogError(info) Logger::_Logger.Log(ImColor(1.0f,0.0f,0.0f),Msg(info))
 #define LogWarning(info) Logger::_Logger.Log(ImColor(1.0f,0.8f,0.0f),Msg(info))
-#define LogInfo(info) Logger::_Logger.Log(ImColor(1.f,0.706f,.035f),Msg(info))
+#define LogInfo(info) Logger::_Logger.Log(ImColor(.333f,0.776f,0.952f),Msg(info))

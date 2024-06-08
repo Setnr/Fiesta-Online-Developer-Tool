@@ -105,7 +105,7 @@ bool FiestaOnlineTool::Initialize()
         break;
 
     case Version::Status::New:
-        LogWarning("There is a new Version\nDownload it from Github :)");
+        LogWarning("There is a new Version on Github :)");
         break;
     }
     return true;
