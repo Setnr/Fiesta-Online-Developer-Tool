@@ -63,7 +63,7 @@ void EditScene::SHMDCopyPaste()
 			_Pick.SetFrontOnly(true);
 			_Pick.SetReturnNormal(true);
 			_Pick.SetObserveAppCullFlag(true);
-			_Pick.SetTarget(kWorld->GetTerrainScene());
+			_Pick.SetTarget(kWorld->GetWorldScene());
 			if (_Pick.PickObjects(kOrigin, kDir, true))
 			{
 				NiPick::Results& results = _Pick.GetResults();
@@ -71,7 +71,7 @@ void EditScene::SHMDCopyPaste()
 				NiNodePtr ptr = (NiNode*)&*Obj;
 				kWorld->AttachGroundObj(ptr);
 
-				Obj->SetName(SelectedObj->GetName());
+				Obj->SetName(CopyObj->GetName());
 				Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
 
 				Obj->SetSelectiveUpdateRigid(true);

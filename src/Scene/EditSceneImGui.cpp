@@ -237,7 +237,7 @@ void EditScene::MiddleMouseButtonMenu()
 				_Pick.SetFrontOnly(true);
 				_Pick.SetReturnNormal(true);
 				_Pick.SetObserveAppCullFlag(true);
-				_Pick.SetTarget(kWorld->GetTerrainScene());
+				_Pick.SetTarget(kWorld->GetWorldScene());
 				if (_Pick.PickObjects(kOrigin, kDir, true))
 				{
 					NiPick::Results& results = _Pick.GetResults();
