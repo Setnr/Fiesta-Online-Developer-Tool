@@ -98,6 +98,16 @@ bool FiestaOnlineTool::Initialize()
         LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
         PgUtil::LoadingScreen(this->m_spRenderer, LoadingScreen, 1.f, false);
     }
+    switch (PgUtil::CheckVersion()) 
+    {
+    case Version::Status::CantCheck:
+        LogError("Cant Check for new Version");
+        break;
+
+    case Version::Status::New:
+        LogWarning("There is a new Version\nDownload it from Github :)");
+        break;
+    }
     return true;
 }
 

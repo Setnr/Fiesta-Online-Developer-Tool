@@ -66,16 +66,10 @@
     <ClInclude Include="src\NiApplication\FiestaOnlineTool_GeneralHeaders.h">
       <Filter>NiApplication</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\EditorScene.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="src\Scene\FiestaScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\SetupScene.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\StartScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\ImGuiConstantFuncs.h" />
@@ -152,11 +146,14 @@
     <ClInclude Include="Includes\Ini\INIReader.h">
       <Filter>Includes\Ini</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\SHBDScene.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="src\Data\SHBD\SHBD.h">
       <Filter>Data\SHBD</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\SHMD\SHMD.h" />
+    <ClInclude Include="src\NiInterface\NiViewPort\NiViewPort.h" />
+    <ClInclude Include="src\Scene\EditScene.h" />
+    <ClInclude Include="src\Data\Version.h">
+      <Filter>Data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -187,19 +184,10 @@
     <ClCompile Include="src\NiApplication\FiestaOnlineTool_UI.cpp">
       <Filter>NiApplication</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\EditorScene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scene\FiestaScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\SetupScene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\SHMDLoad.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\StartScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp" />
@@ -257,11 +245,15 @@
     <ClCompile Include="Includes\Ini\INIReader.cpp">
       <Filter>Includes\Ini</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\SHBDScene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\Data\SHBD\SHBD.cpp">
       <Filter>Data\SHBD</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\IngameWorldInit.cpp" />
+    <ClCompile Include="src\Scene\EditScene.cpp" />
+    <ClCompile Include="src\Scene\EditSceneControlls.cpp" />
+    <ClCompile Include="src\Scene\EditSceneImGui.cpp" />
+    <ClCompile Include="src\Data\Version.cpp">
+      <Filter>Data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

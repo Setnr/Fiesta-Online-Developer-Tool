@@ -8,8 +8,12 @@
 #include "NiPickable.h"
 #include <NiPortal.h>
 #include <NiRoom.h>
+#include "Data/Version.h"
+#include <windows.h>
+#include <wininet.h>
 
 #define PICKABLEOBJECTS 1
+
 class PgUtil 
 {
 public:
@@ -179,4 +183,23 @@ public:
         return ApplicationPath;
     }
     static std::string ApplicationPath;
+
+    static Version::Status CheckVersion() 
+    {
+        
+        // ------------------------------------------------------------------------
+   
+        // ------------------------------------------------------------------------
+        
+        Version Cur(Version::CurVersion);
+        DWORD dwFlags;
+        if (!InternetGetConnectedState(&dwFlags, 0))
+            return Version::Status::CantCheck;
+           
+
+        Version latest(GetLatestVersion());
+        if (Cur < latest)
+            return Version::Status::New;
+        return Version::Status::OK;
+    }
 };
