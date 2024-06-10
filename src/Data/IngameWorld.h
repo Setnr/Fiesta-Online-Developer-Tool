@@ -226,7 +226,7 @@ public:
 	NiPoint3 GetSpawnPoint();
 	void CreateBrushTexture(NiPoint3& BrushPositon, int BrushSize, bool MoveStatus);
 
-
+	void ShowHTD(bool Show);
 private:
 	bool LoadedSuccessfully = false;
 	MapInfo* _Info;
@@ -235,6 +235,9 @@ private:
 	ShineBlockData _SHBD;
 	NiNodePtr SHBDNode;
 	std::vector<std::vector<NiPixelDataPtr>> TextureConnector;
+
+	std::vector<std::vector<std::pair<float,std::vector<NiPoint3*>>>> _HTD;
+
 	std::pair<int, int> ResetPoint;
 
 	unsigned int Blocked;

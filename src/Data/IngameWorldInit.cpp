@@ -178,6 +178,9 @@ bool World::LoadTerrain()
 	if (!_InitFile.Load())
 		return false;
 	if (_InitFile.FileType == "")return true;
+	for (int i = 0; i < m_spGroundTerrain->GetChildCount(); i++)
+		m_spGroundTerrain->DetachChildAt(i);
+	m_spGroundTerrain->CompactChildArray();
 	std::string HTDFilePath = PgUtil::CreateFullFilePathFromBaseFolder(_InitFile.HeightFileName);
 	std::ifstream HTDFile;
 	struct PointInfos
@@ -235,12 +238,19 @@ bool World::LoadTerrain()
 	}
 	HTDFile.read((char*)&PointCounter, sizeof(PointCounter));
 	for (int w = 0; w < _InitFile.HeightMap_width; w++)
+		_HTD.push_back(std::vector<std::pair<float, std::vector<NiPoint3*>>>(_InitFile.HeightMap_height));
+
+	for (int w = 0; w < _InitFile.HeightMap_width; w++)
 		VertexMap.push_back(std::vector<PointInfos>(_InitFile.HeightMap_height));
 
 	for (int h = 0; h < _InitFile.HeightMap_height; h++)
 	{
 		for (int w = 0; w < _InitFile.HeightMap_width; w++)
+		{
 			HTDFile.read((char*)&VertexMap[w][h].Height, sizeof(VertexMap[w][h].Height));
+			_HTD[w][h].first = VertexMap[w][h].Height;
+			_HTD[w][h].second = std::vector<NiPoint3*>(_InitFile.LayerList.size());
+		}
 	}
 	HTDFile.close();
 	std::string HTDGFilePath = HTDFilePath + "g";
@@ -288,7 +298,7 @@ bool World::LoadTerrain()
 			PixelCounter++;
 		}
 	}
-
+	int Layer = 0;
 	for (auto CurrentLayer : _InitFile.LayerList)
 	{
 		auto ColorArray = (TerrainLayer::RGBAColor*)CurrentLayer->pixldata->GetPixels();
@@ -310,6 +320,7 @@ bool World::LoadTerrain()
 			for (int BlockY = 0; BlockY < (_InitFile.HeightMap_height - 1) / _InitFile.QuadsWide; BlockY++) //19
 			{
 				std::vector<NiPoint3> VerticesList;
+				std::vector<std::pair<int, int>> WHList;
 				std::vector<NiPoint3> NormalList;
 				std::vector<NiColorA> ColorList;
 				std::vector<NiPoint2> TextureList1;
@@ -393,6 +404,7 @@ bool World::LoadTerrain()
 								info->BL = TriCt;
 								TriCt++;
 								VerticesList.push_back(NiPoint3(ActiveW * _InitFile.OneBlock_width, ActiveH * _InitFile.OneBlock_height, info->Height));
+								WHList.push_back({ ActiveW,ActiveH });
 								NormalList.push_back(World::ms_kUpDir);
 								ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
 								TextureList1.push_back(NiPoint2(PixelW * FirstWScale, PixelH * FirstHScale));
@@ -403,6 +415,7 @@ bool World::LoadTerrain()
 								info->BR = TriCt;
 								TriCt++;
 								VerticesList.push_back(NiPoint3((ActiveW + 1) * _InitFile.OneBlock_width, ActiveH * _InitFile.OneBlock_height, VertexMap[ActiveW + 1][ActiveH].Height));
+								WHList.push_back({ ActiveW + 1,ActiveH });
 								NormalList.push_back(World::ms_kUpDir);
 								ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
 								TextureList1.push_back(NiPoint2((PixelW + 1) * FirstWScale, PixelH * FirstHScale));
@@ -413,6 +426,7 @@ bool World::LoadTerrain()
 								info->TL = TriCt;
 								TriCt++;
 								VerticesList.push_back(NiPoint3(ActiveW * _InitFile.OneBlock_width, (ActiveH + 1) * _InitFile.OneBlock_height, VertexMap[ActiveW][ActiveH + 1].Height));
+								WHList.push_back({ ActiveW,ActiveH + 1 });
 								NormalList.push_back(World::ms_kUpDir);
 								ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
 								TextureList1.push_back(NiPoint2(PixelW * FirstWScale, (PixelH + 1) * FirstHScale));
@@ -423,6 +437,7 @@ bool World::LoadTerrain()
 								info->TR = TriCt;
 								TriCt++;
 								VerticesList.push_back(NiPoint3((ActiveW + 1) * _InitFile.OneBlock_width, (ActiveH + 1) * _InitFile.OneBlock_height, VertexMap[ActiveW + 1][ActiveH + 1].Height));
+								WHList.push_back({ ActiveW + 1,ActiveH + 1});
 								NormalList.push_back(World::ms_kUpDir);
 								ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
 								TextureList1.push_back(NiPoint2((PixelW + 1) * FirstWScale, (PixelH + 1) * FirstHScale));
@@ -453,6 +468,12 @@ bool World::LoadTerrain()
 				memcpy(pkColor, &ColorList[0], (int)ColorList.size() * sizeof(NiColorA));
 				memcpy(pkTexture, &TextureList1[0], (int)TextureList1.size() * sizeof(NiPoint2));
 				memcpy(pusTriList, &TriangleList[0], (int)TriangleList.size() * 3 * sizeof(unsigned short));
+
+				for (int i = 0; i < WHList.size(); i++) 
+				{
+					auto it = _HTD[WHList[i].first][WHList[i].second];
+					it.second[Layer] = &pkVertix[i];
+				}
 
 				NiTriShapeDataPtr data = NiNew NiTriShapeData((unsigned short)VerticesList.size(), pkVertix, pkNormal, pkColor, pkTexture, 2, NiGeometryData::DataFlags::NBT_METHOD_NONE, (unsigned short)TriangleList.size(), pusTriList);
 				NiTriShapePtr Shape = NiNew NiTriShape(data);
@@ -522,6 +543,7 @@ bool World::LoadTerrain()
 				}
 			}
 		}
+		Layer++;
 	}
 }
 

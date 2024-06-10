@@ -59,6 +59,7 @@ private:
 		None,
 		SHMD,
 		SHBD,
+		HTD,
 		Max
 	};
 	EditMode CurrentEditMode = None;
@@ -74,6 +75,7 @@ private:
 		CurrentEditMode = mode;
 		
 		kWorld->SetSHBDVisiblity(mode == SHBD);
+		kWorld->ShowHTD(mode == HTD);
 	}
 	std::string GetEditMode() 
 	{
@@ -81,6 +83,7 @@ private:
 		case None: return "None";
 		case SHMD: return "SHMD";
 		case SHBD: return "SHBD";
+		case HTD: return "HTD";
 		default: return "Inactive";
 		}
 	}

@@ -29,6 +29,8 @@ void EditScene::UpdateCamera(float fTime)
 		MoveSHBDTexture(fTime);
 		MoveViaMiddleMouse();
 		break;
+	case HTD:
+		break;
 	}
 }
 
@@ -80,6 +82,7 @@ void EditScene::SHMDCopyPaste()
 				node->UpdateProperties();
 				node->Update(0.0);
 				SelectedObj = Obj;
+				
 				SelectedObj->SetTranslate(results.GetAt(0)->GetIntersection());
 			}
 		}

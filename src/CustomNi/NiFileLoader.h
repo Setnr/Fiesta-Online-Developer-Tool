@@ -34,9 +34,13 @@ public:
 		std::string File = fileDialog.GetSelected().string();
 		std::string BasePath = PgUtil::CreateFullFilePathFromBaseFolder("");
 		NiNodePtr nif = PgUtil::LoadNifFile(File.c_str(), 0, _Pickable);
-		nif->SetName(File.substr(BasePath.length() + 1).c_str());
 		if(NiIsKindOf(NiPickable,nif))
+		{
 			nif->SetTranslate(_Pos);
+			NiPickable* ptr = (NiPickable*)&*nif;
+			ptr->SetSHMDPath(File.substr(BasePath.length() + 1).c_str());
+		}else
+			nif->SetName(File.substr(BasePath.length() + 1).c_str());
 		_LoadToScene->AttachChild(nif);
 		_LoadToScene->UpdateEffects();
 		_LoadToScene->UpdateProperties();

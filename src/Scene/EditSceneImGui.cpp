@@ -102,7 +102,11 @@ void EditScene::CreateMenuBar()
 			UpdateEditMode(EditMode::SHBD);
 			ImGui::CloseCurrentPopup();
 		}
-		
+		if (ImGui::Button("HTD"))
+		{
+			UpdateEditMode(EditMode::HTD);
+			ImGui::CloseCurrentPopup();
+		}
 		ImGui::EndPopup();
 	}
 	if (ImGui::IsKeyPressed((ImGuiKey)VK_TAB, false))

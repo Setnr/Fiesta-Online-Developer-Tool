@@ -116,7 +116,6 @@ void World::SaveSHBD()
 {
 	_SHBD.Save();
 }
-
 void World::SaveSHMD() 
 {
 	auto start = std::chrono::steady_clock::now();
@@ -146,7 +145,6 @@ void World::SaveSHMD()
 		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
 	LogInfo(oss.str());
 }
-
 void World::SaveSHMDEntry(std::ofstream& file, NiNodePtr objNode, const char* Name)
 {
 	objNode->CompactChildArray();
@@ -206,7 +204,6 @@ void World::SaveSHMDGroundObjects(std::ofstream& file, NiNodePtr node)
 	}
 	file << "DataObjectLoadingEnd" << std::endl;
 }
-
 void World::SaveSHMDGlobalGroundObjects(std::ofstream& file, NiNodePtr objNode)
 {
 	objNode->CompactChildArray();
@@ -230,4 +227,28 @@ void World::SaveSHMDGlobalGroundObjects(std::ofstream& file, NiNodePtr objNode)
 		file << Info->GetName() << std::endl;
 		
 	}
+}
+
+void World::ShowHTD(bool Show)
+{
+	if (!Show)
+	{
+		m_spGroundScene->AttachChild(m_spGroundObject);
+		m_spNormalLightScene->AttachChild(m_spWaterScene);
+	}
+	else
+	{
+		m_spGroundScene->DetachChild(m_spGroundObject);
+		m_spNormalLightScene->DetachChild(m_spWaterScene);
+		m_spGroundScene->CompactChildArray();
+		m_spNormalLightScene->CompactChildArray();
+	}
+
+	m_spGroundScene->DetachChild(m_spGroundTerrain);
+	m_spGroundScene->AttachChild(m_spGroundTerrain);
+	m_spGroundScene->CompactChildArray();
+
+	//m_spGroundScene->UpdateEffects();
+	//m_spGroundScene->UpdateProperties();
+	m_spGroundScene->Update(0.0f);
 }
