@@ -227,6 +227,7 @@ public:
 	void CreateBrushTexture(NiPoint3& BrushPositon, int BrushSize, bool MoveStatus);
 
 	void ShowHTD(bool Show);
+	void UpdateHTD(NiPoint3 InterSect, int BrushSize);
 private:
 	bool LoadedSuccessfully = false;
 	MapInfo* _Info;
@@ -236,7 +237,13 @@ private:
 	NiNodePtr SHBDNode;
 	std::vector<std::vector<NiPixelDataPtr>> TextureConnector;
 
-	std::vector<std::vector<std::pair<float,std::vector<NiPoint3*>>>> _HTD;
+	struct HTDHelper {
+		float Height;
+		std::vector<NiPoint3*> Vec;
+		std::vector<NiGeometryData*> Shape;
+	};
+
+	std::vector<std::vector<HTDHelper>> _HTD;
 
 	std::pair<int, int> ResetPoint;
 

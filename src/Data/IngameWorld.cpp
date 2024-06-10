@@ -1,6 +1,7 @@
 #include "IngameWorld.h"
 #include "../Logger/Logger.h"
 #include <chrono>
+#include <future>
 World::World(MapInfo* MapInfo) : _Info(MapInfo) , _InitFile(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "ini")) , _SHBD(_Info)
 {
 	auto start = std::chrono::steady_clock::now();
@@ -251,4 +252,27 @@ void World::ShowHTD(bool Show)
 	//m_spGroundScene->UpdateEffects();
 	//m_spGroundScene->UpdateProperties();
 	m_spGroundScene->Update(0.0f);
+}
+
+void World::UpdateHTD(NiPoint3 InterSect, int BrushSize) 
+{
+	int middlew = InterSect.x / _InitFile.OneBlock_width;
+	int middleh = InterSect.y / _InitFile.OneBlock_height;
+	for (int w = middlew - BrushSize; w <= middlew + BrushSize && w < _HTD.size(); w++)
+	
+	{
+		if (w < 0)
+			continue;
+		for (int h = middleh - BrushSize; h <= middleh + BrushSize && h < _HTD[w].size(); h++)
+		
+		{
+			for (auto point : _HTD[w][h].Vec)
+				if (point)
+					point->z += 1.0f;
+			for (auto shape : _HTD[w][h].Shape)
+				if (shape)
+					shape->MarkAsChanged(NiGeometryData::VERTEX_MASK);
+		}
+	}
+	
 }

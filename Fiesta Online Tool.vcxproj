@@ -337,6 +337,7 @@
       <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem23VC80D.lib;NiCollision23VC80D.lib;NiAnimation23VC80D.lib;NiParticle23VC80D.lib;NiMain23VC80D.lib;NiVisualTracker23VC80D.lib;NiInput23VC80D.lib;NiFont23VC80D.lib;NiCursor23VC80D.lib;NiD3DXEffectShaderLibDX923VC80D.lib;NSBShaderLibDX923VC80D.lib;NiBinaryShaderLibDX923VC80D.lib;NiD3D10BinaryShaderLibD3D1023VC80D.lib;NSFParserLibDX923VC80D.lib;legacy_stdio_definitions.lib;NiUserInterface23VC80D.lib;NiViewMath23VC80D.lib;NiOptimization23VC80D.lib;NiPortal23VC80D.lib;syelog.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
       <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"
@@ -384,6 +385,7 @@ copy ".\Includes\Gamebryo 2.3\DLL\ShaderLibraryDX923VC80D.dll" ".\Build\$(Config
       <AdditionalDependencies>legacy_stdio_definitions.lib;NiSample.lib;NiApplication.lib;NiCollision.lib;NiAnimation.lib;NiParticle.lib;NiMain.lib;NiVisualTracker.lib;NiInput.lib;NiFont.lib;NiCursor.lib;NiD3DXEffectShaderLibDX9.lib;NSBShaderLibDX9.lib;NiBinaryShaderLibDX9.lib;NiD3D10BinaryShaderLibD3D10.lib;NSFParserLibDX9.lib;NiUserInterface.lib;NiViewMath.lib;NiOptimization.lib;NiPortal.lib;syelog.lib;detours.lib;NiSystem.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
       <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"
@@ -411,6 +413,7 @@ copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\Bou
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem23VC80R.lib;NiCollision23VC80R.lib;NiAnimation23VC80R.lib;NiParticle23VC80R.lib;NiMain23VC80R.lib;NiVisualTracker23VC80R.lib;NiInput23VC80R.lib;NiFont23VC80R.lib;NiCursor23VC80R.lib;NiD3DXEffectShaderLibDX923VC80R.lib;NSBShaderLibDX923VC80R.lib;NiBinaryShaderLibDX923VC80R.lib;NiD3D10BinaryShaderLibD3D1023VC80R.lib;NSFParserLibDX923VC80R.lib;legacy_stdio_definitions.lib;NiUserInterface23VC80R.lib;NiViewMath23VC80R.lib;NiOptimization23VC80R.lib;NiPortal23VC80R.lib;syelog.lib;Detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
       <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"
@@ -457,6 +460,7 @@ copy ".\Includes\Gamebryo 2.3\DLL\ShaderLibraryDX923VC80R.dll" ".\Build\$(Config
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem23VC80S.lib;NiCollision23VC80S.lib;NiAnimation23VC80S.lib;NiParticle23VC80S.lib;NiMain23VC80S.lib;NiVisualTracker23VC80S.lib;NiInput23VC80S.lib;NiFont23VC80S.lib;NiCursor23VC80S.lib;NiD3DXEffectShaderLibDX923VC80S.lib;NSBShaderLibDX923VC80S.lib;NiBinaryShaderLibDX923VC80S.lib;NiD3D10BinaryShaderLibD3D1023VC80S.lib;NSFParserLibDX923VC80S.lib;legacy_stdio_definitions.lib;NiUserInterface23VC80S.lib;NiPortal23VC80S.lib;syelog.lib;Detours.lib;NiMetricsOutput23VC80S.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
       <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"
@@ -502,6 +506,7 @@ copy ".\Includes\Gamebryo 2.3\DLL\NSFParserLibDX923VC80S.dll" ".\Build\$(Configu
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem.lib;NiCollision.lib;NiAnimation.lib;NiParticle.lib;NiMain.lib;NiVisualTracker.lib;NiInput.lib;NiFont.lib;NiCursor.lib;NiD3DXEffectShaderLibDX9.lib;NSBShaderLibDX9.lib;NiBinaryShaderLibDX9.lib;NiD3D10BinaryShaderLibD3D10.lib;NSFParserLibDX9.lib;legacy_stdio_definitions.lib;NiUserInterface.lib;NiViewMath.lib;NiOptimization.lib;NiPortal.lib;syelog.lib;Detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
       <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"
@@ -529,6 +534,7 @@ copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\Bou
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem.lib;NiCollision.lib;NiAnimation.lib;NiParticle.lib;NiMain.lib;NiVisualTracker.lib;NiInput.lib;NiFont.lib;NiCursor.lib;NiD3DXEffectShaderLibDX9.lib;NSBShaderLibDX9.lib;NiBinaryShaderLibDX9.lib;NiD3D10BinaryShaderLibD3D10.lib;NSFParserLibDX9.lib;legacy_stdio_definitions.lib;NiUserInterface.lib;NiPortal.lib;syelog.lib;Detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
       <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"

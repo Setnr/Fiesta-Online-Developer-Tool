@@ -237,19 +237,21 @@ bool World::LoadTerrain()
 		return false;
 	}
 	HTDFile.read((char*)&PointCounter, sizeof(PointCounter));
-	for (int w = 0; w < _InitFile.HeightMap_width; w++)
-		_HTD.push_back(std::vector<std::pair<float, std::vector<NiPoint3*>>>(_InitFile.HeightMap_height));
 
 	for (int w = 0; w < _InitFile.HeightMap_width; w++)
+	{
 		VertexMap.push_back(std::vector<PointInfos>(_InitFile.HeightMap_height));
+		_HTD.push_back(std::vector<HTDHelper>(_InitFile.HeightMap_height));
+	}
 
 	for (int h = 0; h < _InitFile.HeightMap_height; h++)
 	{
 		for (int w = 0; w < _InitFile.HeightMap_width; w++)
 		{
 			HTDFile.read((char*)&VertexMap[w][h].Height, sizeof(VertexMap[w][h].Height));
-			_HTD[w][h].first = VertexMap[w][h].Height;
-			_HTD[w][h].second = std::vector<NiPoint3*>(_InitFile.LayerList.size());
+			_HTD[w][h].Height = VertexMap[w][h].Height;
+			_HTD[w][h].Vec = std::vector<NiPoint3*>();
+			_HTD[w][h].Shape = std::vector<NiGeometryData*>();
 		}
 	}
 	HTDFile.close();
@@ -469,15 +471,9 @@ bool World::LoadTerrain()
 				memcpy(pkTexture, &TextureList1[0], (int)TextureList1.size() * sizeof(NiPoint2));
 				memcpy(pusTriList, &TriangleList[0], (int)TriangleList.size() * 3 * sizeof(unsigned short));
 
-				for (int i = 0; i < WHList.size(); i++) 
-				{
-					auto it = _HTD[WHList[i].first][WHList[i].second];
-					it.second[Layer] = &pkVertix[i];
-				}
-
 				NiTriShapeDataPtr data = NiNew NiTriShapeData((unsigned short)VerticesList.size(), pkVertix, pkNormal, pkColor, pkTexture, 2, NiGeometryData::DataFlags::NBT_METHOD_NONE, (unsigned short)TriangleList.size(), pusTriList);
 				NiTriShapePtr Shape = NiNew NiTriShape(data);
-
+				
 				NiSourceTexturePtr BaseTexture = CurrentLayer->BaseTexture;
 				NiSourceTexturePtr BlendTexture = CurrentLayer->BlendTexture;
 				Shape->SetSortObject(false);
@@ -517,6 +513,14 @@ bool World::LoadTerrain()
 				Shape->UpdateEffects();
 				Shape->UpdateProperties();
 				Shape->Update(0.0);
+
+				Shape->SetConsistency(NiGeometryData::Consistency::MUTABLE);
+
+				for (int i = 0; i < WHList.size(); i++)
+				{
+					_HTD[WHList[i].first][WHList[i].second].Vec.push_back(&pkVertix[i]);
+					_HTD[WHList[i].first][WHList[i].second].Shape.push_back(Shape->GetModelData());
+				}
 
 				AttachGroundTerrain(Shape);
 			}
@@ -633,7 +637,7 @@ bool World::LoadSHMD()
 				_ThreadList.pop_back();
 				continue;
 			}
-			Sleep(2);
+			Sleep(1);
 		}
 	}
 }
@@ -678,12 +682,6 @@ bool World::LoadSHBD()
 	TriangleList.push_back(Triangle(0, 1, 2));
 	TriangleList.push_back(Triangle(2, 1, 3));
 
-
-	NiTexture::FormatPrefs kPrefs;
-	kPrefs.m_eAlphaFmt = NiTexture::FormatPrefs::SMOOTH;
-	kPrefs.m_ePixelLayout = NiTexture::FormatPrefs::TRUE_COLOR_32;
-	kPrefs.m_eMipMapped = NiTexture::FormatPrefs::NO;
-
 	NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
 	alphaprop->SetAlphaBlending(true);
 	alphaprop->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
@@ -693,82 +691,111 @@ bool World::LoadSHBD()
 	if (_SHBD.GetSHBDSize() % TextureSize != 0)
 		TextureCt++;
 
+	std::vector<std::shared_future<std::pair<std::vector<NiPixelDataPtr>, std::vector<NiTriShapePtr>>>> _ThreadList;
 	for (int TextureH = 0; TextureH < TextureCt; TextureH++)
 	{
-		std::vector<NiPixelDataPtr> TextureList;
-		for (int TextureW = 0; TextureW < TextureCt; TextureW++)
-		{
-			NiPoint3 BL(TextureW * TextureSize * PixelSize, TextureH * TextureSize * PixelSize, 1.f);
-			NiPoint3 BR((TextureW + 1) * TextureSize * PixelSize, TextureH * TextureSize * PixelSize, 1.f);
-			NiPoint3 TL(TextureW * TextureSize * PixelSize, (TextureH + 1) * TextureSize * PixelSize, 1.f);
-			NiPoint3 TR((TextureW + 1) * TextureSize * PixelSize, (TextureH + 1) * TextureSize * PixelSize, 1.f);
-
-			std::vector<NiPoint3> VerticesList = { BL,BR,TL,TR };
-
-			NiPoint3* pkVertix = NiNew NiPoint3[4];
-			memcpy(pkVertix, &VerticesList[0], (int)VerticesList.size() * sizeof(NiPoint3));
-
-			NiPoint3* pkNormal = NiNew NiPoint3[(int)NormalList.size()];
-			NiColorA* pkColor = NiNew NiColorA[(int)ColorList.size()];
-			NiPoint2* pkTexture = NiNew NiPoint2[(int)TextureList1.size()];
-
-			unsigned short* pusTriList = (unsigned short*)NiAlloc(char, 12 * (TriangleList.size() / 2));// NiNew NiPoint3[TriangleList.size() / 2];
-
-
-			memcpy(pkNormal, &NormalList[0], (int)NormalList.size() * sizeof(NiPoint3));
-			memcpy(pkColor, &ColorList[0], (int)ColorList.size() * sizeof(NiColorA));
-			memcpy(pkTexture, &TextureList1[0], (int)TextureList1.size() * sizeof(NiPoint2));
-			memcpy(pusTriList, &TriangleList[0], (int)TriangleList.size() * 3 * sizeof(unsigned short));
-
-
-			NiTriShapeDataPtr data = NiNew NiTriShapeData((unsigned short)VerticesList.size(), pkVertix, pkNormal, pkColor, pkTexture, 2, NiGeometryData::DataFlags::NBT_METHOD_NONE, (unsigned short)TriangleList.size(), pusTriList);
-			NiTriShapePtr BlockShape = NiNew NiTriShape(data);
-			BlockShape->AttachProperty(alphaprop);
-			BlockShape->CalculateNormals();
-
-			NiPixelData* pixel = NiNew NiPixelData(TextureSize, TextureSize, NiPixelFormat::RGBA32);
-
-			auto pixeloffset = (unsigned int*)pixel->GetPixels();
-			TextureList.push_back(pixel);
-			for (int h = 0; h < TextureSize; h++)
+		auto future = std::async(std::launch::async, 
+			[this, TextureCt, TextureH, NormalList,ColorList,TextureList1, TriangleList,alphaprop,SHBDData]
 			{
-				for (int w = 0; w < TextureSize; w++)
+				NiTexture::FormatPrefs kPrefs;
+				kPrefs.m_eAlphaFmt = NiTexture::FormatPrefs::SMOOTH;
+				kPrefs.m_ePixelLayout = NiTexture::FormatPrefs::TRUE_COLOR_32;
+				kPrefs.m_eMipMapped = NiTexture::FormatPrefs::NO;
+
+				std::vector<NiPixelDataPtr> TextureList;
+				std::vector<NiTriShapePtr> Shapes;
+				for (int TextureW = 0; TextureW < TextureCt; TextureW++)
 				{
-					unsigned int* NewPtr = (pixeloffset + (h * pixel->GetWidth()) + w);
-					int hges = h + TextureH * TextureSize;
-					int wges = w + TextureW * TextureSize;
+					NiPoint3 BL(TextureW * TextureSize * PixelSize, TextureH * TextureSize * PixelSize, 1.f);
+					NiPoint3 BR((TextureW + 1) * TextureSize * PixelSize, TextureH * TextureSize * PixelSize, 1.f);
+					NiPoint3 TL(TextureW * TextureSize * PixelSize, (TextureH + 1) * TextureSize * PixelSize, 1.f);
+					NiPoint3 TR((TextureW + 1) * TextureSize * PixelSize, (TextureH + 1) * TextureSize * PixelSize, 1.f);
 
-					int index = hges * _SHBD.GetSHBDSize() + wges;
+					std::vector<NiPoint3> VerticesList = { BL,BR,TL,TR };
 
-					size_t charIndex = index / 8;
-					if (charIndex < SHBDData.size())
+					NiPoint3* pkVertix = NiNew NiPoint3[4];
+					memcpy(pkVertix, &VerticesList[0], (int)VerticesList.size() * sizeof(NiPoint3));
+
+					NiPoint3* pkNormal = NiNew NiPoint3[(int)NormalList.size()];
+					NiColorA* pkColor = NiNew NiColorA[(int)ColorList.size()];
+					NiPoint2* pkTexture = NiNew NiPoint2[(int)TextureList1.size()];
+
+					unsigned short* pusTriList = (unsigned short*)NiAlloc(char, 12 * (TriangleList.size() / 2));// NiNew NiPoint3[TriangleList.size() / 2];
+
+					memcpy(pkNormal, &NormalList[0], (int)NormalList.size() * sizeof(NiPoint3));
+					memcpy(pkColor, &ColorList[0], (int)ColorList.size() * sizeof(NiColorA));
+					memcpy(pkTexture, &TextureList1[0], (int)TextureList1.size() * sizeof(NiPoint2));
+					memcpy(pusTriList, &TriangleList[0], (int)TriangleList.size() * 3 * sizeof(unsigned short));
+
+
+					NiTriShapeDataPtr data = NiNew NiTriShapeData((unsigned short)VerticesList.size(), pkVertix, pkNormal, pkColor, pkTexture, 2, NiGeometryData::DataFlags::NBT_METHOD_NONE, (unsigned short)TriangleList.size(), pusTriList);
+					NiTriShapePtr BlockShape = NiNew NiTriShape(data);
+					BlockShape->AttachProperty(alphaprop);
+					BlockShape->CalculateNormals();
+
+					NiPixelData* pixel = NiNew NiPixelData(TextureSize, TextureSize, NiPixelFormat::RGBA32);
+
+					auto pixeloffset = (unsigned int*)pixel->GetPixels();
+					TextureList.push_back(pixel);
+					for (int h = 0; h < TextureSize; h++)
 					{
-						size_t bitIndex = index % 8;
+						for (int w = 0; w < TextureSize; w++)
+						{
+							unsigned int* NewPtr = (pixeloffset + (h * pixel->GetWidth()) + w);
+							int hges = h + TextureH * TextureSize;
+							int wges = w + TextureW * TextureSize;
 
-						if ((SHBDData[charIndex] >> bitIndex) & 0x1)
-							*pixeloffset = Blocked;
-						else
-							*pixeloffset = Walkable;
+							int index = hges * _SHBD.GetSHBDSize() + wges;
+
+							size_t charIndex = index / 8;
+							if (charIndex < SHBDData.size())
+							{
+								size_t bitIndex = index % 8;
+
+								if ((SHBDData[charIndex] >> bitIndex) & 0x1)
+									*pixeloffset = Blocked;
+								else
+									*pixeloffset = Walkable;
+							}
+
+							pixeloffset++;
+						}
 					}
 
-					pixeloffset++;
+					NiSourceTexturePtr texture = NiSourceTexture::Create(pixel,kPrefs);
+					texture->SetStatic(false);
+					NiTexturingPropertyPtr Texture = NiNew NiTexturingProperty;
+					Texture->SetBaseTexture(texture);
+					Texture->SetBaseFilterMode(NiTexturingProperty::FILTER_NEAREST);
+					Texture->SetApplyMode(NiTexturingProperty::APPLY_REPLACE);
+
+
+					BlockShape->AttachProperty(Texture);
+					Shapes.push_back(BlockShape);
+					//SHBDNode->AttachChild(BlockShape);
 				}
-			}
-
-			NiSourceTexturePtr texture = NiSourceTexture::Create(pixel, kPrefs);
-			texture->SetStatic(false);
-			NiTexturingPropertyPtr Texture = NiNew NiTexturingProperty;
-			Texture->SetBaseTexture(texture);
-			Texture->SetBaseFilterMode(NiTexturingProperty::FILTER_NEAREST);
-			Texture->SetApplyMode(NiTexturingProperty::APPLY_REPLACE);
-
-
-			BlockShape->AttachProperty(Texture);
-			SHBDNode->AttachChild(BlockShape);
-		}
-		TextureConnector.push_back(TextureList);
+				return std::pair<std::vector<NiPixelDataPtr>, std::vector<NiTriShapePtr>> (TextureList, Shapes);
+			});
+		_ThreadList.push_back(future.share());
 	}
-	
+	{
+		using namespace std::chrono_literals;
+		while (_ThreadList.size())
+		{
+			auto status = _ThreadList.at(_ThreadList.size() - 1).wait_for(10ms);
+			if (status == std::future_status::ready)
+			{
+				auto it = _ThreadList.at(_ThreadList.size() - 1).get();
+				TextureConnector.push_back(it.first);
+				for (auto shape : it.second)
+					SHBDNode->AttachChild(shape);
+				_ThreadList.pop_back();
+				continue;
+			}
+			Sleep(1);
+		}
+	}
+	SHBDNode->Update(0.0f);
 	ResetSHBD(GetSpawnPoint());
 	return true;
 }
