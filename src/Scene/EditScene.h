@@ -16,6 +16,9 @@ public:
 	virtual void Update(float fTime);
 private:
 	void LoadMap(MapInfo* Info);
+	void LookAndMoveAtWorldPoint(NiPoint3 Point);
+	void RecreateBoundingBox();
+	void FindBoundingData(NiNodePtr Node, NiPoint3& MinPoint, NiPoint3& MaxPoint);
 	WorldPtr kWorld;
 	std::mutex UpDateWorldLock;
 	WorldPtr UpDateWorld;
@@ -28,7 +31,11 @@ private:
 	void ShowAboutWindow();
 
 	void DrawGeneralInfoWindow();
-
+	void DrawSceneNode(NiNodePtr Node);
+	NiNodePtr GeneralInfoNode;
+	NiNodePtr BoundingBox;
+	void DrawGeneralInfoNode();
+	void UpdateGeneralInfoNode(NiNodePtr Node);
 	void DrawGizmo();
 	void SelectObject();
 	void SHMDCopyPaste();

@@ -244,7 +244,7 @@ void EditScene::MiddleMouseButtonMenu()
 					for (int i = 0; i < results.GetSize(); i++)
 					{
 						auto result = results.GetAt(i);
-						loader.Prepare(kWorld->GetGroundCollidee(), PICKABLEOBJECTS, result->GetIntersection());
+						loader.Prepare(kWorld->GetGroundObjNode(), PICKABLEOBJECTS, result->GetIntersection());
 					}
 
 				}
@@ -417,7 +417,98 @@ void EditScene::ShowSettings()
 
 void EditScene::DrawGeneralInfoWindow() 
 {
+	if (!kWorld)
+		return;
+	ImGui::SetNextWindowPos(ImVec2(0, 20));
+	ImGui::SetNextWindowSize(ImVec2(250, 450));
+	if (ImGui::Begin("Scene Overview", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoCollapse))
+	{
+		DrawSceneNode(kWorld->GetWorldScene());
+		ImGui::End();
+	}
+	if (GeneralInfoNode)
+		DrawGeneralInfoNode();
+}
 
+void EditScene::DrawGeneralInfoNode()
+{
+	ImGui::SetNextWindowPos(ImVec2(0, 470));
+	ImGui::SetNextWindowSize(ImVec2(250, 250));
+	if (ImGui::Begin("Node Overview", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_NoCollapse))
+	{
+		std::string Name;
+		if (GeneralInfoNode->GetName())
+			Name = GeneralInfoNode->GetName();
+		else
+			Name = "-";
+		ImGui::Text("Name: "); ImGui::SameLine(); ImGui::Text(Name.c_str());
+
+		auto Translate = GeneralInfoNode->GetTranslate();
+		auto Rotation = GeneralInfoNode->GetRotate();
+		float angle, x, y, z;
+		Rotation.ExtractAngleAndAxis(angle, x, y, z);
+		NiPropertyList& PropertyList = GeneralInfoNode->GetPropertyList();
+		ImGui::Text("Pos \n\tX: %f, \n\tY: %f, \n\tZ: %f", Translate.x, Translate.y, Translate.z);
+		ImGui::Text("Rotate \n\tAngle: %f, \n\tX: %f, \n\tY: %f, \n\tZ: %f", angle, x, y, z);
+		ImGui::Text("Scale: %f", GeneralInfoNode->GetScale());
+		ImGui::Text("Properties: %i", PropertyList.GetSize());
+		ImGui::Text("Children: %i", GeneralInfoNode->GetChildCount());
+		if (NiIsKindOf(NiPickable, GeneralInfoNode)) 
+		{
+			NiPickablePtr ptr = (NiPickable*)&*GeneralInfoNode;
+			ImGui::Text("SHMD File Path \n\t%s", ptr->GetSHMDPath().c_str());
+		}
+		ImGui::End();
+	}
+}
+
+void EditScene::LookAndMoveAtWorldPoint(NiPoint3 Point) 
+{
+	Camera->SetTranslate(Point + NiPoint3(250.f,250.f,250.f));
+	Camera->Update(0.0f);
+	Camera->LookAtWorldPoint(Point, World::ms_kUpDir);
+	Camera->LookAtWorldPoint(Point, World::ms_kUpDir);
+	NiMatrix3 mat = Camera->GetRotate();
+	mat.ToEulerAnglesXYZ(Roll, Yaw, Pitch); //Roll Yaw Pitch Steuerung gespiegelt
+	Camera->Update(0.0f);
+}
+
+void EditScene::DrawSceneNode(NiNodePtr Node)
+{
+	std::string Name = "";
+	if (Node->GetName())
+		Name = Node->GetName();
+	else
+		Name = "-";
+	std::string Name2 = "##" + std::to_string((int)&*Node);
+	Name += Name2;
+	bool ExpandNode = ImGui::TreeNode(Name2.c_str());
+	
+	ImGui::SameLine();
+	bool selected = false;
+	if (Node == GeneralInfoNode)
+		selected = true;
+	if (ImGui::Selectable(Name.c_str(), selected, 0, ImVec2(150, 0)))
+	{
+		UpdateGeneralInfoNode(Node);
+		LookAndMoveAtWorldPoint(GeneralInfoNode->GetTranslate());
+		if (CurrentEditMode == EditMode::SHMD && NiIsKindOf(NiPickable, Node))
+		{
+			SelectedObj = (NiPickable*) &*Node;
+		}
+	}
+	if (!ExpandNode)
+		return;
+	for (int i = 0; i < Node->GetChildCount(); i++)
+	{
+		auto child = Node->GetAt(i);
+		if (child && NiIsKindOf(NiNode, Node))
+		{
+			NiNodePtr ptr = (NiNode*)child;
+			DrawSceneNode(ptr);
+		}
+	}
+	ImGui::TreePop();
 }
 
 void EditScene::DrawSHMDWindow() 

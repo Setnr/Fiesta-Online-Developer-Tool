@@ -151,9 +151,14 @@
     </ClInclude>
     <ClInclude Include="src\Data\SHMD\SHMD.h" />
     <ClInclude Include="src\NiInterface\NiViewPort\NiViewPort.h" />
-    <ClInclude Include="src\Scene\EditScene.h" />
     <ClInclude Include="src\Data\Version.h">
       <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\EditScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CustomNi\NiBoundingBox.h">
+      <Filter>CustomNi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -249,11 +254,13 @@
       <Filter>Data\SHBD</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\IngameWorldInit.cpp" />
-    <ClCompile Include="src\Scene\EditScene.cpp" />
     <ClCompile Include="src\Scene\EditSceneControlls.cpp" />
     <ClCompile Include="src\Scene\EditSceneImGui.cpp" />
     <ClCompile Include="src\Data\Version.cpp">
       <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\EditScene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

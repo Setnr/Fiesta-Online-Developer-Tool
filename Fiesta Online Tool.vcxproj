@@ -71,6 +71,7 @@
     <ClInclude Include="Includes\Ini\ini.h" />
     <ClInclude Include="Includes\Ini\INIReader.h" />
     <ClInclude Include="Includes\md5\md5.h" />
+    <ClInclude Include="src\CustomNi\NiBoundingBox.h" />
     <ClInclude Include="src\CustomNi\NiFileLoader.h" />
     <ClInclude Include="src\CustomNi\NiPickable.h" />
     <ClInclude Include="src\Data\IngameWorld.h" />
@@ -342,6 +343,7 @@
 copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
+copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
 
 copy ".\Includes\Gamebryo 2.3\DLL\d3dx9d_32.dll" ".\Build\$(Configuration)\d3dx9d_32.dll" 
 
@@ -387,7 +389,8 @@ copy ".\Includes\Gamebryo 2.3\DLL\ShaderLibraryDX923VC80D.dll" ".\Build\$(Config
       <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"
 copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
-copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"</Command>
+copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
+copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -414,6 +417,7 @@ copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settin
 copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
+copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
 
 
 copy ".\Includes\Gamebryo 2.3\DLL\NiAnimation23VC80R.dll" ".\Build\$(Configuration)\NiAnimation23VC80R.dll" 
@@ -459,6 +463,7 @@ copy ".\Includes\Gamebryo 2.3\DLL\ShaderLibraryDX923VC80R.dll" ".\Build\$(Config
 copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
+copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
 
 
 copy ".\Includes\Gamebryo 2.3\DLL\NiAnimation23VC80S.dll" ".\Build\$(Configuration)\NiAnimation23VC80S.dll" 
@@ -502,7 +507,8 @@ copy ".\Includes\Gamebryo 2.3\DLL\NSFParserLibDX923VC80S.dll" ".\Build\$(Configu
       <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"
 copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
-copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"</Command>
+copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
+copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
@@ -529,7 +535,8 @@ copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settin
 copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
-copy ".\Required\AlphaTextureBlender.NSF" ".\Build\$(Configuration)\FiestaOnlineTool\AlphaTextureBlender.NSF"</Command>
+copy ".\Required\AlphaTextureBlender.NSF" ".\Build\$(Configuration)\FiestaOnlineTool\AlphaTextureBlender.NSF"
+copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

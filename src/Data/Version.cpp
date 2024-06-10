@@ -1,6 +1,7 @@
 #pragma once
 #include "Version.h"
 std::string Version::CurVersion = "V0.0.2";
+
 std::string parseLatestVersion(const std::string& jsonResponse)
 {
     auto json = nlohmann::json::parse(jsonResponse);

@@ -15,7 +15,7 @@ void EditScene::LoadMap(MapInfo* Info)
 {
 	std::lock_guard<std::mutex> lock(UpDateWorldLock);
 	UpDateWorld = NiNew World(Info);
-
+	PgUtil::LoadNodeNifFile(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\BoundingBox.nif").c_str(), &BoundingBox, NULL);
 }
 
 void EditScene::Draw(NiRenderer* renderer)
@@ -110,7 +110,7 @@ void EditScene::SelectObject() {
 					float angle, x, y, z;
 					SelectedObj->GetRotate().ExtractAngleAndAxis(angle, x, y, z);
 					SelectedObjAngels = glm::degrees(glm::vec3{ eulerAngles(glm::angleAxis((float)angle, glm::vec3(x, y, z))) });
-					
+					UpdateGeneralInfoNode((NiNode*)&*SelectedObj);
 				}
 			}
 		}
@@ -119,13 +119,29 @@ void EditScene::SelectObject() {
 
 void EditScene::ResetCamera() 
 {
-	Camera->SetTranslate(kWorld->GetSpawnPoint());
-	Pitch = 1.57f * 2.0f;
-	Yaw = -1.57f;
-	Roll = 1.57f;
-	NiMatrix3 rotation;
-	rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
+	LookAndMoveAtWorldPoint(kWorld->GetSpawnPoint());
+	//Camera->SetTranslate(kWorld->GetSpawnPoint());
+	//Pitch = 1.57f * 2.0f;
+	//Yaw = -1.57f;
+	//Roll = 1.57f;
+	//NiMatrix3 rotation;
+	//rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
 
-	Camera->SetRotate(rotation);
+	//Camera->SetRotate(rotation);
 	Camera->Update(0.0f);
+}
+
+void EditScene::UpdateGeneralInfoNode(NiNodePtr Node) 
+{
+	if (GeneralInfoNode && NiIsKindOf(NiPickable, GeneralInfoNode))
+	{
+		NiPickable* ptr = (NiPickable*) & *GeneralInfoNode;
+		ptr->HideBoundingBox(BoundingBox);
+	}
+	GeneralInfoNode = Node;
+	if(Node && NiIsKindOf(NiPickable, Node))
+	{
+		NiPickable* ptr = (NiPickable*)&*GeneralInfoNode;
+		ptr->ShowBoundingBox(BoundingBox);
+	}
 }

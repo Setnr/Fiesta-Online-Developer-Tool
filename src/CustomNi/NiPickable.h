@@ -12,6 +12,9 @@ public:
 	}
 	void SetSHMDPath(std::string Path) { SHMDPath = Path; }
 	std::string GetSHMDPath() { return SHMDPath; }
+	NiNodePtr ToNiNode();
+	void ShowBoundingBox(NiNodePtr& BoundingBox);
+	void HideBoundingBox(NiNodePtr& BoundingBox);
 private:
 	std::string SHMDPath;
 };
