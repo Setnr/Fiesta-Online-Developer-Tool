@@ -29,7 +29,7 @@ void EditScene::UpdateCamera(float fTime)
 		MoveSHBDTexture(fTime);
 		MoveViaMiddleMouse();
 		break;
-	case HTD:
+	case HTDG:
 		if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
 		{
 			NiPoint3 kOrigin, kDir;
