@@ -77,6 +77,7 @@
     <ClInclude Include="src\Data\HTDBrush\ChangeBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\HTDBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\SmoothingBrush.h" />
     <ClInclude Include="src\Data\IngameWorld.h" />
     <ClInclude Include="src\Data\IniFile.h" />
     <ClInclude Include="src\Data\SHBD\SHBD.h" />

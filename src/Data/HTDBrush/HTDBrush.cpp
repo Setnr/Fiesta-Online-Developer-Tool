@@ -1,6 +1,7 @@
 #include "HTDBrush.h"
 #include "ChangeBrush.h"
 #include "LevelingBrush.h"
+#include "SmoothingBrush.h"
 HTDBrushPtr HTDBrush::Draw()
 {
 	HTDBrushPtr ptr;
@@ -23,6 +24,8 @@ HTDBrushPtr HTDBrush::Draw()
 			ptr = NiNew ChangeBrush(Node, BrushSize);
 		if (ImGui::Selectable("Leveling Brush", &s))
 			ptr = NiNew LevelingBrush(Node, BrushSize);
+		if (ImGui::Selectable("Smoothing Brush", &s))
+			ptr = NiNew SmoothingBrush(Node, BrushSize);
 		ImGui::EndChild();
 		ImGui::SameLine();
 		this->DrawInternal();
