@@ -37,6 +37,9 @@
     <Filter Include="Data\SHBD">
       <UniqueIdentifier>{7d99ffca-03c8-416e-8ded-40356de3ee57}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\IngameWorld">
+      <UniqueIdentifier>{e4622090-4bdd-4758-bd60-c43956ed2031}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CustomNi\NiFileLoader.h">
@@ -44,9 +47,6 @@
     </ClInclude>
     <ClInclude Include="src\CustomNi\NiPickable.h">
       <Filter>CustomNi</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\IngameWorld.h">
-      <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="src\Data\IniFile.h">
       <Filter>Data</Filter>
@@ -149,8 +149,6 @@
     <ClInclude Include="src\Data\SHBD\SHBD.h">
       <Filter>Data\SHBD</Filter>
     </ClInclude>
-    <ClInclude Include="src\Data\SHMD\SHMD.h" />
-    <ClInclude Include="src\NiInterface\NiViewPort\NiViewPort.h" />
     <ClInclude Include="src\Data\Version.h">
       <Filter>Data</Filter>
     </ClInclude>
@@ -160,13 +158,19 @@
     <ClInclude Include="src\CustomNi\NiBoundingBox.h">
       <Filter>CustomNi</Filter>
     </ClInclude>
+    <ClInclude Include="src\Data\SHMD\SHMD.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\NiInterface\NiViewPort\NiViewPort.h">
+      <Filter>CustomNi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\IngameWorld.h">
+      <Filter>Data\IngameWorld</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">
       <Filter>CustomNi</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\IngameWorld.cpp">
-      <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\IniFile.cpp">
       <Filter>Data</Filter>
@@ -253,14 +257,23 @@
     <ClCompile Include="src\Data\SHBD\SHBD.cpp">
       <Filter>Data\SHBD</Filter>
     </ClCompile>
-    <ClCompile Include="src\Data\IngameWorldInit.cpp" />
-    <ClCompile Include="src\Scene\EditSceneControlls.cpp" />
-    <ClCompile Include="src\Scene\EditSceneImGui.cpp" />
     <ClCompile Include="src\Data\Version.cpp">
       <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\EditScene.cpp">
       <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\EditSceneImGui.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\EditSceneControlls.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\IngameWorldInit.cpp">
+      <Filter>Data\IngameWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\IngameWorld.cpp">
+      <Filter>Data\IngameWorld</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

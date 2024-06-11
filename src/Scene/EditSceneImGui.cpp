@@ -610,8 +610,7 @@ void EditScene::DrawSHBDEditor()
 	bool Remove = !MoveStatus;
 	if (ImGui::Checkbox("Remove Blocked Area", &Remove))
 		MoveStatus = false;
-	if (ImGui::SliderInt("BrushSize", &BrushSize, 0, 100))
-		UpdateTexture = false;
+	UpdateBrushSize();
 
 	ImGui::End();
 }

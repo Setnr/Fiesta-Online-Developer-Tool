@@ -30,29 +30,33 @@ void EditScene::UpdateCamera(float fTime)
 		MoveViaMiddleMouse();
 		break;
 	case HTDG:
-		if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+		NiPoint3 kOrigin, kDir;
+		long X, Y;
+		FiestaOnlineTool::GetMousePosition(X, Y);
+		if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
 		{
-			NiPoint3 kOrigin, kDir;
-			long X, Y;
-			FiestaOnlineTool::GetMousePosition(X, Y);
-			if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
+			NiPick _Pick;
+			_Pick.SetPickType(NiPick::FIND_FIRST);
+			_Pick.SetSortType(NiPick::SORT);
+			_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+			_Pick.SetFrontOnly(true);
+			_Pick.SetReturnNormal(true);
+			_Pick.SetObserveAppCullFlag(true);
+			_Pick.SetTarget(kWorld->GetTerrainScene());
+			if (_Pick.PickObjects(kOrigin, kDir, true))
 			{
-				NiPick _Pick;
-				_Pick.SetPickType(NiPick::FIND_FIRST);
-				_Pick.SetSortType(NiPick::SORT);
-				_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
-				_Pick.SetFrontOnly(true);
-				_Pick.SetReturnNormal(true);
-				_Pick.SetObserveAppCullFlag(true);
-				_Pick.SetTarget(kWorld->GetTerrainScene());
-				if (_Pick.PickObjects(kOrigin, kDir, true))
+				NiPick::Results& results = _Pick.GetResults();
+				NiPoint3 Intersect = results.GetAt(0)->GetIntersection();
+				
+				if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
 				{
-					NiPick::Results& results = _Pick.GetResults();
-					NiPoint3 p = results.GetAt(0)->GetIntersection();
-					kWorld->UpdateHTD(p, 10);
+					kWorld->UpdateHTD(Intersect, BrushSize);
 				}
+				HTDOrbNode->SetTranslate(Intersect);
 			}
 		}
+		
+		
 		break;
 	}
 }

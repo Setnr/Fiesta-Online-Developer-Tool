@@ -230,19 +230,22 @@ void World::SaveSHMDGlobalGroundObjects(std::ofstream& file, NiNodePtr objNode)
 	}
 }
 
-void World::ShowHTD(bool Show)
+void World::ShowHTD(bool Show, NiNodePtr OrbNode)
 {
 	if (!Show)
 	{
 		m_spGroundScene->AttachChild(m_spGroundObject);
 		m_spNormalLightScene->AttachChild(m_spWaterScene);
+		m_spGroundScene->DetachChild(OrbNode);
 	}
 	else
 	{
 		m_spGroundScene->DetachChild(m_spGroundObject);
 		m_spNormalLightScene->DetachChild(m_spWaterScene);
+		m_spGroundScene->AttachChild(OrbNode);
 		m_spGroundScene->CompactChildArray();
 		m_spNormalLightScene->CompactChildArray();
+
 	}
 
 	m_spGroundScene->DetachChild(m_spGroundTerrain);
@@ -252,20 +255,25 @@ void World::ShowHTD(bool Show)
 	//m_spGroundScene->UpdateEffects();
 	//m_spGroundScene->UpdateProperties();
 	m_spGroundScene->Update(0.0f);
+	OrbNode->UpdateEffects();
+	OrbNode->UpdateProperties();
+	OrbNode->Update(0.0f);
 }
 
 void World::UpdateHTD(NiPoint3 InterSect, int BrushSize) 
 {
 	int middlew = InterSect.x / _InitFile.OneBlock_width;
 	int middleh = InterSect.y / _InitFile.OneBlock_height;
-	for (int w = middlew - BrushSize; w <= middlew + BrushSize && w < _HTD.size(); w++)
-	
+	for (int w = middlew - BrushSize; w <= middlew + BrushSize && w < (int)_HTD.size(); w++)
 	{
 		if (w < 0)
 			continue;
-		for (int h = middleh - BrushSize; h <= middleh + BrushSize && h < _HTD[w].size(); h++)
-		
+		for (int h = middleh - BrushSize; h <= middleh + BrushSize && h < (int)_HTD[w].size(); h++)
 		{
+			if (h < 0)
+				continue;
+			if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
+				continue;
 			for (auto point : _HTD[w][h].Vec)
 				if (point)
 					point->z += 1.0f;

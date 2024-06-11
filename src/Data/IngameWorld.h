@@ -226,7 +226,7 @@ public:
 	NiPoint3 GetSpawnPoint();
 	void CreateBrushTexture(NiPoint3& BrushPositon, int BrushSize, bool MoveStatus);
 
-	void ShowHTD(bool Show);
+	void ShowHTD(bool Show, NiNodePtr OrbNode);
 	void UpdateHTD(NiPoint3 InterSect, int BrushSize);
 private:
 	bool LoadedSuccessfully = false;

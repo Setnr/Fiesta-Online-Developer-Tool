@@ -14,8 +14,16 @@ NiRect<float> TopRight(0.5f, 1.0f, 1.0f, 0.5f);
 void EditScene::LoadMap(MapInfo* Info) 
 {
 	std::lock_guard<std::mutex> lock(UpDateWorldLock);
-	UpDateWorld = NiNew World(Info);
-	PgUtil::LoadNodeNifFile(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\BoundingBox.nif").c_str(), &BoundingBox, NULL);
+	UpDateWorld = NiNew World(Info); 
+	if(!BoundingBox)
+		PgUtil::LoadNodeNifFile(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\BoundingBox.nif").c_str(), &BoundingBox, NULL);
+	if(!HTDOrbNode)
+	{
+		PgUtil::LoadNodeNifFile(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\HTDCircle.nif").c_str(), &HTDOrbNode, NULL);
+		NiWireframePropertyPtr ptr = NiNew NiWireframeProperty;
+		ptr->SetWireframe(true);
+		HTDOrbNode->AttachProperty(ptr);
+	}
 }
 
 void EditScene::Draw(NiRenderer* renderer)
