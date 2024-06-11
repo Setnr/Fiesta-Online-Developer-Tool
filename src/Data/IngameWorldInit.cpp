@@ -780,16 +780,16 @@ bool World::LoadSHBD()
 	}
 	{
 		using namespace std::chrono_literals;
-		while (_ThreadList.size())
+		auto it = _ThreadList.begin();
+		while (it != _ThreadList.end())
 		{
-			auto status = _ThreadList.at(_ThreadList.size() - 1).wait_for(10ms);
+			auto status = it->wait_for(10ms);
 			if (status == std::future_status::ready)
 			{
-				auto it = _ThreadList.at(_ThreadList.size() - 1).get();
-				TextureConnector.push_back(it.first);
-				for (auto shape : it.second)
+				TextureConnector.push_back(it->get().first);
+				for (auto shape : it->get().second)
 					SHBDNode->AttachChild(shape);
-				_ThreadList.pop_back();
+				it++;
 				continue;
 			}
 			Sleep(1);
