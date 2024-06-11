@@ -32,7 +32,8 @@ glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 void EditScene::DrawImGui()
 {
     FiestaScene::DrawImGui();
-	DrawGeneralInfoWindow();
+	if(Settings::GeneralView() && CurrentEditMode != EditMode::HTD)
+		DrawGeneralInfoWindow();
 	switch (CurrentEditMode)
 	{
 	case EditMode::SHBD:
@@ -76,6 +77,15 @@ void EditScene::CreateMenuBar()
             kWorld->SaveSHBD();
         }
         ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu("View"))
+	{
+		if (ImGui::MenuItem("General View"))
+		{
+			Settings::SwitchGeneralView();
+		}
+		
+		ImGui::EndMenu();
 	}
 	ImGui::SameLine(ImGui::GetWindowWidth() - 130);
 	std::string mode = GetEditMode();

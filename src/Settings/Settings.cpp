@@ -34,6 +34,7 @@ Settings::Settings() : _FirstStartUp(false)
 	_FullScreen = reader.GetBoolean("Window", "FullScreen", false);
 	_FPSCap = reader.GetReal("Window", "FPSCap", 144.f);
 	_PasteDelay = reader.GetReal("BaseInformation", "PasteDelay", 0.25f);
+	_GeneralView = reader.GetBoolean("BaseInformation", "GeneralView", true);
 }
 
 void Settings::SaveSettings() 
@@ -49,6 +50,10 @@ void Settings::SaveSettings()
 	file << "[BaseInformation]" << std::endl;
 	file << "ClientPath = " << PgUtil::FolderPath << std::endl;
 	file << "PasteDelay = " << _Settings._PasteDelay << std::endl << std::endl;
+	if (_Settings._GeneralView)
+		file << "GeneralView = true" << std::endl;
+	else
+		file << "GeneralView = false" << std::endl;
 	file << "[Window]" << std::endl;
 	file << "Width = " << _Settings._WindowWidth << std::endl;
 	file << "Height = " << _Settings._WindowHeight << std::endl;

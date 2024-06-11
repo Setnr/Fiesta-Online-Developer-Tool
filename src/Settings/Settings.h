@@ -25,6 +25,7 @@ public:
 	{
 		return std::string( std::to_string(_Settings._WindowWidth) + " x " + std::to_string(_Settings._WindowHeight));
 	}
+	static void SwitchGeneralView() { _Settings._GeneralView = !_Settings._GeneralView; }
 private:
 	static Settings _Settings;
 
@@ -34,5 +35,6 @@ private:
 	Setting(bool, FullScreen, _FullScreen);
 	Setting(float, FPSCap, _FPSCap);
 	Setting(float, PasteDelay, _PasteDelay);
+	Setting(bool, GeneralView, _GeneralView);
 
 };
