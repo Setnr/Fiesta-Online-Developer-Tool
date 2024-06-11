@@ -24,6 +24,8 @@ void EditScene::LoadMap(MapInfo* Info)
 		ptr->SetWireframe(true);
 		HTDOrbNode->AttachProperty(ptr);
 	}
+	if (!_HTDBrush)
+		_HTDBrush = NiNew HTDBrush(HTDOrbNode, 1);
 }
 
 void EditScene::Draw(NiRenderer* renderer)

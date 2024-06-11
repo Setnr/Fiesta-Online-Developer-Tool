@@ -44,6 +44,13 @@ void EditScene::DrawImGui()
 		DrawSHMDWindow();
 		DrawGizmo();
 		MiddleMouseButtonMenu();
+		break;
+	case EditMode::HTDG:
+	{
+		HTDBrushPtr n = _HTDBrush->Draw();
+		if (n) _HTDBrush = n;
+	}
+		break;
 	default:
 		break;
 	}
@@ -76,6 +83,10 @@ void EditScene::CreateMenuBar()
         {
             kWorld->SaveSHBD();
         }
+		if (ImGui::MenuItem("Save HTDG", 0, false, kWorld != NULL))
+		{
+			kWorld->SaveHTDG();
+		}
         ImGui::EndMenu();
 	}
 	if (ImGui::BeginMenu("View"))
@@ -610,7 +621,7 @@ void EditScene::DrawSHBDEditor()
 	bool Remove = !MoveStatus;
 	if (ImGui::Checkbox("Remove Blocked Area", &Remove))
 		MoveStatus = false;
-	UpdateBrushSize();
+	ImGui::SliderInt("BrushSize", &BrushSize, 0, 100);
 
 	ImGui::End();
 }
@@ -639,3 +650,4 @@ void EditScene::DrawSHMDHeader(std::string Name, NiNodePtr Node)
 			Node->CompactChildArray();
 	}
 }
+

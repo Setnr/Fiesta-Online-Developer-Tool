@@ -40,6 +40,9 @@
     <Filter Include="Data\IngameWorld">
       <UniqueIdentifier>{e4622090-4bdd-4758-bd60-c43956ed2031}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\HTDBrush">
+      <UniqueIdentifier>{26cb47e0-b716-40a1-b0c7-d2f8a4d1515a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CustomNi\NiFileLoader.h">
@@ -167,6 +170,15 @@
     <ClInclude Include="src\Data\IngameWorld.h">
       <Filter>Data\IngameWorld</Filter>
     </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\HTDBrush.h">
+      <Filter>Data\HTDBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\ChangeBrush.h">
+      <Filter>Data\HTDBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h">
+      <Filter>Data\HTDBrush</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">
@@ -274,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="src\Data\IngameWorld.cpp">
       <Filter>Data\IngameWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\HTDBrush\HTDBrush.cpp">
+      <Filter>Data\HTDBrush</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

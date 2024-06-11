@@ -38,7 +38,6 @@ public:
 	void AppendToTexture(NiDynamicTexturePtr texture, int x, int y, int width, int height);
 	void Save() 
 	{
-		auto start = std::chrono::steady_clock::now();
 		std::string SHBDFilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd");
 		std::ofstream SHBDFile;
 		if (std::filesystem::exists(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak")))
@@ -55,11 +54,6 @@ public:
 		for (int i = 0; i < Data.size(); i++)
 			SHBDFile.write(&Data[i], sizeof(char));
 		SHBDFile.close();
-		auto diff = std::chrono::steady_clock::now() - start;
-		std::ostringstream oss;
-		oss << "Successfully safed SHBD for " << _Info->MapName << "("
-			<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
-		LogInfo(oss.str());
 	}
 	int GetMapSize() { return MapSize; }
 	int GetSHBDSize() { return SHBDSize; }

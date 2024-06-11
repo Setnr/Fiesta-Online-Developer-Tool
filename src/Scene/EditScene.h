@@ -1,10 +1,10 @@
 #pragma once
 #include "FiestaScene.h"
 #include "../Data/IngameWorld.h"
-
+#include "../Data/HTDBrush/HTDBrush.h"
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
-class EditScene :    public FiestaScene
+class EditScene :  public FiestaScene
 {
 public:
 	EditScene() = default;
@@ -53,13 +53,9 @@ private:
 	void MoveSHBDTexture(float fTime);
 	void DrawSHBDEditor();
 	int BrushSize = 0;
-	void inline UpdateBrushSize() 
-	{
-		if (ImGui::SliderInt("BrushSize", &BrushSize, 0, 100))
-			HTDOrbNode->SetScale((50.f / 160.f) * BrushSize);
-	}
 	bool MoveStatus = false;
 
+	HTDBrushPtr _HTDBrush;
 	NiNodePtr HTDOrbNode;
 
 	enum EditMode : int
@@ -83,7 +79,7 @@ private:
 		CurrentEditMode = mode;
 		
 		kWorld->SetSHBDVisiblity(mode == SHBD);
-		kWorld->ShowHTD(mode == HTDG, HTDOrbNode);
+		kWorld->ShowHTDG(mode == HTDG, HTDOrbNode);
 	}
 	std::string GetEditMode() 
 	{

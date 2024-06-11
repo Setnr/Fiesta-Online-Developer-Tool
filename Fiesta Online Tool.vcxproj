@@ -74,6 +74,9 @@
     <ClInclude Include="src\CustomNi\NiBoundingBox.h" />
     <ClInclude Include="src\CustomNi\NiFileLoader.h" />
     <ClInclude Include="src\CustomNi\NiPickable.h" />
+    <ClInclude Include="src\Data\HTDBrush\ChangeBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\HTDBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h" />
     <ClInclude Include="src\Data\IngameWorld.h" />
     <ClInclude Include="src\Data\IniFile.h" />
     <ClInclude Include="src\Data\SHBD\SHBD.h" />
@@ -113,6 +116,7 @@
     <ClCompile Include="Includes\Ini\INIReader.cpp" />
     <ClCompile Include="Includes\md5\md5.cpp" />
     <ClCompile Include="src\CustomNi\NiPickable.cpp" />
+    <ClCompile Include="src\Data\HTDBrush\HTDBrush.cpp" />
     <ClCompile Include="src\Data\IngameWorld.cpp" />
     <ClCompile Include="src\Data\IngameWorldInit.cpp" />
     <ClCompile Include="src\Data\IniFile.cpp" />

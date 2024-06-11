@@ -273,7 +273,7 @@ bool World::LoadTerrain()
 		}
 		else
 		{
-			float Value = 0.f;
+			float Value = 0.0f;
 			for (int h = 0; h < _InitFile.HeightMap_height; h++)
 			{
 				for (int w = 0; w < _InitFile.HeightMap_width; w++)

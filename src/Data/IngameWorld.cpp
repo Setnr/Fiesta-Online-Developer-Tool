@@ -115,7 +115,13 @@ void World::CreateBrushTexture(NiPoint3& BrushPositon, int BrushSize, bool MoveS
 
 void World::SaveSHBD() 
 {
+	auto start = std::chrono::steady_clock::now();
 	_SHBD.Save();
+	auto diff = std::chrono::steady_clock::now() - start;
+	std::ostringstream oss;
+	oss << "Successfully safed SHBD for " << _Info->MapName << "("
+		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
+	LogInfo(oss.str());
 }
 void World::SaveSHMD() 
 {
@@ -142,7 +148,7 @@ void World::SaveSHMD()
 	file.close();
 	auto diff = std::chrono::steady_clock::now() - start;
 	std::ostringstream oss;
-	oss << "Successfully safed " << _Info->MapName << "("
+	oss << "Successfully safed SHMD for " << _Info->MapName << "("
 		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
 	LogInfo(oss.str());
 }
@@ -230,7 +236,7 @@ void World::SaveSHMDGlobalGroundObjects(std::ofstream& file, NiNodePtr objNode)
 	}
 }
 
-void World::ShowHTD(bool Show, NiNodePtr OrbNode)
+void World::ShowHTDG(bool Show, NiNodePtr OrbNode)
 {
 	if (!Show)
 	{
@@ -260,27 +266,36 @@ void World::ShowHTD(bool Show, NiNodePtr OrbNode)
 	OrbNode->Update(0.0f);
 }
 
-void World::UpdateHTD(NiPoint3 InterSect, int BrushSize) 
+void World::SaveHTDG() 
 {
-	int middlew = InterSect.x / _InitFile.OneBlock_width;
-	int middleh = InterSect.y / _InitFile.OneBlock_height;
-	for (int w = middlew - BrushSize; w <= middlew + BrushSize && w < (int)_HTD.size(); w++)
+	if (_InitFile.HeightFileName == "")
 	{
-		if (w < 0)
-			continue;
-		for (int h = middleh - BrushSize; h <= middleh + BrushSize && h < (int)_HTD[w].size(); h++)
+		LogInfo("This map does not have a HTDG to save");
+		return;
+	}
+	auto start = std::chrono::steady_clock::now();
+	std::string HTDFilePath = PgUtil::CreateFullFilePathFromBaseFolder(_InitFile.HeightFileName);
+	std::string HTDGFilePath = HTDFilePath + "G";
+	if (std::filesystem::exists(HTDGFilePath + ".bak"))
+		std::filesystem::remove(HTDGFilePath + ".bak");
+	std::filesystem::copy(HTDGFilePath, HTDGFilePath + ".bak");
+
+	std::ofstream file;
+	file.open(HTDGFilePath, std::ios::binary);
+	int Size = _InitFile.HeightMap_height * _InitFile.HeightMap_width;
+	file.write((char*) & Size, sizeof(Size));
+	for (int h = 0; h < _InitFile.HeightMap_height; h++)
+	{
+		for (int w = 0; w < _InitFile.HeightMap_width; w++)
 		{
-			if (h < 0)
-				continue;
-			if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
-				continue;
-			for (auto point : _HTD[w][h].Vec)
-				if (point)
-					point->z += 1.0f;
-			for (auto shape : _HTD[w][h].Shape)
-				if (shape)
-					shape->MarkAsChanged(NiGeometryData::VERTEX_MASK);
+			float Value = _HTD[w][h].Vec[0]->z - _HTD[w][h].Height;
+			file.write((char*)&Value, sizeof(Value));
 		}
 	}
-	
+	file.close();
+	auto diff = std::chrono::steady_clock::now() - start;
+	std::ostringstream oss;
+	oss << "Successfully safed HTDG for" << _Info->MapName << "("
+		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
+	LogInfo(oss.str());
 }

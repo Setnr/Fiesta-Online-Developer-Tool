@@ -50,13 +50,11 @@ void EditScene::UpdateCamera(float fTime)
 				
 				if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
 				{
-					kWorld->UpdateHTD(Intersect, BrushSize);
+					_HTDBrush->UpdateHTD(kWorld->GetIni(), kWorld->GetHTD(), Intersect);
 				}
 				HTDOrbNode->SetTranslate(Intersect);
 			}
 		}
-		
-		
 		break;
 	}
 }
