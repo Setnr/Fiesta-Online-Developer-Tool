@@ -90,6 +90,14 @@ public:
 		if (_Tool)
 			_Tool->cursor->Show(true);
 	}
+	static void AddScreenTexture(NiScreenTexturePtr texture) {
+		if (_Tool)
+			_Tool->GetScreenTextures().AddTail(texture);
+	}
+	static void RemoveScreenTexture(NiScreenTexturePtr texture) {
+		if (_Tool)
+			_Tool->GetScreenTextures().Remove(texture);
+	}
 private: 
 	std::mutex SceneLock;
 	FiestaScenePtr _Scene;

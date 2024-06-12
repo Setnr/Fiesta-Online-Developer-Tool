@@ -2,6 +2,7 @@
 #include "ChangeBrush.h"
 #include "LevelingBrush.h"
 #include "SmoothingBrush.h"
+#include "PerlinBrush.h"
 HTDBrushPtr HTDBrush::Draw()
 {
 	HTDBrushPtr ptr;
@@ -26,6 +27,10 @@ HTDBrushPtr HTDBrush::Draw()
 			ptr = NiNew LevelingBrush(Node, BrushSize);
 		if (ImGui::Selectable("Smoothing Brush", &s))
 			ptr = NiNew SmoothingBrush(Node, BrushSize);
+
+		if (ImGui::Selectable("Perlin Brush", &s))
+			ptr = NiNew PerlinBrush(Node, BrushSize);
+
 		ImGui::EndChild();
 		ImGui::SameLine();
 		this->DrawInternal();

@@ -182,6 +182,9 @@
     <ClInclude Include="src\Data\HTDBrush\SmoothingBrush.h">
       <Filter>Data\HTDBrush</Filter>
     </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\PerlinBrush.h">
+      <Filter>Data\HTDBrush</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">

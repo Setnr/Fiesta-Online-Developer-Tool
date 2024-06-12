@@ -139,6 +139,8 @@ void TerrainLayer::CreateTexture()
 IniFile::IniFile(std::string FilePath)
 {
 	_FilePath = FilePath;
+	OneBlock_height = 50.f;
+	OneBlock_width = 50.f;
 }
 bool IniFile::Load()
 {
@@ -155,35 +157,36 @@ bool IniFile::Load()
 	}
 	std::string line;
 	std::string info;
+	
 	while (File >> line) 
 	{
-		if (line == "#PGFILE" && !LoadPGFile(File))
-			return false;
-		if(line == "#FILE_VER" && !LoadFileVer(File))
-			return false;
-
-		if (line == "#HeightFileName" && !LoadHeightFileName(File))
-			return false;
-		if (line == "#VerTexColorTexture" && !LoadVerTextTexture(File))
+		if (line.find("#PGFILE") != std::string::npos && !LoadPGFile(File))
+		return false;
+		if (line.find("#FILE_VER") != std::string::npos && !LoadFileVer(File))
 			return false;
 
-		if (line == "#HEIGHTMAP_WIDTH" && !LoadHeightMapWidth(File))
+		if (line.find("#HeightFileName") != std::string::npos && !LoadHeightFileName(File))
 			return false;
-		if (line == "#HEIGHTMAP_HEIGHT" && !LoadHeightMapHeight(File))
-			return false;
-
-		if (line == "#OneBlockWidth" && !LoadOneBlockWidht(File))
-			return false;
-		if (line == "#OneBlockHeight" && !LoadOneBlockHeight(File))
+		if (line.find("#VerTexColorTexture") != std::string::npos && !LoadVerTextTexture(File))
 			return false;
 
-		if (line == "#QuadsWide" && !LoadQuadsWide(File))
+		if (line.find("#HEIGHTMAP_WIDTH") != std::string::npos && !LoadHeightMapWidth(File))
 			return false;
-		if (line == "#QuadsHigh" && !LoadQuadsHigh(File))
+		if (line.find("#HEIGHTMAP_HEIGHT") != std::string::npos && !LoadHeightMapHeight(File))
+			return false;
+
+		if (line.find("#OneBlockWidth") != std::string::npos && !LoadOneBlockWidht(File))
+			return false;
+		if (line.find("#OneBlockHeight") != std::string::npos && !LoadOneBlockHeight(File))
+			return false;
+
+		if (line.find("#QuadsWide") != std::string::npos && !LoadQuadsWide(File))
+			return false;
+		if (line.find("#QuadsHigh") != std::string::npos && !LoadQuadsHigh(File))
 			return false;
 
 
-		if (line == "#Layer" && !LoadLayer(File))
+		if (line.find("#Layer") != std::string::npos && !LoadLayer(File))
 			return false;
 	}
 	return true;
