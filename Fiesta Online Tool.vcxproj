@@ -74,18 +74,26 @@
     <ClInclude Include="src\CustomNi\NiBoundingBox.h" />
     <ClInclude Include="src\CustomNi\NiFileLoader.h" />
     <ClInclude Include="src\CustomNi\NiPickable.h" />
+    <ClInclude Include="src\Data\Algorithms\worley.h" />
+    <ClInclude Include="src\Data\DiamondSquareFractal.h" />
+    <ClInclude Include="src\Data\Fractal.h" />
     <ClInclude Include="src\Data\HTDBrush\ChangeBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\HTDBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\PerlinBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\SmoothingBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\TextureBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\WorleyBrush.h" />
     <ClInclude Include="src\Data\IngameWorld.h" />
     <ClInclude Include="src\Data\IniFile.h" />
+    <ClInclude Include="src\Data\PerlinFractal.h" />
     <ClInclude Include="src\Data\SHBD\SHBD.h" />
     <ClInclude Include="src\Data\SHMD\SHMD.h" />
     <ClInclude Include="src\Data\SHNManager.h" />
     <ClInclude Include="src\Data\SHNStruct.h" />
+    <ClInclude Include="src\Data\TerrainWorld.h" />
     <ClInclude Include="src\Data\Version.h" />
+    <ClInclude Include="src\Data\WorleyFractal.h" />
     <ClInclude Include="src\ImGuiConstantFuncs.h" />
     <ClInclude Include="src\Logger\Logger.h" />
     <ClInclude Include="src\NiApplication\FiestaOnlineTool.h" />
@@ -97,6 +105,7 @@
     <ClInclude Include="src\PgUtil.h" />
     <ClInclude Include="src\Scene\EditScene.h" />
     <ClInclude Include="src\Scene\FiestaScene.h" />
+    <ClInclude Include="src\Scene\MapCreateScene.h" />
     <ClInclude Include="src\Scene\SetupScene.h" />
     <ClInclude Include="src\Settings\Settings.h" />
   </ItemGroup>
@@ -118,12 +127,19 @@
     <ClCompile Include="Includes\Ini\INIReader.cpp" />
     <ClCompile Include="Includes\md5\md5.cpp" />
     <ClCompile Include="src\CustomNi\NiPickable.cpp" />
+    <ClCompile Include="src\Data\Algorithms\worley.cpp" />
+    <ClCompile Include="src\Data\Fractal.cpp" />
     <ClCompile Include="src\Data\HTDBrush\HTDBrush.cpp" />
+    <ClCompile Include="src\Data\HTDBrush\PerlinBrush.cpp" />
+    <ClCompile Include="src\Data\HTDBrush\TextureBrush.cpp" />
+    <ClCompile Include="src\Data\HTDBrush\WorleyBrush.cpp" />
     <ClCompile Include="src\Data\IngameWorld.cpp" />
     <ClCompile Include="src\Data\IngameWorldInit.cpp" />
     <ClCompile Include="src\Data\IniFile.cpp" />
     <ClCompile Include="src\Data\SHBD\SHBD.cpp" />
     <ClCompile Include="src\Data\SHNManager.cpp" />
+    <ClCompile Include="src\Data\TerrainWorld.cpp" />
+    <ClCompile Include="src\Data\TerrainWorldInit.cpp" />
     <ClCompile Include="src\Data\Version.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -136,6 +152,7 @@
     <ClCompile Include="src\Scene\EditSceneControlls.cpp" />
     <ClCompile Include="src\Scene\EditSceneImGui.cpp" />
     <ClCompile Include="src\Scene\FiestaScene.cpp" />
+    <ClCompile Include="src\Scene\MapCreateScene.cpp" />
     <ClCompile Include="src\Scene\SetupScene.cpp" />
     <ClCompile Include="src\Settings\Settings.cpp" />
   </ItemGroup>

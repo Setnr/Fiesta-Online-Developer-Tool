@@ -3,6 +3,7 @@
 #include "LevelingBrush.h"
 #include "SmoothingBrush.h"
 #include "PerlinBrush.h"
+#include "WorleyBrush.h"
 HTDBrushPtr HTDBrush::Draw()
 {
 	HTDBrushPtr ptr;
@@ -30,11 +31,15 @@ HTDBrushPtr HTDBrush::Draw()
 
 		if (ImGui::Selectable("Perlin Brush", &s))
 			ptr = NiNew PerlinBrush(Node, BrushSize);
-
+		if (ImGui::Selectable("Worley Brush", &s))
+			ptr = NiNew WorleyBrush(Node, BrushSize);
+		
 		ImGui::EndChild();
 		ImGui::SameLine();
 		this->DrawInternal();
 		ImGui::End();
 	}
+	if (ptr)
+		ptr->Init();
 	return ptr;
 	}

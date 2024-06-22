@@ -81,6 +81,14 @@ public:
     NiColorA (float fR = 0.0f, float fG = 0.0f, 
               float fB = 0.0f, float fA = 0.0f);
 
+    NiColorA(unsigned char fR, unsigned char fG, unsigned char fB, unsigned char fA)
+    {
+        r = static_cast<float>(fR) / 0xFF;
+        g = static_cast<float>(fG) / 0xFF;
+        b = static_cast<float>(fB) / 0xFF;
+        a = static_cast<float>(fA) / 0xFF;
+    }
+
     NiColorA& operator= (float fScalar);
     bool operator== (const NiColorA& c) const;
     bool operator!= (const NiColorA& c) const { return !(*this == c); }

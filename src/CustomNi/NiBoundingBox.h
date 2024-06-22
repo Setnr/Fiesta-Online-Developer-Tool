@@ -2,10 +2,10 @@
 #include "../Logger/Logger.h"
 #include <NiTriShape.h>
 #include <NiTriStrips.h>
+#include <NiWireframeProperty.h>
 class NiBoundingBox 
 {
 private:
-
 
 	static void UpdateVertices(NiNodePtr& BoundingBox, NiPoint3 MinPoint, NiPoint3 MaxPoint)
 	{

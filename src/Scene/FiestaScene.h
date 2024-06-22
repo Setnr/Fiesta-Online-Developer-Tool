@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include "../Data/IngameWorld.h"
 #define SettingsPath ".\\FiestaOnlineTool\\Settings.ini"
 NiSmartPointer(FiestaScene);
 class FiestaScene : public NiRefObject
@@ -12,7 +13,6 @@ class FiestaScene : public NiRefObject
 public:
 	FiestaScene() 
 	{
-		CanSwitch = false;
 		Yaw = 0.0f;
 		Pitch = 0.0f;
 		Roll = 0.0f;
@@ -26,14 +26,15 @@ public:
 	virtual void Draw(NiRenderer* renderer) {}
 	virtual void DrawImGui();
 	virtual void CreateMenuBar() {};
-	void StartImGuiFrame();
-	void EndImGuiFrame();
 	virtual void Update(float fTime)
 	{
-		BaseNode->Update(fTime);
+		if (BaseNode)
+			BaseNode->Update(fTime);
 	}
 	virtual void UpdateCamera(float fTime);
 	bool CanBeSwitched() { return CanSwitch; }
+	void StartImGuiFrame();
+	void EndImGuiFrame();
 protected:
 	NiNodePtr BaseNode;
 	NiCameraPtr Camera;
@@ -44,7 +45,20 @@ protected:
 
 	float FPS[90];
 	int values_offset;
-	std::atomic<bool> CanSwitch;
+	bool ShowAbout = false;
+	virtual void ShowAboutWindow();
+	void LookAndMoveAtWorldPoint(NiPoint3 Point)
+	{
+		Camera->SetTranslate(Point + NiPoint3(250.f, 250.f, 250.f));
+		Camera->Update(0.0f);
+		Camera->LookAtWorldPoint(Point, World::ms_kUpDir);
+		Camera->LookAtWorldPoint(Point, World::ms_kUpDir);
+		NiMatrix3 mat = Camera->GetRotate();
+		mat.ToEulerAnglesXYZ(Roll, Yaw, Pitch); //Roll Yaw Pitch Steuerung gespiegelt
+		Camera->Update(0.0f);
+	}
+
+	std::atomic<bool> CanSwitch = false;
 
 };
 

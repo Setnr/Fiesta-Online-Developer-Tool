@@ -10,6 +10,7 @@
 
 #include <NiPick.h>
 #include "FiestaOnlineTool.h"
+#include "MapCreateScene.h"
 
 
 ImGuizmo::OPERATION OperationMode = ImGuizmo::OPERATION::TRANSLATE;
@@ -48,7 +49,10 @@ void EditScene::DrawImGui()
 	case EditMode::HTDG:
 	{
 		HTDBrushPtr n = _HTDBrush->Draw();
-		if (n) _HTDBrush = n;
+		if (n) 
+		{
+			_HTDBrush = n;
+		}
 	}
 		break;
 	default:
@@ -152,7 +156,12 @@ void EditScene::ShowMapInfo()
     {
         static char buffer[15];
         ImGui::InputText("Filter Maps", buffer, sizeof(buffer));
-
+		ImGui::SameLine();
+		if (ImGui::Button("Create New Map")) {
+			MapCreateScenePtr ptr = NiNew MapCreateScene;
+			FiestaScenePtr scene = (FiestaScene*)&*ptr;
+			FiestaOnlineTool::UpdateScene(scene);
+		}
         if (shn->DrawHeader())
         {
             for (unsigned int i = 0; i < shn->GetRows(); i++)
@@ -485,17 +494,6 @@ void EditScene::DrawGeneralInfoNode()
 		}
 		ImGui::End();
 	}
-}
-
-void EditScene::LookAndMoveAtWorldPoint(NiPoint3 Point) 
-{
-	Camera->SetTranslate(Point + NiPoint3(250.f,250.f,250.f));
-	Camera->Update(0.0f);
-	Camera->LookAtWorldPoint(Point, World::ms_kUpDir);
-	Camera->LookAtWorldPoint(Point, World::ms_kUpDir);
-	NiMatrix3 mat = Camera->GetRotate();
-	mat.ToEulerAnglesXYZ(Roll, Yaw, Pitch); //Roll Yaw Pitch Steuerung gespiegelt
-	Camera->Update(0.0f);
 }
 
 void EditScene::DrawSceneNode(NiNodePtr Node)

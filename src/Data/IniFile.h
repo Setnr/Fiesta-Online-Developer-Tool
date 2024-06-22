@@ -275,7 +275,7 @@ private:
 		auto Layer = std::make_shared<TerrainLayer>();
 		if (!Layer->Load(File))
 		{
-			std::string msg = _FilePath + "\Failed to Load a Layer";
+			std::string msg = _FilePath + "Failed to Load a Layer";
 			NiMessageBox::DisplayMessage(msg.c_str(), "Error");
 			return false;
 		}

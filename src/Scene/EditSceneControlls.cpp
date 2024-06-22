@@ -1,6 +1,7 @@
 #pragma once
 #include "EditScene.h"
 #include "FiestaOnlineTool.h"
+#include "ImGui/ImGuizmo.h"
 void EditScene::UpdateCamera(float fTime)
 {
 	if (Camera == NULL)
@@ -17,7 +18,7 @@ void EditScene::UpdateCamera(float fTime)
 	switch (CurrentEditMode) 
 	{
 	case SHMD:
-		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGuizmo::IsOver())
 		{
 			SelectObject();
 		}

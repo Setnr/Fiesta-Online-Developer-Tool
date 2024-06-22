@@ -4,19 +4,23 @@
 #include "../Data/HTDBrush/HTDBrush.h"
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
+NiSmartPointer(EditScene);
 class EditScene :  public FiestaScene
 {
 public:
-	EditScene() = default;
+	EditScene() 
+	{
+		CanSwitch = true;
+	}
 
 	virtual void Draw(NiRenderer* renderer);
 	virtual void DrawImGui();
 	virtual void CreateMenuBar();
 	virtual void UpdateCamera(float fTime);
 	virtual void Update(float fTime);
-private:
 	void LoadMap(MapInfo* Info);
-	void LookAndMoveAtWorldPoint(NiPoint3 Point);
+	void HideShowLoadMenu() { ShowLoadMenu = false; }
+private:
 	void RecreateBoundingBox();
 	void FindBoundingData(NiNodePtr Node, NiPoint3& MinPoint, NiPoint3& MaxPoint);
 	WorldPtr kWorld;
@@ -27,9 +31,7 @@ private:
 	void ShowMapInfo();
 	bool ShowSettingsMenu = false;
 	void ShowSettings();
-	bool ShowAbout = false;
 	void ShowAboutWindow();
-
 	void DrawGeneralInfoWindow();
 	void DrawSceneNode(NiNodePtr Node);
 	NiNodePtr GeneralInfoNode;
@@ -80,6 +82,7 @@ private:
 		
 		kWorld->SetSHBDVisiblity(mode == SHBD);
 		kWorld->ShowHTDG(mode == HTDG, HTDOrbNode);
+		_HTDBrush->Show(mode == HTDG);
 	}
 	std::string GetEditMode() 
 	{

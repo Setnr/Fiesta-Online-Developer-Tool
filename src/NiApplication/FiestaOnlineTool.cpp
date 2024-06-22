@@ -65,6 +65,7 @@ void FiestaOnlineTool::OnIdle()
         this->DisplayFrame();
         
         ++this->m_iClicks;
+        this->UpdateSceneInternal();
     }
 
 }
@@ -79,11 +80,23 @@ void FiestaOnlineTool::DrawCursor()
 
 void FiestaOnlineTool::UpdateScene(FiestaScenePtr Scene)
 {
+    if (!_Tool)
+        return;
     _Tool->UpdateSceneInternal(Scene);
 }
 void FiestaOnlineTool::UpdateSceneInternal(FiestaScenePtr Scene)
 {
-    std::lock_guard<std::mutex> lock(SceneLock);
-    if(Scene->CanBeSwitched())
-        _Scene = Scene;
+    std::lock_guard<std::mutex> lock(UpdateLock);
+    NewScene = Scene; 
+}
+void FiestaOnlineTool::UpdateSceneInternal()
+{
+    std::lock_guard<std::mutex> lock(UpdateLock);
+    if (!NewScene)
+        return;
+    std::lock_guard<std::mutex> lock2(SceneLock);
+    
+    if(NewScene->CanBeSwitched())
+        _Scene = NewScene;
+    NewScene = nullptr;
 }

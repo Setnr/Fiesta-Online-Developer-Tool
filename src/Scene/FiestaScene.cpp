@@ -148,3 +148,18 @@ void FiestaScene::DrawImGui()
 		ImGui::EndMainMenuBar();
 	}
 }
+
+void FiestaScene::ShowAboutWindow()
+{
+	ImGuiIO& io = ImGui::GetIO();
+	ImVec2 Size(500, 250);
+	ImVec2 Pos(io.DisplaySize.x / 2 - Size.x / 2, io.DisplaySize.y / 2 - Size.y / 2);
+	ImGui::SetNextWindowPos(Pos);
+	ImGui::SetNextWindowSize(Size);
+	if (ImGui::Begin("About", &ShowAbout, ImGuiWindowFlags_NoCollapse))
+	{
+		ImGui::Text("Fiesta Online DeveloperTool by SetNr12");
+		
+		ImGui::End();
+	}
+}

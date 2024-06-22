@@ -34,14 +34,38 @@
     <Filter Include="Includes\Ini">
       <UniqueIdentifier>{232af55f-3883-490d-b370-c9cce28da9fb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Data\SHBD">
-      <UniqueIdentifier>{7d99ffca-03c8-416e-8ded-40356de3ee57}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Data\IngameWorld">
       <UniqueIdentifier>{e4622090-4bdd-4758-bd60-c43956ed2031}</UniqueIdentifier>
     </Filter>
     <Filter Include="Data\HTDBrush">
       <UniqueIdentifier>{26cb47e0-b716-40a1-b0c7-d2f8a4d1515a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Algorithms">
+      <UniqueIdentifier>{e5124381-9a96-424b-ab50-45183f73dda5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Edit Scene">
+      <UniqueIdentifier>{32a4b6f0-c005-4808-b424-65489f3eea6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Setup Scene">
+      <UniqueIdentifier>{b6e5a3ee-d989-4ce0-bd87-a904d66706b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\MapCreateScene">
+      <UniqueIdentifier>{d10a841f-91bc-4506-a315-3aebebabe92e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\SHN">
+      <UniqueIdentifier>{1c85780d-af1e-45d5-bdbf-bd8078954b87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\ShineData">
+      <UniqueIdentifier>{fc0e6006-63a5-410f-9110-b387a65407b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\ShineData\SHBD">
+      <UniqueIdentifier>{7d99ffca-03c8-416e-8ded-40356de3ee57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\ShineData\IniFile">
+      <UniqueIdentifier>{d3dc150a-3b1a-4426-afa4-70a148c553ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Algorithms\FractalAlgorithms">
+      <UniqueIdentifier>{ac16d4bb-c744-4b7b-b72c-c035e1ea240b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -50,15 +74,6 @@
     </ClInclude>
     <ClInclude Include="src\CustomNi\NiPickable.h">
       <Filter>CustomNi</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\IniFile.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\SHNManager.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\SHNStruct.h">
-      <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="src\Logger\Logger.h">
       <Filter>Logger</Filter>
@@ -70,9 +85,6 @@
       <Filter>NiApplication</Filter>
     </ClInclude>
     <ClInclude Include="src\Scene\FiestaScene.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\SetupScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\ImGuiConstantFuncs.h" />
@@ -150,19 +162,13 @@
       <Filter>Includes\Ini</Filter>
     </ClInclude>
     <ClInclude Include="src\Data\SHBD\SHBD.h">
-      <Filter>Data\SHBD</Filter>
+      <Filter>Data\ShineData\SHBD</Filter>
     </ClInclude>
     <ClInclude Include="src\Data\Version.h">
       <Filter>Data</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\EditScene.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="src\CustomNi\NiBoundingBox.h">
       <Filter>CustomNi</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\SHMD\SHMD.h">
-      <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="src\NiInterface\NiViewPort\NiViewPort.h">
       <Filter>CustomNi</Filter>
@@ -185,16 +191,55 @@
     <ClInclude Include="src\Data\HTDBrush\PerlinBrush.h">
       <Filter>Data\HTDBrush</Filter>
     </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\TextureBrush.h">
+      <Filter>Data\HTDBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\WorleyBrush.h">
+      <Filter>Data\HTDBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\Algorithms\worley.h">
+      <Filter>Data\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\EditScene.h">
+      <Filter>Scene\Edit Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\SetupScene.h">
+      <Filter>Scene\Setup Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\MapCreateScene.h">
+      <Filter>Scene\MapCreateScene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\IniFile.h">
+      <Filter>Data\ShineData\IniFile</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\SHNStruct.h">
+      <Filter>Data\SHN</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\SHNManager.h">
+      <Filter>Data\SHN</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\SHMD\SHMD.h">
+      <Filter>Data\ShineData</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\TerrainWorld.h">
+      <Filter>Data\IngameWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\DiamondSquareFractal.h">
+      <Filter>Data\Algorithms\FractalAlgorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\Fractal.h">
+      <Filter>Data\Algorithms\FractalAlgorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\PerlinFractal.h">
+      <Filter>Data\Algorithms\FractalAlgorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\WorleyFractal.h">
+      <Filter>Data\Algorithms\FractalAlgorithms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">
       <Filter>CustomNi</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\IniFile.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\SHNManager.cpp">
-      <Filter>Data</Filter>
     </ClCompile>
     <ClCompile Include="src\Logger\Logger.cpp">
       <Filter>Logger</Filter>
@@ -212,9 +257,6 @@
       <Filter>NiApplication</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\FiestaScene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\SetupScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp" />
@@ -273,19 +315,10 @@
       <Filter>Includes\Ini</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\SHBD\SHBD.cpp">
-      <Filter>Data\SHBD</Filter>
+      <Filter>Data\ShineData\SHBD</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\Version.cpp">
       <Filter>Data</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\EditScene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\EditSceneImGui.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\EditSceneControlls.cpp">
-      <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\IngameWorldInit.cpp">
       <Filter>Data\IngameWorld</Filter>
@@ -295,6 +328,48 @@
     </ClCompile>
     <ClCompile Include="src\Data\HTDBrush\HTDBrush.cpp">
       <Filter>Data\HTDBrush</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\Algorithms\worley.cpp">
+      <Filter>Data\Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\HTDBrush\PerlinBrush.cpp">
+      <Filter>Data\HTDBrush</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\HTDBrush\WorleyBrush.cpp">
+      <Filter>Data\HTDBrush</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\HTDBrush\TextureBrush.cpp">
+      <Filter>Data\HTDBrush</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\EditSceneImGui.cpp">
+      <Filter>Scene\Edit Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\EditSceneControlls.cpp">
+      <Filter>Scene\Edit Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\EditScene.cpp">
+      <Filter>Scene\Edit Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\SetupScene.cpp">
+      <Filter>Scene\Setup Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\MapCreateScene.cpp">
+      <Filter>Scene\MapCreateScene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\IniFile.cpp">
+      <Filter>Data\ShineData\IniFile</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\SHNManager.cpp">
+      <Filter>Data\SHN</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\TerrainWorld.cpp">
+      <Filter>Data\IngameWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\TerrainWorldInit.cpp">
+      <Filter>Data\IngameWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\Fractal.cpp">
+      <Filter>Data\Algorithms\FractalAlgorithms</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

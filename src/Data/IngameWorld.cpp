@@ -5,16 +5,7 @@
 World::World(MapInfo* MapInfo) : _Info(MapInfo) , _InitFile(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "ini")) , _SHBD(_Info)
 {
 	auto start = std::chrono::steady_clock::now();
-	if (!InitScene())
-		return;
-	if (!InitCamera())
-		return;
-	if (!InitSkyCtrl())
-		return;
-	if (!InitLightFog())
-		return;
-	if (!InitShadow())
-		return;
+
 
 	if (!LoadTerrain())
 		return;

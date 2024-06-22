@@ -73,7 +73,9 @@ public:
 	}
 	static void UpdateScene(FiestaScenePtr Scene);
 	static FiestaOnlineTool* _Tool;
+	FiestaScenePtr NewScene;
 	void UpdateSceneInternal(FiestaScenePtr Scene);
+	void UpdateSceneInternal();
 	static float GetLastUpdateTime() {
 		return _Tool->_LastUpdateTime();
 	}
@@ -100,6 +102,7 @@ public:
 	}
 private: 
 	std::mutex SceneLock;
+	std::mutex UpdateLock;
 	FiestaScenePtr _Scene;
 	static unsigned int ShaderErrorCallback(const char* pacError,NiShaderError eError, bool bRecoverable);
 	virtual bool RunShaderParser();

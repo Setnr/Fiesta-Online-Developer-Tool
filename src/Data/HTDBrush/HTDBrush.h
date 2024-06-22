@@ -13,8 +13,9 @@ public:
 	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD, NiPoint3 InterSect){}
 	virtual void DrawInternal() {}
 	virtual const char* GetName() { return "-"; }
+	virtual void Show(bool Show){}
+	virtual void Init() {}
 protected:
 	NiNodePtr Node;
 	int BrushSize;
-
 };

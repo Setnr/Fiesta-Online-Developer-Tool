@@ -63,7 +63,7 @@ void EditScene::Update(float fTime)
 		{
 			NiPoint3 translate(Camera->GetTranslate());
 			kWorld->GetSkyNode()->SetTranslate(translate);
-			kWorld->GetSkyNode()->Update(fTime);
+			kWorld->GetSkyNode()->Update(fTime / 10.f);
 		}
 	}
 }
