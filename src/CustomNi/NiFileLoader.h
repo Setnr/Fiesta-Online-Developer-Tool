@@ -41,13 +41,16 @@ public:
 			ptr->SetSHMDPath(File.substr(BasePath.length() + 1).c_str());
 		}else
 			nif->SetName(File.substr(BasePath.length() + 1).c_str());
-		_LoadToScene->AttachChild(nif);
-		_LoadToScene->UpdateEffects();
-		_LoadToScene->UpdateProperties();
-		_LoadToScene->Update(0.0f);
-		_LoadToScene = NULL; // This Line resolves a NiDx9RendererCrash xD
-		//The Renderer crashes because he releases its Shaders but if this is not cleared it still holds
-		// a deep reference to a shader which cases the RendererDestructor to crash
+		if(_LoadToScene)
+		{
+			_LoadToScene->AttachChild(nif);
+			_LoadToScene->UpdateEffects();
+			_LoadToScene->UpdateProperties();
+			_LoadToScene->Update(0.0f);
+			_LoadToScene = NULL; // This Line resolves a NiDx9RendererCrash xD
+			//The Renderer crashes because he releases its Shaders but if this is not cleared it still holds
+			// a deep reference to a shader which cases the RendererDestructor to crash
+		}
 		fileDialog.ClearSelected();
 		return nif;
 	}

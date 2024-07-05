@@ -56,7 +56,6 @@ void EditScene::Update(float fTime)
 	}
 	if (kWorld)
 	{
-		
 		if (kWorld->GetWorldScene())
 			kWorld->GetWorldScene()->Update(fTime);
 		if(kWorld->GetSkyNode())

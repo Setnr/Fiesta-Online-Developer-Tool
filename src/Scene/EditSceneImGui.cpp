@@ -564,6 +564,27 @@ void EditScene::DrawSHMDWindow()
 
 	ImGui::End();
 
+	static NiFileLoader loader;
+	if (loader.DrawImGui())
+	{
+		NiNodePtr obj = loader.Load();
+		if (NiIsKindOf(NiPickable, obj))
+		{
+			auto Parent = SelectedObj->GetParent();
+			obj->SetTranslate(SelectedObj->GetTranslate());
+			obj->SetRotate(SelectedObj->GetRotate());
+			obj->SetScale(SelectedObj->GetScale());
+			Parent->DetachChild(SelectedObj);
+			Parent->AttachChild(obj);
+			Parent->UpdateEffects();
+			Parent->UpdateProperties();
+			Parent->Update(0.0f);
+			Parent->CompactChildArray();
+			SelectedObj = (NiPickable*)(NiNode*)obj;
+			UpdateGeneralInfoNode((NiNode*)&*SelectedObj);
+		}
+	}
+
 	if (SelectedObj)
 	{
 		{
@@ -596,9 +617,13 @@ void EditScene::DrawSHMDWindow()
 			float Scale = SelectedObj->GetScale();
 			if (ImGui::DragFloat("Scale", &Scale, 0.01f, 0.0f, 5.0f))
 				SelectedObj->SetScale(Scale);
+
+			if (ImGui::Button("Change NIF of Object"))
+				loader.Prepare(nullptr,NiIsKindOf(NiPickable, SelectedObj));
 			ImGui::End();
 		}
 	}
+	
 }
 
 void EditScene::DrawSHBDEditor() 
