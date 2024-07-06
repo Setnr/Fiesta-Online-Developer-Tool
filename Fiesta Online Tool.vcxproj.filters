@@ -67,6 +67,9 @@
     <Filter Include="Data\Algorithms\FractalAlgorithms">
       <UniqueIdentifier>{ac16d4bb-c744-4b7b-b72c-c035e1ea240b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene\MapTextureScene">
+      <UniqueIdentifier>{b2d35b31-b639-4f3d-af43-e57f85ec1b47}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CustomNi\NiFileLoader.h">
@@ -236,6 +239,9 @@
     <ClInclude Include="src\Data\WorleyFractal.h">
       <Filter>Data\Algorithms\FractalAlgorithms</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene\MapTextureScene.h">
+      <Filter>Scene\MapTextureScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">
@@ -370,6 +376,9 @@
     </ClCompile>
     <ClCompile Include="src\Data\Fractal.cpp">
       <Filter>Data\Algorithms\FractalAlgorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\MapTextureScene.cpp">
+      <Filter>Scene\MapTextureScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

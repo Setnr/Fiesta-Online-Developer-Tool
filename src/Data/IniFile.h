@@ -5,6 +5,7 @@
 #include <fstream>
 
 #include <NiSourceTexture.h>
+#include <filesystem>
 
 class TerrainLayer 
 {
@@ -102,7 +103,44 @@ public:
 		LayerList.clear();
 	}
 	bool Load();
+	void Save(std::string Path) 
+	{
+		std::ofstream IniFile;
+		if (std::filesystem::exists(Path))
+			std::filesystem::remove(Path);
+		IniFile.open(Path);
+		IniFile << "#PGFILE" + 0x20 << ":" + 0x20 << FileType << std::endl;
+		IniFile << "#FILE_VER" + 0x20 << ":" + 0x20 << Version << std::endl << std::endl;
 
+		IniFile << "#HeightFileName" + 0x20 << ":" +0x20 << HeightFileName << std::endl;
+		IniFile << "#VerTexColorTexture" + 0x20 << ":" +0x20 << VertexColorTexture << std::endl << std::endl;
+
+		IniFile << "#HEIGHTMAP_WIDTH" + 0x20 << ":" +0x20 << HeightMap_width << std::endl;
+		IniFile << "#HEIGHTMAP_HEIGHT" + 0x20 << ":" +0x20 << HeightMap_height << std::endl << std::endl;
+
+		IniFile << "#OneBlockWidth" + 0x20 << ":" +0x20 << OneBlock_width << std::endl;
+		IniFile << "#OneBlockHeight" + 0x20 << ":" +0x20 << OneBlock_height << std::endl << std::endl;
+
+		IniFile << "#QuadsWide" + 0x20 << ":" +0x20 << QuadsWide << std::endl;
+		IniFile << "#QuadsHigh" + 0x20 << ":" +0x20 << QuadsHigh << std::endl << std::endl;
+
+		for (auto layer : LayerList) 
+		{
+			IniFile << "#Layer" << std::endl;
+			IniFile << "{" << std::endl;
+			IniFile << "	#Name" + 0x20 << ":" +0x20 << layer->Name << std::endl;
+			IniFile << "	#DiffuseFileName" + 0x20 << ":" +0x20 << layer->DiffuseFileName << std::endl;
+			IniFile << "	#BlendFileName" + 0x20 << ":" +0x20 << layer->BlendFileName << std::endl;
+			IniFile << "	#StartPos_X" + 0x20 << ":" +0x20 << layer->StartPos_X << std::endl;
+			IniFile << "	#StartPos_Y" + 0x20 << ":" +0x20 << layer->StartPos_Y << std::endl;
+			IniFile << "	#Width" + 0x20 << ":" +0x20 << layer->Width << std::endl;
+			IniFile << "	#Height" + 0x20 << ":" +0x20 << layer->Height << std::endl;
+			IniFile << "	#UVScaleDiffuse" + 0x20 << ":" +0x20 << layer->UVScaleDiffuse << std::endl;
+			IniFile << "	#UVScaleBlend" + 0x20 << ":" +0x20 << layer->UVScaleBlend << std::endl;
+			IniFile << "}" << std::endl;
+		}
+		IniFile << "#END_FILE" << std::endl;
+	}
 
 	std::string FileType;
 	std::string HeightFileName;

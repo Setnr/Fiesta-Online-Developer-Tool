@@ -106,6 +106,7 @@
     <ClInclude Include="src\Scene\EditScene.h" />
     <ClInclude Include="src\Scene\FiestaScene.h" />
     <ClInclude Include="src\Scene\MapCreateScene.h" />
+    <ClInclude Include="src\Scene\MapTextureScene.h" />
     <ClInclude Include="src\Scene\SetupScene.h" />
     <ClInclude Include="src\Settings\Settings.h" />
   </ItemGroup>
@@ -153,6 +154,7 @@
     <ClCompile Include="src\Scene\EditSceneImGui.cpp" />
     <ClCompile Include="src\Scene\FiestaScene.cpp" />
     <ClCompile Include="src\Scene\MapCreateScene.cpp" />
+    <ClCompile Include="src\Scene\MapTextureScene.cpp" />
     <ClCompile Include="src\Scene\SetupScene.cpp" />
     <ClCompile Include="src\Settings\Settings.cpp" />
   </ItemGroup>

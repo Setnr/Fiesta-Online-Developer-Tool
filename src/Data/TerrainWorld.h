@@ -5,6 +5,7 @@
 #include <map>
 #include <list>
 #include <mutex>
+#include "../Data/IniFile.h"
 #include "PgUtil.h"
 
 
@@ -12,7 +13,7 @@ NiSmartPointer(TerrainWorld);
 class TerrainWorld : public NiRefObject
 {
 public:
-	TerrainWorld() 
+	TerrainWorld(std::string IniFile) : _InitFile(IniFile)
 	{
 		if (!InitScene())
 			return;
@@ -26,8 +27,41 @@ public:
 			return;
 
 		this->GetCamera()->SetViewFrustum(this->GetWorldFrustum());
+
+		if (!LoadTerrain())
+			return;
 	}
-	
+	TerrainWorld() : _InitFile(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\BaseIni.ini"))
+	{
+		if (!InitScene())
+			return;
+		if (!InitCamera())
+			return;
+		if (!InitSkyCtrl())
+			return;
+		if (!InitLightFog())
+			return;
+		if (!InitShadow())
+			return;
+
+		this->GetCamera()->SetViewFrustum(this->GetWorldFrustum());
+
+		if (!LoadTerrain())
+			return;
+	}
+#pragma region GlobalStatics
+	static NiPoint3 ms_kUpDir; // idb
+	static NiPoint3 ms_kDownDir; // idb
+	static NiPoint3 ms_kNorthDir; // idb
+	static NiPoint3 ms_kEastDir; // idb
+	static NiPoint3 ms_kWestDir; // idb
+	static NiPoint3 ms_kDefaultDirectionalLightDir; // idb
+#pragma endregion
+	struct HTDHelper {
+		float Height;
+		std::vector<NiPoint3*> Vec;
+		std::vector<NiGeometryData*> Shape;
+	};
 #pragma region Init
 	bool InitScene();
 	bool InitCamera();
@@ -200,4 +234,47 @@ protected:
 	NiColor BackgroundColor;
 #pragma endregion
 	bool LoadedSuccessfully = false;
+
+	bool LoadTerrain();
+	IniFile _InitFile;
+
+	std::vector<std::vector<HTDHelper>> _HTD;
+	struct PointInfos
+	{
+		float Height;
+		TerrainLayer::RGBAColor PixelColor;
+		NiColorA VertexColor;
+	};
+	struct Triangle
+	{
+		unsigned short one;
+		unsigned short two;
+		unsigned short three;
+	};
+	std::vector<std::vector<PointInfos>> VertexMap;
+	void CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer);
+	NiNodePtr GetLayerNode(std::string LayerName) 
+	{
+		NiSortAdjustNodePtr Terrain = GetTerrainScene();
+		/*
+		* Look if Layer Allready exists if yes detach it and recreate it
+		*/
+		NiAVObjectPtr ActiveChild = nullptr;
+		for (unsigned int i = 0; i < Terrain->GetChildCount(); i++) 
+		{
+			NiAVObjectPtr child = Terrain->GetAt(i);
+			if (child->GetName().Equals(LayerName.c_str()))
+			{
+				ActiveChild = child;
+				break;
+			}
+		}
+		if (ActiveChild)
+			Terrain->DetachChild(ActiveChild);
+
+		NiNodePtr LayerNode = NiNew NiNode;
+		LayerNode->SetName(LayerName.c_str());
+		Terrain->AttachChild(LayerNode);
+		return LayerNode;
+	}
 };

@@ -88,6 +88,7 @@ public:
         pkScreenTexture->AddNewScreenRect(20,0, pkTexture->GetWidth(), pkTexture->GetHeight(), 0, 0);
         Show(_Show);
     }
+    void SaveHTD(std::string FilePath);
 protected:
     int grid_size;
     float BlockWidth = 50.f;

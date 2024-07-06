@@ -85,4 +85,5 @@ private:
 	bool AlgoPreview = false;
 	FractalPtr _Fractal;
 	TerrainWorldPtr kWorld;
+	bool ShowHTDSave = false;
 };

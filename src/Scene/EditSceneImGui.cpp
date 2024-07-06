@@ -162,6 +162,7 @@ void EditScene::ShowMapInfo()
 			FiestaScenePtr scene = (FiestaScene*)&*ptr;
 			FiestaOnlineTool::UpdateScene(scene);
 		}
+		
         if (shn->DrawHeader())
         {
             for (unsigned int i = 0; i < shn->GetRows(); i++)

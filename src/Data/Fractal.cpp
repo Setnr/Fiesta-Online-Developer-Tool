@@ -283,6 +283,31 @@ void Fractal::cleanUpGrid(T** grid) {
     }
 }
 
+void Fractal::SaveHTD(std::string FilePath) 
+{
+    std::ofstream HTDFile;
+    HTDFile.open(FilePath, std::ios::binary);
+    unsigned short Size = static_cast<unsigned short>(grid_size);
+    int PointCounter = grid_size * grid_size;
+    HTDFile.write((char*)&PointCounter, sizeof(PointCounter));
+
+    std::ofstream HTDGFile;
+    HTDGFile.open(FilePath + "G", std::ios::binary);
+    HTDGFile.write((char*)&PointCounter, sizeof(PointCounter));
+    float DeadHeight = 0.f;
+    for (int h = 0; h < grid_size; h++)
+    {
+        for (int w = 0; w < grid_size; w++)
+        {
+            float Height = grid[w][h] * 25.f;
+            HTDFile.write((char*)&Height, sizeof(Height));
+            HTDGFile.write((char*)&DeadHeight, sizeof(float));
+        }
+    }
+    HTDFile.close();
+    HTDGFile.close();
+}
+
 void Fractal::CreateTerrain(TerrainWorldPtr world, int Size)
 {
     auto start = std::chrono::steady_clock::now();

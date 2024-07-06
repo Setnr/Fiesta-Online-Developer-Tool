@@ -1,6 +1,5 @@
 #pragma once
 #include "../Data/SHNStruct.h"
-#include "../Data/IniFile.h"
 #include "../Data/SHBD/SHBD.h"
 #include "TerrainWorld.h"
 
@@ -28,14 +27,7 @@ public:
 		}
 	}
 	NiNodePtr GetSHBDNode() { return SHBDNode; }
-#pragma region GlobalStatics
-	static NiPoint3 ms_kUpDir; // idb
-	static NiPoint3 ms_kDownDir; // idb
-	static NiPoint3 ms_kNorthDir; // idb
-	static NiPoint3 ms_kEastDir; // idb
-	static NiPoint3 ms_kWestDir; // idb
-	static NiPoint3 ms_kDefaultDirectionalLightDir; // idb
-#pragma endregion
+
 
 	void ResetSHBD(NiPoint3 SpawnPoint);
 	void SaveSHBD();
@@ -51,28 +43,21 @@ public:
 
 	void ShowHTDG(bool Show, NiNodePtr OrbNode);
 	void SaveHTDG();
-	struct HTDHelper {
-		float Height;
-		std::vector<NiPoint3*> Vec;
-		std::vector<NiGeometryData*> Shape;
-	};
+
 	std::vector<std::vector<HTDHelper>>& GetHTD() { return _HTD; }
 	IniFile& GetIni() { return _InitFile; }
 
 private:
-	bool LoadTerrain();
 	bool LoadSHMD();
 	bool LoadSHBD();
 
 private:
 	MapInfo* _Info;
-	IniFile _InitFile;
 
 	ShineBlockData _SHBD;
 	NiNodePtr SHBDNode;
 	std::vector<std::vector<NiPixelDataPtr>> TextureConnector;
 
-	std::vector<std::vector<HTDHelper>> _HTD;
 
 	std::pair<int, int> ResetPoint;
 

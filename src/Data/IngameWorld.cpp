@@ -2,13 +2,11 @@
 #include "../Logger/Logger.h"
 #include <chrono>
 #include <future>
-World::World(MapInfo* MapInfo) : _Info(MapInfo) , _InitFile(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "ini")) , _SHBD(_Info)
+World::World(MapInfo* MapInfo) : _Info(MapInfo) , TerrainWorld(PgUtil::CreateMapFolderPath(MapInfo->KingdomMap, MapInfo->MapFolderName, "ini")) , _SHBD(MapInfo)
 {
 	auto start = std::chrono::steady_clock::now();
 
 
-	if (!LoadTerrain())
-		return;
 	if (!LoadSHMD())
 		return;
 	if (!LoadSHBD())

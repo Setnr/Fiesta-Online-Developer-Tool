@@ -51,8 +51,8 @@ protected:
 	{
 		Camera->SetTranslate(Point + NiPoint3(250.f, 250.f, 250.f));
 		Camera->Update(0.0f);
-		Camera->LookAtWorldPoint(Point, World::ms_kUpDir);
-		Camera->LookAtWorldPoint(Point, World::ms_kUpDir);
+		Camera->LookAtWorldPoint(Point, TerrainWorld::ms_kUpDir);
+		Camera->LookAtWorldPoint(Point, TerrainWorld::ms_kUpDir);
 		NiMatrix3 mat = Camera->GetRotate();
 		mat.ToEulerAnglesXYZ(Roll, Yaw, Pitch); //Roll Yaw Pitch Steuerung gespiegelt
 		Camera->Update(0.0f);

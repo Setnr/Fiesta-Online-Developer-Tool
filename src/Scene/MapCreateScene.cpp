@@ -4,6 +4,7 @@
 #include "../Data/SHNManager.h"
 #include "EditScene.h"
 #include "../NiApplication/FiestaOnlineTool.h"
+#include "MapTextureScene.h"
 
 void MapCreateScene::ShowMapInfo() 
 {
@@ -18,6 +19,15 @@ void MapCreateScene::ShowMapInfo()
             MapCreateScenePtr ptr = NiNew MapCreateScene;
             FiestaScenePtr scene = (FiestaScene*)&*ptr;
             FiestaOnlineTool::UpdateScene(scene);
+        }
+        if (ImGui::Button("Texture Map From HTD")) 
+        {
+            /*
+            *
+            * TODO
+            * Create MapTextureScene mit Nem LoadFromSource(HTD) oder LoadFromSource(Ini) jenach FileAuswahl
+            */
+
         }
         if (shn->DrawHeader())
         {
@@ -65,7 +75,7 @@ void MapCreateScene::DrawImGui()
     if (ShowLoadMenu)
         ShowMapInfo();
 
-    if (ImGui::Begin("Create Map"))
+    if (ImGui::Begin("Create Map", 0 , ImGuiWindowFlags_NoCollapse))
     {
         bool UpdateAlgo = false;
         if (ImGui::RadioButton("64x64", MapSize == 65))
@@ -118,32 +128,37 @@ void MapCreateScene::DrawImGui()
         {
         case Perlin:
         {
-            if (ImGui::DragInt("Octave", &Octave, 1.f, 1.f, 20.f) ||
-                ImGui::DragFloat("Min Height", &MinValue, 1.0f, -5000.0f, 1000.f) ||
-                ImGui::DragFloat("Max Height", &MaxValue, 1.0f, -1000.0f, 5000.f)) {
-                
+            if (ImGui::DragInt("Octave", &Octave, 1.f, 1.f, 20.f))
                 UpdateAlgo = true;
-            }
+            if (ImGui::DragFloat("Min Height", &MinValue, 1.0f, -5000.0f, 1000.f))
+                UpdateAlgo = true;
+            if (ImGui::DragFloat("Max Height", &MaxValue, 1.0f, -1000.0f, 5000.f))
+                UpdateAlgo = true;
+                
+            
             break;
         }
         case Worley:
         {
-            if (ImGui::DragInt("Num Points", &NumPoints,1.0,0,25) ||
-                ImGui::DragInt("Point Loc", &PointLoc, 1.0, 0, NumPoints - 1) ||
-                ImGui::DragFloat("Min Height", &MinValue, 1.0f, -5000.0f, 1000.f) ||
-                ImGui::DragFloat("Max Height", &MaxValue, 1.0f, -1000.0f, 5000.f)) {
-
+            if (ImGui::DragInt("Num Points", &NumPoints,1.0,0,25))
                 UpdateAlgo = true;
-            }
+            if (ImGui::DragInt("Point Loc", &PointLoc, 1.0, 0, NumPoints - 1))
+                UpdateAlgo = true;
+            if (ImGui::DragFloat("Min Height", &MinValue, 1.0f, -5000.0f, 1000.f))
+                UpdateAlgo = true;
+            if (ImGui::DragFloat("Max Height", &MaxValue, 1.0f, -1000.0f, 5000.f))
+                UpdateAlgo = true;
             break;
         }
         case DiamondSquare: 
-            {
-                if(ImGui::DragFloat("Noise",&noise,0.01f) || 
-                    ImGui::DragFloat("Min Height", &MinValue, 1.0f, -5000.0f, 1000.f) ||
-                    ImGui::DragFloat("Max Height", &MaxValue, 1.0f, -1000.0f, 5000.f))
-                    UpdateAlgo = true;
-            }
+        {
+            if (ImGui::DragFloat("Noise", &noise, 0.01f))
+                UpdateAlgo = true;
+            if (ImGui::DragFloat("Min Height", &MinValue, 1.0f, -5000.0f, 1000.f))
+                UpdateAlgo = true;
+            if (ImGui::DragFloat("Max Height", &MaxValue, 1.0f, -1000.0f, 5000.f))
+                UpdateAlgo = true;
+        }
             break;
         }
 
@@ -158,16 +173,73 @@ void MapCreateScene::DrawImGui()
         ImGui::SameLine();
         if (ImGui::Button("Reset Grid"))
             UpdateAlgo = true;
-        if (ImGui::Button("Save Test Nif")) 
+        if (ImGui::Button("Procced To Texturing")) 
         {
-            NiStream s;
-            s.InsertObject(kWorld->GetTerrainScene());
-            s.Save(PgUtil::CreateFullFilePathFromApplicationFolder("./Test.nif").c_str());
+            ShowHTDSave = true;
         }
 
         if (UpdateAlgo)
             UpdateAlgorithm(_Algo);
         ImGui::End();
+    }
+
+    if (ShowHTDSave) 
+    {
+        if (ImGui::Begin("Save HTD"))
+        {
+            static enum MapType {
+                Field,
+                IDField,
+                KDField
+            } SaveType = Field;
+            if (ImGui::RadioButton("Field Map", SaveType == Field))
+                SaveType = Field;
+            ImGui::SameLine();
+            if (ImGui::RadioButton("ID Map", SaveType == IDField))
+                SaveType = IDField;
+            ImGui::SameLine();
+            if (ImGui::RadioButton("KD Map", SaveType == KDField))
+                SaveType = KDField;
+            static char MapName[128] = "SetTool";
+            ImGui::InputText("MapName", MapName, sizeof(MapName));
+            if (ImGui::Button("Save"))
+            {
+                std::string SubPath = ".\\resmap\\";
+                switch (SaveType)
+                {
+                case Field: SubPath += "field";
+                    break;
+                case IDField: SubPath += "IDField";
+                    break;
+                case KDField: SubPath += "KDField";
+                    break;
+                }
+                SubPath += "\\" + std::string(MapName);
+                std::string Direcotry = PgUtil::CreateFullFilePathFromBaseFolder(SubPath);
+                if (!std::filesystem::exists(Direcotry))
+                {
+                    std::filesystem::create_directories(Direcotry);
+                }
+
+                _Fractal->SaveHTD(Direcotry +"\\NewMap.HTD");
+                IniFile file(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\BaseIni.ini"));
+                if (!file.Load()) 
+                {
+                    NiMessageBox::DisplayMessage("Cant Find BaseIni.ini", "ERROR");
+                    return;
+                }
+                file.HeightMap_height = MapSize;
+                file.HeightMap_width = MapSize;
+                file.HeightFileName = SubPath + "\\NewMap.HTD";
+                file.Save(Direcotry + "\\NewMap.ini");
+
+                MapTextureScenePtr ptr = NiNew MapTextureScene(Direcotry + "\\NewMap.ini");
+                FiestaScenePtr scene = (FiestaScene*)&*ptr;
+                FiestaOnlineTool::UpdateScene(scene);
+
+            }
+            ImGui::End();
+        }
     }
 }
 
