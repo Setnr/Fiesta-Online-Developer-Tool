@@ -1,81 +1,17 @@
 #include "MapCreateScene.h"
 
-#include <future>
-#include "../Data/SHNManager.h"
 #include "EditScene.h"
 #include "../NiApplication/FiestaOnlineTool.h"
 #include "MapTextureScene.h"
 
-void MapCreateScene::ShowMapInfo() 
-{
-    static std::future<void> future;
-    auto shn = SHNManager::Get(SHNManager::MapInfoType);
-    if (ImGui::Begin("Load MapInfo", &ShowLoadMenu));
-    {
-        static char buffer[15];
-        ImGui::InputText("Filter Maps", buffer, sizeof(buffer));
-        ImGui::SameLine();
-        if (ImGui::Button("Create New Map")) {
-            MapCreateScenePtr ptr = NiNew MapCreateScene;
-            FiestaScenePtr scene = (FiestaScene*)&*ptr;
-            FiestaOnlineTool::UpdateScene(scene);
-        }
-        if (ImGui::Button("Texture Map From HTD")) 
-        {
-            /*
-            *
-            * TODO
-            * Create MapTextureScene mit Nem LoadFromSource(HTD) oder LoadFromSource(Ini) jenach FileAuswahl
-            */
 
-        }
-        if (shn->DrawHeader())
-        {
-            for (unsigned int i = 0; i < shn->GetRows(); i++)
-            {
-                MapInfo* info = shn->GetRow<MapInfo>(i);
-                std::string MapName = info->MapName;
-                std::transform(MapName.begin(), MapName.end(), MapName.begin(), ::tolower);
-                std::string BufferStr = buffer;
-                std::transform(BufferStr.begin(), BufferStr.end(), BufferStr.begin(), ::tolower);
-
-                if (MapName.find(BufferStr) == std::string::npos)
-                    continue;
-                shn->DrawRow(i);
-                if (!future.valid() || future.wait_for(std::chrono::milliseconds(0)) != std::future_status::timeout)
-                {
-                    if (ImGui::Button(std::string("Load Map##" + std::to_string(i)).c_str()))
-                    {
-                        ImGui::SetWindowFocus("");
-                        ShowLoadMenu = false;
-                        future = std::async(std::launch::async, [this, shn, i]
-                            {
-                                EditScenePtr ptr = NiNew EditScene;
-                                ptr->HideShowLoadMenu();
-                                MapInfo* info = shn->GetRow<MapInfo>(i);
-                                ptr->LoadMap(info);
-                                FiestaScenePtr scene = (FiestaScene*)&*ptr;
-                                FiestaOnlineTool::UpdateScene(scene);
-
-                            });
-
-                    }
-
-                }
-            }
-            ImGui::EndTable();
-        }
-        ImGui::End();
-    }
-}
 
 void MapCreateScene::DrawImGui()
 {
     FiestaScene::DrawImGui();
-    if (ShowLoadMenu)
-        ShowMapInfo();
+    _MapMenu.RenderMenu();
 
-    if (ImGui::Begin("Create Map", 0 , ImGuiWindowFlags_NoCollapse))
+    if (ImGui::Begin("Create Map", 0 , ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove))
     {
         bool UpdateAlgo = false;
         if (ImGui::RadioButton("64x64", MapSize == 65))
@@ -177,7 +113,9 @@ void MapCreateScene::DrawImGui()
         {
             ShowHTDSave = true;
         }
-
+        ImGui::SameLine();
+        if(ImGui::Button("Save as .nif"))
+            PgUtil::SaveNode(PgUtil::CreateFullFilePathFromBaseFolder(".\\Test.nif"), kWorld->GetTerrainScene());
         if (UpdateAlgo)
             UpdateAlgorithm(_Algo);
         ImGui::End();
@@ -185,7 +123,7 @@ void MapCreateScene::DrawImGui()
 
     if (ShowHTDSave) 
     {
-        if (ImGui::Begin("Save HTD"))
+        if (ImGui::Begin("Save HTD", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove))
         {
             static enum MapType {
                 Field,
@@ -214,14 +152,15 @@ void MapCreateScene::DrawImGui()
                 case KDField: SubPath += "KDField";
                     break;
                 }
-                SubPath += "\\" + std::string(MapName);
+                std::string _MapName = std::string(MapName);
+                SubPath += "\\" + _MapName;
                 std::string Direcotry = PgUtil::CreateFullFilePathFromBaseFolder(SubPath);
                 if (!std::filesystem::exists(Direcotry))
                 {
                     std::filesystem::create_directories(Direcotry);
                 }
 
-                _Fractal->SaveHTD(Direcotry +"\\NewMap.HTD");
+                _Fractal->SaveHTD(Direcotry + "\\" + _MapName + ".HTD");
                 IniFile file(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\BaseIni.ini"));
                 if (!file.Load()) 
                 {
@@ -230,13 +169,15 @@ void MapCreateScene::DrawImGui()
                 }
                 file.HeightMap_height = MapSize;
                 file.HeightMap_width = MapSize;
-                file.HeightFileName = SubPath + "\\NewMap.HTD";
-                file.Save(Direcotry + "\\NewMap.ini");
-
-                MapTextureScenePtr ptr = NiNew MapTextureScene(Direcotry + "\\NewMap.ini");
+                file.HeightFileName = SubPath + "\\" + _MapName + ".HTD";
+                file.VertexColorTexture = SubPath + "\\Vertex" + _MapName + ".bmp";
+                file.LayerList[0]->Height = MapSize;
+                file.LayerList[0]->Width = MapSize;
+                file.Save(Direcotry + "\\" + _MapName + ".ini");
+                PgUtil::SaveTexture(Direcotry + "\\Vertex" + _MapName + ".bmp", _Fractal->GetSourceTexture());
+                MapTextureScenePtr ptr = NiNew MapTextureScene(Direcotry + "\\" + _MapName + ".ini");
                 FiestaScenePtr scene = (FiestaScene*)&*ptr;
                 FiestaOnlineTool::UpdateScene(scene);
-
             }
             ImGui::End();
         }
@@ -247,10 +188,7 @@ void MapCreateScene::CreateMenuBar()
 {
     if (ImGui::BeginMenu("File"))
     {
-        if (ImGui::MenuItem("Load Map"))
-        {
-            ShowLoadMenu = true;
-        }
+        _MapMenu.ShowMenuBar();
         ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("View"))

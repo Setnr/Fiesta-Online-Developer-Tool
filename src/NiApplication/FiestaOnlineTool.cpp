@@ -42,6 +42,9 @@ void FiestaOnlineTool::OnIdle()
             /*Draw MainScene (GameWorld)*/
             _Scene->Draw(this->m_spRenderer);
 
+            /*Draw NiScreenElements Maybe needs Work so it Draws Player HP Hud and stuff*/
+            this->RenderScreenItems();
+
             NiDX9RendererPtr renderer = (NiDX9Renderer*)(NiRenderer*)this->m_spRenderer; //Reset some TextureStage Shit to fix some broken Rendering
             renderer->GetRenderState()->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, 0);
             renderer->GetRenderState()->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
@@ -53,9 +56,6 @@ void FiestaOnlineTool::OnIdle()
 
         /*Draw Interface Windows*/
         Pgg_kWinMgr->Draw(m_spRenderer);
-        /*Draw NiScreenElements Maybe needs Work so it Draws Player HP Hud and stuff*/
-        this->RenderScreenItems();
-
         /*Draws the Cursor*/
         DrawCursor();
 

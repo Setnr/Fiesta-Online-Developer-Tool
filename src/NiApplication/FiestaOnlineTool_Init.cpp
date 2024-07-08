@@ -39,7 +39,9 @@ bool FiestaOnlineTool::Initialize()
 
     if (LoadSetupScene)
     {
-        _Scene = NiNew EditScene;
+        EditScene* Scene = NiNew EditScene;
+        Scene->ShowLoadMenu();
+        _Scene = Scene;
         NiShaderFactory::RegisterErrorCallback(ShaderErrorCallback);
         this->RunShaderParser();
         this->RegisterShaderLibraries();

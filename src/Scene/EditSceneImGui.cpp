@@ -59,8 +59,7 @@ void EditScene::DrawImGui()
 		break;
 	}
 
-    if (ShowLoadMenu)
-        ShowMapInfo();
+	_MapMenu.RenderMenu();
 	if (ShowSettingsMenu)
 		ShowSettings();
 	if (ShowAbout)
@@ -71,10 +70,7 @@ void EditScene::CreateMenuBar()
 {
     if (ImGui::BeginMenu("File"))
     {
-        if (ImGui::MenuItem("Load Map"))
-        {
-            ShowLoadMenu = true;
-        }
+		_MapMenu.ShowMenuBar();
         if (ImGui::MenuItem("Settings"))
         {
             ShowSettingsMenu = true;
@@ -148,56 +144,6 @@ void EditScene::CreateMenuBar()
 	}
 }
 
-void EditScene::ShowMapInfo()
-{
-    static std::future<void> future;
-    auto shn = SHNManager::Get(SHNManager::MapInfoType);
-    if (ImGui::Begin("Load MapInfo", &ShowLoadMenu));
-    {
-        static char buffer[15];
-        ImGui::InputText("Filter Maps", buffer, sizeof(buffer));
-		ImGui::SameLine();
-		if (ImGui::Button("Create New Map")) {
-			MapCreateScenePtr ptr = NiNew MapCreateScene;
-			FiestaScenePtr scene = (FiestaScene*)&*ptr;
-			FiestaOnlineTool::UpdateScene(scene);
-		}
-		
-        if (shn->DrawHeader())
-        {
-            for (unsigned int i = 0; i < shn->GetRows(); i++)
-            {
-                MapInfo* info = shn->GetRow<MapInfo>(i);
-                std::string MapName = info->MapName;
-                std::transform(MapName.begin(), MapName.end(), MapName.begin(), ::tolower);
-                std::string BufferStr = buffer;
-                std::transform(BufferStr.begin(), BufferStr.end(), BufferStr.begin(), ::tolower);
-
-                if (MapName.find(BufferStr) == std::string::npos)
-                    continue;
-                shn->DrawRow(i);
-                if (!future.valid() || future.wait_for(std::chrono::milliseconds(0)) != std::future_status::timeout)
-                {
-                    if (ImGui::Button(std::string("Load Map##" + std::to_string(i)).c_str()))
-                    {
-                        ImGui::SetWindowFocus("");
-                        ShowLoadMenu = false;
-                        future = std::async(std::launch::async, [this, shn, i]
-                            {
-                                MapInfo* info = shn->GetRow<MapInfo>(i);
-                                LoadMap(info);
-
-                            });
-
-                    }
-                   
-                }
-            }
-            ImGui::EndTable();
-        }
-        ImGui::End();
-    }
-}
 
 void EditScene::ShowAboutWindow() 
 {

@@ -193,7 +193,9 @@ public:
 	float GetFOV() { return this->m_fCameraFOV; }
 
 	bool WasLoadedSuccessfully() { return LoadedSuccessfully; }
-	
+	IniFile& GetIniFile() { return _InitFile; }
+	void CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer);
+	std::vector<std::vector<HTDHelper>>& GetHTD() { return _HTD; }
 #pragma endregion
 protected:
 #pragma region WorldStructureNodes
@@ -252,29 +254,5 @@ protected:
 		unsigned short three;
 	};
 	std::vector<std::vector<PointInfos>> VertexMap;
-	void CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer);
-	NiNodePtr GetLayerNode(std::string LayerName) 
-	{
-		NiSortAdjustNodePtr Terrain = GetTerrainScene();
-		/*
-		* Look if Layer Allready exists if yes detach it and recreate it
-		*/
-		NiAVObjectPtr ActiveChild = nullptr;
-		for (unsigned int i = 0; i < Terrain->GetChildCount(); i++) 
-		{
-			NiAVObjectPtr child = Terrain->GetAt(i);
-			if (child->GetName().Equals(LayerName.c_str()))
-			{
-				ActiveChild = child;
-				break;
-			}
-		}
-		if (ActiveChild)
-			Terrain->DetachChild(ActiveChild);
-
-		NiNodePtr LayerNode = NiNew NiNode;
-		LayerNode->SetName(LayerName.c_str());
-		Terrain->AttachChild(LayerNode);
-		return LayerNode;
-	}
+	NiNodePtr GetLayerNode(std::string LayerName);
 };

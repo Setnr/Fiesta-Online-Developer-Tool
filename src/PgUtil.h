@@ -11,7 +11,7 @@
 #include "Data/Version.h"
 #include <windows.h>
 #include <wininet.h>
-
+#include <EasyBMP/EasyBMP.h>
 #define PICKABLEOBJECTS 1
 
 class PgUtil 
@@ -201,5 +201,29 @@ public:
         if (Cur < latest)
             return Version::Status::New;
         return Version::Status::OK;
+    }
+    static void SaveTexture(std::string Path, NiSourceTexturePtr Texture) 
+    {
+        BMP bmp;
+        bmp.SetSize(Texture->GetWidth(), Texture->GetHeight());
+        RGBApixel* PixelData = (RGBApixel*)Texture->GetSourcePixelData()->GetPixels();
+        for (int w = 0; w < Texture->GetWidth(); w++) 
+        {
+            for (int h = 0; h < Texture->GetWidth(); h++) {
+                int XPart = w;
+
+                int PreFullLines = Texture->GetWidth() * h;
+                int YPartNormal = PreFullLines;
+                int PointOffsetNormal = XPart + YPartNormal;
+                bmp.SetPixel(w, h, PixelData[PointOffsetNormal]);
+            }
+        }
+        bmp.WriteToFile(Path.c_str());
+    }
+    static void SaveNode(std::string Path, NiObject* Node) 
+    {
+        NiStream s;
+        s.InsertObject(Node);
+        s.Save(Path.c_str());
     }
 };

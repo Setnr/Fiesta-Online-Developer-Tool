@@ -267,7 +267,8 @@ void World::SaveHTDG()
 	std::string HTDGFilePath = HTDFilePath + "G";
 	if (std::filesystem::exists(HTDGFilePath + ".bak"))
 		std::filesystem::remove(HTDGFilePath + ".bak");
-	std::filesystem::copy(HTDGFilePath, HTDGFilePath + ".bak");
+	if(std::filesystem::exists(HTDGFilePath))
+		std::filesystem::copy(HTDGFilePath, HTDGFilePath + ".bak");
 
 	std::ofstream file;
 	file.open(HTDGFilePath, std::ios::binary);

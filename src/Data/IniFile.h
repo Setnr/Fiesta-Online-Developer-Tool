@@ -6,6 +6,7 @@
 
 #include <NiSourceTexture.h>
 #include <filesystem>
+#include "PgUtil.h"
 
 class TerrainLayer 
 {
@@ -94,6 +95,22 @@ public:
 	NiPixelDataPtr pixldata;
 	NiSourceTexturePtr BlendTexture;
 	NiSourceTexturePtr BaseTexture;
+	bool LoadDiffuseFile()
+	{
+		NiTexture::FormatPrefs BasePref;
+		BasePref.m_ePixelLayout = NiTexture::FormatPrefs::PixelLayout::PIX_DEFAULT;
+		BasePref.m_eMipMapped = NiTexture::FormatPrefs::MipFlag::MIP_DEFAULT;
+		BasePref.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
+
+		std::string acFileName = PgUtil::CreateFullFilePathFromBaseFolder(DiffuseFileName);
+		BaseTexture = NiSourceTexture::Create(acFileName.c_str(), BasePref);
+		if (BaseTexture == NULL)
+		{
+			NiMessageBox::DisplayMessage("BaseTexture is Nullptr", "");
+			return false;
+		}
+		return true;
+	}
 };
 class IniFile 
 {
@@ -109,34 +126,35 @@ public:
 		if (std::filesystem::exists(Path))
 			std::filesystem::remove(Path);
 		IniFile.open(Path);
-		IniFile << "#PGFILE" + 0x20 << ":" + 0x20 << FileType << std::endl;
-		IniFile << "#FILE_VER" + 0x20 << ":" + 0x20 << Version << std::endl << std::endl;
+		IniFile << std::fixed << std::setprecision(1);
+		IniFile << "#PGFILE\t:\t" << FileType << std::endl;
+		IniFile << "#FILE_VER\t:\t" << Version << std::endl << std::endl;
 
-		IniFile << "#HeightFileName" + 0x20 << ":" +0x20 << HeightFileName << std::endl;
-		IniFile << "#VerTexColorTexture" + 0x20 << ":" +0x20 << VertexColorTexture << std::endl << std::endl;
+		IniFile << "#HeightFileName\t:\t\"" << HeightFileName << "\"" << std::endl;
+		IniFile << "#VerTexColorTexture\t:\t\"" << VertexColorTexture << "\"" << std::endl << std::endl;
 
-		IniFile << "#HEIGHTMAP_WIDTH" + 0x20 << ":" +0x20 << HeightMap_width << std::endl;
-		IniFile << "#HEIGHTMAP_HEIGHT" + 0x20 << ":" +0x20 << HeightMap_height << std::endl << std::endl;
+		IniFile << "#HEIGHTMAP_WIDTH\t:\t" << HeightMap_width << std::endl;
+		IniFile << "#HEIGHTMAP_HEIGHT\t:\t" << HeightMap_height << std::endl << std::endl;
 
-		IniFile << "#OneBlockWidth" + 0x20 << ":" +0x20 << OneBlock_width << std::endl;
-		IniFile << "#OneBlockHeight" + 0x20 << ":" +0x20 << OneBlock_height << std::endl << std::endl;
+		IniFile << "#OneBlockWidth\t:\t" << OneBlock_width << "f" << std::endl;
+		IniFile << "#OneBlockHeight\t:\t" << OneBlock_height << "f" << std::endl << std::endl;
 
-		IniFile << "#QuadsWide" + 0x20 << ":" +0x20 << QuadsWide << std::endl;
-		IniFile << "#QuadsHigh" + 0x20 << ":" +0x20 << QuadsHigh << std::endl << std::endl;
+		IniFile << "#QuadsWide\t:\t" << QuadsWide << std::endl;
+		IniFile << "#QuadsHigh\t:\t" << QuadsHigh << std::endl << std::endl;
 
 		for (auto layer : LayerList) 
 		{
 			IniFile << "#Layer" << std::endl;
 			IniFile << "{" << std::endl;
-			IniFile << "	#Name" + 0x20 << ":" +0x20 << layer->Name << std::endl;
-			IniFile << "	#DiffuseFileName" + 0x20 << ":" +0x20 << layer->DiffuseFileName << std::endl;
-			IniFile << "	#BlendFileName" + 0x20 << ":" +0x20 << layer->BlendFileName << std::endl;
-			IniFile << "	#StartPos_X" + 0x20 << ":" +0x20 << layer->StartPos_X << std::endl;
-			IniFile << "	#StartPos_Y" + 0x20 << ":" +0x20 << layer->StartPos_Y << std::endl;
-			IniFile << "	#Width" + 0x20 << ":" +0x20 << layer->Width << std::endl;
-			IniFile << "	#Height" + 0x20 << ":" +0x20 << layer->Height << std::endl;
-			IniFile << "	#UVScaleDiffuse" + 0x20 << ":" +0x20 << layer->UVScaleDiffuse << std::endl;
-			IniFile << "	#UVScaleBlend" + 0x20 << ":" +0x20 << layer->UVScaleBlend << std::endl;
+			IniFile << "	#Name\t:" << layer->Name << std::endl;
+			IniFile << "	#DiffuseFileName\t:\"" << layer->DiffuseFileName << "\"" << std::endl;
+			IniFile << "	#BlendFileName\t:\"" << layer->BlendFileName << "\"" << std::endl;
+			IniFile << "	#StartPos_X\t:" << layer->StartPos_X << "f" << std::endl;
+			IniFile << "	#StartPos_Y\t:" << layer->StartPos_Y << "f" << std::endl;
+			IniFile << "	#Width\t:" << layer->Width << "f" << std::endl;
+			IniFile << "	#Height\t:" << layer->Height << "f" << std::endl;
+			IniFile << "	#UVScaleDiffuse\t:" << layer->UVScaleDiffuse << "f" << std::endl;
+			IniFile << "	#UVScaleBlend\t:" << layer->UVScaleBlend << "f" << std::endl;
 			IniFile << "}" << std::endl;
 		}
 		IniFile << "#END_FILE" << std::endl;
@@ -320,4 +338,5 @@ private:
 		LayerList.push_back(Layer);
 		return true;
 	}
+	
 };

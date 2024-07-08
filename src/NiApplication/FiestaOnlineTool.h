@@ -100,6 +100,14 @@ public:
 		if (_Tool)
 			_Tool->GetScreenTextures().Remove(texture);
 	}
+	static void AddScreenElemets(NiScreenElementsPtr element) {
+		if (_Tool)
+			_Tool->GetScreenElements().AddTail(element);
+	}
+	static void RemoveScreenElemets(NiScreenElementsPtr element) {
+		if (_Tool)
+			_Tool->GetScreenElements().Remove(element);
+	}
 private: 
 	std::mutex SceneLock;
 	std::mutex UpdateLock;

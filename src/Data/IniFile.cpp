@@ -1,5 +1,4 @@
 #include "IniFile.h"
-#include "PgUtil.h"
 
 #include <NiMessageBox.h>
 #include <filesystem>
@@ -116,11 +115,6 @@ void TerrainLayer::CreateTexture()
 		}
 	}
 
-	NiTexture::FormatPrefs BasePref;
-	BasePref.m_ePixelLayout = NiTexture::FormatPrefs::PixelLayout::PIX_DEFAULT;
-	BasePref.m_eMipMapped = NiTexture::FormatPrefs::MipFlag::MIP_DEFAULT;
-	BasePref.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
-
 	NiTexture::FormatPrefs BlendPref;
 	BlendPref.m_ePixelLayout = NiTexture::FormatPrefs::PixelLayout::TRUE_COLOR_32;
 	BlendPref.m_eMipMapped = NiTexture::FormatPrefs::MipFlag::YES;
@@ -128,12 +122,7 @@ void TerrainLayer::CreateTexture()
 
 	BlendTexture = NiSourceTexture::Create(pixldata, BlendPref);
 
-	acFileName = PgUtil::CreateFullFilePathFromBaseFolder(DiffuseFileName);
-	BaseTexture = NiSourceTexture::Create(acFileName.c_str(), BasePref);
-	if (BaseTexture == NULL)
-		NiMessageBox::DisplayMessage("BaseTexture is Nullptr", "");
-
-
+	LoadDiffuseFile();
 }
 
 IniFile::IniFile(std::string FilePath)

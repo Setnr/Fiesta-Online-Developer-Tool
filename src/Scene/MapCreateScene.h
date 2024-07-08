@@ -6,8 +6,9 @@
 #include "../Data/DiamondSquareFractal.h"
 #include "../Data/PerlinFractal.h"
 #include "../Data/WorleyFractal.h"
+#include "Elements/MapMenu.h"
 NiSmartPointer(MapCreateScene);
-class MapCreateScene : public FiestaScene 
+class MapCreateScene : public FiestaScene  
 {
 public:
 	MapCreateScene() {
@@ -31,8 +32,7 @@ public:
 	virtual void UpdateCamera(float fTime) { if(Camera)FiestaScene::UpdateCamera(fTime); }
 
 private:
-	bool ShowLoadMenu = false;
-	void ShowMapInfo();
+	MapMenu _MapMenu;
 	int MapSize = 129;
 	int Seed = 12345;
 	float noise = 0.5f; 

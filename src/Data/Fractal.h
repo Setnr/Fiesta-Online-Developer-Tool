@@ -84,11 +84,15 @@ public:
         BlendPref.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
         pkTexture = NiSourceTexture::Create(data, BlendPref);
         pkTexture->SetStatic(false);
-        pkScreenTexture = NiNew NiScreenTexture(pkTexture);
-        pkScreenTexture->AddNewScreenRect(20,0, pkTexture->GetWidth(), pkTexture->GetHeight(), 0, 0);
+        if(!pkScreenTexture)
+        {
+            pkScreenTexture = NiNew NiScreenTexture(pkTexture);
+            pkScreenTexture->AddNewScreenRect(20, 0, pkTexture->GetWidth(), pkTexture->GetHeight(), 0, 0);
+        }
         Show(_Show);
     }
     void SaveHTD(std::string FilePath);
+    NiSourceTexturePtr GetSourceTexture() { return pkTexture; }
 protected:
     int grid_size;
     float BlockWidth = 50.f;

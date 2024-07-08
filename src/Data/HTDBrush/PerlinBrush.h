@@ -28,7 +28,6 @@ public:
 			perlin = siv::PerlinNoise(seed);
 			UpdatePixelData();
 		}
-		
 		ImGui::EndChild();	
 
 	}

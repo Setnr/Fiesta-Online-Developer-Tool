@@ -128,6 +128,31 @@ bool TerrainWorld::LoadTerrain()
 	}
 }
 
+NiNodePtr TerrainWorld::GetLayerNode(std::string LayerName)
+{
+	NiSortAdjustNodePtr Terrain = GetTerrainScene();
+	/*
+	* Look if Layer Allready exists if yes detach it and recreate it
+	*/
+
+	NiNodePtr LayerNode = NiNew NiNode;
+	LayerNode->SetName(LayerName.c_str());
+	bool SkipAttach = false;
+	Terrain->CompactChildArray();
+	for (unsigned int i = 0; i < Terrain->GetChildCount(); i++)
+	{
+		NiAVObjectPtr child = Terrain->GetAt(i);
+		if (child && child->GetName().Equals(LayerName.c_str())&& NiIsKindOf(NiNode, child))
+		{
+			Terrain->SetAt(i, LayerNode);
+			SkipAttach = true;;
+		}
+	}
+	if(!SkipAttach)
+		Terrain->AttachChild(LayerNode);
+	return LayerNode;
+}
+
 void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer) 
 {
 	NiNodePtr LayerNode = GetLayerNode(CurrentLayer->Name);
@@ -363,9 +388,7 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 				_HTD[WHList[i].first][WHList[i].second].Shape.push_back(Shape->GetModelData());
 			}
 			LayerNode->AttachChild(Shape);
-			//AttachGroundTerrain(Shape);
 		}
-
 	}
 
 	LayerNode->UpdateEffects();

@@ -51,6 +51,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Includes\EasyBMP\EasyBMP.h" />
+    <ClInclude Include="Includes\EasyBMP\EasyBMP_BMP.h" />
+    <ClInclude Include="Includes\EasyBMP\EasyBMP_DataStructures.h" />
+    <ClInclude Include="Includes\EasyBMP\EasyBMP_VariousBMPutilities.h" />
     <ClInclude Include="Includes\ImGui\GraphEditor.h" />
     <ClInclude Include="Includes\ImGui\ImApp.h" />
     <ClInclude Include="Includes\ImGui\imconfig.h" />
@@ -74,6 +78,7 @@
     <ClInclude Include="src\CustomNi\NiBoundingBox.h" />
     <ClInclude Include="src\CustomNi\NiFileLoader.h" />
     <ClInclude Include="src\CustomNi\NiPickable.h" />
+    <ClInclude Include="src\CustomNi\TextureFileLoader.h" />
     <ClInclude Include="src\Data\Algorithms\worley.h" />
     <ClInclude Include="src\Data\DiamondSquareFractal.h" />
     <ClInclude Include="src\Data\Fractal.h" />
@@ -104,6 +109,8 @@
     <ClInclude Include="src\NiInterface\PgWinObj.h" />
     <ClInclude Include="src\PgUtil.h" />
     <ClInclude Include="src\Scene\EditScene.h" />
+    <ClInclude Include="src\Scene\Elements\LayerEditWindow.h" />
+    <ClInclude Include="src\Scene\Elements\MapMenu.h" />
     <ClInclude Include="src\Scene\FiestaScene.h" />
     <ClInclude Include="src\Scene\MapCreateScene.h" />
     <ClInclude Include="src\Scene\MapTextureScene.h" />
@@ -111,6 +118,7 @@
     <ClInclude Include="src\Settings\Settings.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Includes\EasyBMP\EasyBMP.cpp" />
     <ClCompile Include="Includes\ImGui\GraphEditor.cpp" />
     <ClCompile Include="Includes\ImGui\ImCurveEdit.cpp" />
     <ClCompile Include="Includes\ImGui\ImGradient.cpp" />
@@ -152,6 +160,8 @@
     <ClCompile Include="src\Scene\EditScene.cpp" />
     <ClCompile Include="src\Scene\EditSceneControlls.cpp" />
     <ClCompile Include="src\Scene\EditSceneImGui.cpp" />
+    <ClCompile Include="src\Scene\Elements\LayerEditWindow.cpp" />
+    <ClCompile Include="src\Scene\Elements\MapMenu.cpp" />
     <ClCompile Include="src\Scene\FiestaScene.cpp" />
     <ClCompile Include="src\Scene\MapCreateScene.cpp" />
     <ClCompile Include="src\Scene\MapTextureScene.cpp" />
@@ -323,7 +333,7 @@
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
-    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;$(IncludePath)</IncludePath>
+    <IncludePath>./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;./Includes/EasyBMP;$(IncludePath)</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\ShippingLib;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)\</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
@@ -370,6 +380,7 @@ copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
 copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
+copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
 
 copy ".\Includes\Gamebryo 2.3\DLL\d3dx9d_32.dll" ".\Build\$(Configuration)\d3dx9d_32.dll" 
 
@@ -417,7 +428,8 @@ copy ".\Includes\Gamebryo 2.3\DLL\ShaderLibraryDX923VC80D.dll" ".\Build\$(Config
 copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
-copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"</Command>
+copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
+copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -446,6 +458,7 @@ copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
 copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
+copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
 
 
 copy ".\Includes\Gamebryo 2.3\DLL\NiAnimation23VC80R.dll" ".\Build\$(Configuration)\NiAnimation23VC80R.dll" 
@@ -493,7 +506,7 @@ copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
 copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
-
+copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
 
 copy ".\Includes\Gamebryo 2.3\DLL\NiAnimation23VC80S.dll" ".\Build\$(Configuration)\NiAnimation23VC80S.dll" 
 copy ".\Includes\Gamebryo 2.3\DLL\NiBinaryShaderLibDX923VC80S.dll" ".\Build\$(Configuration)\NiBinaryShaderLibDX923VC80S.dll"
@@ -538,7 +551,8 @@ copy ".\Includes\Gamebryo 2.3\DLL\NSFParserLibDX923VC80S.dll" ".\Build\$(Configu
 copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
-copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"</Command>
+copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
+copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
@@ -567,7 +581,8 @@ copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
 copy ".\Required\AlphaTextureBlender.NSF" ".\Build\$(Configuration)\FiestaOnlineTool\AlphaTextureBlender.NSF"
-copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"</Command>
+copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
+copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -70,6 +70,12 @@
     <Filter Include="Scene\MapTextureScene">
       <UniqueIdentifier>{b2d35b31-b639-4f3d-af43-e57f85ec1b47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene\SceneElements">
+      <UniqueIdentifier>{519228d9-010c-49b4-a12a-923f5d01e260}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\EasyBMP">
+      <UniqueIdentifier>{3efee3f1-ee46-4535-bf75-4f16bc75a850}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CustomNi\NiFileLoader.h">
@@ -242,6 +248,27 @@
     <ClInclude Include="src\Scene\MapTextureScene.h">
       <Filter>Scene\MapTextureScene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene\Elements\MapMenu.h">
+      <Filter>Scene\SceneElements</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\EasyBMP\EasyBMP.h">
+      <Filter>Includes\EasyBMP</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\EasyBMP\EasyBMP_BMP.h">
+      <Filter>Includes\EasyBMP</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\EasyBMP\EasyBMP_DataStructures.h">
+      <Filter>Includes\EasyBMP</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\EasyBMP\EasyBMP_VariousBMPutilities.h">
+      <Filter>Includes\EasyBMP</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CustomNi\TextureFileLoader.h">
+      <Filter>CustomNi</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene\Elements\LayerEditWindow.h">
+      <Filter>Scene\SceneElements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">
@@ -379,6 +406,15 @@
     </ClCompile>
     <ClCompile Include="src\Scene\MapTextureScene.cpp">
       <Filter>Scene\MapTextureScene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Elements\MapMenu.cpp">
+      <Filter>Scene\SceneElements</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\EasyBMP\EasyBMP.cpp">
+      <Filter>Includes\EasyBMP</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Elements\LayerEditWindow.cpp">
+      <Filter>Scene\SceneElements</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

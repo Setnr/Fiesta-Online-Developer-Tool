@@ -4,6 +4,7 @@
 #include "../Data/HTDBrush/HTDBrush.h"
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
+#include "Elements/MapMenu.h"
 NiSmartPointer(EditScene);
 class EditScene :  public FiestaScene
 {
@@ -19,7 +20,8 @@ public:
 	virtual void UpdateCamera(float fTime);
 	virtual void Update(float fTime);
 	void LoadMap(MapInfo* Info);
-	void HideShowLoadMenu() { ShowLoadMenu = false; }
+	void HideShowLoadMenu() { _MapMenu.HideMenu(); }
+	void ShowLoadMenu() { _MapMenu.ShowMenu(); }
 private:
 	void RecreateBoundingBox();
 	void FindBoundingData(NiNodePtr Node, NiPoint3& MinPoint, NiPoint3& MaxPoint);
@@ -27,8 +29,7 @@ private:
 	std::mutex UpDateWorldLock;
 	WorldPtr UpDateWorld;
 
-	bool ShowLoadMenu = true;
-	void ShowMapInfo();
+	MapMenu _MapMenu;
 	bool ShowSettingsMenu = false;
 	void ShowSettings();
 	void ShowAboutWindow();
