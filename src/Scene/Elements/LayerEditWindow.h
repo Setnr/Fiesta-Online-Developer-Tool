@@ -11,7 +11,10 @@ public:
 
 	bool Show();
 	void UpdateLayer(std::vector<std::vector<TerrainWorld::HTDHelper>>& _HTD);
+	NiScreenElementsPtr GetScreenTexture() { return pkScreenTexture; }
 private:
+	void UpdateTexturePos();
+
 	TerrainWorldPtr kWorld;
 	bool _Show = false;
 	std::shared_ptr<TerrainLayer> Layer;
@@ -19,4 +22,6 @@ private:
 	float MinHeight;
 	float MaxHeight;
 	NiScreenElementsPtr pkScreenTexture;
+
+	int BrushColor = 0x0;
 };

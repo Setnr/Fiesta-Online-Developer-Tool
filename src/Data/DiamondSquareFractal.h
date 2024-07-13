@@ -24,6 +24,9 @@ private:
     std::mt19937 generator;
     std::uniform_real_distribution<float> distribution;
 public:
+    DiamondSquareFractal(int grid_size = 129) : Fractal(grid_size)
+    {
+    }
     void generateGrid(int grid_size, int seed, float noise, float random_min, float random_max) 
     {
         auto start = std::chrono::steady_clock::now();

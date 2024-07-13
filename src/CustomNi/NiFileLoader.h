@@ -60,3 +60,37 @@ private:
 	bool _Pickable;
 	ImGui::FileBrowser fileDialog;
 };
+
+
+class IniFileLoader
+{
+public:
+	IniFileLoader() : fileDialog(ImGuiFileBrowserFlags_NoTitleBar | ImGuiFileBrowserFlags_CloseOnEsc)
+	{
+		fileDialog.SetTitle("Select Ini-File");
+		fileDialog.SetTypeFilters({ ".ini" });
+		fileDialog.SetPwd(PgUtil::CreateFullFilePathFromBaseFolder(""));
+	}
+	~IniFileLoader()
+	{
+	};
+
+	void Prepare()
+	{
+		fileDialog.Open();
+		
+	}
+
+	bool DrawImGui()
+	{
+		fileDialog.Display();
+		return fileDialog.HasSelected();
+	}
+	std::string Load()
+	{
+		return fileDialog.GetSelected().string();
+		
+	}
+private:
+	ImGui::FileBrowser fileDialog;
+};

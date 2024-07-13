@@ -24,6 +24,10 @@ public:
 	bool DrawImGui() 
 	{
 		fileDialog.Display();
+		if (fileDialog.HasSelected())
+		{
+			LogInfo(fileDialog.GetSelected().string());
+		}
 		return fileDialog.HasSelected();
 	}
 	std::string Load() 

@@ -220,10 +220,15 @@ public:
         }
         bmp.WriteToFile(Path.c_str());
     }
+
+    static NiScreenElements* CreateScreenElement(float width, float height, NiSourceTexturePtr texture);
+
     static void SaveNode(std::string Path, NiObject* Node) 
     {
         NiStream s;
         s.InsertObject(Node);
         s.Save(Path.c_str());
     }
+
+    static bool HoveringScreenElement(NiScreenElements* pElement, float& x, float& y);
 };

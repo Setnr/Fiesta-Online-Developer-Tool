@@ -10,6 +10,12 @@ void MapTextureScene::Draw(NiRenderer* renderer)
 	NiVisibleArray m_kVisible2;
 	NiCullingProcess m_spCuller2(&m_kVisible2);
 	NiDrawScene(kWorld.GetCamera(), kWorld.GetTerrainScene(), m_spCuller2);
+
+    if(_LayerEdit.GetScreenTexture())
+    {
+        renderer->SetScreenSpaceCameraData();
+        _LayerEdit.GetScreenTexture()->Draw(renderer);
+    }
 }
 
 void MapTextureScene::DrawImGui() 
@@ -23,7 +29,14 @@ void MapTextureScene::DrawImGui()
     ImGui::SetWindowSize(ImVec2(470.f, 350.f));
     if (ImGui::Begin("Texture Editor", 0, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoMove || ImGuiWindowFlags_NoResize))
     {
-        
+        if (ImGui::Button("Reload World"))
+        {
+            kWorld.ClearTerrainScene();
+            for (auto CurrentLayer : kWorld.GetIniFile().LayerList)
+            {
+                kWorld.CreateTerrainLayer(CurrentLayer);
+            }
+        }
         if (ImGui::BeginChild("Layer List",ImVec2(120.f, 350.f))) 
         {
             if(ImGui::Button("Create New Layer"))
@@ -34,7 +47,10 @@ void MapTextureScene::DrawImGui()
             }
             for (auto layer : Ini.LayerList)
                 if (ImGui::Selectable(layer->Name.c_str(), layer == SelectedLayer))
+                {
                     SelectedLayer = layer;
+                    _LayerEdit.ChangeLayer(SelectedLayer);
+                }
 
             ImGui::EndChild();
         }
@@ -59,12 +75,6 @@ void MapTextureScene::DrawImGui()
                             SelectedLayer = Ini.LayerList.at(Ini.LayerList.size() - 1);
                         }
                     }
-                }
-                ImGui::SameLine();
-                if (ImGui::Button("Edit Layer"))
-                {
-                    _LayerEdit.ChangeLayer(SelectedLayer);
-                    _LayerEdit.UpdateLayer(kWorld.GetHTD());
                 }
            
                 char Buffer[128];
@@ -93,7 +103,7 @@ void MapTextureScene::DrawImGui()
    
     if(_LayerEdit.Show())
     {
-        _LayerEdit.UpdateLayer(kWorld.GetHTD());
+       
         kWorld.CreateTerrainLayer(SelectedLayer);
     }
 }

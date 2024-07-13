@@ -3,8 +3,9 @@
 #include <future>
 #include "../Data/SHNManager.h"
 #include "../MapCreateScene.h"
+#include "../MapTextureScene.h"
 #include "../EditScene.h"
-
+#include "../../CustomNi/NiFileLoader.h"
 void MapMenu::ShowMenuBar() {
 	if (ImGui::MenuItem("Load Map"))
 	{
@@ -29,6 +30,14 @@ void MapMenu::RenderMenu()
             FiestaScenePtr scene = (FiestaScene*)&*ptr;
             FiestaOnlineTool::UpdateScene(scene);
         }
+        static IniFileLoader loader;
+        
+        if (loader.DrawImGui()) {
+            ;
+            MapTextureScenePtr ptr = NiNew MapTextureScene(loader.Load().c_str());
+            FiestaScenePtr scene = (FiestaScene*)&*ptr;
+            FiestaOnlineTool::UpdateScene(scene);
+        }
         if (ImGui::Button("Texture Map From HTD"))
         {
             /*
@@ -36,6 +45,7 @@ void MapMenu::RenderMenu()
             * TODO
             * Create MapTextureScene mit Nem LoadFromSource(HTD) oder LoadFromSource(Ini) jenach FileAuswahl
             */
+            loader.Prepare();
 
         }
         if (shn->DrawHeader())

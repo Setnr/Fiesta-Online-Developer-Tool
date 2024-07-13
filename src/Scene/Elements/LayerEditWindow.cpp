@@ -1,40 +1,130 @@
 #include "LayerEditWindow.h"
 #include <ImGui/imgui.h>
 #include "../../NiApplication/FiestaOnlineTool.h"
+#define TextureWidth 512.f
+#define TextureHeight 512.f
 LayerEditWindow::LayerEditWindow(TerrainWorldPtr World) : kWorld(World) 
 {
-
+	
 }
 
 bool LayerEditWindow::Show() 
 {
-	bool ReturnValue = false; //Set to True if Layer Needs to be recreated;
+	bool UpdateTerrainLayer = false; //Set to True if Layer Needs to be recreated;
+	ImGuiIO& io = ImGui::GetIO();
 	if (!_Show)
-		return ReturnValue;
+		return UpdateTerrainLayer;
 	if (ImGui::Begin("Change Texture",0,ImGuiWindowFlags_NoCollapse ))
 	{
 		if (ImGui::BeginChild("Settings Preview")) 
 		{
 			if (ImGui::DragFloat("Min Height", &MinHeight))
-				ReturnValue = true;
+			{
+				UpdateTerrainLayer = true;
+				UpdateLayer(kWorld->GetHTD());
+			}
 			if (ImGui::DragFloat("Max Height", &MaxHeight))
-				ReturnValue = true;
+			{
+				UpdateTerrainLayer = true;
+				UpdateLayer(kWorld->GetHTD());
+			}
+			
+			ImGui::DragInt("Color", &BrushColor, 1.f, 0, 255);
 			ImGui::EndChild();
 		}
 		if(pkScreenTexture)
 		{
-			/*NiScreenTexture::ScreenRect& rect = pkScreenTexture->GetScreenRect(0);
-			auto pos = ImGui::GetWindowPos();
-			auto size = ImGui::GetWindowSize();
-			rect.m_sPixTop = pos.y;
-			rect.m_sPixLeft = pos.x + size.x;
-			pkScreenTexture->MarkAsChanged(NiScreenTexture::VERTEX_MASK);*/
+			UpdateTexturePos();
+			NiTexturingPropertyPtr prop = (NiTexturingProperty*)pkScreenTexture->GetProperty(NiProperty::TEXTURING);
+			auto TexturProp = prop->GetBaseTextureTransform();
+			if (!TexturProp) 
+			{
+				LogError("Something went Horribly Wrong and Texture doesnt have a BaseTextureTransform");
+				return false;
+			}
+			float x, y;
+			if(PgUtil::HoveringScreenElement(pkScreenTexture, x, y))
+			{
+				auto data = this->Layer->BlendTexture->GetSourcePixelData();
+				TerrainLayer::RGBAColor* pixel = (TerrainLayer::RGBAColor*)data->GetPixels();
+				NiPoint2 Scale = TexturProp->GetScale();
+				auto Translate = TexturProp->GetTranslate();
+				int yPixel = data->GetHeight() - (data->GetHeight() * y) + data->GetHeight() * Translate.x * Scale.y;  //Currently no clue why x and y are wrong order
+				int xPixel = (data->GetWidth() * x) + data->GetWidth() * Translate.y * Scale.x;
+				yPixel *= Scale.x;
+				xPixel *= Scale.x;
+
+				if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+				{
+					int XPart = xPixel;
+
+					int PreFullLines = Layer->BlendTexture->GetWidth() * yPixel;
+					int YPartNormal = PreFullLines;
+					int PointOffsetNormal = XPart + YPartNormal;
+					pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)BrushColor);
+					UpdateTerrainLayer = true;
+					data->MarkAsChanged();
+
+
+				}
+				bool W_Key = ImGui::IsKeyDown((ImGuiKey)0x57);
+				bool S_Key = ImGui::IsKeyDown((ImGuiKey)0x53);
+				bool A_Key = ImGui::IsKeyDown((ImGuiKey)0x41);
+				bool D_Key = ImGui::IsKeyDown((ImGuiKey)0x44);
+				bool CtrlKey = ImGui::IsKeyDown((ImGuiKey)VK_CONTROL);
+				if (CtrlKey)
+				{
+					float MoveValue = 0.03;
+					if (W_Key)
+						Translate.x += MoveValue;
+					if (S_Key)
+						Translate.x -= MoveValue;
+					if (A_Key)
+						Translate.y -= MoveValue;
+					if (D_Key)
+						Translate.y += MoveValue;
+					if (Translate.x < 0.f)
+						Translate.x = 0.f;
+					if (Translate.x > 1.f)
+						Translate.x = 1.f;
+					if (Translate.y < 0.f)
+						Translate.y = 0.f;
+					if (Translate.y > 1.f)
+						Translate.y = 1.f;
+					TexturProp->SetTranslate(Translate);
+				}
+				if (io.MouseWheel != 0.0f)
+				{
+					Scale.x -= io.MouseWheel * 0.03f;
+					Scale.y -= io.MouseWheel * 0.03f;
+					if (Scale.x > 1.f || Scale.y > 1.f)
+						Scale = NiPoint2(1.f, 1.f);
+					if (Scale.x <= 0.f || Scale.y <= 0.f)
+						Scale = NiPoint2(0.05f, 0.05f);
+					TexturProp->SetScale(Scale);
+					//pkScreenTexture->UpdateProperties();
+				}
+			}
 		}
-		
-		
 		ImGui::End();
 	}
-	return ReturnValue;
+	return UpdateTerrainLayer;
+}
+
+void LayerEditWindow::UpdateTexturePos() 
+{
+	auto& io = ImGui::GetIO();
+	auto pos = ImGui::GetWindowPos();
+	auto size = ImGui::GetWindowSize();
+	float fLeft = (pos.x + size.x) / io.DisplaySize.x;
+	float fTop = pos.y / io.DisplaySize.y;
+	float fBottom = fTop + TextureHeight / io.DisplaySize.y;
+	float fRight = TextureWidth / io.DisplaySize.x + fLeft;
+	pkScreenTexture->SetVertex(0, 0, NiPoint2(fLeft, fBottom));
+	pkScreenTexture->SetVertex(0, 1, NiPoint2(fRight, fBottom));
+	pkScreenTexture->SetVertex(0, 2, NiPoint2(fRight, fTop));
+	pkScreenTexture->SetVertex(0, 3, NiPoint2(fLeft, fTop));
+	pkScreenTexture->UpdateBound();
 }
 
 std::shared_ptr<TerrainLayer>  LayerEditWindow::NewLayer(std::string BlendFileName, float Width, float Height)
@@ -53,7 +143,7 @@ std::shared_ptr<TerrainLayer>  LayerEditWindow::NewLayer(std::string BlendFileNa
 	kWorld->CreateTerrainLayer(Layer);
 	
 	ChangeLayer(Layer);
-
+	
 	return Layer;
 }
 
@@ -63,70 +153,19 @@ void LayerEditWindow::ChangeLayer(std::shared_ptr<TerrainLayer> Layer)
 	_Show = true;
 
 	Layer->BlendTexture->SetStatic(false);
-
 	FiestaOnlineTool::RemoveScreenElemets(pkScreenTexture);
-	pkScreenTexture = NiNew NiScreenElements(NiNew NiScreenElementsData(false, true, 1));
-	pkScreenTexture->Insert(4);
-	pkScreenTexture->SetRectangle(0, 0.4f, 0.4f, 0.8f, 0.8f);
-	pkScreenTexture->UpdateBound();
-	pkScreenTexture->SetTextures(0, 0, 0.0f, 0.0f, 1.0f, 1.0f);
-	pkScreenTexture->SetColors(0, NiColorA::WHITE);
-	float fLeft = 0.4f;
-	float fBottom = 0.4f;
-	float fRight = 0.8f;
-	float fTop = 0.8f;
-	pkScreenTexture->SetVertex(0, 0, NiPoint2(fLeft, 1.0f - fBottom));
-	pkScreenTexture->SetVertex(0, 1, NiPoint2(fRight, 1.0f - fBottom));
-	pkScreenTexture->SetVertex(0, 2, NiPoint2(fRight, 1.0f - fTop));
-	pkScreenTexture->SetVertex(0, 3, NiPoint2(fLeft, 1.0f - fTop));
-	pkScreenTexture->UpdateBound();
-	
-	NiTexturingPropertyPtr prop = NiNew NiTexturingProperty();
-	prop->SetBaseTexture(Layer->BlendTexture);
-	prop->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
-	prop->SetBaseFilterMode(NiTexturingProperty::FILTER_BILERP);
-	NiVertexColorProperty* pVertex = NiNew NiVertexColorProperty;
-	pVertex->SetSourceMode(NiVertexColorProperty::SOURCE_EMISSIVE);
-	pVertex->SetLightingMode(NiVertexColorProperty::LIGHTING_E);
-	pkScreenTexture->AttachProperty(pVertex);
-
-	// use alpha blending
-	NiAlphaProperty* pAlpha = NiNew NiAlphaProperty;
-	pAlpha->SetAlphaBlending(true);
-	pAlpha->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
-	//pAlpha->SetDestBlendMode(NiAlphaProperty::ALPHA_INVSRCALPHA);
-	pkScreenTexture->AttachProperty(pAlpha);
-	pkScreenTexture->AttachProperty(prop);
+	pkScreenTexture = PgUtil::CreateScreenElement(TextureWidth, TextureHeight, Layer->BlendTexture);
 	pkScreenTexture->UpdateProperties();
-	pkScreenTexture->UpdateEffects();
-	pkScreenTexture->Update(0.0f);
-	
-	FiestaOnlineTool::AddScreenElemets(pkScreenTexture);
-	/*FiestaOnlineTool::RemoveScreenTexture(pkScreenTexture);
-	pkScreenTexture = NiNew NiScreenTexture(Layer->BlendTexture);
-	NiTexturingProperty* prop = pkScreenTexture->GetTexturingProperty();
-	NiTextureTransform* transform = NiNew NiTextureTransform();
-	transform->SetScale(NiPoint2(512/Layer->BlendTexture->GetWidth(), 512 / Layer->BlendTexture->GetWidth()));
-	transform->SetCenter(NiPoint2(transform->GetScale() / 2));
-	transform->SetRotate(5.f);
-	prop->SetBaseTextureTransform(transform);
-	auto text = prop->GetBaseTexture();
-	pkScreenTexture->SetApplyMode(NiTexturingProperty::APPLY_REPLACE)dw;
-	//pkScreenTexture->SetClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
-	//pkScreenTexture->SetApplyMode(NiTexturingProperty::APPLY_DECAL);
-
-	pkScreenTexture->AddNewScreenRect(20, 0, 512, 512, 0, 0);
-	FiestaOnlineTool::AddScreenTexture(pkScreenTexture);
-	PgUtil::SaveNode(PgUtil::CreateFullFilePathFromBaseFolder(".\\Test.nif"), prop);*/
+	//FiestaOnlineTool::AddScreenElemets(pkScreenTexture);
 }
 
 void LayerEditWindow::UpdateLayer(std::vector<std::vector<TerrainWorld::HTDHelper>>& _HTD) 
 {
 	NiPixelDataPtr data = Layer->BlendTexture->GetSourcePixelData();
 	TerrainLayer::RGBAColor* pixel = (TerrainLayer::RGBAColor*)data->GetPixels();
-	for (int w = 0; w < _HTD.size(); w++) 
+	for (int w = 0; w < data->GetWidth(); w++)
 	{
-		for (int h = 0; h < _HTD[w].size(); h++)
+		for (int h = 0; h < data->GetHeight(); h++)
 		{
 			int XPart = w;
 
@@ -134,9 +173,9 @@ void LayerEditWindow::UpdateLayer(std::vector<std::vector<TerrainWorld::HTDHelpe
 			int YPartNormal = PreFullLines;
 			int PointOffsetNormal = XPart + YPartNormal;
 			if (_HTD[w][h].Height >= MinHeight && _HTD[w][h].Height <= MaxHeight)
-				pixel[PointOffsetNormal] = TerrainLayer::RGBAColor(TerrainLayer::RGBColor(0xFF));
+				pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)0xFF);
 			else
-				pixel[PointOffsetNormal] = TerrainLayer::RGBAColor(TerrainLayer::RGBColor(0x0));
+				pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)0x0);
 		}
 	}
 	data->MarkAsChanged();

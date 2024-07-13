@@ -58,6 +58,15 @@ public:
 		Y = kPoint.y;
 		return true;
 	}
+	static bool GetResolution(unsigned int& Width, unsigned int& Height)
+	{
+		if (!_Tool)
+			return false;
+
+		Height = _Tool->GetAppWindow()->GetHeight();
+		Width = _Tool->GetAppWindow()->GetWidth();
+		return true;
+	}
 	static float GetFPSCap() 
 	{
 		if (!_Tool)

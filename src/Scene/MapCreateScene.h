@@ -55,11 +55,11 @@ private:
 			_Fractal = NiNew PerlinFractal(Octave, MapSize);
 			break;
 		case Worley:
-			_Fractal = NiNew WorleyFractal(NumPoints,PointLoc,Seed);
+			_Fractal = NiNew WorleyFractal(NumPoints,PointLoc,Seed,MapSize);
 			break;
 		case DiamondSquare:
 		default:
-			_Fractal = NiNew DiamondSquareFractal;
+			_Fractal = NiNew DiamondSquareFractal(MapSize);
 				
 		}
 		_Fractal->generateGrid(MapSize, Seed, noise,MinValue,MaxValue);

@@ -65,7 +65,7 @@ public:
         {
             for (int h = 0; h < hmax; h++)
             {
-                PixelColorA[i] = RGBAColor((grid[w][h] - min) / (max - min));
+                PixelColorA[i] = RGBAColor((((grid[w][h] + grid[w+1][h+1]) / 2) - min) / (max - min));
                 i++;
             }
         }
@@ -74,10 +74,10 @@ public:
 
     void CreateTexture(int grid_size) 
     {
-        if (data && data->GetWidth() == grid_size)
+        if (data && data->GetWidth() == grid_size - 1)
             return;
         Show(false);
-        data = NiNew NiPixelData(grid_size, grid_size, NiPixelFormat::RGBA32);
+        data = NiNew NiPixelData(grid_size - 1, grid_size - 1, NiPixelFormat::RGBA32);
         NiTexture::FormatPrefs BlendPref;
         BlendPref.m_ePixelLayout = NiTexture::FormatPrefs::PixelLayout::TRUE_COLOR_32;
         BlendPref.m_eMipMapped = NiTexture::FormatPrefs::MipFlag::YES;
