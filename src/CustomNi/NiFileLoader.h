@@ -91,6 +91,7 @@ public:
 		return fileDialog.GetSelected().string();
 		
 	}
+	std::string GetFolderPath() { return fileDialog.GetPwd().string(); }
 private:
 	ImGui::FileBrowser fileDialog;
 };

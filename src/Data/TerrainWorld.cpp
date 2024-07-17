@@ -3,6 +3,7 @@
 #include <thread>
 #include <future>
 #include "../Logger/Logger.h"
+#include <NiPick.h>
 NiPoint3 TerrainWorld::ms_kUpDir = NiPoint3(0.0, 0.0, 1.0);
 NiPoint3 TerrainWorld::ms_kDownDir = NiPoint3(0.0, 0.0, -1.0);
 NiPoint3 TerrainWorld::ms_kNorthDir = NiPoint3(0.0, 1.0, 0.0);
@@ -394,4 +395,30 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 	LayerNode->UpdateEffects();
 	LayerNode->UpdateProperties();
 	LayerNode->Update(0.0);
+}
+
+NiPoint3 TerrainWorld::GetSpawnPoint()
+{
+	NiPick _Pick;
+	_Pick.SetTarget(GetWorldScene());
+	_Pick.SetPickType(NiPick::FIND_ALL);
+	_Pick.SetSortType(NiPick::SORT);
+	_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+	_Pick.SetFrontOnly(false);
+	_Pick.SetReturnNormal(true);
+	_Pick.SetObserveAppCullFlag(true);
+	NiPoint3 kOrigin(0.f, 0.f, 0.f);
+	if (_Pick.PickObjects(kOrigin, TerrainWorld::ms_kUpDir, true))
+	{
+		NiPick::Results& results = _Pick.GetResults();
+		for (int i = 0; i < results.GetSize(); i++)
+		{
+			auto result = results.GetAt(i);
+			if (result->GetIntersection().z > kOrigin.z)
+				kOrigin.z = result->GetIntersection().z;
+		}
+
+	}
+	kOrigin.z += 100.f;
+	return kOrigin;
 }

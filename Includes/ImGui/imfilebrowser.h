@@ -102,6 +102,7 @@ namespace ImGui
         // this function will pre-fill the input dialog with a filename.
         void SetInputName(std::string_view input);
 
+
     private:
 
         template <class Functor>

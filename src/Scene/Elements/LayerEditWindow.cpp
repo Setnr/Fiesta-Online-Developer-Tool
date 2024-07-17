@@ -3,18 +3,26 @@
 #include "../../NiApplication/FiestaOnlineTool.h"
 #define TextureWidth 512.f
 #define TextureHeight 512.f
-LayerEditWindow::LayerEditWindow(TerrainWorldPtr World) : kWorld(World) 
+LayerEditWindow::LayerEditWindow(TerrainWorldPtr& World) : kWorld(World) 
 {
 	
 }
-
+LayerEditWindow::~LayerEditWindow() 
+{
+	kWorld = 0;
+	if(pkScreenTexture)
+		FiestaOnlineTool::RemoveScreenElemets(pkScreenTexture);
+	if(pkScreenElement)
+		FiestaOnlineTool::RemoveScreenElemets(pkScreenElement);
+}
 bool LayerEditWindow::Show() 
 {
 	bool UpdateTerrainLayer = false; //Set to True if Layer Needs to be recreated;
 	ImGuiIO& io = ImGui::GetIO();
 	if (!_Show)
 		return UpdateTerrainLayer;
-	if (ImGui::Begin("Change Texture",0,ImGuiWindowFlags_NoCollapse ))
+	ImGui::SetNextWindowSize(ImVec2(200.f, 300.f));
+	if (ImGui::Begin("Change Texture",0,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 	{
 		if (ImGui::BeginChild("Settings Preview")) 
 		{
@@ -30,6 +38,9 @@ bool LayerEditWindow::Show()
 			}
 			
 			ImGui::DragInt("Color", &BrushColor, 1.f, 0, 255);
+			float Col = static_cast<float>(BrushColor) / 255;
+			ImGui::SameLine(); ImGui::ColorButton("Preview Color", ImVec4(Col, Col, Col, Col));
+			ImGui::DragInt("BrushSize", &BrushSize, 1.f, 0, 100);
 			ImGui::EndChild();
 		}
 		if(pkScreenTexture)
@@ -49,19 +60,43 @@ bool LayerEditWindow::Show()
 				TerrainLayer::RGBAColor* pixel = (TerrainLayer::RGBAColor*)data->GetPixels();
 				NiPoint2 Scale = TexturProp->GetScale();
 				auto Translate = TexturProp->GetTranslate();
-				int yPixel = data->GetHeight() - (data->GetHeight() * y) + data->GetHeight() * Translate.x * Scale.y;  //Currently no clue why x and y are wrong order
-				int xPixel = (data->GetWidth() * x) + data->GetWidth() * Translate.y * Scale.x;
-				yPixel *= Scale.x;
-				xPixel *= Scale.x;
-
-				if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+				float MaxValue = Scale.x;
+				
+				y = y * Scale.x + (1.f - Scale.x) - Translate.x;
+				x = x * Scale.x + Translate.y;
+				int yPixel = data->GetHeight() - (data->GetHeight() * y) ;  //Currently no clue why x and y are wrong order
+				int xPixel = (data->GetWidth() * x);
+				static float LastDrawTime;
+				float CurTime = NiGetCurrentTimeInSec();
+				
+				if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && LastDrawTime + pow(io.Framerate, -0.5f) < CurTime && !ImGui::IsAnyItemActive())
 				{
-					int XPart = xPixel;
+					LastDrawTime = CurTime;
 
-					int PreFullLines = Layer->BlendTexture->GetWidth() * yPixel;
-					int YPartNormal = PreFullLines;
-					int PointOffsetNormal = XPart + YPartNormal;
-					pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)BrushColor);
+					int wh = -1;
+					for (int w = xPixel - BrushSize; w <= xPixel + BrushSize && w < static_cast<int>(data->GetWidth()); w++)
+					{
+						wh++;
+						if (w < 0)
+							continue;
+						int hh = -1;
+						for (int h = yPixel - BrushSize; h <= yPixel + BrushSize && h < static_cast<int>(data->GetHeight()); h++)
+						{
+							hh++;
+							if (h < 0)
+								continue;
+							if (!((w - xPixel) * (w - xPixel) + (h - yPixel) * (h - yPixel) <= BrushSize * BrushSize))
+								continue;
+							int XPart = w;
+
+							int PreFullLines = Layer->BlendTexture->GetWidth() * h;
+							int YPartNormal = PreFullLines;
+							int PointOffsetNormal = XPart + YPartNormal;
+							pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)BrushColor);
+							
+						}
+					}
+
 					UpdateTerrainLayer = true;
 					data->MarkAsChanged();
 
@@ -72,8 +107,21 @@ bool LayerEditWindow::Show()
 				bool A_Key = ImGui::IsKeyDown((ImGuiKey)0x41);
 				bool D_Key = ImGui::IsKeyDown((ImGuiKey)0x44);
 				bool CtrlKey = ImGui::IsKeyDown((ImGuiKey)VK_CONTROL);
-				if (CtrlKey)
+				if (io.MouseWheel != 0.0f)
 				{
+					Scale.x -= io.MouseWheel * 0.03f;
+					Scale.y -= io.MouseWheel * 0.03f;
+
+					if (Scale.x > 1.f || Scale.y > 1.f)
+						Scale = NiPoint2(1.f, 1.f);
+					if (Scale.x <= 0.f || Scale.y <= 0.f)
+						Scale = NiPoint2(0.05f, 0.05f);
+					TexturProp->SetScale(Scale);
+					//pkScreenTexture->UpdateProperties();
+				}
+				if (CtrlKey || io.MouseWheel != 0.0f)
+				{
+					NiPoint2 Scale = TexturProp->GetScale();
 					float MoveValue = 0.03;
 					if (W_Key)
 						Translate.x += MoveValue;
@@ -85,29 +133,22 @@ bool LayerEditWindow::Show()
 						Translate.y += MoveValue;
 					if (Translate.x < 0.f)
 						Translate.x = 0.f;
-					if (Translate.x > 1.f)
-						Translate.x = 1.f;
 					if (Translate.y < 0.f)
 						Translate.y = 0.f;
-					if (Translate.y > 1.f)
-						Translate.y = 1.f;
+
+
+					if (Translate.x > 1.f * ( 1.f - Scale.x))
+						Translate.x = 1.f * (1.f - Scale.x);
+					if (Translate.y > 1.f * (1.f - Scale.y))
+						Translate.y = 1.f * (1.f - Scale.y);
 					TexturProp->SetTranslate(Translate);
 				}
-				if (io.MouseWheel != 0.0f)
-				{
-					Scale.x -= io.MouseWheel * 0.03f;
-					Scale.y -= io.MouseWheel * 0.03f;
-					if (Scale.x > 1.f || Scale.y > 1.f)
-						Scale = NiPoint2(1.f, 1.f);
-					if (Scale.x <= 0.f || Scale.y <= 0.f)
-						Scale = NiPoint2(0.05f, 0.05f);
-					TexturProp->SetScale(Scale);
-					//pkScreenTexture->UpdateProperties();
-				}
+				
 			}
 		}
 		ImGui::End();
 	}
+	
 	return UpdateTerrainLayer;
 }
 
@@ -130,7 +171,8 @@ void LayerEditWindow::UpdateTexturePos()
 std::shared_ptr<TerrainLayer>  LayerEditWindow::NewLayer(std::string BlendFileName, float Width, float Height)
 {
 	auto Layer = std::make_shared<TerrainLayer>();
-	Layer->Name = "00 New Layer";
+	Layer->Name = std::to_string(LayerCt) + " New Layer";
+	LayerCt++;
 	Layer->DiffuseFileName = ".\\resmap\\fieldTexture\\grass_01.dds";
 	Layer->BlendFileName = BlendFileName;
 	Layer->StartPos_X = .0f;
@@ -151,12 +193,12 @@ void LayerEditWindow::ChangeLayer(std::shared_ptr<TerrainLayer> Layer)
 {
 	this->Layer = Layer;
 	_Show = true;
-
-	Layer->BlendTexture->SetStatic(false);
 	FiestaOnlineTool::RemoveScreenElemets(pkScreenTexture);
+	Layer->BlendTexture->SetStatic(false);
 	pkScreenTexture = PgUtil::CreateScreenElement(TextureWidth, TextureHeight, Layer->BlendTexture);
 	pkScreenTexture->UpdateProperties();
-	//FiestaOnlineTool::AddScreenElemets(pkScreenTexture);
+	FiestaOnlineTool::AddScreenElemets(pkScreenTexture);
+	UpdateTexturePreview();
 }
 
 void LayerEditWindow::UpdateLayer(std::vector<std::vector<TerrainWorld::HTDHelper>>& _HTD) 

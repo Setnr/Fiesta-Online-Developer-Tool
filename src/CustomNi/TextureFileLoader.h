@@ -3,6 +3,7 @@
 #include <NiNode.h>
 #include "ImGui/imgui.h"
 #include "ImGui/imfilebrowser.h"
+#include "../NiApplication/FiestaOnlineTool.h"
 class TextureFileLoader 
 {
 public:
@@ -19,19 +20,39 @@ public:
 	void Prepare()
 	{
 		fileDialog.Open();
+		if(pkScreenElement)
+			FiestaOnlineTool::AddScreenElemets(pkScreenElement);
 	}
 
 	bool DrawImGui() 
 	{
 		fileDialog.Display();
-		if (fileDialog.HasSelected())
+		if (fileDialog.GetPwd() != fileDialog.GetSelected())
 		{
-			LogInfo(fileDialog.GetSelected().string());
+			if(!pkScreenElement || !pkScreenElement->GetName().Contains(fileDialog.GetSelected().string().c_str()))
+			{
+				NiSourceTexturePtr ptr = NiSourceTexture::Create(fileDialog.GetSelected().string().c_str());
+				pkScreenElement = PgUtil::CreateScreenElement(256, 256, ptr);
+				pkScreenElement->SetName(fileDialog.GetSelected().string().c_str());
+				FiestaOnlineTool::AddScreenElemets(pkScreenElement);
+				auto& io = ImGui::GetIO();
+				float fLeft = 1.f - 256 / io.DisplaySize.x;
+				float fTop = 1.f - 256 / io.DisplaySize.y;
+				float fBottom = 1.f;
+				float fRight = 1.f;
+				pkScreenElement->SetVertex(0, 0, NiPoint2(fLeft, fBottom));
+				pkScreenElement->SetVertex(0, 1, NiPoint2(fRight, fBottom));
+				pkScreenElement->SetVertex(0, 2, NiPoint2(fRight, fTop));
+				pkScreenElement->SetVertex(0, 3, NiPoint2(fLeft, fTop));
+				pkScreenElement->UpdateBound();
+			}
 		}
+		
 		return fileDialog.HasSelected();
 	}
 	std::string Load() 
 	{
+		FiestaOnlineTool::RemoveScreenElemets(pkScreenElement);
 		std::string File = fileDialog.GetSelected().string();
 		std::string BasePath = PgUtil::CreateFullFilePathFromBaseFolder("");
 		fileDialog.ClearSelected();
@@ -39,4 +60,5 @@ public:
 	}
 private:
 	ImGui::FileBrowser fileDialog;
+	NiScreenElementsPtr pkScreenElement;
 };

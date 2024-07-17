@@ -191,12 +191,20 @@ public:
 	NiCameraPtr GetCamera() { return m_spCamera; }
 
 	float GetFOV() { return this->m_fCameraFOV; }
-
+	
 	bool WasLoadedSuccessfully() { return LoadedSuccessfully; }
 	IniFile& GetIniFile() { return _InitFile; }
 	void CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer);
 	std::vector<std::vector<HTDHelper>>& GetHTD() { return _HTD; }
+	virtual NiPoint3 GetSpawnPoint();
 #pragma endregion
+	void ReloadTerrain() {
+		ClearTerrainScene();
+		for (auto CurrentLayer : _InitFile.LayerList)
+		{
+			CreateTerrainLayer(CurrentLayer);
+		}
+	}
 protected:
 #pragma region WorldStructureNodes
 	NiNodePtr m_spLightArea;
@@ -239,7 +247,6 @@ protected:
 
 	bool LoadTerrain();
 	IniFile _InitFile;
-
 	std::vector<std::vector<HTDHelper>> _HTD;
 	struct PointInfos
 	{

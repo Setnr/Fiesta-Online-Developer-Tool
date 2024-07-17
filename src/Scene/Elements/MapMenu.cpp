@@ -34,7 +34,7 @@ void MapMenu::RenderMenu()
         
         if (loader.DrawImGui()) {
             ;
-            MapTextureScenePtr ptr = NiNew MapTextureScene(loader.Load().c_str());
+            MapTextureScenePtr ptr = NiNew MapTextureScene(loader.Load().c_str(),loader.GetFolderPath());
             FiestaScenePtr scene = (FiestaScene*)&*ptr;
             FiestaOnlineTool::UpdateScene(scene);
         }

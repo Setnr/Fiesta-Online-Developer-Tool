@@ -72,8 +72,8 @@ void EditScene::SHMDCopyPaste()
 	}
 	float CurTime = NiGetCurrentTimeInSec();
 	if (LastPasteTime + Settings::PasteDelay() < CurTime && CopyObj && (
-		ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x56)
-		|| ImGui::IsKeyPressed((ImGuiKey)VK_CONTROL) && ImGui::IsKeyDown((ImGuiKey)0x56)
+		(ImGui::IsKeyDown((ImGuiKey)0x11) && ImGui::IsKeyPressed((ImGuiKey)0x56))
+		|| (ImGui::IsKeyPressed((ImGuiKey)0x11) && ImGui::IsKeyDown((ImGuiKey)0x56))
 		)
 		)   // ctrl v
 	{
@@ -95,7 +95,9 @@ void EditScene::SHMDCopyPaste()
 			if (_Pick.PickObjects(kOrigin, kDir, true))
 			{
 				NiPick::Results& results = _Pick.GetResults();
+				CopyObj->HideBoundingBox(BoundingBox);
 				NiPickablePtr Obj = (NiPickable*)CopyObj->Clone();
+
 				NiNodePtr ptr = (NiNode*)&*Obj;
 				kWorld->AttachGroundObj(ptr);
 
@@ -108,8 +110,9 @@ void EditScene::SHMDCopyPaste()
 				node->UpdateProperties();
 				node->Update(0.0);
 				SelectedObj = Obj;
-				
+				UpdateGeneralInfoNode((NiNode*)&*SelectedObj);
 				SelectedObj->SetTranslate(results.GetAt(0)->GetIntersection());
+				SelectedObjAngels[0] = 0; SelectedObjAngels[1] = 0; SelectedObjAngels[2] = 0;
 			}
 		}
 	}

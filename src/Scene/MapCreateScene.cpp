@@ -171,16 +171,23 @@ void MapCreateScene::DrawImGui()
                 file.HeightMap_width = MapSize;
                 file.HeightFileName = SubPath + "\\" + _MapName + ".HTD";
                 file.VertexColorTexture = SubPath + "\\Vertex" + _MapName + ".bmp";
-                file.LayerList[0]->Height = MapSize;
-                file.LayerList[0]->Width = MapSize;
-                file.Save(Direcotry + "\\" + _MapName + ".ini");
+                file.LayerList[0]->Height = MapSize - 1;
+                file.LayerList[0]->Width = MapSize - 1;
+                file.LayerList[0]->BlendFileName = SubPath + "\\" + file.LayerList[0]->Name + ".bmp";;
+                file.LayerList[0]->BlendTexture = _Fractal->GetSourceTexture();
                 PgUtil::SaveTexture(Direcotry + "\\Vertex" + _MapName + ".bmp", _Fractal->GetSourceTexture());
-                MapTextureScenePtr ptr = NiNew MapTextureScene(Direcotry + "\\" + _MapName + ".ini");
+                file.UpdateFilePath(Direcotry + "\\" + _MapName + ".ini");
+                file.Save();
+                MapTextureScenePtr ptr = NiNew MapTextureScene(Direcotry + "\\" + _MapName + ".ini", SubPath);
                 FiestaScenePtr scene = (FiestaScene*)&*ptr;
                 FiestaOnlineTool::UpdateScene(scene);
             }
             ImGui::End();
         }
+    }
+    if (ImGui::IsKeyPressed((ImGuiKey)0x52)) //R
+    {
+        LookAndMoveAtWorldPoint(kWorld->GetSpawnPoint());
     }
 }
 

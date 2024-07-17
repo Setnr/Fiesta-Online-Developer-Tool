@@ -120,12 +120,13 @@ public:
 		LayerList.clear();
 	}
 	bool Load();
-	void Save(std::string Path) 
+	void UpdateFilePath(std::string FilePath) { _FilePath = FilePath; }
+	void Save()
 	{
 		std::ofstream IniFile;
-		if (std::filesystem::exists(Path))
-			std::filesystem::remove(Path);
-		IniFile.open(Path);
+		if (std::filesystem::exists(_FilePath))
+			std::filesystem::remove(_FilePath);
+		IniFile.open(_FilePath);
 		IniFile << std::fixed << std::setprecision(1);
 		IniFile << "#PGFILE\t:\t" << FileType << std::endl;
 		IniFile << "#FILE_VER\t:\t" << Version << std::endl << std::endl;
@@ -156,8 +157,11 @@ public:
 			IniFile << "	#UVScaleDiffuse\t:" << layer->UVScaleDiffuse << "f" << std::endl;
 			IniFile << "	#UVScaleBlend\t:" << layer->UVScaleBlend << "f" << std::endl;
 			IniFile << "}" << std::endl;
+			
+			PgUtil::SaveTexture(PgUtil::CreateFullFilePathFromBaseFolder(layer->BlendFileName), layer->BlendTexture);
 		}
 		IniFile << "#END_FILE" << std::endl;
+		IniFile << "//Made With Fiesta Developer Tools by Set" << std::endl;
 	}
 
 	std::string FileType;

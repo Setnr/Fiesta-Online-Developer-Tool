@@ -32,8 +32,9 @@ void NiPickable::HideBoundingBox(NiNodePtr& BoundingBox) {
 void NiPickable::ShowBoundingBox(NiNodePtr& BoundingBox)
 {
     BoundingBox = NiBoundingBox::CreateBoundingBox(this, BoundingBox);
-
+    
     this->AttachChild(BoundingBox);
+    this->CompactChildArray();
     this->UpdateProperties();
     this->UpdateEffects();
     this->Update(0.0f);

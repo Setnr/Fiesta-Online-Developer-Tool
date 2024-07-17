@@ -13,6 +13,7 @@ class MapCreateScene : public FiestaScene
 public:
 	MapCreateScene() {
 		UpdateAlgorithm(_Algo);
+		LookAndMoveAtWorldPoint(kWorld->GetSpawnPoint());
 		CanSwitch = true;
 	}
 	~MapCreateScene() {

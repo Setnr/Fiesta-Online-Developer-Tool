@@ -9,15 +9,18 @@ class MapTextureScene : public FiestaScene
 {
 public:
 
-	MapTextureScene(std::string FilePath) : kWorld(FilePath), _LayerEdit(&kWorld)
+	MapTextureScene(std::string FilePath, std::string SubPath) : _LayerEdit(kWorld), _SubPath(SubPath)
 	{
-		Camera = kWorld.GetCamera();
-		LookAndMoveAtWorldPoint(NiPoint3(0.0f, 0.0f, 0.0f));
-		kWorld.SetAmbientLightAmbientColor(NiColor::WHITE);
-		PgUtil::SaveNode(PgUtil::CreateFullFilePathFromBaseFolder(".\\Test.nif"), kWorld.GetTerrainScene());
+		kWorld = NiNew TerrainWorld(FilePath);
+		Camera = kWorld->GetCamera();
+		LookAndMoveAtWorldPoint(kWorld->GetSpawnPoint());
+		kWorld->SetAmbientLightAmbientColor(NiColor::WHITE);
 		CanSwitch = true;
 	}
-
+	~MapTextureScene() 
+	{
+		return;
+	}
 	virtual void Draw(NiRenderer* renderer);
 	virtual void DrawImGui();
 	virtual void CreateMenuBar();
@@ -27,8 +30,10 @@ public:
 	std::shared_ptr<TerrainLayer> SelectedLayer;
 
 private:
-	TerrainWorld kWorld;
+	void SaveMap();
+	TerrainWorldPtr kWorld;
 	MapMenu _MapMenu;
 	LayerEditWindow _LayerEdit;
+	std::string _SubPath;
 };
 

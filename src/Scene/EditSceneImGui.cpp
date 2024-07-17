@@ -227,7 +227,6 @@ void EditScene::MiddleMouseButtonMenu()
 						auto result = results.GetAt(i);
 						loader.Prepare(kWorld->GetGroundObjNode(), PICKABLEOBJECTS, result->GetIntersection());
 					}
-
 				}
 				else
 				{
