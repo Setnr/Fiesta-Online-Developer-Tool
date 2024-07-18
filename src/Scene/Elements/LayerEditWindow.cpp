@@ -57,71 +57,96 @@ bool LayerEditWindow::Show()
 				return false;
 			}
 			float x, y;
-			if(PgUtil::HoveringScreenElement(pScreenElementTextureEdit, x, y))
+			auto data = this->Layer->BlendTexture->GetSourcePixelData();
+			TerrainLayer::RGBAColor* pixel = (TerrainLayer::RGBAColor*)data->GetPixels();
+			NiPoint2 Scale = TexturProp->GetScale();
+			auto Translate = TexturProp->GetTranslate();
+			//float MaxValue = Scale.x;
+
+			//y = y * Scale.x + (1.f - Scale.x) - Translate.x;
+			//x = x * Scale.x + Translate.y;
+			//int yPixel = data->GetHeight() - (data->GetHeight() * y);  //Currently no clue why x and y are wrong order
+			//int xPixel = (data->GetWidth() * x);
+
+			static float LastDrawTime;
+			float CurTime = NiGetCurrentTimeInSec();
+
+			if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && LastDrawTime + pow(io.Framerate, -0.5f) < CurTime && !ImGui::IsAnyItemActive() && !ImGui::IsAnyItemHovered())
 			{
-				auto data = this->Layer->BlendTexture->GetSourcePixelData();
-				TerrainLayer::RGBAColor* pixel = (TerrainLayer::RGBAColor*)data->GetPixels();
-				NiPoint2 Scale = TexturProp->GetScale();
-				auto Translate = TexturProp->GetTranslate();
-				float MaxValue = Scale.x;
-				
-				y = y * Scale.x + (1.f - Scale.x) - Translate.x;
-				x = x * Scale.x + Translate.y;
-				int yPixel = data->GetHeight() - (data->GetHeight() * y) ;  //Currently no clue why x and y are wrong order
-				int xPixel = (data->GetWidth() * x);
-				static float LastDrawTime;
-				float CurTime = NiGetCurrentTimeInSec();
-				
-				if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && LastDrawTime + pow(io.Framerate, -0.5f) < CurTime && !ImGui::IsAnyItemActive())
-				{
-					LastDrawTime = CurTime;
+				LastDrawTime = CurTime;
 
-					int wh = -1;
-					for (int w = xPixel - BrushSize; w <= xPixel + BrushSize && w < static_cast<int>(data->GetWidth()); w++)
+				NiPoint3 kOrigin, kDir;
+				long X, Y;
+				FiestaOnlineTool::GetMousePosition(X, Y);
+				if (kWorld->GetCamera()->WindowPointToRay(X, Y, kOrigin, kDir))
+				{
+					NiPick _Pick;
+					_Pick.SetPickType(NiPick::FIND_FIRST);
+					_Pick.SetSortType(NiPick::SORT);
+					_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+					_Pick.SetFrontOnly(true);
+					_Pick.SetReturnNormal(true);
+					_Pick.SetObserveAppCullFlag(true);
+					_Pick.SetTarget(kWorld->GetTerrainScene());
+					if (_Pick.PickObjects(kOrigin, kDir, true))
 					{
-						wh++;
-						if (w < 0)
-							continue;
-						int hh = -1;
-						for (int h = yPixel - BrushSize; h <= yPixel + BrushSize && h < static_cast<int>(data->GetHeight()); h++)
+						NiPick::Results& results = _Pick.GetResults();
+						NiPoint3 Intersect = results.GetAt(0)->GetIntersection();
+						IniFile& _InitFile = kWorld->GetIniFile();
+						int xPixel = Intersect.x / _InitFile.OneBlock_width;
+						int yPixel = Intersect.y / _InitFile.OneBlock_height;
+
+						int wh = -1;
+						for (int w = xPixel - BrushSize; w <= xPixel + BrushSize && w < static_cast<int>(data->GetWidth()); w++)
 						{
-							hh++;
-							if (h < 0)
+							wh++;
+							if (w < 0)
 								continue;
-							if (!((w - xPixel) * (w - xPixel) + (h - yPixel) * (h - yPixel) <= BrushSize * BrushSize))
-								continue;
-							int XPart = w;
+							int hh = -1;
+							for (int h = yPixel - BrushSize; h <= yPixel + BrushSize && h < static_cast<int>(data->GetHeight()); h++)
+							{
+								hh++;
+								if (h < 0)
+									continue;
+								if (!((w - xPixel) * (w - xPixel) + (h - yPixel) * (h - yPixel) <= BrushSize * BrushSize))
+									continue;
+								int XPart = w;
 
-							int PreFullLines = Layer->BlendTexture->GetWidth() * h;
-							int YPartNormal = PreFullLines;
-							int PointOffsetNormal = XPart + YPartNormal;
-							pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)BrushColor);
-							
+								int PreFullLines = Layer->BlendTexture->GetWidth() * h;
+								int YPartNormal = PreFullLines;
+								int PointOffsetNormal = XPart + YPartNormal;
+								pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)BrushColor);
+
+							}
 						}
+
+						UpdateTerrainLayer = true;
+						data->MarkAsChanged();
+
+
 					}
-
-					UpdateTerrainLayer = true;
-					data->MarkAsChanged();
-
-
 				}
-				bool W_Key = ImGui::IsKeyDown((ImGuiKey)0x57);
-				bool S_Key = ImGui::IsKeyDown((ImGuiKey)0x53);
-				bool A_Key = ImGui::IsKeyDown((ImGuiKey)0x41);
-				bool D_Key = ImGui::IsKeyDown((ImGuiKey)0x44);
-				bool CtrlKey = ImGui::IsKeyDown((ImGuiKey)VK_CONTROL);
-				if (io.MouseWheel != 0.0f)
-				{
-					Scale.x -= io.MouseWheel * 0.03f;
-					Scale.y -= io.MouseWheel * 0.03f;
 
-					if (Scale.x > 1.f || Scale.y > 1.f)
-						Scale = NiPoint2(1.f, 1.f);
-					if (Scale.x <= 0.f || Scale.y <= 0.f)
-						Scale = NiPoint2(0.05f, 0.05f);
-					TexturProp->SetScale(Scale);
-					//pkScreenTexture->UpdateProperties();
-				}
+			}
+			bool W_Key = ImGui::IsKeyDown((ImGuiKey)0x57);
+			bool S_Key = ImGui::IsKeyDown((ImGuiKey)0x53);
+			bool A_Key = ImGui::IsKeyDown((ImGuiKey)0x41);
+			bool D_Key = ImGui::IsKeyDown((ImGuiKey)0x44);
+			bool CtrlKey = ImGui::IsKeyDown((ImGuiKey)VK_CONTROL);
+			if (io.MouseWheel != 0.0f)
+			{
+				Scale.x -= io.MouseWheel * 0.03f;
+				Scale.y -= io.MouseWheel * 0.03f;
+
+				if (Scale.x > 1.f || Scale.y > 1.f)
+					Scale = NiPoint2(1.f, 1.f);
+				if (Scale.x <= 0.f || Scale.y <= 0.f)
+					Scale = NiPoint2(0.05f, 0.05f);
+				TexturProp->SetScale(Scale);
+			}
+
+			if (PgUtil::HoveringScreenElement(pScreenElementTextureEdit, x, y))
+			{
 				if (CtrlKey || io.MouseWheel != 0.0f)
 				{
 					NiPoint2 Scale = TexturProp->GetScale();

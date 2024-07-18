@@ -20,6 +20,8 @@ public:
 	void Prepare()
 	{
 		fileDialog.Open();
+		if(pkScreenElement)
+			FiestaOnlineTool::RemoveScreenElemets(pkScreenElement);
 		pkScreenElement = NULL;
 	}
 
