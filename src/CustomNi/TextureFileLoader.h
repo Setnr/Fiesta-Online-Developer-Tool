@@ -15,6 +15,8 @@ public:
 	}
 	~TextureFileLoader()
 	{
+		if (pkScreenElement)
+			FiestaOnlineTool::RemoveScreenElemets(pkScreenElement);
 	};
 
 	void Prepare()
@@ -61,7 +63,8 @@ public:
 	}
 	std::string Load() 
 	{
-		FiestaOnlineTool::RemoveScreenElemets(pkScreenElement);
+		if(pkScreenElement)
+			FiestaOnlineTool::RemoveScreenElemets(pkScreenElement);
 		std::string File = fileDialog.GetSelected().string();
 		std::string BasePath = PgUtil::CreateFullFilePathFromBaseFolder("");
 		fileDialog.ClearSelected();

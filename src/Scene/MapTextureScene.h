@@ -3,6 +3,7 @@
 #include "../Data/IniFile.h"
 #include "Elements/MapMenu.h"
 #include "Elements/LayerEditWindow.h"
+#include "../CustomNi/TextureFileLoader.h"
 
 NiSmartPointer(MapTextureScene);
 class MapTextureScene : public FiestaScene
@@ -35,5 +36,6 @@ private:
 	MapMenu _MapMenu;
 	LayerEditWindow _LayerEdit;
 	std::string _SubPath;
+	TextureFileLoader loader;
 };
 

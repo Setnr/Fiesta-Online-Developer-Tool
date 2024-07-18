@@ -1,6 +1,5 @@
 #include "MapTextureScene.h"
 #include "../Settings/Settings.h"
-#include "../CustomNi/TextureFileLoader.h"
 #include <future>
 
 void MapTextureScene::Draw(NiRenderer* renderer) 
@@ -83,7 +82,6 @@ void MapTextureScene::DrawImGui()
                     SelectedLayer->Name = Buffer;
                     SelectedLayer->BlendFileName = _SubPath + "\\" + SelectedLayer->Name + ".bmp";
                 }
-                static TextureFileLoader loader;
                 if (ImGui::Selectable(("TextureFile: " + SelectedLayer->DiffuseFileName).c_str()))
                 {
                     loader.Prepare();
