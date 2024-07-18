@@ -10,11 +10,11 @@ void MapTextureScene::Draw(NiRenderer* renderer)
 	NiVisibleArray m_kVisible2;
 	NiCullingProcess m_spCuller2(&m_kVisible2);
 	NiDrawScene(kWorld->GetCamera(), kWorld->GetTerrainScene(), m_spCuller2);
-    return;
+    
     if(_LayerEdit.GetScreenTexture())
     {
-        //renderer->SetScreenSpaceCameraData();
-        //_LayerEdit.GetScreenTexture()->Draw(renderer);
+        renderer->SetScreenSpaceCameraData();
+        _LayerEdit.GetScreenTexture()->Draw(renderer);
     }
 }
 

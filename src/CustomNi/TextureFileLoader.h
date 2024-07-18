@@ -20,18 +20,26 @@ public:
 	void Prepare()
 	{
 		fileDialog.Open();
-		if(pkScreenElement)
-			FiestaOnlineTool::AddScreenElemets(pkScreenElement);
+		pkScreenElement = NULL;
 	}
 
 	bool DrawImGui() 
 	{
 		fileDialog.Display();
+		static bool LastOpenStatus = false;
+		if (LastOpenStatus != fileDialog.IsOpened()) 
+		{
+			LastOpenStatus = fileDialog.IsOpened();
+			if (!LastOpenStatus && pkScreenElement)
+				FiestaOnlineTool::RemoveScreenElemets(pkScreenElement);
+		}
 		if (fileDialog.GetPwd() != fileDialog.GetSelected())
 		{
 			if(!pkScreenElement || !pkScreenElement->GetName().Contains(fileDialog.GetSelected().string().c_str()))
 			{
 				NiSourceTexturePtr ptr = NiSourceTexture::Create(fileDialog.GetSelected().string().c_str());
+				if (pkScreenElement)
+					FiestaOnlineTool::RemoveScreenElemets(pkScreenElement);
 				pkScreenElement = PgUtil::CreateScreenElement(256, 256, ptr);
 				pkScreenElement->SetName(fileDialog.GetSelected().string().c_str());
 				FiestaOnlineTool::AddScreenElemets(pkScreenElement);
@@ -47,7 +55,6 @@ public:
 				pkScreenElement->UpdateBound();
 			}
 		}
-		
 		return fileDialog.HasSelected();
 	}
 	std::string Load() 

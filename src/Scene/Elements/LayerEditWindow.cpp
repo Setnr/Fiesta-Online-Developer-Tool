@@ -10,10 +10,13 @@ LayerEditWindow::LayerEditWindow(TerrainWorldPtr& World) : kWorld(World)
 LayerEditWindow::~LayerEditWindow() 
 {
 	kWorld = 0;
-	if(pkScreenTexture)
-		FiestaOnlineTool::RemoveScreenElemets(pkScreenTexture);
-	if(pkScreenElement)
-		FiestaOnlineTool::RemoveScreenElemets(pkScreenElement);
+	if(pScreenElementTextureEdit)
+	{
+		pScreenElementTextureEdit = NULL;
+		//FiestaOnlineTool::RemoveScreenElemets(pScreenElementTextureEdit);
+	}
+	if(pScreenElementTexturePreview)
+		FiestaOnlineTool::RemoveScreenElemets(pScreenElementTexturePreview);
 }
 bool LayerEditWindow::Show() 
 {
@@ -43,10 +46,10 @@ bool LayerEditWindow::Show()
 			ImGui::DragInt("BrushSize", &BrushSize, 1.f, 0, 100);
 			ImGui::EndChild();
 		}
-		if(pkScreenTexture)
+		if(pScreenElementTextureEdit)
 		{
 			UpdateTexturePos();
-			NiTexturingPropertyPtr prop = (NiTexturingProperty*)pkScreenTexture->GetProperty(NiProperty::TEXTURING);
+			NiTexturingPropertyPtr prop = (NiTexturingProperty*)pScreenElementTextureEdit->GetProperty(NiProperty::TEXTURING);
 			auto TexturProp = prop->GetBaseTextureTransform();
 			if (!TexturProp) 
 			{
@@ -54,7 +57,7 @@ bool LayerEditWindow::Show()
 				return false;
 			}
 			float x, y;
-			if(PgUtil::HoveringScreenElement(pkScreenTexture, x, y))
+			if(PgUtil::HoveringScreenElement(pScreenElementTextureEdit, x, y))
 			{
 				auto data = this->Layer->BlendTexture->GetSourcePixelData();
 				TerrainLayer::RGBAColor* pixel = (TerrainLayer::RGBAColor*)data->GetPixels();
@@ -161,11 +164,11 @@ void LayerEditWindow::UpdateTexturePos()
 	float fTop = pos.y / io.DisplaySize.y;
 	float fBottom = fTop + TextureHeight / io.DisplaySize.y;
 	float fRight = TextureWidth / io.DisplaySize.x + fLeft;
-	pkScreenTexture->SetVertex(0, 0, NiPoint2(fLeft, fBottom));
-	pkScreenTexture->SetVertex(0, 1, NiPoint2(fRight, fBottom));
-	pkScreenTexture->SetVertex(0, 2, NiPoint2(fRight, fTop));
-	pkScreenTexture->SetVertex(0, 3, NiPoint2(fLeft, fTop));
-	pkScreenTexture->UpdateBound();
+	pScreenElementTextureEdit->SetVertex(0, 0, NiPoint2(fLeft, fBottom));
+	pScreenElementTextureEdit->SetVertex(0, 1, NiPoint2(fRight, fBottom));
+	pScreenElementTextureEdit->SetVertex(0, 2, NiPoint2(fRight, fTop));
+	pScreenElementTextureEdit->SetVertex(0, 3, NiPoint2(fLeft, fTop));
+	pScreenElementTextureEdit->UpdateBound();
 }
 
 std::shared_ptr<TerrainLayer>  LayerEditWindow::NewLayer(std::string BlendFileName, float Width, float Height)
@@ -177,8 +180,8 @@ std::shared_ptr<TerrainLayer>  LayerEditWindow::NewLayer(std::string BlendFileNa
 	Layer->BlendFileName = BlendFileName;
 	Layer->StartPos_X = .0f;
 	Layer->StartPos_Y = .0f;
-	Layer->Width = Width;
-	Layer->Height = Height;
+	Layer->Width = Width + 1;
+	Layer->Height = Height + 1;
 	Layer->UVScaleDiffuse = 5.0f;
 	Layer->UVScaleBlend = 1.0f;
 	Layer->CreateTexture();
@@ -193,11 +196,13 @@ void LayerEditWindow::ChangeLayer(std::shared_ptr<TerrainLayer> Layer)
 {
 	this->Layer = Layer;
 	_Show = true;
-	FiestaOnlineTool::RemoveScreenElemets(pkScreenTexture);
+	if(pScreenElementTextureEdit)
+		pScreenElementTextureEdit = NULL;
+	//FiestaOnlineTool::RemoveScreenElemets(pScreenElementTextureEdit);
 	Layer->BlendTexture->SetStatic(false);
-	pkScreenTexture = PgUtil::CreateScreenElement(TextureWidth, TextureHeight, Layer->BlendTexture);
-	pkScreenTexture->UpdateProperties();
-	FiestaOnlineTool::AddScreenElemets(pkScreenTexture);
+	pScreenElementTextureEdit = PgUtil::CreateScreenElement(TextureWidth, TextureHeight, Layer->BlendTexture);
+	pScreenElementTextureEdit->UpdateProperties();
+	//FiestaOnlineTool::AddScreenElemets(pScreenElementTextureEdit);
 	UpdateTexturePreview();
 }
 

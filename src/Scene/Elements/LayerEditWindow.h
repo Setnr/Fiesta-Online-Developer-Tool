@@ -11,24 +11,24 @@ public:
 
 	bool Show();
 	void UpdateLayer(std::vector<std::vector<TerrainWorld::HTDHelper>>& _HTD);
-	NiScreenElementsPtr GetScreenTexture() { return pkScreenTexture; }
+	NiScreenElementsPtr GetScreenTexture() { return pScreenElementTextureEdit; }
 	void UpdateTexturePreview() 
 	{
 		NiSourceTexturePtr ptr = NiSourceTexture::Create(PgUtil::CreateFullFilePathFromBaseFolder(Layer->DiffuseFileName).c_str());
-		if (pkScreenElement)
-			FiestaOnlineTool::RemoveScreenElemets(pkScreenElement);
-		pkScreenElement = PgUtil::CreateScreenElement(256, 256, ptr);
+		if (pScreenElementTexturePreview)
+			FiestaOnlineTool::RemoveScreenElemets(pScreenElementTexturePreview);
+		pScreenElementTexturePreview = PgUtil::CreateScreenElement(256, 256, ptr);
 		auto& io = ImGui::GetIO();
 		float fLeft = 1.f - 256 / io.DisplaySize.x;
 		float fTop = 1.f - 256 / io.DisplaySize.y;
 		float fBottom = 1.f;
 		float fRight = 1.f;
-		pkScreenElement->SetVertex(0, 0, NiPoint2(fLeft, fBottom));
-		pkScreenElement->SetVertex(0, 1, NiPoint2(fRight, fBottom));
-		pkScreenElement->SetVertex(0, 2, NiPoint2(fRight, fTop));
-		pkScreenElement->SetVertex(0, 3, NiPoint2(fLeft, fTop));
-		pkScreenElement->UpdateBound();
-		FiestaOnlineTool::AddScreenElemets(pkScreenElement);
+		pScreenElementTexturePreview->SetVertex(0, 0, NiPoint2(fLeft, fBottom));
+		pScreenElementTexturePreview->SetVertex(0, 1, NiPoint2(fRight, fBottom));
+		pScreenElementTexturePreview->SetVertex(0, 2, NiPoint2(fRight, fTop));
+		pScreenElementTexturePreview->SetVertex(0, 3, NiPoint2(fLeft, fTop));
+		pScreenElementTexturePreview->UpdateBound();
+		FiestaOnlineTool::AddScreenElemets(pScreenElementTexturePreview);
 	}
 private:
 	void UpdateTexturePos();
@@ -39,8 +39,8 @@ private:
 
 	float MinHeight;
 	float MaxHeight;
-	NiScreenElementsPtr pkScreenElement;
-	NiScreenElementsPtr pkScreenTexture;
+	NiScreenElementsPtr pScreenElementTexturePreview;
+	NiScreenElementsPtr pScreenElementTextureEdit;
 
 	int BrushColor = 0x0;
 	int BrushSize = 2;

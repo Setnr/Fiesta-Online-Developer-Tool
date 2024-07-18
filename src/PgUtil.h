@@ -209,13 +209,14 @@ public:
         RGBApixel* PixelData = (RGBApixel*)Texture->GetSourcePixelData()->GetPixels();
         for (int w = 0; w < Texture->GetWidth(); w++) 
         {
-            for (int h = 0; h < Texture->GetWidth(); h++) {
+            for (int h = Texture->GetHeight() - 1; h >= 0; h--)
+            {
                 int XPart = w;
 
                 int PreFullLines = Texture->GetWidth() * h;
                 int YPartNormal = PreFullLines;
                 int PointOffsetNormal = XPart + YPartNormal;
-                bmp.SetPixel(w, h, PixelData[PointOffsetNormal]);
+                bmp.SetPixel(w, Texture->GetHeight() - h - 1, PixelData[PointOffsetNormal]);
             }
         }
         bmp.WriteToFile(Path.c_str());

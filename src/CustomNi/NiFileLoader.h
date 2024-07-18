@@ -88,7 +88,9 @@ public:
 	}
 	std::string Load()
 	{
-		return fileDialog.GetSelected().string();
+		std::string path = fileDialog.GetSelected().string();
+		fileDialog.ClearSelected();
+		return path;
 		
 	}
 	std::string GetFolderPath() { return fileDialog.GetPwd().string(); }
