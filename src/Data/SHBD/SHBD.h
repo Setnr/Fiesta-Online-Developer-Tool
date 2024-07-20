@@ -55,6 +55,32 @@ public:
 			SHBDFile.write(&Data[i], sizeof(char));
 		SHBDFile.close();
 	}
+	static void Save(std::string FullSubPath, std::string MapName, int MapSize)
+	{
+		std::string SHBDFilePath = FullSubPath + "\\" + MapName + ".shbd";
+		std::ofstream SHBDFile;
+		if (std::filesystem::exists(SHBDFilePath + ".bak"))
+			std::filesystem::remove(SHBDFilePath + ".bak");
+		if (std::filesystem::exists(SHBDFilePath))
+		{
+			std::filesystem::copy(SHBDFilePath, SHBDFilePath + ".bak");
+			std::filesystem::remove(SHBDFilePath);
+		}
+
+		SHBDFile.open(SHBDFilePath, std::ios::binary);
+		if (!SHBDFile.is_open())
+		{
+			LogError("Failed to open and create SHBD for " + MapName);
+			return;
+		}
+		int SHBDSize = MapSize * 8;
+		char Walking = 0x0;
+		SHBDFile.write((char*)&MapSize, sizeof(MapSize));
+		SHBDFile.write((char*)&SHBDSize, sizeof(SHBDSize));
+		for (int i = 0; i < SHBDSize; i++)
+			SHBDFile.write(&Walking, sizeof(char));
+		SHBDFile.close();
+	}
 	int GetMapSize() { return MapSize; }
 	int GetSHBDSize() { return SHBDSize; }
 	std::vector<char>& GetDataRefrence() { return Data; }

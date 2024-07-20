@@ -11,6 +11,10 @@ void MapMenu::ShowMenuBar() {
 	{
 		ShowLoadMenu = true;
 	}
+    if (ImGui::MenuItem("Reload MapInfo"))
+    {
+        SHNManager::ReloadSHN(SHNManager::MapInfoType);
+    }
 }
 
 void MapMenu::RenderMenu()

@@ -381,6 +381,7 @@ copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCu
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
 copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
 copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
+copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"
 
 copy ".\Includes\Gamebryo 2.3\DLL\d3dx9d_32.dll" ".\Build\$(Configuration)\d3dx9d_32.dll" 
 
@@ -429,7 +430,8 @@ copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
 copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
-copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"</Command>
+copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
+copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -459,6 +461,7 @@ copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCu
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
 copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
 copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
+copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"
 
 
 copy ".\Includes\Gamebryo 2.3\DLL\NiAnimation23VC80R.dll" ".\Build\$(Configuration)\NiAnimation23VC80R.dll" 
@@ -507,6 +510,7 @@ copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCu
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
 copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
 copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
+copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"
 
 copy ".\Includes\Gamebryo 2.3\DLL\NiAnimation23VC80S.dll" ".\Build\$(Configuration)\NiAnimation23VC80S.dll" 
 copy ".\Includes\Gamebryo 2.3\DLL\NiBinaryShaderLibDX923VC80S.dll" ".\Build\$(Configuration)\NiBinaryShaderLibDX923VC80S.dll"
@@ -552,7 +556,8 @@ copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini
 copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
 copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
-copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"</Command>
+copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
+copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
@@ -582,7 +587,8 @@ copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCu
 copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
 copy ".\Required\AlphaTextureBlender.NSF" ".\Build\$(Configuration)\FiestaOnlineTool\AlphaTextureBlender.NSF"
 copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
-copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"</Command>
+copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
+copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -24,6 +24,26 @@ bool LayerEditWindow::Show()
 	ImGuiIO& io = ImGui::GetIO();
 	if (!_Show)
 		return UpdateTerrainLayer;
+	NiPoint3 Intersect = NiPoint3::ZERO;
+	NiPoint3 kOrigin, kDir;
+	long X, Y;
+	FiestaOnlineTool::GetMousePosition(X, Y);
+	if (kWorld->GetCamera()->WindowPointToRay(X, Y, kOrigin, kDir))
+	{
+		NiPick _Pick;
+		_Pick.SetPickType(NiPick::FIND_FIRST);
+		_Pick.SetSortType(NiPick::SORT);
+		_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+		_Pick.SetFrontOnly(true);
+		_Pick.SetReturnNormal(true);
+		_Pick.SetObserveAppCullFlag(true);
+		_Pick.SetTarget(kWorld->GetTerrainScene());
+		if (_Pick.PickObjects(kOrigin, kDir, true))
+		{
+			NiPick::Results& results = _Pick.GetResults();
+			Intersect = results.GetAt(0)->GetIntersection();
+		}
+	}
 	ImGui::SetNextWindowSize(ImVec2(200.f, 300.f));
 	if (ImGui::Begin("Change Texture",0,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 	{
@@ -44,6 +64,9 @@ bool LayerEditWindow::Show()
 			float Col = static_cast<float>(BrushColor) / 255;
 			ImGui::SameLine(); ImGui::ColorButton("Preview Color", ImVec4(Col, Col, Col, Col));
 			ImGui::DragInt("BrushSize", &BrushSize, 1.f, 0, 100);
+			std::string Coords = "Mouse Pos \nX: " + std::to_string(static_cast<int>(Intersect.x)) + "\nY: " + std::to_string(static_cast<int>(Intersect.y));
+			ImGui::Text(Coords.c_str());
+			ImGui::Checkbox("Show Texture", &ShowTexture);
 			ImGui::EndChild();
 		}
 		if(pScreenElementTextureEdit)
@@ -61,73 +84,46 @@ bool LayerEditWindow::Show()
 			TerrainLayer::RGBAColor* pixel = (TerrainLayer::RGBAColor*)data->GetPixels();
 			NiPoint2 Scale = TexturProp->GetScale();
 			auto Translate = TexturProp->GetTranslate();
-			//float MaxValue = Scale.x;
 
-			//y = y * Scale.x + (1.f - Scale.x) - Translate.x;
-			//x = x * Scale.x + Translate.y;
-			//int yPixel = data->GetHeight() - (data->GetHeight() * y);  //Currently no clue why x and y are wrong order
-			//int xPixel = (data->GetWidth() * x);
 
-			static float LastDrawTime;
-			float CurTime = NiGetCurrentTimeInSec();
-
-			if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && LastDrawTime + pow(io.Framerate, -0.5f) < CurTime && !ImGui::IsAnyItemActive() && !ImGui::IsAnyItemHovered())
+			IniFile& _InitFile = kWorld->GetIniFile();
+			int xPixel = Intersect.x / _InitFile.OneBlock_width;
+			int yPixel = Intersect.y / _InitFile.OneBlock_height;
+			static int LastxPixel = 0;
+			static int LastYPixel = 0;
+			if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered() && xPixel != LastxPixel && yPixel != LastYPixel)// && LastDrawTime + pow(io.Framerate, -0.5f) < CurTime && !ImGui::IsAnyItemActive() )
 			{
-				LastDrawTime = CurTime;
-
-				NiPoint3 kOrigin, kDir;
-				long X, Y;
-				FiestaOnlineTool::GetMousePosition(X, Y);
-				if (kWorld->GetCamera()->WindowPointToRay(X, Y, kOrigin, kDir))
+				LastxPixel = xPixel;
+				LastYPixel = yPixel;
+				int wh = -1;
+				for (int w = xPixel - BrushSize; w <= xPixel + BrushSize && w < static_cast<int>(data->GetWidth()); w++)
 				{
-					NiPick _Pick;
-					_Pick.SetPickType(NiPick::FIND_FIRST);
-					_Pick.SetSortType(NiPick::SORT);
-					_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
-					_Pick.SetFrontOnly(true);
-					_Pick.SetReturnNormal(true);
-					_Pick.SetObserveAppCullFlag(true);
-					_Pick.SetTarget(kWorld->GetTerrainScene());
-					if (_Pick.PickObjects(kOrigin, kDir, true))
+					wh++;
+					if (w < 0)
+						continue;
+					int hh = -1;
+					for (int h = yPixel - BrushSize; h <= yPixel + BrushSize && h < static_cast<int>(data->GetHeight()); h++)
 					{
-						NiPick::Results& results = _Pick.GetResults();
-						NiPoint3 Intersect = results.GetAt(0)->GetIntersection();
-						IniFile& _InitFile = kWorld->GetIniFile();
-						int xPixel = Intersect.x / _InitFile.OneBlock_width;
-						int yPixel = Intersect.y / _InitFile.OneBlock_height;
+						hh++;
+						if (h < 0)
+							continue;
+						if (!((w - xPixel) * (w - xPixel) + (h - yPixel) * (h - yPixel) <= BrushSize * BrushSize))
+							continue;
+						int XPart = w;
 
-						int wh = -1;
-						for (int w = xPixel - BrushSize; w <= xPixel + BrushSize && w < static_cast<int>(data->GetWidth()); w++)
-						{
-							wh++;
-							if (w < 0)
-								continue;
-							int hh = -1;
-							for (int h = yPixel - BrushSize; h <= yPixel + BrushSize && h < static_cast<int>(data->GetHeight()); h++)
-							{
-								hh++;
-								if (h < 0)
-									continue;
-								if (!((w - xPixel) * (w - xPixel) + (h - yPixel) * (h - yPixel) <= BrushSize * BrushSize))
-									continue;
-								int XPart = w;
-
-								int PreFullLines = Layer->BlendTexture->GetWidth() * h;
-								int YPartNormal = PreFullLines;
-								int PointOffsetNormal = XPart + YPartNormal;
-								pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)BrushColor);
-
-							}
-						}
-
-						UpdateTerrainLayer = true;
-						data->MarkAsChanged();
-
+						int PreFullLines = Layer->BlendTexture->GetWidth() * h;
+						int YPartNormal = PreFullLines;
+						int PointOffsetNormal = XPart + YPartNormal;
+						pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)BrushColor);
 
 					}
 				}
 
+				UpdateTerrainLayer = true;
+				data->MarkAsChanged();
+
 			}
+			
 			bool W_Key = ImGui::IsKeyDown((ImGuiKey)0x57);
 			bool S_Key = ImGui::IsKeyDown((ImGuiKey)0x53);
 			bool A_Key = ImGui::IsKeyDown((ImGuiKey)0x41);
@@ -185,6 +181,13 @@ void LayerEditWindow::UpdateTexturePos()
 	auto& io = ImGui::GetIO();
 	auto pos = ImGui::GetWindowPos();
 	auto size = ImGui::GetWindowSize();
+
+	static ImVec2 LastPos = { 0,0 };
+	static ImVec2 LastSize = { 0,0 };
+
+	if (pos.x == LastPos.x && pos.y == LastPos.y && size.x == LastSize.x && size.y == LastSize.y)
+		return;
+
 	float fLeft = (pos.x + size.x) / io.DisplaySize.x;
 	float fTop = pos.y / io.DisplaySize.y;
 	float fBottom = fTop + TextureHeight / io.DisplaySize.y;

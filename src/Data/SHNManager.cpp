@@ -16,6 +16,18 @@ void SHNManager::Init()
 	Manager.Add(SHNType::MapInfoType,reader);
 }
 
+void SHNManager::ReloadSHN(SHNType type) 
+{
+    std::string Name = Manager.Remove(type);
+    if (Name == "")
+    {
+        LogError("Cant Reload not loaded SHN. Please reach out to the Developer");
+        return;
+    }
+    auto reader = std::make_shared<CDataReader>();
+    reader->Load(Name);
+    Manager.Add(type, reader);
+}
 bool CDataReader::Load(std::string& FileName)
 {
 	_FileName = FileName;

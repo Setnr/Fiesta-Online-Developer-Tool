@@ -1,5 +1,6 @@
 #include "MapTextureScene.h"
 #include "../Settings/Settings.h"
+#include "../Data/SHBD/SHBD.h"
 #include <future>
 
 void MapTextureScene::Draw(NiRenderer* renderer) 
@@ -149,4 +150,16 @@ void MapTextureScene::SaveMap()
 {
     IniFile& ini = kWorld->GetIniFile();
     ini.Save();
+    std::string MapName = _SubPath.substr(_SubPath.find_last_of("\\") + 1);
+    std::string FullSubPath = PgUtil::CreateFullFilePathFromBaseFolder(_SubPath);
+    
+    if (std::filesystem::exists(FullSubPath + "\\" +MapName+".shmd.bak"))
+        std::filesystem::remove(FullSubPath + "\\" + MapName + ".shmd.bak");
+    if (std::filesystem::exists(FullSubPath + "\\" + MapName + ".shmd"))
+    {
+        std::filesystem::copy(FullSubPath + "\\" + MapName + ".shmd", FullSubPath + "\\" + MapName + ".shmd.bak");
+        std::filesystem::remove(FullSubPath + "\\" + MapName + ".shmd");
+    }
+    std::filesystem::copy(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\Base.shmd"), FullSubPath + "\\" + MapName + ".shmd");
+    ShineBlockData::Save(FullSubPath, MapName, ini.HeightMap_width - 1);
 }

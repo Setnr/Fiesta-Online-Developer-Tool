@@ -33,6 +33,7 @@ public:
 		}
 		return srow->ColLen;
 	}
+	std::string GetFileName() { return _FileName; }
 private:
 	struct HEAD
 	{
@@ -205,10 +206,21 @@ public:
 		MAX
 	};
 	static void Init();
+	static void ReloadSHN(SHNType type);
+	
 	static SHNManager Manager;
 	void Add(SHNType type, std::shared_ptr<CDataReader> ptr) 
 	{
 		SHNList.insert({ type,ptr });
+	}
+	std::string Remove(SHNType type) 
+	{
+		std::string ret = "";
+		auto it = SHNList.find(type);
+		if (it != SHNList.end())
+			ret = it->second->GetFileName();
+		SHNList.erase(type);
+		return ret;
 	}
 	static std::shared_ptr<CDataReader> Get(SHNType type);
 	std::shared_ptr<CDataReader> InternalGet(SHNType type);

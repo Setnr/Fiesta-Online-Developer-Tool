@@ -11,7 +11,12 @@ public:
 
 	bool Show();
 	void UpdateLayer(std::vector<std::vector<TerrainWorld::HTDHelper>>& _HTD);
-	NiScreenElementsPtr GetScreenTexture() { return pScreenElementTextureEdit; }
+	NiScreenElementsPtr GetScreenTexture() 
+	{ 
+		if(ShowTexture)
+			return pScreenElementTextureEdit; 
+		return NULL;
+	}
 	void UpdateTexturePreview() 
 	{
 		NiSourceTexturePtr ptr = NiSourceTexture::Create(PgUtil::CreateFullFilePathFromBaseFolder(Layer->DiffuseFileName).c_str());
@@ -45,4 +50,6 @@ private:
 	int BrushColor = 0x0;
 	int BrushSize = 2;
 	int LayerCt = 0;
+
+	bool ShowTexture = true;
 };

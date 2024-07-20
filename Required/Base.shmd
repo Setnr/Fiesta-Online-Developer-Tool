@@ -1,0 +1,11 @@
+shmd0_5
+Sky 0
+Water 0
+GroundObject 0
+GlobalLight 0.792157 0.792157 0.792157
+Fog 0.570000 0.070588 0.541176 0.929412
+BackGroundColor 0.000000 0.501961 1.000000
+Frustum 5000.000000
+DataObjectLoadingEnd
+DirectionLightAmbient 0.000000 0.000000 0.000000
+DirectionLightDiffuse 1.000000 0.976471 0.901961

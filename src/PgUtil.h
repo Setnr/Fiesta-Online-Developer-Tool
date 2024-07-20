@@ -12,6 +12,7 @@
 #include <windows.h>
 #include <wininet.h>
 #include <EasyBMP/EasyBMP.h>
+#include <NiTextureTransform.h>
 #define PICKABLEOBJECTS 1
 
 class PgUtil 
@@ -230,6 +231,41 @@ public:
         s.InsertObject(Node);
         s.Save(Path.c_str());
     }
-
+    /**
+      *   \brief Chceks if a Element is hovered
+      *
+      *   \param pElement -> Pointer to the NiScreenElement to check
+      *   \param x -> FloatValue of relativ X - Position above Element
+      *   \param y -> FloatValue of relativ Y - Position above Element
+      *   \return true if Element is hovered / false if Element is not Hovered
+      *
+      **/
     static bool HoveringScreenElement(NiScreenElements* pElement, float& x, float& y);
+
+     /**
+      *   \brief Calculates x and y based on TextureTransform on NiScreenElement
+      *     be Careful with rotation
+      *     if(PgUtil::HoveringScreenElement(pScreenElementTextureEdit, x, y)))
+      *          ZoomAndPanScreenElementCalculation(x,y,pkTexutre,pkTransform);
+      *
+      *   \param x & y -> Floats 0.f - 1.f matching Position over ScreenElement will be adjusted so x and y matches to point within texture
+      *   \param Texture The used Texture for the ScreenElement
+      *   \param TextureTransForm The Transform of the Texture
+      *   \return std::pair<int,int> with x and y Pixel 
+      *
+      **/
+    static std::pair<int,int> ZoomAndPanScreenElementCalculation(float& x, float& y, NiSourceTexturePtr Texture, NiTextureTransform* TextureTransForm) 
+    {
+        //
+        auto data = Texture->GetSourcePixelData();
+        NiPoint2 Scale = TextureTransForm->GetScale();
+        auto Translate = TextureTransForm->GetTranslate();
+        float MaxValue = Scale.x;
+
+        y = y * Scale.x + (1.f - Scale.x) - Translate.x;
+        x = x * Scale.x + Translate.y;
+        int yPixel = data->GetHeight() - (data->GetHeight() * y);  //Currently no clue why x and y are wrong order
+        int xPixel = (data->GetWidth() * x);
+        return { xPixel,yPixel };
+    }
 };
