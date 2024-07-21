@@ -26,6 +26,12 @@ public:
 				GetGroundObjNode()->DetachChild(SHBDNode);
 		}
 	}
+	virtual std::string GetFolderPath()
+	{
+		if(HasMapInfo())
+			return PgUtil::GetMapFolderPath(_Info->KingdomMap, _Info->MapFolderName);
+		return _InitFile.HeightFileName.substr(0, _InitFile.HeightFileName.find_last_of("\\"));
+	}
 	NiNodePtr GetSHBDNode() { return SHBDNode; }
 
 

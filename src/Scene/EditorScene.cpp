@@ -39,11 +39,11 @@ glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 	return { angle_rad, x, y, z };
 }
 
-EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName, "ini")) 
+EditorScene::EditorScene(MapInfo* info) : _InitFile(PgUtil::CreateFilePathFromMapInfo(info->KingdomMap, info->MapFolderName, "ini")) 
 {
 	ShowLoadMenu = false;
 	auto start = std::chrono::steady_clock::now();
-	std::string _FilePath = PgUtil::CreateMapFolderPath(info->KingdomMap, info->MapFolderName,"shmd");
+	std::string _FilePath = PgUtil::CreateFilePathFromMapInfo(info->KingdomMap, info->MapFolderName,"shmd");
 	_Info = info;
 	if (!kWorld.InitScene())
 		return;
@@ -682,10 +682,15 @@ void EditorScene::ja ()
 			ImGui::RadioButton("Translate", &e, 0);
 			ImGui::SameLine();
 			ImGui::RadioButton("Rotate", &e, 1);
+			ImGui::SameLine();
+			ImGui::RadioButton("Scale", &e, 2);
 			switch (e)
 			{
 			case 0:
 				OperationMode = ImGuizmo::OPERATION::TRANSLATE;
+				break;
+			case 2:
+				OperationMode = ImGuizmo::OPERATION::SCALE;
 				break;
 			case 1:
 			default:
@@ -996,11 +1001,11 @@ bool EditorScene::ResetCamera(bool ForceReset)
 void EditorScene::SaveSHMD() 
 {
 	auto start = std::chrono::steady_clock::now();
-	if (std::filesystem::exists(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak")))
-		std::filesystem::remove(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
+	if (std::filesystem::exists(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak")))
+		std::filesystem::remove(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
 
-	std::filesystem::copy(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd"), PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
-	std::string _FilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd");
+	std::filesystem::copy(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd"), PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
+	std::string _FilePath = PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd");
 	std::ofstream file;
 	file.open(_FilePath);
 	file << std::fixed << std::setprecision(6);

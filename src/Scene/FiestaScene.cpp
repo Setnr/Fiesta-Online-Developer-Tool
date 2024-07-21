@@ -66,36 +66,39 @@ void FiestaScene::UpdateCamera(float fTime)
 	}
 	float DeltaTime = fTime - FiestaOnlineTool::GetLastUpdateTime();
 
-	bool W_Key = ImGui::IsKeyDown((ImGuiKey)0x57);
-	bool S_Key = ImGui::IsKeyDown((ImGuiKey)0x53);
-	bool A_Key = ImGui::IsKeyDown((ImGuiKey)0x41);
-	bool D_Key = ImGui::IsKeyDown((ImGuiKey)0x44);
-	bool E_Key = ImGui::IsKeyDown((ImGuiKey)0x45);
-	bool Q_Key = ImGui::IsKeyDown((ImGuiKey)0x51);
-	if (W_Key || S_Key || A_Key || D_Key || E_Key || Q_Key)
+	if(!ImGui::IsKeyDown((ImGuiKey)VK_CONTROL))
 	{
-		
-		NiPoint3 CameraPosition = Camera->GetTranslate();
-		NiPoint3 MoveDirect(0.0f, 0.0f, 0.0f);
-		float SpeedUp = 3.0f;
-		if (io.KeyShift)
-			SpeedUp = 10.0f;
-		NiPoint3 WorldDirect = Camera->GetWorldDirection() * 115.f * DeltaTime * SpeedUp;
-		NiPoint3 RightDirect = Camera->GetWorldRightVector() * 115.f * DeltaTime * SpeedUp;
-		
-		if(W_Key)
-			MoveDirect += WorldDirect;
-		if (S_Key)
-			MoveDirect -= WorldDirect;
-		if (D_Key)
-			MoveDirect += RightDirect;
-		if (A_Key)
-			MoveDirect -=  RightDirect;
-		if (Q_Key)
-			CameraPosition.z += 115.f * DeltaTime * SpeedUp;
-		if (E_Key)
-			CameraPosition.z -= 115.f * DeltaTime * SpeedUp;
-		Camera->SetTranslate(CameraPosition + MoveDirect);
+		bool W_Key = ImGui::IsKeyDown((ImGuiKey)0x57);
+		bool S_Key = ImGui::IsKeyDown((ImGuiKey)0x53);
+		bool A_Key = ImGui::IsKeyDown((ImGuiKey)0x41);
+		bool D_Key = ImGui::IsKeyDown((ImGuiKey)0x44);
+		bool E_Key = ImGui::IsKeyDown((ImGuiKey)0x45);
+		bool Q_Key = ImGui::IsKeyDown((ImGuiKey)0x51);
+		if (W_Key || S_Key || A_Key || D_Key || E_Key || Q_Key)
+		{
+
+			NiPoint3 CameraPosition = Camera->GetTranslate();
+			NiPoint3 MoveDirect(0.0f, 0.0f, 0.0f);
+			float SpeedUp = 3.0f;
+			if (io.KeyShift)
+				SpeedUp = 10.0f;
+			NiPoint3 WorldDirect = Camera->GetWorldDirection() * 115.f * DeltaTime * SpeedUp;
+			NiPoint3 RightDirect = Camera->GetWorldRightVector() * 115.f * DeltaTime * SpeedUp;
+
+			if (W_Key)
+				MoveDirect += WorldDirect;
+			if (S_Key)
+				MoveDirect -= WorldDirect;
+			if (D_Key)
+				MoveDirect += RightDirect;
+			if (A_Key)
+				MoveDirect -= RightDirect;
+			if (Q_Key)
+				CameraPosition.z += 115.f * DeltaTime * SpeedUp;
+			if (E_Key)
+				CameraPosition.z -= 115.f * DeltaTime * SpeedUp;
+			Camera->SetTranslate(CameraPosition + MoveDirect);
+		}
 	}
 
 	Camera->Update(0.0f);

@@ -33,7 +33,7 @@ void FiestaOnlineTool::OnIdle()
             this->UpdateFrame();
             this->BeginFrame();
 
-            m_spRenderer->BeginUsingDefaultRenderTargetGroup(7u);
+            m_spRenderer->BeginUsingDefaultRenderTargetGroup(NiRenderer::CLEAR_ALL);
 
             /*Set BackgroundColor of Renderer*/
             NiColorA m_kBackGroundColor;

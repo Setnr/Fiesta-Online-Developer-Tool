@@ -24,6 +24,7 @@ void EditScene::UpdateCamera(float fTime)
 		}
 		SHMDCopyPaste();
 		SHMDDelete();
+		SHMDChangeGizmoStatus();
 		break;
 	case SHBD:
 		UpdateSHBDTexture();
@@ -60,22 +61,23 @@ void EditScene::UpdateCamera(float fTime)
 	}
 }
 
+void EditScene::SHMDChangeGizmoStatus() 
+{
+	if (SelectedObj && ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x57))  // ctrl W
+		OperationMode = ImGuizmo::OPERATION::TRANSLATE;
+	if (SelectedObj && ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x45))  // ctrl E
+		OperationMode = ImGuizmo::OPERATION::ROTATE;
+	if (SelectedObj && ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x44))  // ctrl D
+		SnapMove = !SnapMove;
+}
 void EditScene::SHMDCopyPaste() 
 {
-	if (SelectedObj && (
-		ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x43)
-		|| ImGui::IsKeyPressed((ImGuiKey)VK_CONTROL) && ImGui::IsKeyDown((ImGuiKey)0x43)
-		)
-		)  // ctrl c
+	if (SelectedObj && ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x43))  // ctrl c
 	{
 		CopyObj = SelectedObj;
 	}
 	float CurTime = NiGetCurrentTimeInSec();
-	if (LastPasteTime + Settings::PasteDelay() < CurTime && CopyObj && (
-		(ImGui::IsKeyDown((ImGuiKey)0x11) && ImGui::IsKeyPressed((ImGuiKey)0x56))
-		|| (ImGui::IsKeyPressed((ImGuiKey)0x11) && ImGui::IsKeyDown((ImGuiKey)0x56))
-		)
-		)   // ctrl v
+	if (LastPasteTime + Settings::PasteDelay() < CurTime && CopyObj && ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x56))   // ctrl v
 	{
 		LastPasteTime = CurTime;
 			

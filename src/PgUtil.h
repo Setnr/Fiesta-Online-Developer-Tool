@@ -145,7 +145,7 @@ public:
         return FolderPath;
     }
     static std::string FolderPath;
-    static std::string CreateMapFolderPath(char KingdomMap, std::string MapName, std::string FileType) 
+    static std::string CreateFilePathFromMapInfo(char KingdomMap, std::string MapName, std::string FileType) 
     {
         std::string BasePath = CreateFullFilePathFromBaseFolder("") + "\\resmap\\";
         switch (KingdomMap)
@@ -167,6 +167,30 @@ public:
             break;
         }
         BasePath += "\\" + MapName + "\\" + MapName + "." + FileType;
+        return BasePath;
+    }
+    static std::string GetMapFolderPath(char KingdomMap, std::string MapName)
+    {
+        std::string BasePath = CreateFullFilePathFromBaseFolder("") + "\\resmap\\";
+        switch (KingdomMap)
+        {
+        case 0:
+        case 4:
+        case 6:
+        case 7:
+            BasePath += "field";
+            break;
+        case 1:
+            BasePath += "KDfield";
+            break;
+        case 2:
+            BasePath += "MHfield";
+            break;
+        case 3:
+            BasePath += "IDfield";
+            break;
+        }
+        BasePath += "\\" + MapName + "\\";
         return BasePath;
     }
     static void LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, float Percent, bool Map);

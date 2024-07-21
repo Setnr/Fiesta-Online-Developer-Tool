@@ -32,6 +32,7 @@ void EditScene::Draw(NiRenderer* renderer)
 {
 	if (!kWorld)
 		return;
+	renderer->SetBackgroundColor(kWorld->GetBackgroundColor());
 	kWorld->GetCamera()->SetViewFrustum(kWorld->GetSkyFrustum());
 
 	NiVisibleArray m_kVisible;
@@ -42,6 +43,12 @@ void EditScene::Draw(NiRenderer* renderer)
 	NiVisibleArray m_kVisible2;
 	NiCullingProcess m_spCuller2(&m_kVisible2);
 	NiDrawScene(kWorld->GetCamera(), kWorld->GetWorldScene(), m_spCuller2);
+
+	if (MiddleMouseLoader.ShowInternalScene())
+		MiddleMouseLoader.DrawScene(renderer);
+
+	if (SHMDWindowLoader.ShowInternalScene())
+		SHMDWindowLoader.DrawScene(renderer);
 }
 
 void EditScene::Update(float fTime) 
@@ -65,6 +72,11 @@ void EditScene::Update(float fTime)
 			kWorld->GetSkyNode()->Update(fTime / 10.f);
 		}
 	}
+	if(MiddleMouseLoader.ShowInternalScene())
+		MiddleMouseLoader.Update(fTime);
+
+	if (SHMDWindowLoader.ShowInternalScene())
+		SHMDWindowLoader.Update(fTime);
 }
 
 void EditScene::SelectObject() {

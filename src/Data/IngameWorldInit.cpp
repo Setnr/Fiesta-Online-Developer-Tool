@@ -13,7 +13,7 @@
 bool World::LoadSHMD() 
 {
 	std::ifstream SHMD;
-	std::string _FilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd");
+	std::string _FilePath = PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd");
 	SHMD.open(_FilePath, std::ios::in);
 
 	if (!SHMD.is_open())

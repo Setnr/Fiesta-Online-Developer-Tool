@@ -56,6 +56,7 @@ private:
 		strips->GetModelData()->MarkAsChanged(NiGeometryData::VERTEX_MASK);
 		strips->Update(0.0f);
 	}
+public:
 	static void GetNewVerticesData(NiNode* Parent, NiPoint3& MinPoint, NiPoint3& MaxPoint,NiMatrix3& WorldRotate, NiPoint3 ParentTranslate = NiPoint3(0.f,0.f,0.f))
 	{
 		for (int i = 0; i < Parent->GetChildCount(); i++)
@@ -125,7 +126,6 @@ private:
 			}
 		}
 	}
-public:
 	static NiNodePtr CreateBoundingBox(NiNode* Parent,NiNodePtr BoundingBox)
 	{
 		NiPoint3 MinPoint(0.f, 0.f, 0.f);

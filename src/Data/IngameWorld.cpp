@@ -2,7 +2,7 @@
 #include "../Logger/Logger.h"
 #include <chrono>
 #include <future>
-World::World(MapInfo* MapInfo) : _Info(MapInfo) , TerrainWorld(PgUtil::CreateMapFolderPath(MapInfo->KingdomMap, MapInfo->MapFolderName, "ini")) , _SHBD(MapInfo)
+World::World(MapInfo* MapInfo) : _Info(MapInfo) , TerrainWorld(PgUtil::CreateFilePathFromMapInfo(MapInfo->KingdomMap, MapInfo->MapFolderName, "ini")) , _SHBD(MapInfo)
 {
 	auto start = std::chrono::steady_clock::now();
 
@@ -115,11 +115,11 @@ void World::SaveSHBD()
 void World::SaveSHMD() 
 {
 	auto start = std::chrono::steady_clock::now();
-	if (std::filesystem::exists(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak")))
-		std::filesystem::remove(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
+	if (std::filesystem::exists(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak")))
+		std::filesystem::remove(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
 
-	std::filesystem::copy(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd"), PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
-	std::string _FilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shmd");
+	std::filesystem::copy(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd"), PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
+	std::string _FilePath = PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd");
 	std::ofstream file;
 	file.open(_FilePath);
 	file << std::fixed << std::setprecision(6);

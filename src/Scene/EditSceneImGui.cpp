@@ -4,7 +4,6 @@
 #include <future>
 #include "../Data/SHNManager.h"
 
-#include "ImGui/ImGuizmo.h"
 #include "ImGuiConstantFuncs.h"
 #include "NiFileLoader.h"
 
@@ -13,7 +12,6 @@
 #include "MapCreateScene.h"
 
 
-ImGuizmo::OPERATION OperationMode = ImGuizmo::OPERATION::TRANSLATE;
 glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 {
 	if (q.w == 1.f)
@@ -86,6 +84,10 @@ void EditScene::CreateMenuBar()
 		if (ImGui::MenuItem("Save HTDG", 0, false, kWorld != NULL))
 		{
 			kWorld->SaveHTDG();
+		}
+		if (ImGui::MenuItem("Export HTD as NIF", 0, false, kWorld != NULL))
+		{
+			PgUtil::SaveNode(kWorld->GetFolderPath() + "Export.nif", kWorld->GetTerrainScene());
 		}
         ImGui::EndMenu();
 	}
@@ -168,6 +170,9 @@ void EditScene::ShowAboutWindow()
 			ImGui::Text("Select Objects with Left Click");
 			ImGui::Text("Copy and Paste with ctrl + c/v");
 			ImGui::Text("Move Up/Down with Q/E");
+			ImGui::Text("Switch to Translate Mode ctrl + w");
+			ImGui::Text("Switch to Rotate Mode ctrl + e");
+			ImGui::Text("Enable/Disable Snap Mode ctrl + d");
 			break;
 		case SHBD:
 			ImGui::Text("Move Camera with WASD");
@@ -188,10 +193,9 @@ void EditScene::ShowAboutWindow()
 
 void EditScene::MiddleMouseButtonMenu()
 {
-	static NiFileLoader loader;
-	if (loader.DrawImGui())
+	if (MiddleMouseLoader.DrawImGui())
 	{
-		NiNodePtr obj = loader.Load();
+		NiNodePtr obj = MiddleMouseLoader.Load();
 		if (NiIsKindOf(NiPickable, obj))
 			SelectedObj = (NiPickable*)(NiNode*)obj;
 
@@ -199,11 +203,11 @@ void EditScene::MiddleMouseButtonMenu()
 	if (ImGui::BeginPopupContextVoid(0, ImGuiPopupFlags_MouseButtonMiddle))
 	{
 		if (ImGui::Selectable("Add Sky"))
-			loader.Prepare(kWorld->GetSkyNode());
+			MiddleMouseLoader.Prepare(kWorld->GetSkyNode());
 		if (ImGui::Selectable("Add Water"))
-			loader.Prepare(kWorld->GetWaterNode());
+			MiddleMouseLoader.Prepare(kWorld->GetWaterNode());
 		if (ImGui::Selectable("Add Global Object"))
-			loader.Prepare(kWorld->GetGroundObjNode());
+			MiddleMouseLoader.Prepare(kWorld->GetGroundObjNode());
 		if (ImGui::Selectable("Add Movable Object"))
 		{
 			NiPoint3 kOrigin, kDir;
@@ -225,7 +229,7 @@ void EditScene::MiddleMouseButtonMenu()
 					for (int i = 0; i < results.GetSize(); i++)
 					{
 						auto result = results.GetAt(i);
-						loader.Prepare(kWorld->GetGroundObjNode(), PICKABLEOBJECTS, result->GetIntersection());
+						MiddleMouseLoader.Prepare(kWorld->GetGroundObjNode(), PICKABLEOBJECTS, result->GetIntersection());
 					}
 				}
 				else
@@ -237,7 +241,7 @@ void EditScene::MiddleMouseButtonMenu()
 						for (int i = 0; i < results.GetSize(); i++)
 						{
 							auto result = results.GetAt(i);
-							loader.Prepare(kWorld->GetGroundCollidee(), PICKABLEOBJECTS, result->GetIntersection());
+							MiddleMouseLoader.Prepare(kWorld->GetGroundCollidee(), PICKABLEOBJECTS, result->GetIntersection());
 						}
 
 					}
@@ -307,8 +311,11 @@ void EditScene::DrawGizmo()
 	ImGuizmo::RecomposeMatrixFromComponents(&SelectedNode->GetTranslate().x, &tmpRotation[0], matrixScale, (float*)matrix);
 
 	ImGuizmo::SetRect((float_t)0, (float_t)0, (float_t)io.DisplaySize.x, (float_t)io.DisplaySize.y);
-	ImGuizmo::Manipulate(&view[0][0], &projectionMatrix[0][0], OperationMode, ImGuizmo::MODE::WORLD, (float*)matrix, nullptr, nullptr);
-
+	if(SnapMove)
+		ImGuizmo::Manipulate(&view[0][0], &projectionMatrix[0][0], OperationMode, ImGuizmo::MODE::WORLD, (float*)matrix, nullptr, &SnapSize.x);
+	else
+		ImGuizmo::Manipulate(&view[0][0], &projectionMatrix[0][0], OperationMode, ImGuizmo::MODE::WORLD, (float*)matrix, nullptr, nullptr);
+	
 	ImGuizmo::DecomposeMatrixToComponents((float*)matrix, (float*)&SelectedNode->GetTranslate().x, &tmpRotation[0], matrixScale);
 
 	SelectedObjAngels -= tmpRotation;
@@ -329,11 +336,12 @@ void EditScene::DrawGizmo()
 	}
 
 	glm::vec4 angleAxis = ConvertQuatToAngleAxis(glm::quat(glm::radians(SelectedObjAngels)));
+
 	NiMatrix3 m;
 	m.MakeRotation(angleAxis[0], angleAxis[1], angleAxis[2], angleAxis[3]);
 
-	float angle, x, y, z;
-	SelectedNode->GetRotate().ExtractAngleAndAxis(angle, x, y, z);
+	//float angle, x, y, z;
+	//SelectedNode->GetRotate().ExtractAngleAndAxis(angle, x, y, z);
 
 	SelectedNode->SetRotate(m);
 }
@@ -509,11 +517,9 @@ void EditScene::DrawSHMDWindow()
 	
 
 	ImGui::End();
-
-	static NiFileLoader loader;
-	if (loader.DrawImGui())
+	if (SHMDWindowLoader.DrawImGui())
 	{
-		NiNodePtr obj = loader.Load();
+		NiNodePtr obj = SHMDWindowLoader.Load();
 		if (NiIsKindOf(NiPickable, obj))
 		{
 			auto Parent = SelectedObj->GetParent();
@@ -536,27 +542,16 @@ void EditScene::DrawSHMDWindow()
 		{
 			auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
 
-			int h2 = 123 + h;
+			int h2 = 150 + h;
 			int w2 = 319;
 
 			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - w2, io.DisplaySize.y - h2));
 			ImGui::SetNextWindowSize(ImVec2(w2, h2 - h));
 
 			ImGui::Begin("Object-Editor", NULL, flags);
-			static int e = 0;
-			ImGui::RadioButton("Translate", &e, 0);
+			ImGui::RadioButton("Translate", (int*)&OperationMode, ImGuizmo::OPERATION::TRANSLATE);
 			ImGui::SameLine();
-			ImGui::RadioButton("Rotate", &e, 1);
-			switch (e)
-			{
-			case 0:
-				OperationMode = ImGuizmo::OPERATION::TRANSLATE;
-				break;
-			case 1:
-			default:
-				OperationMode = ImGuizmo::OPERATION::ROTATE;
-				break;
-			}
+			ImGui::RadioButton("Rotate", (int*)&OperationMode, ImGuizmo::OPERATION::ROTATE);
 
 			ImGui::DragFloat3("Position", (float*)&SelectedObj->GetTranslate().x);
 			ImGui::DragFloat3("Rotation", &SelectedObjAngels[0]);
@@ -564,8 +559,15 @@ void EditScene::DrawSHMDWindow()
 			if (ImGui::DragFloat("Scale", &Scale, 0.01f, 0.0f, 5.0f))
 				SelectedObj->SetScale(Scale);
 
+			ImGui::Checkbox("Snaping Movement", &SnapMove);
+			if (ImGui::DragFloat("Snaping Step", &SnapSize.x))
+			{
+				SnapSize.y = SnapSize.x;
+				SnapSize.z = SnapSize.x;
+			}
+
 			if (ImGui::Button("Change NIF of Object"))
-				loader.Prepare(nullptr,NiIsKindOf(NiPickable, SelectedObj));
+				SHMDWindowLoader.Prepare(nullptr,NiIsKindOf(NiPickable, SelectedObj));
 			ImGui::End();
 		}
 	}

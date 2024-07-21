@@ -157,8 +157,8 @@ SHBDScene::SHBDScene(MapInfo* Info) : _SHBD(Info)
 	}
 
 
-	if (std::filesystem::exists(PgUtil::CreateMapFolderPath(Info->KingdomMap, Info->MapFolderName, "test.nif")))
-		std::filesystem::remove(PgUtil::CreateMapFolderPath(Info->KingdomMap, Info->MapFolderName, "test.nif"));
+	if (std::filesystem::exists(PgUtil::CreateFilePathFromMapInfo(Info->KingdomMap, Info->MapFolderName, "test.nif")))
+		std::filesystem::remove(PgUtil::CreateFilePathFromMapInfo(Info->KingdomMap, Info->MapFolderName, "test.nif"));
 
 
 	ResetSHBD();

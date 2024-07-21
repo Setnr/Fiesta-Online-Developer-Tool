@@ -5,6 +5,8 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 #include "Elements/MapMenu.h"
+#include "../CustomNi/NiFileLoader.h"
+#include "ImGui/ImGuizmo.h"
 NiSmartPointer(EditScene);
 class EditScene :  public FiestaScene
 {
@@ -41,6 +43,7 @@ private:
 	void UpdateGeneralInfoNode(NiNodePtr Node);
 	void DrawGizmo();
 	void SelectObject();
+	void SHMDChangeGizmoStatus();
 	void SHMDCopyPaste();
 	void SHMDDelete();
 	void MiddleMouseButtonMenu();
@@ -50,6 +53,9 @@ private:
 	NiPickablePtr  CopyObj;
 	glm::vec3 SelectedObjAngels;
 	float LastPasteTime = 0.0f;
+	ImGuizmo::OPERATION OperationMode = ImGuizmo::OPERATION::TRANSLATE;
+	bool SnapMove = false;
+	NiPoint3 SnapSize = NiPoint3(2.5f,2.5f,2.5f);
 
 	void UpdateSHBDTexture();
 	void MoveViaMiddleMouse();
@@ -95,5 +101,7 @@ private:
 		default: return "Inactive";
 		}
 	}
+	NiFileLoader MiddleMouseLoader; 
+	NiFileLoader SHMDWindowLoader;
 };
 

@@ -176,6 +176,7 @@ public:
 	{
 		m_spMapDirectionalLight->SetDiffuseColor(kColor);
 	}
+
 	const NiColor& GetMapDirectionalLightDiffuseColor()
 	{
 		return m_spMapDirectionalLight->GetDiffuseColor();
@@ -197,6 +198,10 @@ public:
 	void CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer);
 	std::vector<std::vector<HTDHelper>>& GetHTD() { return _HTD; }
 	virtual NiPoint3 GetSpawnPoint();
+	virtual std::string GetFolderPath() 
+	{
+		return _InitFile.HeightFileName.substr(0, _InitFile.HeightFileName.find_last_of("\\"));
+	}
 #pragma endregion
 	void ReloadTerrain() {
 		ClearTerrainScene();

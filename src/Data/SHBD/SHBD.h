@@ -16,7 +16,7 @@ class ShineBlockData
 public:
 	ShineBlockData(MapInfo* MapInfo) : _Info(MapInfo)
 	{
-		std::string SHBDFilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd");
+		std::string SHBDFilePath = PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shbd");
 		std::ifstream SHBDFile;
 		SHBDFile.open(SHBDFilePath, std::ios::binary);
 		if (!SHBDFile.is_open())
@@ -38,11 +38,11 @@ public:
 	void AppendToTexture(NiDynamicTexturePtr texture, int x, int y, int width, int height);
 	void Save() 
 	{
-		std::string SHBDFilePath = PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd");
+		std::string SHBDFilePath = PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shbd");
 		std::ofstream SHBDFile;
-		if (std::filesystem::exists(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak")))
-			std::filesystem::remove(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak"));
-		std::filesystem::copy(PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd"), PgUtil::CreateMapFolderPath(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak"));
+		if (std::filesystem::exists(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak")))
+			std::filesystem::remove(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak"));
+		std::filesystem::copy(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shbd"), PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak"));
 		SHBDFile.open(SHBDFilePath, std::ios::binary);
 		if (!SHBDFile.is_open())
 		{
