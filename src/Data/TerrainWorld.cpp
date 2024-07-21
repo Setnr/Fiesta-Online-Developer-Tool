@@ -137,6 +137,14 @@ NiNodePtr TerrainWorld::GetLayerNode(std::string LayerName)
 	*/
 
 	NiNodePtr LayerNode = NiNew NiNode;
+	if(!prop)
+	{
+		prop = NiNew NiAlphaProperty;
+		prop->SetAlphaBlending(true);
+		prop->SetSrcBlendMode(NiAlphaProperty::AlphaFunction::ALPHA_SRCALPHA);
+		prop->SetTestMode(NiAlphaProperty::TEST_MAX_MODES);
+		Terrain->AttachProperty(prop);
+	}
 	LayerNode->SetName(LayerName.c_str());
 	bool SkipAttach = false;
 	Terrain->CompactChildArray();
@@ -352,7 +360,6 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 
 			NiTexturingPropertyPtr pkTP = NiNew NiTexturingProperty();
 			NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
-
 			//alphaprop->SetDestBlendMode(NiAlphaProperty::ALPHA_ZERO);
 
 			BaseTextureMap->SetTexture(BaseTexture);
@@ -370,12 +377,19 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 
 			pkTP->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
 			pkTP->SetBaseMap(NormalMap);
+
+			NiVertexColorPropertyPtr vertex = NiNew NiVertexColorProperty;
+			vertex->SetLightingMode(NiVertexColorProperty::LIGHTING_E_A_D);
+			vertex->SetSourceMode(NiVertexColorProperty::SOURCE_AMB_DIFF);
+			Shape->AttachProperty(vertex);
+
 			Shape->AttachProperty(pkTP);
 			Shape->AttachProperty(alphaprop);
 
 			Shape->CalculateNormals();
 
 			Shape->ApplyAndSetActiveMaterial("PgTerrain");
+			Shape->RemoveMaterial("");
 			Shape->Update(0.0);
 			Shape->UpdateEffects();
 			Shape->UpdateProperties();

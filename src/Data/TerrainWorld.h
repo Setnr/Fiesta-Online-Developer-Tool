@@ -267,4 +267,6 @@ protected:
 	};
 	std::vector<std::vector<PointInfos>> VertexMap;
 	NiNodePtr GetLayerNode(std::string LayerName);
+
+	NiAlphaPropertyPtr prop;
 };
