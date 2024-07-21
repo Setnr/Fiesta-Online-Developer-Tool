@@ -120,6 +120,7 @@ bool TerrainWorld::LoadTerrain()
 		for (int w = 0; w < VertexShadowImage->GetWidth(); w++)
 		{
 			VertexMap[w][VertexShadowImage->GetHeight() - h - 1].VertexColor = NiColorA(static_cast<float>(VertexColorArray[PixelCounter].r) / 255.0f, static_cast<float>(VertexColorArray[PixelCounter].g) / 255.f, static_cast<float>(VertexColorArray[PixelCounter].b) / 255.f, 1.0f);
+
 			PixelCounter++;
 		}
 	}

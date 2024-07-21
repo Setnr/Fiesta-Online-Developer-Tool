@@ -225,9 +225,9 @@ void World::SaveSHMDGlobalGroundObjects(std::ofstream& file, NiNodePtr objNode)
 	}
 }
 
-void World::ShowHTDG(bool Show, NiNodePtr OrbNode)
+void World::ShowHTDG(bool ShowOrbNode, bool ShowObjecs, NiNodePtr OrbNode)
 {
-	if (!Show)
+	if (!ShowOrbNode)
 	{
 		m_spGroundScene->AttachChild(m_spGroundObject);
 		m_spNormalLightScene->AttachChild(m_spWaterScene);
@@ -235,13 +235,18 @@ void World::ShowHTDG(bool Show, NiNodePtr OrbNode)
 	}
 	else
 	{
-		m_spGroundScene->DetachChild(m_spGroundObject);
-		m_spNormalLightScene->DetachChild(m_spWaterScene);
+		if (!ShowObjecs)
+		{
+			m_spGroundScene->DetachChild(m_spGroundObject);
+			m_spNormalLightScene->DetachChild(m_spWaterScene);
+		}
 		m_spGroundScene->AttachChild(OrbNode);
 		m_spGroundScene->CompactChildArray();
 		m_spNormalLightScene->CompactChildArray();
 
 	}
+	
+	
 
 	m_spGroundScene->DetachChild(m_spGroundTerrain);
 	m_spGroundScene->AttachChild(m_spGroundTerrain);

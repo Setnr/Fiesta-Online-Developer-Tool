@@ -42,7 +42,7 @@ void EditScene::Draw(NiRenderer* renderer)
 	kWorld->GetCamera()->SetViewFrustum(kWorld->GetWorldFrustum());
 	NiVisibleArray m_kVisible2;
 	NiCullingProcess m_spCuller2(&m_kVisible2);
-	NiDrawScene(kWorld->GetCamera(), kWorld->GetWorldScene(), m_spCuller2);
+	NiDrawScene(kWorld->GetCamera(), kWorld->GetWorldScene(), m_spCuller);
 
 	if (MiddleMouseLoader.ShowInternalScene())
 		MiddleMouseLoader.DrawScene(renderer);

@@ -7,6 +7,8 @@
 #include "Elements/MapMenu.h"
 #include "../CustomNi/NiFileLoader.h"
 #include "ImGui/ImGuizmo.h"
+#include "../Settings/Settings.h"
+
 NiSmartPointer(EditScene);
 class EditScene :  public FiestaScene
 {
@@ -88,7 +90,7 @@ private:
 		CurrentEditMode = mode;
 		
 		kWorld->SetSHBDVisiblity(mode == SHBD);
-		kWorld->ShowHTDG(mode == HTDG, HTDOrbNode);
+		kWorld->ShowHTDG(mode == HTDG , Settings::ShowSHMD(), HTDOrbNode);
 		_HTDBrush->Show(mode == HTDG);
 	}
 	std::string GetEditMode() 

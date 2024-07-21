@@ -35,6 +35,7 @@ Settings::Settings() : _FirstStartUp(false)
 	_FPSCap = reader.GetReal("Window", "FPSCap", 144.f);
 	_PasteDelay = reader.GetReal("BaseInformation", "PasteDelay", 0.25f);
 	_GeneralView = reader.GetBoolean("BaseInformation", "GeneralView", true);
+	_ShowSHMD = reader.GetBoolean("BaseInformation", "ShowSHMD", false);
 }
 
 void Settings::SaveSettings() 
@@ -62,6 +63,10 @@ void Settings::SaveSettings()
 	else
 		file << "FullScreen = false" << std::endl;
 	file << "FPSCap = " << _Settings._FPSCap << std::endl;
+	if (_Settings._ShowSHMD)
+		file << "ShowSHMD = true" << std::endl;
+	else
+		file << "ShowSHMD = false" << std::endl;
 
 	file.close();
 

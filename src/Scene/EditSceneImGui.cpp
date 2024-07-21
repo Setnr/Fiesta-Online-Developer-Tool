@@ -399,6 +399,9 @@ void EditScene::ShowSettings()
 			Settings::SaveSettings();
 			//FiestaOnlineTool::RecreateRenderer = true;
 		}
+		bool ShowSHMD = Settings::ShowSHMD();
+		if (ImGui::Checkbox("Show SHMD in HTDG-Editor", &ShowSHMD))
+			Settings::SetShowSHMD(ShowSHMD);
 		ImGui::End();
 	}
 }

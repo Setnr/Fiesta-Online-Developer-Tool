@@ -47,7 +47,7 @@ public:
 	NiPoint3 GetSpawnPoint();
 	void CreateBrushTexture(NiPoint3& BrushPositon, int BrushSize, bool MoveStatus);
 
-	void ShowHTDG(bool Show, NiNodePtr OrbNode);
+	void ShowHTDG(bool ShowOrbNode, bool ShowObjecs, NiNodePtr OrbNode);
 	void SaveHTDG();
 
 	std::vector<std::vector<HTDHelper>>& GetHTD() { return _HTD; }
