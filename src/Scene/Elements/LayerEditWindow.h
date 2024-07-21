@@ -49,7 +49,7 @@ private:
 
 	int BrushColor = 0x0;
 	int BrushSize = 2;
-	int LayerCt = 0;
+	int LayerCt = 1;
 
 	bool ShowTexture = true;
 };

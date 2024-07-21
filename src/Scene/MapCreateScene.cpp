@@ -173,10 +173,27 @@ void MapCreateScene::DrawImGui()
                 file.VertexColorTexture = SubPath + "\\Vertex" + _MapName + ".bmp";
                 file.LayerList[0]->Height = MapSize - 1;
                 file.LayerList[0]->Width = MapSize - 1;
-                file.LayerList[0]->BlendFileName = SubPath + "\\" + file.LayerList[0]->Name + ".bmp";;
+                file.LayerList[0]->Name = "0 BaseTexture";
+                file.LayerList[0]->BlendFileName = SubPath + "\\0 BaseTexture.bmp";
+
                 file.LayerList[0]->BlendTexture = _Fractal->GetSourceTexture();
                 PgUtil::SaveTexture(Direcotry + "\\Vertex" + _MapName + ".bmp", _Fractal->GetSourceTexture());
                 file.UpdateFilePath(Direcotry + "\\" + _MapName + ".ini");
+
+                RGBApixel* PixelData = (RGBApixel*)_Fractal->GetSourceTexture()->GetSourcePixelData()->GetPixels();
+                for (int w = 0; w < _Fractal->GetSourceTexture()->GetWidth(); w++)
+                {
+                    for (int h = _Fractal->GetSourceTexture()->GetHeight() - 1; h >= 0; h--)
+                    {
+                        int XPart = w;
+
+                        int PreFullLines = _Fractal->GetSourceTexture()->GetWidth() * h;
+                        int YPartNormal = PreFullLines;
+                        int PointOffsetNormal = XPart + YPartNormal;
+                        PixelData[PointOffsetNormal] = RGBApixel(0xFF, 0xFF, 0xFF, 0xFF);
+                    }
+                }
+
                 file.Save();
                 MapTextureScenePtr ptr = NiNew MapTextureScene(Direcotry + "\\" + _MapName + ".ini", SubPath);
                 FiestaScenePtr scene = (FiestaScene*)&*ptr;
