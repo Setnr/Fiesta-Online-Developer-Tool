@@ -15,6 +15,8 @@ void EditScene::UpdateCamera(float fTime)
 	{
 		ResetCamera();
 	}
+	if (ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x53))  // ctrl s
+		this->SaveAll();
 	switch (CurrentEditMode) 
 	{
 	case SHMD:

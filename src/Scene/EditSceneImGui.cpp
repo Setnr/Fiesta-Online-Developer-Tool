@@ -106,6 +106,10 @@ void EditScene::CreateMenuBar()
 		{
 			kWorld->SaveHTDG();
 		}
+		if (ImGui::MenuItem("Save All", 0, false, kWorld != NULL))
+		{
+			this->SaveAll();
+		}
 		if (ImGui::MenuItem("Export HTD as NIF", 0, false, kWorld != NULL))
 		{
 			PgUtil::SaveNode(kWorld->GetFolderPath() + "Export.nif", kWorld->GetTerrainScene());

@@ -63,6 +63,14 @@ private:
 	void MoveViaMiddleMouse();
 	void MoveSHBDTexture(float fTime);
 	void DrawSHBDEditor();
+	void SaveAll() 
+	{
+		if (kWorld == NULL)
+			return;
+		kWorld->SaveSHMD();
+		kWorld->SaveSHBD();
+		kWorld->SaveHTDG();
+	}
 	int BrushSize = 0;
 	bool MoveStatus = false;
 
