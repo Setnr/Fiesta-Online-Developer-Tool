@@ -83,6 +83,7 @@
     <ClInclude Include="src\Data\DiamondSquareFractal.h" />
     <ClInclude Include="src\Data\Fractal.h" />
     <ClInclude Include="src\Data\HTDBrush\ChangeBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\HightBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\HTDBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\PerlinBrush.h" />

@@ -10,19 +10,20 @@ public:
 	{
 		ImGui::BeginChild("BrushChildR", ImVec2(0,0), false, ImGuiWindowFlags_HorizontalScrollbar);
 		ImGui::DragInt("Kernel Size", &KernelSize,2.f,3,21);
+		ImGui::DragInt("Cycles", &Cycles, 1.f, 1, 20);
 		ImGui::EndChild();
 	}
 	virtual const char* GetName() { return "Smoothing"; }
 
-	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD, NiPoint3 InterSect)
+	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD)
 	{
 		static float LastUpdate = 0.0f;
 		float CurTime = NiGetCurrentTimeInSec();
 		if (LastUpdate + 0.25f > CurTime)
 			return;
 		LastUpdate = CurTime;
-		int middlew = InterSect.x / _InitFile.OneBlock_width;
-		int middleh = InterSect.y / _InitFile.OneBlock_height;
+		int middlew = _Intersect.x / _InitFile.OneBlock_width;
+		int middleh = _Intersect.y / _InitFile.OneBlock_height;
 
 		float KernelValue = 1 / static_cast<float>(KernelSize * KernelSize);
 		std::vector<std::vector<float>> KernelMap((BrushSize + 1) * 2);
@@ -61,32 +62,36 @@ public:
 			WHelper++;
 		}
 
-		WHelper = 0;
-		HHelper = 0;
-		for (int w = middlew - BrushSize; w <= middlew + BrushSize && w + KernelSize / 2 < (int)HTD.size(); w++)
+		for(int cycle = 0; cycle < Cycles; cycle++)
 		{
-			if (w - KernelSize / 2 < 0)
-				continue;
-			for (int h = middleh - BrushSize; h <= middleh + BrushSize && h + KernelSize / 2 < (int)HTD[w].size(); h++)
-			{
-				if (h - KernelSize / 2 < 0)
-					continue;
-				if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
-					continue;
-				for (auto point : HTD[w][h].Vec)
-					if (point)
-						point->z = KernelMap[WHelper][HHelper];
-				for (auto shape : HTD[w][h].Shape)
-					if (shape)
-						shape->MarkAsChanged(NiGeometryData::VERTEX_MASK);
-				HHelper++;
-			}
+			WHelper = 0;
 			HHelper = 0;
-			WHelper++;
+			for (int w = middlew - BrushSize; w <= middlew + BrushSize && w + KernelSize / 2 < (int)HTD.size(); w++)
+			{
+				if (w - KernelSize / 2 < 0)
+					continue;
+				for (int h = middleh - BrushSize; h <= middleh + BrushSize && h + KernelSize / 2 < (int)HTD[w].size(); h++)
+				{
+					if (h - KernelSize / 2 < 0)
+						continue;
+					if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
+						continue;
+					for (auto point : HTD[w][h].Vec)
+						if (point)
+							point->z = KernelMap[WHelper][HHelper];
+					for (auto shape : HTD[w][h].Shape)
+						if (shape)
+							shape->MarkAsChanged(NiGeometryData::VERTEX_MASK);
+					HHelper++;
+				}
+				HHelper = 0;
+				WHelper++;
+			}
 		}
 		KernelMap.clear();
 	}
 
 private:
 	int KernelSize = 3;
+	int Cycles = 5;
 };

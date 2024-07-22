@@ -39,10 +39,10 @@ public:
 	}
 	void CreateTexture();
 	void Init(){ CreateTexture(); }
-	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD, NiPoint3 InterSect)
+	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD)
 	{
-		int middlew = InterSect.x / _InitFile.OneBlock_width;
-		int middleh = InterSect.y / _InitFile.OneBlock_height;
+		int middlew = _Intersect.x / _InitFile.OneBlock_width;
+		int middleh = _Intersect.y / _InitFile.OneBlock_height;
 
 		RGBAColor* PixelColorA = (RGBAColor*)data->GetPixels();
 		int wh = -1;

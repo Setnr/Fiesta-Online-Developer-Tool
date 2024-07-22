@@ -46,10 +46,31 @@ void EditScene::DrawImGui()
 		break;
 	case EditMode::HTDG:
 	{
-		HTDBrushPtr n = _HTDBrush->Draw();
-		if (n) 
+		NiPoint3 kOrigin, kDir;
+		long X, Y;
+		FiestaOnlineTool::GetMousePosition(X, Y);
+		if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
 		{
-			_HTDBrush = n;
+			NiPick _Pick;
+			_Pick.SetPickType(NiPick::FIND_FIRST);
+			_Pick.SetSortType(NiPick::SORT);
+			_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+			_Pick.SetFrontOnly(true);
+			_Pick.SetReturnNormal(true);
+			_Pick.SetObserveAppCullFlag(true);
+			_Pick.SetTarget(kWorld->GetTerrainScene());
+			if (_Pick.PickObjects(kOrigin, kDir, true))
+			{
+				NiPick::Results& results = _Pick.GetResults();
+				NiPoint3 Intersect = results.GetAt(0)->GetIntersection();
+				_HTDBrush->SetIntersect(Intersect);
+			}
+		}
+
+		HTDBrushPtr NewBrush = _HTDBrush->Draw();
+		if (NewBrush) 
+		{
+			_HTDBrush = NewBrush;
 		}
 	}
 		break;

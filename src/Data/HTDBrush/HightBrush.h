@@ -1,22 +1,18 @@
 #pragma once
 #include "HTDBrush.h"
 NiSmartPointer(World);
-class LevelingBrush : public HTDBrush
+class HightBrush : public HTDBrush
 {
 public:
-	LevelingBrush(NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(HTDOrbNode, BrushSize){}
-	virtual void DrawInternal() 
+	HightBrush(NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(HTDOrbNode, BrushSize) {}
+	virtual void DrawInternal()
 	{
-		ImGui::BeginChild("BrushChildR", ImVec2(0,0), false, ImGuiWindowFlags_HorizontalScrollbar);
-		
+		ImGui::BeginChild("BrushChildR", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+		ImGui::DragFloat("Set Height to:", &HightValue, 1.f, -5000.f, 5000.f);
 		ImGui::EndChild();
 	}
-	virtual const char* GetName() { return "Change"; }
-	virtual void MouseClick() 
-	{ 
-		HTDBrush::MouseClick();
-		ClickedPoint = _Intersect;
-	}
+	virtual const char* GetName() { return "Hight"; }
+	
 	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD)
 	{
 		if (!InitMouse)
@@ -35,7 +31,7 @@ public:
 					continue;
 				for (auto point : HTD[w][h].Vec)
 					if (point)
-						point->z = ClickedPoint.z;
+						point->z = HightValue;
 				for (auto shape : HTD[w][h].Shape)
 					if (shape)
 						shape->MarkAsChanged(NiGeometryData::VERTEX_MASK);
@@ -45,6 +41,5 @@ public:
 	}
 
 private:
-	float ChangeSize = 10.f;
-	NiPoint3 ClickedPoint;
+	float HightValue = 10.f;
 };

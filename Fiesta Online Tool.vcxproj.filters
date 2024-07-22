@@ -269,6 +269,9 @@
     <ClInclude Include="src\Scene\Elements\LayerEditWindow.h">
       <Filter>Scene\SceneElements</Filter>
     </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\HightBrush.h">
+      <Filter>Data\HTDBrush</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">

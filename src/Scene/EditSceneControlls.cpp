@@ -32,31 +32,16 @@ void EditScene::UpdateCamera(float fTime)
 		MoveViaMiddleMouse();
 		break;
 	case HTDG:
-		NiPoint3 kOrigin, kDir;
-		long X, Y;
-		FiestaOnlineTool::GetMousePosition(X, Y);
-		if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+			_HTDBrush->MouseClick();
+		if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
 		{
-			NiPick _Pick;
-			_Pick.SetPickType(NiPick::FIND_FIRST);
-			_Pick.SetSortType(NiPick::SORT);
-			_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
-			_Pick.SetFrontOnly(true);
-			_Pick.SetReturnNormal(true);
-			_Pick.SetObserveAppCullFlag(true);
-			_Pick.SetTarget(kWorld->GetTerrainScene());
-			if (_Pick.PickObjects(kOrigin, kDir, true))
-			{
-				NiPick::Results& results = _Pick.GetResults();
-				NiPoint3 Intersect = results.GetAt(0)->GetIntersection();
-				
-				if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
-				{
-					_HTDBrush->UpdateHTD(kWorld->GetIni(), kWorld->GetHTD(), Intersect);
-				}
-				HTDOrbNode->SetTranslate(Intersect);
-			}
+			_HTDBrush->UpdateHTD(kWorld->GetIni(), kWorld->GetHTD());
 		}
+		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+			_HTDBrush->MouseRelease();
+
+		HTDOrbNode->SetTranslate(_HTDBrush->GetIntersect());
 		break;
 	}
 }

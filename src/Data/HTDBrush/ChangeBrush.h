@@ -13,15 +13,15 @@ public:
 	}
 	virtual const char* GetName() { return "Change"; }
 
-	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD, NiPoint3 InterSect)
+	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD)
 	{
 		static float LastUpdate = 0.0f;
 		float CurTime = NiGetCurrentTimeInSec();
 		if (LastUpdate + 0.05f > CurTime)
 			return;
 		LastUpdate = CurTime;
-		int middlew = InterSect.x / _InitFile.OneBlock_width;
-		int middleh = InterSect.y / _InitFile.OneBlock_height;
+		int middlew = _Intersect.x / _InitFile.OneBlock_width;
+		int middleh = _Intersect.y / _InitFile.OneBlock_height;
 		for (int w = middlew - BrushSize; w <= middlew + BrushSize && w < (int)HTD.size(); w++)
 		{
 			if (w < 0)
