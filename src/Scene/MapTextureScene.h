@@ -17,6 +17,8 @@ public:
 		LookAndMoveAtWorldPoint(kWorld->GetSpawnPoint());
 		kWorld->SetAmbientLightAmbientColor(NiColor::WHITE);
 		CanSwitch = true;
+
+
 	}
 	~MapTextureScene() 
 	{
@@ -26,7 +28,7 @@ public:
 	virtual void DrawImGui();
 	virtual void CreateMenuBar();
 	virtual void UpdateCamera(float fTime);
-	//virtual void Update(float fTime);
+	virtual void Update(float fTime);
 	
 	std::shared_ptr<TerrainLayer> SelectedLayer;
 
@@ -37,5 +39,6 @@ private:
 	LayerEditWindow _LayerEdit;
 	std::string _SubPath;
 	TextureFileLoader loader;
+
 };
 

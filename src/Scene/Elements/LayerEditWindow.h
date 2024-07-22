@@ -52,4 +52,6 @@ private:
 	int LayerCt = 1;
 
 	bool ShowTexture = true;
+
+	NiNodePtr OrbNode;
 };

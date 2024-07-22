@@ -5,7 +5,7 @@
 #define TextureHeight 512.f
 LayerEditWindow::LayerEditWindow(TerrainWorldPtr& World) : kWorld(World) 
 {
-	
+
 }
 LayerEditWindow::~LayerEditWindow() 
 {
@@ -44,6 +44,9 @@ bool LayerEditWindow::Show()
 			Intersect = results.GetAt(0)->GetIntersection();
 		}
 	}
+	OrbNode->SetTranslate(Intersect);
+
+
 	ImGui::SetNextWindowSize(ImVec2(200.f, 300.f));
 	if (ImGui::Begin("Change Texture",0,ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
 	{
@@ -63,15 +66,19 @@ bool LayerEditWindow::Show()
 			ImGui::DragInt("Color", &BrushColor, 1.f, 0, 255);
 			float Col = static_cast<float>(BrushColor) / 255;
 			ImGui::SameLine(); ImGui::ColorButton("Preview Color", ImVec4(Col, Col, Col, Col));
-			ImGui::DragInt("BrushSize", &BrushSize, 1.f, 0, 100);
+			if (ImGui::DragInt("BrushSize", &BrushSize, 1.f, 0, 100)) 
+			{
+				OrbNode->SetScale((50.f / 160.f) * BrushSize);
+			}
 			std::string Coords = "Mouse Pos \nX: " + std::to_string(static_cast<int>(Intersect.x)) + "\nY: " + std::to_string(static_cast<int>(Intersect.y));
 			ImGui::Text(Coords.c_str());
 			ImGui::Checkbox("Show Texture", &ShowTexture);
 			ImGui::EndChild();
 		}
 		if(pScreenElementTextureEdit)
-		{
 			UpdateTexturePos();
+		if(pScreenElementTextureEdit && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && !ImGui::IsAnyItemActive())
+		{
 			NiTexturingPropertyPtr prop = (NiTexturingProperty*)pScreenElementTextureEdit->GetProperty(NiProperty::TEXTURING);
 			auto TexturProp = prop->GetBaseTextureTransform();
 			if (!TexturProp) 
@@ -91,7 +98,7 @@ bool LayerEditWindow::Show()
 			int yPixel = Intersect.y / _InitFile.OneBlock_height;
 			static int LastxPixel = 0;
 			static int LastYPixel = 0;
-			if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && !ImGui::IsAnyItemHovered() && xPixel != LastxPixel && yPixel != LastYPixel)// && LastDrawTime + pow(io.Framerate, -0.5f) < CurTime && !ImGui::IsAnyItemActive() )
+			if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && xPixel != LastxPixel && yPixel != LastYPixel)// && LastDrawTime + pow(io.Framerate, -0.5f) < CurTime && !ImGui::IsAnyItemActive() )
 			{
 				LastxPixel = xPixel;
 				LastYPixel = yPixel;
@@ -131,14 +138,34 @@ bool LayerEditWindow::Show()
 			bool CtrlKey = ImGui::IsKeyDown((ImGuiKey)VK_CONTROL);
 			if (io.MouseWheel != 0.0f)
 			{
-				Scale.x -= io.MouseWheel * 0.03f;
-				Scale.y -= io.MouseWheel * 0.03f;
+				float d1, d2; //Dead for FunctionCall
+				if(PgUtil::HoveringScreenElement(pScreenElementTextureEdit,d1,d2))
+				{
+					Scale.x -= io.MouseWheel * 0.03f;
+					Scale.y -= io.MouseWheel * 0.03f;
 
-				if (Scale.x > 1.f || Scale.y > 1.f)
-					Scale = NiPoint2(1.f, 1.f);
-				if (Scale.x <= 0.f || Scale.y <= 0.f)
-					Scale = NiPoint2(0.05f, 0.05f);
-				TexturProp->SetScale(Scale);
+					if (Scale.x > 1.f || Scale.y > 1.f)
+						Scale = NiPoint2(1.f, 1.f);
+					if (Scale.x <= 0.f || Scale.y <= 0.f)
+						Scale = NiPoint2(0.05f, 0.05f);
+					TexturProp->SetScale(Scale);
+				}
+				else {
+					if (io.MouseWheel > 0.0f)
+					{
+						if (BrushSize < 100)
+							BrushSize++;
+						OrbNode->SetScale((50.f / 160.f) * BrushSize);
+					}
+					if (io.MouseWheel < 0.0f)
+					{
+						if (BrushSize > 1)
+							BrushSize--;
+						else
+							BrushSize = 1;
+						OrbNode->SetScale((50.f / 160.f) * BrushSize);
+					}
+				}
 			}
 
 			if (PgUtil::HoveringScreenElement(pScreenElementTextureEdit, x, y))
@@ -232,6 +259,24 @@ void LayerEditWindow::ChangeLayer(std::shared_ptr<TerrainLayer> Layer)
 	pScreenElementTextureEdit->UpdateProperties();
 	//FiestaOnlineTool::AddScreenElemets(pScreenElementTextureEdit);
 	UpdateTexturePreview();
+
+	if (!OrbNode)
+	{
+		PgUtil::LoadNodeNifFile(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\HTDCircle.nif").c_str(), &OrbNode, NULL);
+		NiWireframePropertyPtr ptr = NiNew NiWireframeProperty;
+		ptr->SetWireframe(true);
+		OrbNode->AttachProperty(ptr);
+		NiNodePtr terrain = kWorld->GetGroundObjNode();
+		if (terrain)
+		{
+			terrain->AttachChild(OrbNode);
+			terrain->UpdateProperties();
+			terrain->UpdateEffects();
+			terrain->Update(0.0f);
+		}
+		else
+			LogError("LayerEditWindow cant attach OrbNode because Terrain is empty");
+	}
 }
 
 void LayerEditWindow::UpdateLayer(std::vector<std::vector<TerrainWorld::HTDHelper>>& _HTD) 

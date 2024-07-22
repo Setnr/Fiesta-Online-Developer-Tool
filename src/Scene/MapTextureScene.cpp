@@ -5,11 +5,11 @@
 
 void MapTextureScene::Draw(NiRenderer* renderer) 
 {
-	if (!kWorld->GetTerrainScene())
+	if (!kWorld->GetWorldScene())
 		return;
 	NiVisibleArray m_kVisible2;
 	NiCullingProcess m_spCuller2(&m_kVisible2);
-	NiDrawScene(kWorld->GetCamera(), kWorld->GetTerrainScene(), m_spCuller2);
+	NiDrawScene(kWorld->GetCamera(), kWorld->GetWorldScene(), m_spCuller2);
     
     if(_LayerEdit.GetScreenTexture())
     {
@@ -144,7 +144,14 @@ void MapTextureScene::CreateMenuBar()
     }
 }
 void MapTextureScene::UpdateCamera(float fTime) { if (Camera)FiestaScene::UpdateCamera(fTime); }
-//void MapTextureScene::Update(float fTime) {}
+void MapTextureScene::Update(float fTime) 
+{
+    if (!kWorld)
+        return;
+    NiNodePtr terrain = kWorld->GetWorldScene();
+    if (terrain)
+        terrain->Update(fTime);
+}
 
 void MapTextureScene::SaveMap() 
 {
