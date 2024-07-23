@@ -66,9 +66,9 @@ void MapCreateScene::DrawImGui()
         {
             if (ImGui::DragInt("Octave", &Octave, 1.f, 1.f, 20.f))
                 UpdateAlgo = true;
-            if (ImGui::DragFloat("Min Height", &MinValue, 1.0f, -5000.0f, 1000.f))
+            if (ImGui::DragFloat("Min Height", &MinValue, 1.0f, -5000.0f, MaxValue - 1))
                 UpdateAlgo = true;
-            if (ImGui::DragFloat("Max Height", &MaxValue, 1.0f, -1000.0f, 5000.f))
+            if (ImGui::DragFloat("Max Height", &MaxValue, 1.0f, MinValue + 1, 5000.f))
                 UpdateAlgo = true;
                 
             
