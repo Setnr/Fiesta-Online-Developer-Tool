@@ -84,7 +84,7 @@
     <ClInclude Include="src\Data\Fractal.h" />
     <ClInclude Include="src\Data\HTDBrush\ChangeBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\HightBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\HTDBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\Brush.h" />
     <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\PerlinBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\SmoothingBrush.h" />
@@ -139,7 +139,7 @@
     <ClCompile Include="src\CustomNi\NiPickable.cpp" />
     <ClCompile Include="src\Data\Algorithms\worley.cpp" />
     <ClCompile Include="src\Data\Fractal.cpp" />
-    <ClCompile Include="src\Data\HTDBrush\HTDBrush.cpp" />
+    <ClCompile Include="src\Data\HTDBrush\Brush.cpp" />
     <ClCompile Include="src\Data\HTDBrush\PerlinBrush.cpp" />
     <ClCompile Include="src\Data\HTDBrush\TextureBrush.cpp" />
     <ClCompile Include="src\Data\HTDBrush\WorleyBrush.cpp" />

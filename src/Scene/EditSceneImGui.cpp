@@ -45,6 +45,8 @@ void EditScene::DrawImGui()
 		MiddleMouseButtonMenu();
 		break;
 	case EditMode::HTDG:
+	case EditMode::Texture:
+	case EditMode::VertexColor:
 	{
 		NiPoint3 kOrigin, kDir;
 		long X, Y;
@@ -63,21 +65,22 @@ void EditScene::DrawImGui()
 			{
 				NiPick::Results& results = _Pick.GetResults();
 				NiPoint3 Intersect = results.GetAt(0)->GetIntersection();
-				_HTDBrush->SetIntersect(Intersect);
+				_Brush->SetIntersect(Intersect);
 			}
 		}
 
-		HTDBrushPtr NewBrush = _HTDBrush->Draw();
+		BrushPtr NewBrush = _Brush->Draw();
 		if (NewBrush) 
 		{
-			_HTDBrush = NewBrush;
+			_Brush = NewBrush;
 		}
+		if (CurrentEditMode == Texture) 
+			DrawTextureEditor();
 	}
 		break;
 	default:
 		break;
 	}
-
 	_MapMenu.RenderMenu();
 	if (ShowSettingsMenu)
 		ShowSettings();
@@ -170,7 +173,6 @@ void EditScene::CreateMenuBar()
 		ShowAbout = true;
 	}
 }
-
 
 void EditScene::ShowAboutWindow() 
 {
@@ -650,3 +652,105 @@ void EditScene::DrawSHMDHeader(std::string Name, NiNodePtr Node)
 	}
 }
 
+void EditScene::DrawTextureEditor() 
+{
+	auto& io = ImGui::GetIO();
+	auto& Ini = kWorld->GetIniFile();
+
+	ImGui::SetWindowPos("Texture Editor", ImVec2(io.DisplaySize.x - 470, io.DisplaySize.y - 350));
+	ImGui::SetWindowSize(ImVec2(470.f, 350.f));
+	if (ImGui::Begin("Texture Editor", 0, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoMove || ImGuiWindowFlags_NoResize))
+	{
+		if (ImGui::Button("Reload World"))
+		{
+			kWorld->ReloadTerrain();
+		}
+		if (ImGui::BeginChild("Layer List", ImVec2(120.f, 350.f)))
+		{
+			if (ImGui::Button("Create New Layer"))
+			{
+				SelectedLayer = _LayerEdit.NewLayer(Ini.VertexColorTexture, Ini.HeightMap_width - 1, Ini.HeightMap_height - 1);
+				MapInfo* _Info = kWorld->GetMapInfo();
+				if (_Info)
+					SelectedLayer->BlendFileName = PgUtil::GetMapFolderPath(_Info->KingdomMap, _Info->MapFolderName) + "\\" + SelectedLayer->Name + ".bmp";
+				else
+					LogError("MapInfo is Nullptr!");
+
+				//_LayerEdit.UpdateLayer(kWorld->GetHTD());
+				Ini.LayerList.push_back(SelectedLayer);
+			}
+			for (auto layer : Ini.LayerList)
+				if (ImGui::Selectable(layer->Name.c_str(), layer == SelectedLayer))
+				{
+					SelectedLayer = layer;
+					_LayerEdit.ChangeLayer(SelectedLayer);
+				}
+
+			ImGui::EndChild();
+		}
+		ImGui::SameLine();
+		if (ImGui::BeginChild("Layer Overview", ImVec2(350.f, 350.f)))
+		{
+			if (SelectedLayer)
+			{
+				if (ImGui::Button("Delete Layer"))
+				{
+					if (Ini.LayerList.size() <= 1)
+						LogWarning("Cant Delete the Last Layer");
+					else
+					{
+						for (auto layer = Ini.LayerList.begin(); layer != Ini.LayerList.end(); layer++)
+						{
+							if (*layer == SelectedLayer)
+							{
+								Ini.LayerList.erase(layer);
+								break;
+							}
+							SelectedLayer = Ini.LayerList.at(Ini.LayerList.size() - 1);
+						}
+						kWorld->ReloadTerrain();
+					}
+				}
+
+				char Buffer[128];
+				memcpy(&Buffer, SelectedLayer->Name.c_str(), sizeof(Buffer));
+				if (ImGui::InputText("Layerame", Buffer, sizeof(Buffer)))
+				{
+					SelectedLayer->Name = Buffer;
+					MapInfo* _Info = kWorld->GetMapInfo();
+					if (_Info)
+						SelectedLayer->BlendFileName = PgUtil::GetMapFolderPath(_Info->KingdomMap, _Info->MapFolderName) + "\\" + SelectedLayer->Name + ".bmp";
+					else
+						LogError("MapInfo is Nullptr!");
+				}
+				if (ImGui::Selectable(("TextureFile: " + SelectedLayer->DiffuseFileName).c_str()))
+				{
+					loader.Prepare();
+				}
+				if (loader.DrawImGui())
+				{
+					SelectedLayer->DiffuseFileName = loader.Load();
+					SelectedLayer->LoadDiffuseFile();
+					auto start = std::chrono::steady_clock::now();
+					kWorld->CreateTerrainLayer(SelectedLayer);
+					LogTime("Terrain Created in: ", start);
+					_LayerEdit.UpdateTexturePreview();
+				}
+
+			}
+			ImGui::EndChild();
+		}
+		ImGui::End();
+	}
+
+	if (_LayerEdit.Show())
+	{
+
+		kWorld->CreateTerrainLayer(SelectedLayer);
+	}
+
+	if (ImGui::IsKeyPressed((ImGuiKey)0x52)) //R
+	{
+		LookAndMoveAtWorldPoint(kWorld->GetSpawnPoint());
+	}
+}

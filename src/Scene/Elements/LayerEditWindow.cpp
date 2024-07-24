@@ -3,7 +3,7 @@
 #include "../../NiApplication/FiestaOnlineTool.h"
 #define TextureWidth 512.f
 #define TextureHeight 512.f
-LayerEditWindow::LayerEditWindow(TerrainWorldPtr& World) : kWorld(World) 
+LayerEditWindow::LayerEditWindow(TerrainWorldPtr World) : kWorld(World) 
 {
 
 }

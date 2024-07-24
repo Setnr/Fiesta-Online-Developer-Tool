@@ -34,16 +34,18 @@ void EditScene::UpdateCamera(float fTime)
 		MoveViaMiddleMouse();
 		break;
 	case HTDG:
+	case Texture:
+	case VertexColor:
 		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-			_HTDBrush->MouseClick();
+			_Brush->MouseClick();
 		if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
 		{
-			_HTDBrush->UpdateHTD(kWorld->GetIni(), kWorld->GetHTD());
+			_Brush->Update(NiSmartPointerCast(TerrainWorld,kWorld));
 		}
 		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-			_HTDBrush->MouseRelease();
+			_Brush->MouseRelease();
 
-		HTDOrbNode->SetTranslate(_HTDBrush->GetIntersect());
+		HTDOrbNode->SetTranslate(_Brush->GetIntersect());
 		break;
 	}
 }

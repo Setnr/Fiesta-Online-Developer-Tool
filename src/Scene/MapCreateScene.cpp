@@ -2,7 +2,7 @@
 
 #include "EditScene.h"
 #include "../NiApplication/FiestaOnlineTool.h"
-#include "MapTextureScene.h"
+//#include "MapTextureScene.h"
 
 
 
@@ -195,9 +195,21 @@ void MapCreateScene::DrawImGui()
                 }
 
                 file.Save();
-                MapTextureScenePtr ptr = NiNew MapTextureScene(Direcotry + "\\" + _MapName + ".ini", SubPath);
-                FiestaScenePtr scene = (FiestaScene*)&*ptr;
-                FiestaOnlineTool::UpdateScene(scene);
+                std::string FullSubPath = PgUtil::CreateFullFilePathFromBaseFolder(SubPath);
+
+                if (std::filesystem::exists(FullSubPath + "\\" + _MapName + ".shmd.bak"))
+                    std::filesystem::remove(FullSubPath + "\\" + _MapName + ".shmd.bak");
+                if (std::filesystem::exists(FullSubPath + "\\" + _MapName + ".shmd"))
+                {
+                    std::filesystem::copy(FullSubPath + "\\" + _MapName + ".shmd", FullSubPath + "\\" + _MapName + ".shmd.bak");
+                    std::filesystem::remove(FullSubPath + "\\" + MapName + ".shmd");
+                }
+                std::filesystem::copy(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\Base.shmd"), FullSubPath + "\\" + _MapName + ".shmd");
+                ShineBlockData::Save(FullSubPath, _MapName, file.HeightMap_width - 1);
+                LogInfo("Saved Everything Successfully, you can now add the Map to your MapInfo with Spawn 0 / 0\nPlease reload the MapInfo afterwards!");
+                //MapTextureScenePtr ptr = NiNew MapTextureScene(Direcotry + "\\" + _MapName + ".ini", SubPath);
+                //FiestaScenePtr scene = (FiestaScene*)&*ptr;
+                //FiestaOnlineTool::UpdateScene(scene);
             }
             ImGui::End();
         }

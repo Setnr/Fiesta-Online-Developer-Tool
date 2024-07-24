@@ -185,7 +185,7 @@
     <ClInclude Include="src\Data\IngameWorld.h">
       <Filter>Data\IngameWorld</Filter>
     </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\HTDBrush.h">
+    <ClInclude Include="src\Data\HTDBrush\Brush.h">
       <Filter>Data\HTDBrush</Filter>
     </ClInclude>
     <ClInclude Include="src\Data\HTDBrush\ChangeBrush.h">
@@ -362,7 +362,7 @@
     <ClCompile Include="src\Data\IngameWorld.cpp">
       <Filter>Data\IngameWorld</Filter>
     </ClCompile>
-    <ClCompile Include="src\Data\HTDBrush\HTDBrush.cpp">
+    <ClCompile Include="src\Data\HTDBrush\Brush.cpp">
       <Filter>Data\HTDBrush</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\Algorithms\worley.cpp">

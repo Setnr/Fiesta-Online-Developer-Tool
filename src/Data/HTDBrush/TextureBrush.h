@@ -1,8 +1,8 @@
 #pragma once
-#include "HTDBrush.h"
+#include "Brush.h"
 #include "../../NiApplication/FiestaOnlineTool.h"
 NiSmartPointer(TextureBrush);
-class TextureBrush : public HTDBrush
+class TextureBrush : public HTDBrush 
 {
 #define TextureWidth 200
 #define TextureHeight 100
@@ -39,8 +39,10 @@ public:
 	}
 	void CreateTexture();
 	void Init(){ CreateTexture(); }
-	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD)
+	virtual void Update(TerrainWorldPtr kWorld)
 	{
+		IniFile& _InitFile = kWorld->GetIniFile();;
+		std::vector<std::vector<World::HTDHelper>>& HTD = kWorld->GetHTD();
 		int middlew = _Intersect.x / _InitFile.OneBlock_width;
 		int middleh = _Intersect.y / _InitFile.OneBlock_height;
 

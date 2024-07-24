@@ -1,7 +1,7 @@
 #pragma once
-#include "HTDBrush.h"
+#include "Brush.h"
 NiSmartPointer(World);
-class LevelingBrush : public HTDBrush
+class LevelingBrush : public HTDBrush 
 {
 public:
 	LevelingBrush(NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(HTDOrbNode, BrushSize){}
@@ -14,13 +14,15 @@ public:
 	virtual const char* GetName() { return "Change"; }
 	virtual void MouseClick() 
 	{ 
-		HTDBrush::MouseClick();
+		Brush::MouseClick();
 		ClickedPoint = _Intersect;
 	}
-	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD)
+	virtual void Update(TerrainWorldPtr kWorld)
 	{
 		if (!InitMouse)
 			return;
+		IniFile& _InitFile = kWorld->GetIniFile();;
+		std::vector<std::vector<World::HTDHelper>>& HTD = kWorld->GetHTD();
 		int middlew = _Intersect.x / _InitFile.OneBlock_width;
 		int middleh = _Intersect.y / _InitFile.OneBlock_height;
 		for (int w = middlew - BrushSize; w <= middlew + BrushSize && w < (int)HTD.size(); w++)

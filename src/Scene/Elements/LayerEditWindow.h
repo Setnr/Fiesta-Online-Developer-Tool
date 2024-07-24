@@ -4,18 +4,22 @@
 class LayerEditWindow 
 {
 public:
-	LayerEditWindow(TerrainWorldPtr& World);
+	LayerEditWindow(TerrainWorldPtr World);
 	~LayerEditWindow();
 	std::shared_ptr<TerrainLayer>  NewLayer(std::string BledFileName, float Width, float Height);
 	void ChangeLayer(std::shared_ptr<TerrainLayer> Layer);
 
 	bool Show();
 	void UpdateLayer(std::vector<std::vector<TerrainWorld::HTDHelper>>& _HTD);
-	NiScreenElementsPtr GetScreenTexture() 
+	NiScreenElementsPtr GetScreenEditTexture() 
 	{ 
 		if(ShowTexture)
 			return pScreenElementTextureEdit; 
 		return NULL;
+	}
+	void HideTexturePreview(bool hide) {
+		if(hide)
+			FiestaOnlineTool::RemoveScreenElemets(pScreenElementTexturePreview);
 	}
 	void UpdateTexturePreview() 
 	{
@@ -38,7 +42,7 @@ public:
 private:
 	void UpdateTexturePos();
 
-	TerrainWorldPtr& kWorld;
+	TerrainWorldPtr kWorld;
 	bool _Show = false;
 	std::shared_ptr<TerrainLayer> Layer;
 

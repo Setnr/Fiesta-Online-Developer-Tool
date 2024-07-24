@@ -3,14 +3,14 @@
 #include "ImGui/imgui.h"
 #include "../IniFile.h"
 #include "../IngameWorld.h"
-NiSmartPointer(HTDBrush);
-class HTDBrush : public NiRefObject 
+NiSmartPointer(Brush);
+class Brush : public NiRefObject 
 {
 public:
-	HTDBrush(NiNodePtr HTDOrbNode,int BrushSize) : Node(HTDOrbNode), BrushSize(BrushSize) {}
-	virtual HTDBrushPtr Draw();
+	Brush(NiNodePtr HTDOrbNode,int BrushSize) : Node(HTDOrbNode), BrushSize(BrushSize) {}
+	virtual BrushPtr Draw() {}
 	
-	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<TerrainWorld::HTDHelper>>& HTD){}
+	virtual void Update(TerrainWorldPtr kWorld){}
 	virtual void DrawInternal() {}
 	virtual const char* GetName() { return "-"; }
 	virtual void Show(bool Show){}
@@ -24,4 +24,18 @@ protected:
 	int BrushSize;
 	bool InitMouse = false;
 	NiPoint3 _Intersect;
+};
+
+class HTDBrush : public Brush
+{
+public:
+	HTDBrush(NiNodePtr HTDOrbNode, int BrushSize) : Brush(HTDOrbNode, BrushSize){}
+	virtual BrushPtr Draw();
+};
+
+class ColorBrush : public Brush
+{
+public:
+	ColorBrush(NiNodePtr HTDOrbNode, int BrushSize) : Brush(HTDOrbNode, BrushSize) {}
+	virtual BrushPtr Draw();
 };

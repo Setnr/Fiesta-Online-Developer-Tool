@@ -3,7 +3,7 @@
 #include <future>
 #include "../Data/SHNManager.h"
 #include "../MapCreateScene.h"
-#include "../MapTextureScene.h"
+//#include "../MapTextureScene.h"
 #include "../EditScene.h"
 #include "../../CustomNi/NiFileLoader.h"
 void MapMenu::ShowMenuBar() {
@@ -37,10 +37,10 @@ void MapMenu::RenderMenu()
         static IniFileLoader loader;
         
         if (loader.DrawImGui()) {
-            ;
-            MapTextureScenePtr ptr = NiNew MapTextureScene(loader.Load().c_str(),loader.GetFolderPath());
-            FiestaScenePtr scene = (FiestaScene*)&*ptr;
-            FiestaOnlineTool::UpdateScene(scene);
+            
+            //MapTextureScenePtr ptr = NiNew MapTextureScene(loader.Load().c_str(),loader.GetFolderPath());
+            //FiestaScenePtr scene = (FiestaScene*)&*ptr;
+            //FiestaOnlineTool::UpdateScene(scene);
         }
         if (ImGui::Button("Texture Map From HTD"))
         {

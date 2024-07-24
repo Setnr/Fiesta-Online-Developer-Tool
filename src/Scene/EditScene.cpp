@@ -24,8 +24,8 @@ void EditScene::LoadMap(MapInfo* Info)
 		ptr->SetWireframe(true);
 		HTDOrbNode->AttachProperty(ptr);
 	}
-	if (!_HTDBrush)
-		_HTDBrush = NiNew HTDBrush(HTDOrbNode, 1);
+	if (!_Brush)
+		_Brush = NiNew Brush(HTDOrbNode, 1);
 }
 
 void EditScene::Draw(NiRenderer* renderer)
@@ -49,6 +49,15 @@ void EditScene::Draw(NiRenderer* renderer)
 
 	if (SHMDWindowLoader.ShowInternalScene())
 		SHMDWindowLoader.DrawScene(renderer);
+
+	if (CurrentEditMode == Texture) 
+	{
+		if (_LayerEdit.GetScreenEditTexture())
+		{
+			renderer->SetScreenSpaceCameraData();
+			_LayerEdit.GetScreenEditTexture()->Draw(renderer);
+		}
+	}
 }
 
 void EditScene::Update(float fTime) 
@@ -60,6 +69,7 @@ void EditScene::Update(float fTime)
 		UpDateWorld = nullptr;
 		Camera = kWorld->GetCamera();
 		ResetCamera();
+		_LayerEdit = LayerEditWindow(NiSmartPointerCast(TerrainWorld,kWorld));
 	}
 	if (kWorld)
 	{

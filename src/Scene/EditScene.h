@@ -1,19 +1,21 @@
 #pragma once
 #include "FiestaScene.h"
 #include "../Data/IngameWorld.h"
-#include "../Data/HTDBrush/HTDBrush.h"
+#include "../Data/HTDBrush/Brush.h"
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 #include "Elements/MapMenu.h"
 #include "../CustomNi/NiFileLoader.h"
 #include "ImGui/ImGuizmo.h"
 #include "../Settings/Settings.h"
+#include "../CustomNi/TextureFileLoader.h"
+#include "Elements/LayerEditWindow.h"
 
 NiSmartPointer(EditScene);
 class EditScene :  public FiestaScene
 {
 public:
-	EditScene() 
+	EditScene() : _LayerEdit(NULL)
 	{
 		CanSwitch = true;
 	}
@@ -63,6 +65,14 @@ private:
 	void MoveViaMiddleMouse();
 	void MoveSHBDTexture(float fTime);
 	void DrawSHBDEditor();
+
+	std::shared_ptr<TerrainLayer> SelectedLayer;
+
+	LayerEditWindow _LayerEdit;
+	TextureFileLoader loader;
+
+	void DrawTextureEditor();
+
 	void SaveAll() 
 	{
 		if (kWorld == NULL)
@@ -70,11 +80,12 @@ private:
 		kWorld->SaveSHMD();
 		kWorld->SaveSHBD();
 		kWorld->SaveHTDG();
+		kWorld->GetIniFile().Save();
 	}
 	int BrushSize = 0;
 	bool MoveStatus = false;
 
-	HTDBrushPtr _HTDBrush;
+	BrushPtr _Brush;
 	NiNodePtr HTDOrbNode;
 
 	enum EditMode : int
@@ -83,6 +94,8 @@ private:
 		SHMD,
 		SHBD,
 		HTDG,
+		Texture,
+		VertexColor,
 		Max
 	};
 	EditMode CurrentEditMode = None;
@@ -98,8 +111,10 @@ private:
 		CurrentEditMode = mode;
 		
 		kWorld->SetSHBDVisiblity(mode == SHBD);
-		kWorld->ShowHTDG(mode == HTDG , Settings::ShowSHMD(), HTDOrbNode);
-		_HTDBrush->Show(mode == HTDG);
+		kWorld->ShowHTDG(mode == HTDG || mode == Texture || mode == VertexColor, Settings::ShowSHMD(), HTDOrbNode);
+		_Brush->Show(mode == HTDG || mode == Texture || mode == VertexColor);
+		_LayerEdit.HideTexturePreview(mode != Texture);
+
 	}
 	std::string GetEditMode() 
 	{
@@ -108,6 +123,8 @@ private:
 		case SHMD: return "SHMD";
 		case SHBD: return "SHBD";
 		case HTDG: return "HTDG";
+		case Texture: return "Texture";
+		case VertexColor: return "VertexColor";
 		default: return "Inactive";
 		}
 	}

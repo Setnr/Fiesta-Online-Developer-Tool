@@ -36,8 +36,8 @@ private:
 	void SaveMap();
 	TerrainWorldPtr kWorld;
 	MapMenu _MapMenu;
-	LayerEditWindow _LayerEdit;
 	std::string _SubPath;
+	LayerEditWindow _LayerEdit;
 	TextureFileLoader loader;
 
 };

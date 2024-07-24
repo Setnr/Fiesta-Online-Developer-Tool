@@ -1,7 +1,7 @@
 #pragma once
-#include "HTDBrush.h"
+#include "Brush.h"
 NiSmartPointer(World);
-class ChangeBrush : public HTDBrush
+class ChangeBrush : public HTDBrush 
 {
 public:
 	ChangeBrush(NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(HTDOrbNode, BrushSize){}
@@ -13,8 +13,10 @@ public:
 	}
 	virtual const char* GetName() { return "Change"; }
 
-	virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD)
+	virtual void Update(TerrainWorldPtr kWorld)
 	{
+		IniFile& _InitFile = kWorld->GetIniFile();;
+		std::vector<std::vector<World::HTDHelper>>& HTD = kWorld->GetHTD();
 		static float LastUpdate = 0.0f;
 		float CurTime = NiGetCurrentTimeInSec();
 		if (LastUpdate + 0.05f > CurTime)
