@@ -4,7 +4,7 @@ NiSmartPointer(World);
 class ChangeBrush : public HTDBrush 
 {
 public:
-	ChangeBrush(NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(HTDOrbNode, BrushSize){}
+	ChangeBrush(TerrainWorldPtr kWorld, NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(kWorld, HTDOrbNode, BrushSize){}
 	virtual void DrawInternal() 
 	{
 		ImGui::BeginChild("BrushChildR", ImVec2(0,0), false, ImGuiWindowFlags_HorizontalScrollbar);
@@ -13,7 +13,7 @@ public:
 	}
 	virtual const char* GetName() { return "Change"; }
 
-	virtual void Update(TerrainWorldPtr kWorld)
+	virtual void Update()
 	{
 		IniFile& _InitFile = kWorld->GetIniFile();;
 		std::vector<std::vector<World::HTDHelper>>& HTD = kWorld->GetHTD();

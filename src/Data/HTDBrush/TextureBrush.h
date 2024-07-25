@@ -7,7 +7,7 @@ class TextureBrush : public HTDBrush
 #define TextureWidth 200
 #define TextureHeight 100
 public:
-	TextureBrush(NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(HTDOrbNode, BrushSize) {  }
+	TextureBrush(TerrainWorldPtr kWorld, NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(kWorld, HTDOrbNode, BrushSize) {  }
 	~TextureBrush(){ this->Show(false); }
 	virtual void Show(bool ShowTexture) 
 	{
@@ -39,7 +39,7 @@ public:
 	}
 	void CreateTexture();
 	void Init(){ CreateTexture(); }
-	virtual void Update(TerrainWorldPtr kWorld)
+	virtual void Update()
 	{
 		IniFile& _InitFile = kWorld->GetIniFile();;
 		std::vector<std::vector<World::HTDHelper>>& HTD = kWorld->GetHTD();

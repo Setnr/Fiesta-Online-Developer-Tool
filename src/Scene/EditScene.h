@@ -15,7 +15,7 @@ NiSmartPointer(EditScene);
 class EditScene :  public FiestaScene
 {
 public:
-	EditScene() : _LayerEdit(NULL)
+	EditScene()
 	{
 		CanSwitch = true;
 	}
@@ -68,7 +68,6 @@ private:
 
 	std::shared_ptr<TerrainLayer> SelectedLayer;
 
-	LayerEditWindow _LayerEdit;
 	TextureFileLoader loader;
 
 	void DrawTextureEditor();
@@ -112,9 +111,23 @@ private:
 		
 		kWorld->SetSHBDVisiblity(mode == SHBD);
 		kWorld->ShowHTDG(mode == HTDG || mode == Texture || mode == VertexColor, Settings::ShowSHMD(), HTDOrbNode);
-		_Brush->Show(mode == HTDG || mode == Texture || mode == VertexColor);
-		_LayerEdit.HideTexturePreview(mode != Texture);
 
+		switch (mode)
+		{
+		case EditScene::HTDG:
+			_Brush = NiNew HTDBrush(NiSmartPointerCast(TerrainWorld,kWorld), HTDOrbNode, 5);
+			break;
+		case EditScene::Texture:
+			_Brush = NiNew HTDTextureBrush(SelectedLayer,NiSmartPointerCast(TerrainWorld, kWorld), HTDOrbNode, 5);
+			break;
+		case EditScene::VertexColor:
+			_Brush = NiNew HTDBrush(NiSmartPointerCast(TerrainWorld, kWorld), HTDOrbNode, 5);
+			break;
+		default:
+			break;
+		}
+
+		_Brush->Show(mode == HTDG || mode == Texture || mode == VertexColor);
 	}
 	std::string GetEditMode() 
 	{

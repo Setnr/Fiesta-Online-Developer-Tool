@@ -657,39 +657,47 @@ void EditScene::DrawTextureEditor()
 	auto& io = ImGui::GetIO();
 	auto& Ini = kWorld->GetIniFile();
 
-	ImGui::SetWindowPos("Texture Editor", ImVec2(io.DisplaySize.x - 470, io.DisplaySize.y - 350));
-	ImGui::SetWindowSize(ImVec2(470.f, 350.f));
+	ImGui::SetWindowPos("Texture Editor", ImVec2(io.DisplaySize.x - 380, io.DisplaySize.y - 230));
+	ImGui::SetWindowSize(ImVec2(380, 230.f));
 	if (ImGui::Begin("Texture Editor", 0, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoMove || ImGuiWindowFlags_NoResize))
 	{
 		if (ImGui::Button("Reload World"))
 		{
 			kWorld->ReloadTerrain();
 		}
-		if (ImGui::BeginChild("Layer List", ImVec2(120.f, 350.f)))
+		if (ImGui::BeginChild("Layer List", ImVec2(120.f, 200.f)))
 		{
 			if (ImGui::Button("Create New Layer"))
 			{
-				SelectedLayer = _LayerEdit.NewLayer(Ini.VertexColorTexture, Ini.HeightMap_width - 1, Ini.HeightMap_height - 1);
+				if (NiIsKindOf(HTDTextureBrush, _Brush)) 
+				{
+					HTDTextureBrushPtr ptr = NiSmartPointerCast(HTDTextureBrush, _Brush);
+					SelectedLayer = ptr->NewLayer(Ini.VertexColorTexture, Ini.HeightMap_width - 1, Ini.HeightMap_height - 1);
+				}
+				
 				MapInfo* _Info = kWorld->GetMapInfo();
 				if (_Info)
 					SelectedLayer->BlendFileName = PgUtil::GetMapFolderPath(_Info->KingdomMap, _Info->MapFolderName) + "\\" + SelectedLayer->Name + ".bmp";
 				else
 					LogError("MapInfo is Nullptr!");
 
-				//_LayerEdit.UpdateLayer(kWorld->GetHTD());
 				Ini.LayerList.push_back(SelectedLayer);
 			}
 			for (auto layer : Ini.LayerList)
 				if (ImGui::Selectable(layer->Name.c_str(), layer == SelectedLayer))
 				{
-					SelectedLayer = layer;
-					_LayerEdit.ChangeLayer(SelectedLayer);
+					if (NiIsKindOf(HTDTextureBrush, _Brush))
+					{
+						SelectedLayer = layer;
+						HTDTextureBrushPtr ptr = NiSmartPointerCast(HTDTextureBrush, _Brush);
+						ptr->ChangeLayer(SelectedLayer);
+					}
 				}
 
 			ImGui::EndChild();
 		}
 		ImGui::SameLine();
-		if (ImGui::BeginChild("Layer Overview", ImVec2(350.f, 350.f)))
+		if (ImGui::BeginChild("Layer Overview", ImVec2(260.f, 200.f)))
 		{
 			if (SelectedLayer)
 			{
@@ -706,8 +714,8 @@ void EditScene::DrawTextureEditor()
 								Ini.LayerList.erase(layer);
 								break;
 							}
-							SelectedLayer = Ini.LayerList.at(Ini.LayerList.size() - 1);
 						}
+						SelectedLayer = Ini.LayerList.at(Ini.LayerList.size() - 1);
 						kWorld->ReloadTerrain();
 					}
 				}
@@ -734,7 +742,11 @@ void EditScene::DrawTextureEditor()
 					auto start = std::chrono::steady_clock::now();
 					kWorld->CreateTerrainLayer(SelectedLayer);
 					LogTime("Terrain Created in: ", start);
-					_LayerEdit.UpdateTexturePreview();
+					if (NiIsKindOf(HTDTextureBrush, _Brush))
+					{
+						HTDTextureBrushPtr ptr = NiSmartPointerCast(HTDTextureBrush, _Brush);
+						ptr->UpdateTexturePreview();
+					}
 				}
 
 			}
@@ -742,12 +754,13 @@ void EditScene::DrawTextureEditor()
 		}
 		ImGui::End();
 	}
-
-	if (_LayerEdit.Show())
+	if (NiIsKindOf(HTDTextureBrush, _Brush))
 	{
-
-		kWorld->CreateTerrainLayer(SelectedLayer);
+		HTDTextureBrushPtr ptr = NiSmartPointerCast(HTDTextureBrush, _Brush);
+		if(ptr->UpdateTerrain())
+			kWorld->CreateTerrainLayer(SelectedLayer);
 	}
+	
 
 	if (ImGui::IsKeyPressed((ImGuiKey)0x52)) //R
 	{

@@ -1,10 +1,10 @@
 #pragma once
 #include "Brush.h"
 NiSmartPointer(World);
-class HightBrush : public HTDBrush 
+class HeightBrush : public HTDBrush 
 {
 public:
-	HightBrush(NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(HTDOrbNode, BrushSize) {}
+	HeightBrush(TerrainWorldPtr kWorld, NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(kWorld, HTDOrbNode, BrushSize) {}
 	virtual void DrawInternal()
 	{
 		ImGui::BeginChild("BrushChildR", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
@@ -13,7 +13,7 @@ public:
 	}
 	virtual const char* GetName() { return "Hight"; }
 	
-	virtual void Update(TerrainWorldPtr kWorld)
+	virtual void Update()
 	{
 		if (!InitMouse)
 			return;

@@ -37,9 +37,6 @@
     <Filter Include="Data\IngameWorld">
       <UniqueIdentifier>{e4622090-4bdd-4758-bd60-c43956ed2031}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Data\HTDBrush">
-      <UniqueIdentifier>{26cb47e0-b716-40a1-b0c7-d2f8a4d1515a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Data\Algorithms">
       <UniqueIdentifier>{e5124381-9a96-424b-ab50-45183f73dda5}</UniqueIdentifier>
     </Filter>
@@ -75,6 +72,15 @@
     </Filter>
     <Filter Include="Includes\EasyBMP">
       <UniqueIdentifier>{3efee3f1-ee46-4535-bf75-4f16bc75a850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Brushes">
+      <UniqueIdentifier>{26cb47e0-b716-40a1-b0c7-d2f8a4d1515a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Brushes\HTDBrush">
+      <UniqueIdentifier>{8c66f2f2-40b6-44b3-8f07-b4e2443179dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Brushes\HTDTextureBrush">
+      <UniqueIdentifier>{1f71426e-3f0a-4dff-b2f2-6be04db2146e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -186,25 +192,7 @@
       <Filter>Data\IngameWorld</Filter>
     </ClInclude>
     <ClInclude Include="src\Data\HTDBrush\Brush.h">
-      <Filter>Data\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\ChangeBrush.h">
-      <Filter>Data\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h">
-      <Filter>Data\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\SmoothingBrush.h">
-      <Filter>Data\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\PerlinBrush.h">
-      <Filter>Data\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\TextureBrush.h">
-      <Filter>Data\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\WorleyBrush.h">
-      <Filter>Data\HTDBrush</Filter>
+      <Filter>Data\Brushes</Filter>
     </ClInclude>
     <ClInclude Include="src\Data\Algorithms\worley.h">
       <Filter>Data\Algorithms</Filter>
@@ -269,8 +257,32 @@
     <ClInclude Include="src\Scene\Elements\LayerEditWindow.h">
       <Filter>Scene\SceneElements</Filter>
     </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\ChangeBrush.h">
+      <Filter>Data\Brushes\HTDBrush</Filter>
+    </ClInclude>
     <ClInclude Include="src\Data\HTDBrush\HightBrush.h">
-      <Filter>Data\HTDBrush</Filter>
+      <Filter>Data\Brushes\HTDBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h">
+      <Filter>Data\Brushes\HTDBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\PerlinBrush.h">
+      <Filter>Data\Brushes\HTDBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\SmoothingBrush.h">
+      <Filter>Data\Brushes\HTDBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\TextureBrush.h">
+      <Filter>Data\Brushes\HTDBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\WorleyBrush.h">
+      <Filter>Data\Brushes\HTDBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\PixelBrush.h">
+      <Filter>Data\Brushes\HTDTextureBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\TextureSmoothingBrush.h">
+      <Filter>Data\Brushes\HTDTextureBrush</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -363,19 +375,10 @@
       <Filter>Data\IngameWorld</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\HTDBrush\Brush.cpp">
-      <Filter>Data\HTDBrush</Filter>
+      <Filter>Data\Brushes</Filter>
     </ClCompile>
     <ClCompile Include="src\Data\Algorithms\worley.cpp">
       <Filter>Data\Algorithms</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\HTDBrush\PerlinBrush.cpp">
-      <Filter>Data\HTDBrush</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\HTDBrush\WorleyBrush.cpp">
-      <Filter>Data\HTDBrush</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\HTDBrush\TextureBrush.cpp">
-      <Filter>Data\HTDBrush</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\EditSceneImGui.cpp">
       <Filter>Scene\Edit Scene</Filter>
@@ -418,6 +421,15 @@
     </ClCompile>
     <ClCompile Include="src\Scene\Elements\LayerEditWindow.cpp">
       <Filter>Scene\SceneElements</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\HTDBrush\PerlinBrush.cpp">
+      <Filter>Data\Brushes\HTDBrush</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\HTDBrush\TextureBrush.cpp">
+      <Filter>Data\Brushes\HTDBrush</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Data\HTDBrush\WorleyBrush.cpp">
+      <Filter>Data\Brushes\HTDBrush</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

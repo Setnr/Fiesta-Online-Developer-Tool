@@ -87,8 +87,10 @@
     <ClInclude Include="src\Data\HTDBrush\Brush.h" />
     <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\PerlinBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\PixelBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\SmoothingBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\TextureBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\TextureSmoothingBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\WorleyBrush.h" />
     <ClInclude Include="src\Data\IngameWorld.h" />
     <ClInclude Include="src\Data\IniFile.h" />

@@ -4,7 +4,7 @@ NiSmartPointer(World);
 class LevelingBrush : public HTDBrush 
 {
 public:
-	LevelingBrush(NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(HTDOrbNode, BrushSize){}
+	LevelingBrush(TerrainWorldPtr kWorld, NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(kWorld, HTDOrbNode, BrushSize){}
 	virtual void DrawInternal() 
 	{
 		ImGui::BeginChild("BrushChildR", ImVec2(0,0), false, ImGuiWindowFlags_HorizontalScrollbar);
@@ -17,7 +17,7 @@ public:
 		Brush::MouseClick();
 		ClickedPoint = _Intersect;
 	}
-	virtual void Update(TerrainWorldPtr kWorld)
+	virtual void Update()
 	{
 		if (!InitMouse)
 			return;

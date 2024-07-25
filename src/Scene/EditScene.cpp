@@ -25,7 +25,7 @@ void EditScene::LoadMap(MapInfo* Info)
 		HTDOrbNode->AttachProperty(ptr);
 	}
 	if (!_Brush)
-		_Brush = NiNew Brush(HTDOrbNode, 1);
+		_Brush = NiNew Brush(NiSmartPointerCast(TerrainWorld,UpDateWorld), HTDOrbNode, 1);
 }
 
 void EditScene::Draw(NiRenderer* renderer)
@@ -49,15 +49,6 @@ void EditScene::Draw(NiRenderer* renderer)
 
 	if (SHMDWindowLoader.ShowInternalScene())
 		SHMDWindowLoader.DrawScene(renderer);
-
-	if (CurrentEditMode == Texture) 
-	{
-		if (_LayerEdit.GetScreenEditTexture())
-		{
-			renderer->SetScreenSpaceCameraData();
-			_LayerEdit.GetScreenEditTexture()->Draw(renderer);
-		}
-	}
 }
 
 void EditScene::Update(float fTime) 
@@ -69,7 +60,7 @@ void EditScene::Update(float fTime)
 		UpDateWorld = nullptr;
 		Camera = kWorld->GetCamera();
 		ResetCamera();
-		_LayerEdit = LayerEditWindow(NiSmartPointerCast(TerrainWorld,kWorld));
+		_Brush->UpdateWorld(NiSmartPointerCast(TerrainWorld, kWorld));
 	}
 	if (kWorld)
 	{
@@ -151,14 +142,6 @@ void EditScene::SelectObject() {
 void EditScene::ResetCamera() 
 {
 	LookAndMoveAtWorldPoint(kWorld->GetSpawnPoint());
-	//Camera->SetTranslate(kWorld->GetSpawnPoint());
-	//Pitch = 1.57f * 2.0f;
-	//Yaw = -1.57f;
-	//Roll = 1.57f;
-	//NiMatrix3 rotation;
-	//rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
-
-	//Camera->SetRotate(rotation);
 	Camera->Update(0.0f);
 }
 

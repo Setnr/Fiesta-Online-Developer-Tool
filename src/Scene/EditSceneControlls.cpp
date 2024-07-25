@@ -40,7 +40,7 @@ void EditScene::UpdateCamera(float fTime)
 			_Brush->MouseClick();
 		if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
 		{
-			_Brush->Update(NiSmartPointerCast(TerrainWorld,kWorld));
+			_Brush->Update();
 		}
 		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
 			_Brush->MouseRelease();

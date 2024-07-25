@@ -7,7 +7,7 @@ NiSmartPointer(WorleyBrush);
 class WorleyBrush : public TextureBrush
 {
 public:
-	WorleyBrush(NiNodePtr HTDOrbNode, int BrushSize) : TextureBrush(HTDOrbNode, BrushSize), wg(Distance)
+	WorleyBrush(TerrainWorldPtr kWorld, NiNodePtr HTDOrbNode, int BrushSize) : TextureBrush(kWorld, HTDOrbNode, BrushSize), wg(Distance)
 	{
 		
 	}

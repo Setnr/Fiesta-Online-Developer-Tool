@@ -6,7 +6,7 @@ NiSmartPointer(PerlinBrush);
 class PerlinBrush : public TextureBrush
 {
 public:
-	PerlinBrush(NiNodePtr HTDOrbNode, int BrushSize) : TextureBrush(HTDOrbNode, BrushSize){}
+	PerlinBrush(TerrainWorldPtr kWorld, NiNodePtr HTDOrbNode, int BrushSize) : TextureBrush(kWorld, HTDOrbNode, BrushSize){}
 	
 	virtual void DrawInternal() 
 	{
@@ -33,30 +33,6 @@ public:
 	}
 	virtual const char* GetName() { return "Perlin Brush"; }
 
-	/*virtual void UpdateHTD(IniFile& _InitFile, std::vector<std::vector<World::HTDHelper>>& HTD, NiPoint3 InterSect)
-	{
-		int middlew = InterSect.x / _InitFile.OneBlock_width;
-		int middleh = InterSect.y / _InitFile.OneBlock_height;
-		for (int w = middlew - BrushSize; w <= middlew + BrushSize && w < (int)HTD.size(); w++)
-		{
-			if (w < 0)
-				continue;
-			for (int h = middleh - BrushSize; h <= middleh + BrushSize && h < (int)HTD[w].size(); h++)
-			{
-				if (h < 0)
-					continue;
-				if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
-					continue;
-				float z = perlin.octave2D_01(static_cast<float>(w), static_cast<float>(h), Octaves) * ChangeSize;
-				for (auto point : HTD[w][h].Vec)
-					if (point)
-						point->z += z;
-				for (auto shape : HTD[w][h].Shape)
-					if (shape)
-						shape->MarkAsChanged(NiGeometryData::VERTEX_MASK);
-			}
-		}
-	}*/
 	void UpdatePixelData() override;
 
 
