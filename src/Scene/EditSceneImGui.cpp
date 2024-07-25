@@ -699,7 +699,7 @@ void EditScene::DrawTextureEditor()
 				
 				MapInfo* _Info = kWorld->GetMapInfo();
 				if (_Info)
-					SelectedLayer->BlendFileName = PgUtil::GetMapFolderPath(_Info->KingdomMap, _Info->MapFolderName) + "\\" + SelectedLayer->Name + ".bmp";
+					SelectedLayer->BlendFileName = PgUtil::GetMapFolderPath(_Info->KingdomMap, _Info->MapFolderName) + SelectedLayer->Name + ".bmp";
 				else
 					LogError("MapInfo is Nullptr!");
 
@@ -749,7 +749,7 @@ void EditScene::DrawTextureEditor()
 					SelectedLayer->Name = Buffer;
 					MapInfo* _Info = kWorld->GetMapInfo();
 					if (_Info)
-						SelectedLayer->BlendFileName = PgUtil::GetMapFolderPath(_Info->KingdomMap, _Info->MapFolderName) + "\\" + SelectedLayer->Name + ".bmp";
+						SelectedLayer->BlendFileName = PgUtil::GetMapFolderPath(_Info->KingdomMap, _Info->MapFolderName) + SelectedLayer->Name + ".bmp";
 					else
 						LogError("MapInfo is Nullptr!");
 				}

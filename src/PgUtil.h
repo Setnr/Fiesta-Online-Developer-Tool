@@ -171,7 +171,7 @@ public:
     }
     static std::string GetMapFolderPath(char KingdomMap, std::string MapName)
     {
-        std::string BasePath = CreateFullFilePathFromBaseFolder("") + "\\resmap\\";
+        std::string BasePath = ".\\resmap\\";
         switch (KingdomMap)
         {
         case 0:

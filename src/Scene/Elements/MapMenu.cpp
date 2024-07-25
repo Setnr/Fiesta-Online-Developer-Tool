@@ -34,24 +34,7 @@ void MapMenu::RenderMenu()
             FiestaScenePtr scene = (FiestaScene*)&*ptr;
             FiestaOnlineTool::UpdateScene(scene);
         }
-        static IniFileLoader loader;
-        
-        if (loader.DrawImGui()) {
-            
-            //MapTextureScenePtr ptr = NiNew MapTextureScene(loader.Load().c_str(),loader.GetFolderPath());
-            //FiestaScenePtr scene = (FiestaScene*)&*ptr;
-            //FiestaOnlineTool::UpdateScene(scene);
-        }
-        if (ImGui::Button("Texture Map From HTD"))
-        {
-            /*
-            *
-            * TODO
-            * Create MapTextureScene mit Nem LoadFromSource(HTD) oder LoadFromSource(Ini) jenach FileAuswahl
-            */
-            loader.Prepare();
-
-        }
+       
         if (shn->DrawHeader())
         {
             for (unsigned int i = 0; i < shn->GetRows(); i++)

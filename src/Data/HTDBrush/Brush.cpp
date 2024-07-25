@@ -53,7 +53,7 @@ BrushPtr HTDBrush::Draw()
 			ptr = NiNew ChangeBrush(kWorld, Node, BrushSize);
 		if (ImGui::Selectable("Leveling Brush", &s))
 			ptr = NiNew LevelingBrush(kWorld, Node, BrushSize);
-		if (ImGui::Selectable("Hight Brush", &s))
+		if (ImGui::Selectable("Height Brush", &s))
 			ptr = NiNew HeightBrush(kWorld, Node, BrushSize);
 		if (ImGui::Selectable("Smoothing Brush", &s))
 			ptr = NiNew SmoothingBrush(kWorld, Node, BrushSize);
