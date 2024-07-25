@@ -23,7 +23,7 @@ void MapMenu::RenderMenu()
         return;
     static std::future<void> future;
     auto shn = SHNManager::Get(SHNManager::MapInfoType);
-    if (ImGui::Begin("Load MapInfo", &ShowLoadMenu));
+    if (ImGui::Begin("Load MapInfo", &ShowLoadMenu))
     {
         static char buffer[15];
         ImGui::InputText("Filter Maps", buffer, sizeof(buffer));

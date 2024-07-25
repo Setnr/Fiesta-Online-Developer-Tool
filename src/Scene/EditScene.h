@@ -18,6 +18,7 @@ public:
 	EditScene()
 	{
 		CanSwitch = true;
+		SaveTime = NiGetCurrentTimeInSec();
 	}
 
 	virtual void Draw(NiRenderer* renderer);
@@ -34,7 +35,7 @@ private:
 	WorldPtr kWorld;
 	std::mutex UpDateWorldLock;
 	WorldPtr UpDateWorld;
-
+	float SaveTime;
 	MapMenu _MapMenu;
 	bool ShowSettingsMenu = false;
 	void ShowSettings();
@@ -80,6 +81,15 @@ private:
 		kWorld->SaveSHBD();
 		kWorld->SaveHTDG();
 		kWorld->GetIniFile().Save();
+	}
+	void SaveAllBackUp() 
+	{
+		if (kWorld == NULL)
+			return;
+		kWorld->SaveSHMD(true);
+		kWorld->SaveSHBD(true);
+		kWorld->SaveHTDG(true);
+		kWorld->GetIniFile().Save(true);
 	}
 	int BrushSize = 0;
 	bool MoveStatus = false;

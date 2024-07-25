@@ -170,7 +170,7 @@ public:
 			if (CtrlKey || io.MouseWheel != 0.0f)
 			{
 				NiPoint2 Scale = TexturProp->GetScale();
-				float MoveValue = 0.03;
+				float MoveValue = 0.03f;
 				if (W_Key)
 					Translate.x += MoveValue;
 				if (S_Key)

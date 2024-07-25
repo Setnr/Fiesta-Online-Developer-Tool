@@ -36,8 +36,8 @@ public:
 
 
 	void ResetSHBD(NiPoint3 SpawnPoint);
-	void SaveSHBD();
-	void SaveSHMD();
+	void SaveSHBD(bool Backup = false);
+	void SaveSHMD(bool Backup = false);
 	void SaveSHMDEntry(std::ofstream&, NiNodePtr, const char*);
 	void SaveSHMDLight(std::ofstream&, NiColor, const char*);
 	void SaveSHMDFog(std::ofstream&, float, NiColor);
@@ -48,7 +48,7 @@ public:
 	void CreateBrushTexture(NiPoint3& BrushPositon, int BrushSize, bool MoveStatus);
 
 	void ShowHTDG(bool ShowOrbNode, bool ShowObjecs, NiNodePtr OrbNode);
-	void SaveHTDG();
+	void SaveHTDG(bool Backup = false);
 
 	std::vector<std::vector<HTDHelper>>& GetHTD() { return _HTD; }
 	IniFile& GetIni() { return _InitFile; }

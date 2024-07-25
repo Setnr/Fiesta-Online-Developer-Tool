@@ -121,12 +121,19 @@ public:
 	}
 	bool Load();
 	void UpdateFilePath(std::string FilePath) { _FilePath = FilePath; }
-	void Save()
+	void Save(bool Backup = false)
 	{
 		std::ofstream IniFile;
-		if (std::filesystem::exists(_FilePath))
-			std::filesystem::remove(_FilePath);
-		IniFile.open(_FilePath);
+		if(Backup)
+		{
+			std::string OrgPath = _FilePath;
+			_FilePath += ".auto.bak";
+			if (std::filesystem::exists(_FilePath))
+				std::filesystem::remove(_FilePath);
+
+			IniFile.open(_FilePath);
+			_FilePath = OrgPath;
+		}
 		IniFile << std::fixed << std::setprecision(1);
 		IniFile << "#PGFILE\t:\t" << FileType << std::endl;
 		IniFile << "#FILE_VER\t:\t" << Version << std::endl << std::endl;

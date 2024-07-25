@@ -26,6 +26,7 @@ public:
 	{
 		return std::string( std::to_string(_Settings._WindowWidth) + " x " + std::to_string(_Settings._WindowHeight));
 	}
+	static void SetSaveInterval(float Interval) { _Settings._SaveInterval = Interval; }
 	static void SwitchGeneralView() { _Settings._GeneralView = !_Settings._GeneralView; }
 private:
 	static Settings _Settings;
@@ -38,5 +39,6 @@ private:
 	Setting(float, PasteDelay, _PasteDelay);
 	Setting(bool, GeneralView, _GeneralView);
 	Setting(bool, ShowSHMD, _ShowSHMD);
+	Setting(float, SaveInterval, _SaveInterval);
 
 };

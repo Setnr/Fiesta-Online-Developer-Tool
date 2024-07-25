@@ -102,17 +102,17 @@ void World::CreateBrushTexture(NiPoint3& BrushPositon, int BrushSize, bool MoveS
 
 }
 
-void World::SaveSHBD() 
+void World::SaveSHBD(bool Backup)
 {
 	auto start = std::chrono::steady_clock::now();
-	_SHBD.Save();
+	_SHBD.Save(Backup);
 	auto diff = std::chrono::steady_clock::now() - start;
 	std::ostringstream oss;
 	oss << "Successfully safed SHBD for " << _Info->MapName << "("
 		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
 	LogInfo(oss.str());
 }
-void World::SaveSHMD() 
+void World::SaveSHMD(bool Backup)
 {
 	auto start = std::chrono::steady_clock::now();
 	if (std::filesystem::exists(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak")))
@@ -120,6 +120,12 @@ void World::SaveSHMD()
 
 	std::filesystem::copy(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd"), PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd.bak"));
 	std::string _FilePath = PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd");
+	if (Backup)
+	{
+		if (std::filesystem::exists(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd.auto.bak")))
+			std::filesystem::remove(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shmd.auto.bak"));
+		_FilePath += ".auto.bak";
+	}
 	std::ofstream file;
 	file.open(_FilePath);
 	file << std::fixed << std::setprecision(6);
@@ -265,7 +271,7 @@ void World::ShowHTDG(bool ShowOrbNode, bool ShowObjecs, NiNodePtr OrbNode)
 	OrbNode->Update(0.0f);
 }
 
-void World::SaveHTDG() 
+void World::SaveHTDG(bool Backup)
 {
 	if (_InitFile.HeightFileName == "")
 	{
@@ -279,7 +285,12 @@ void World::SaveHTDG()
 		std::filesystem::remove(HTDGFilePath + ".bak");
 	if(std::filesystem::exists(HTDGFilePath))
 		std::filesystem::copy(HTDGFilePath, HTDGFilePath + ".bak");
-
+	if (Backup)
+	{
+		if (std::filesystem::exists(HTDGFilePath + ".auto.bak"))
+			std::filesystem::remove(HTDGFilePath + ".auto.bak");
+		HTDGFilePath += ".auto.bak";
+	}
 	std::ofstream file;
 	file.open(HTDGFilePath, std::ios::binary);
 	int Size = _InitFile.HeightMap_height * _InitFile.HeightMap_width;

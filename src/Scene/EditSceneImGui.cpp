@@ -30,6 +30,16 @@ glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 
 void EditScene::DrawImGui()
 {
+	float Interval = Settings::SaveInterval();
+	if (Interval > 0.0f)
+	{
+		float CurTime = NiGetCurrentTimeInSec();
+		if (Interval * 60.f + SaveTime < CurTime)
+		{
+			this->SaveAllBackUp();
+			SaveTime = CurTime;
+		}
+	}
     FiestaScene::DrawImGui();
 	if(Settings::GeneralView() && CurrentEditMode != EditMode::HTDG)
 		DrawGeneralInfoWindow();
@@ -397,7 +407,7 @@ void EditScene::ShowSettings()
 		Settings::SetClientPath(File);
 		fileDialog.ClearSelected();
 	}
-	if (ImGui::Begin("Settings", &ShowSettingsMenu));
+	if (ImGui::Begin("Settings", &ShowSettingsMenu))
 	{
 		std::string ClientPath = "ClientPath: " + PgUtil::CreateFullFilePathFromBaseFolder("");
 		ImGui::Text(ClientPath.c_str()); ImGui::SameLine();
@@ -433,7 +443,9 @@ void EditScene::ShowSettings()
 		bool ShowSHMD = Settings::ShowSHMD();
 		if (ImGui::Checkbox("Show SHMD in HTDG-Editor", &ShowSHMD))
 			Settings::SetShowSHMD(ShowSHMD);
-
+		float Interval = Settings::SaveInterval();
+		if (ImGui::DragFloat("Save Interval in min", &Interval, 1.0f, 0.0f, 15.f))
+			Settings::SetSaveInterval(Interval);
 		if (ImGui::Button("Safe Settings"))
 		{
 			Settings::SaveSettings();

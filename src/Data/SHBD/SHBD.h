@@ -36,13 +36,18 @@ public:
 	}
 
 	void AppendToTexture(NiDynamicTexturePtr texture, int x, int y, int width, int height);
-	void Save() 
+	void Save(bool Backup = false)
 	{
 		std::string SHBDFilePath = PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shbd");
 		std::ofstream SHBDFile;
 		if (std::filesystem::exists(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak")))
 			std::filesystem::remove(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak"));
 		std::filesystem::copy(PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shbd"), PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapFolderName, "shbd.bak"));
+		if (Backup) {
+			SHBDFilePath += ".auto.bak";
+			if (std::filesystem::exists(SHBDFilePath))
+				std::filesystem::remove(SHBDFilePath);
+		}
 		SHBDFile.open(SHBDFilePath, std::ios::binary);
 		if (!SHBDFile.is_open())
 		{

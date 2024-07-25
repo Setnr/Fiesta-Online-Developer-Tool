@@ -34,6 +34,7 @@ Settings::Settings() : _FirstStartUp(false)
 	_FullScreen = reader.GetBoolean("Window", "FullScreen", false);
 	_FPSCap = reader.GetReal("Window", "FPSCap", 144.f);
 	_PasteDelay = reader.GetReal("BaseInformation", "PasteDelay", 0.25f);
+	_SaveInterval = reader.GetReal("BaseInformation", "SaveInterval", 5.f);
 	_GeneralView = reader.GetBoolean("BaseInformation", "GeneralView", true);
 	_ShowSHMD = reader.GetBoolean("BaseInformation", "ShowSHMD", false);
 }
@@ -48,13 +49,7 @@ void Settings::SaveSettings()
 		LogError("Failed to Safe Settings");
 		return;
 	}
-	file << "[BaseInformation]" << std::endl;
-	file << "ClientPath = " << PgUtil::FolderPath << std::endl;
-	file << "PasteDelay = " << _Settings._PasteDelay << std::endl << std::endl;
-	if (_Settings._GeneralView)
-		file << "GeneralView = true" << std::endl;
-	else
-		file << "GeneralView = false" << std::endl;
+
 	file << "[Window]" << std::endl;
 	file << "Width = " << _Settings._WindowWidth << std::endl;
 	file << "Height = " << _Settings._WindowHeight << std::endl;
@@ -62,11 +57,20 @@ void Settings::SaveSettings()
 		file << "FullScreen = true" << std::endl;
 	else
 		file << "FullScreen = false" << std::endl;
-	file << "FPSCap = " << _Settings._FPSCap << std::endl;
+	file << "FPSCap = " << _Settings._FPSCap << std::endl << std::endl;
+
+	file << "[BaseInformation]" << std::endl;
+	file << "ClientPath = " << PgUtil::FolderPath << std::endl;
+	file << "PasteDelay = " << _Settings._PasteDelay << std::endl;
+	if (_Settings._GeneralView)
+		file << "GeneralView = true" << std::endl;
+	else
+		file << "GeneralView = false" << std::endl;
 	if (_Settings._ShowSHMD)
 		file << "ShowSHMD = true" << std::endl;
 	else
 		file << "ShowSHMD = false" << std::endl;
+	file << "SaveInterval = " << _Settings._SaveInterval << std::endl << std::endl;
 
 	file.close();
 
