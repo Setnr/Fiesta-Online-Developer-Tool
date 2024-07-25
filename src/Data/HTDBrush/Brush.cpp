@@ -7,6 +7,7 @@
 #include "HightBrush.h"
 #include "PixelBrush.h"
 #include "TextureSmoothingBrush.h"
+#include "PerlinTextureBrush.h"
 
 NiImplementRootRTTI(Brush);
 NiImplementRTTI(HTDTextureBrush, Brush);
@@ -74,6 +75,8 @@ BrushPtr HTDBrush::Draw()
 
 BrushPtr HTDTextureBrush::Draw()
 {
+	if (!Layer)
+		return NULL;
 	BrushPtr ptr;
 	ImGuiIO& io = ImGui::GetIO();
 	auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
@@ -119,6 +122,8 @@ BrushPtr HTDTextureBrush::Draw()
 			ptr = NiNew PixelBrush(Layer, kWorld, Node, BrushSize);
 		if (ImGui::Selectable("Smoothing Brush", &s))
 			ptr = NiNew TextureSmoothingBrush(Layer, kWorld, Node, BrushSize);
+		if (ImGui::Selectable("Perlin Brush", &s))
+			ptr = NiNew PerlinTextureBrush(Layer, kWorld, Node, BrushSize);
 
 		ImGui::EndChild();
 		ImGui::SameLine();

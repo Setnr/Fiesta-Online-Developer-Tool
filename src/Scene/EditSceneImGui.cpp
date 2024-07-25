@@ -138,25 +138,13 @@ void EditScene::CreateMenuBar()
 	ImGui::SameLine(ImGui::GetWindowWidth() - 130);
 	if (ImGui::BeginPopup("ChangeEditMode")) 
 	{
-		if (ImGui::Button("None"))
+		for(EditMode m = EditMode::None; m < EditMode::Max; m = (EditMode)(m + 1))
 		{
-			UpdateEditMode(EditMode::None);
-			ImGui::CloseCurrentPopup();
-		}
-		if (ImGui::Button("SHMD"))
-		{
-			UpdateEditMode(EditMode::SHMD);
-			ImGui::CloseCurrentPopup();
-		}
-		if (ImGui::Button("SHBD"))
-		{
-			UpdateEditMode(EditMode::SHBD);
-			ImGui::CloseCurrentPopup();
-		}
-		if (ImGui::Button("HTDG"))
-		{
-			UpdateEditMode(EditMode::HTDG);
-			ImGui::CloseCurrentPopup();
+			if (ImGui::Button(GetEditMode(m).c_str()))
+			{
+				UpdateEditMode(m);
+				ImGui::CloseCurrentPopup();
+			}
 		}
 		ImGui::EndPopup();
 	}
@@ -165,6 +153,11 @@ void EditScene::CreateMenuBar()
 		int m = (int)CurrentEditMode;
 		m++;
 		UpdateEditMode((EditMode)m);
+	}
+	if (ImGui::IsKeyPressed((ImGuiKey)VK_F1,false))
+	{
+		Settings::SetShowSHMD(!Settings::ShowSHMD());
+		UpdateEditMode(CurrentEditMode);
 	}
 	ImGui::SameLine(ImGui::GetWindowWidth() - 30);
 	ImGui::Text("(?)");
@@ -208,7 +201,22 @@ void EditScene::ShowAboutWindow()
 			ImGui::Text("Scroll to Move SHBD Up/Down");
 			ImGui::Text("Change SHBD with Left Click");
 			break;
-
+		case HTDG:
+			ImGui::Text("Move Camera with WASD");
+			ImGui::Text("Rotate Camera with Right Click");
+			ImGui::Text("Move Up/Down with Q/E");
+			ImGui::Text("Scroll to resize Brush");
+			ImGui::Text("F1 to Show/Hide SHMD-Objects");
+			break;
+		case Texture:
+			ImGui::Text("Move Camera with WASD");
+			ImGui::Text("Rotate Camera with Right Click");
+			ImGui::Text("Move Up/Down with Q/E");
+			ImGui::Text("Scroll to resize Brush");
+			ImGui::Text("F1 to Show/Hide SHMD-Objects");
+			break;
+		case VertexColor:
+			break;
 		case None:
 		default:
 			ImGui::Text("Select a Mode to see the matching controls");
@@ -416,19 +424,21 @@ void EditScene::ShowSettings()
 		float fps = FiestaOnlineTool::GetFPSCap();
 		if (ImGui::DragFloat("FPS Cap", &fps, 1.f, 30.f, 144.f))
 			FiestaOnlineTool::SetFPSCap(fps);
-		/*bool FullScreen = Settings::FullScreen();
+		bool FullScreen = Settings::FullScreen();
 		if (ImGui::Checkbox("FullScreen", &FullScreen))
 		{
 			Settings::SetFullScreen(FullScreen);
-		}*/
+		}
+		
+		bool ShowSHMD = Settings::ShowSHMD();
+		if (ImGui::Checkbox("Show SHMD in HTDG-Editor", &ShowSHMD))
+			Settings::SetShowSHMD(ShowSHMD);
+
 		if (ImGui::Button("Safe Settings"))
 		{
 			Settings::SaveSettings();
 			//FiestaOnlineTool::RecreateRenderer = true;
 		}
-		bool ShowSHMD = Settings::ShowSHMD();
-		if (ImGui::Checkbox("Show SHMD in HTDG-Editor", &ShowSHMD))
-			Settings::SetShowSHMD(ShowSHMD);
 		ImGui::End();
 	}
 }

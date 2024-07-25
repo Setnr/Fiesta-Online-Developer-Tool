@@ -87,6 +87,7 @@
     <ClInclude Include="src\Data\HTDBrush\Brush.h" />
     <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\PerlinBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\PerlinTextureBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\PixelBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\SmoothingBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\TextureBrush.h" />

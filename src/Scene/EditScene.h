@@ -115,10 +115,12 @@ private:
 		switch (mode)
 		{
 		case EditScene::HTDG:
-			_Brush = NiNew HTDBrush(NiSmartPointerCast(TerrainWorld,kWorld), HTDOrbNode, 5);
+			if(!NiIsKindOf(HTDBrush,_Brush))
+				_Brush = NiNew HTDBrush(NiSmartPointerCast(TerrainWorld,kWorld), HTDOrbNode, 5);
 			break;
 		case EditScene::Texture:
-			_Brush = NiNew HTDTextureBrush(SelectedLayer,NiSmartPointerCast(TerrainWorld, kWorld), HTDOrbNode, 5);
+			if (!NiIsKindOf(HTDTextureBrush, _Brush))
+				_Brush = NiNew HTDTextureBrush(SelectedLayer,NiSmartPointerCast(TerrainWorld, kWorld), HTDOrbNode, 5);
 			break;
 		case EditScene::VertexColor:
 			_Brush = NiNew HTDBrush(NiSmartPointerCast(TerrainWorld, kWorld), HTDOrbNode, 5);
@@ -132,6 +134,18 @@ private:
 	std::string GetEditMode() 
 	{
 		switch (CurrentEditMode) {
+		case None: return "None";
+		case SHMD: return "SHMD";
+		case SHBD: return "SHBD";
+		case HTDG: return "HTDG";
+		case Texture: return "Texture";
+		case VertexColor: return "VertexColor";
+		default: return "Inactive";
+		}
+	}
+	std::string GetEditMode(EditMode mode)
+	{
+		switch (mode) {
 		case None: return "None";
 		case SHMD: return "SHMD";
 		case SHBD: return "SHBD";

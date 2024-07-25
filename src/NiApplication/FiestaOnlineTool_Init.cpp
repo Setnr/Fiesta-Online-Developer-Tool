@@ -119,17 +119,17 @@ bool FiestaOnlineTool::CreateRenderer()
     Flag = NiDX9Renderer::USE_MULTITHREADED;//  | NiDX9Renderer::USE_STENCIL | NiDX9Renderer::USE_FULLSCREEN| NiDX9Renderer::USE_16BITBUFFERS;//  
 
     //m_spRenderer = NiDX9Select::CreateRenderer(this->GetWindowReference(), this->GetWindowReference(), true, this->m_uiBitDepth, this->GetAppWindow()->GetWidth(), this->GetAppWindow()->GetHeight(), this->m_bStencil, this->m_bMultiThread, this->m_bRefRast, this->m_bSWVertex, this->m_bNVPerfHUD, this->m_bFullscreen);
+    if (Settings::FullScreen())
+    {
+        Flag = Flag | NiDX9Renderer::USE_FULLSCREEN;
 
+    }
     m_spRenderer = NiDX9Renderer::Create(this->m_pkAppWindow->GetWidth(), this->m_pkAppWindow->GetHeight(), Flag, this->m_pkAppWindow->GetWindowReference(), this->m_pkAppWindow->GetRenderWindowReference());
     //NiDX9Renderer* rend = (NiDX9Renderer*)&*m_spRenderer;
     //rend->CreateSwapChainRenderTargetGroup(Flag,)
     if (m_spRenderer == NULL)
         NiMessageBox::DisplayMessage("Failed to Create Renderer, \ntry to downscale your Resolution in Settings.ini", "Error");
-    if (Settings::FullScreen())
-    {
-        Flag = Flag | NiDX9Renderer::USE_FULLSCREEN;
-        
-    }
+
     if (m_spRenderer != NULL)
     {
         std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");

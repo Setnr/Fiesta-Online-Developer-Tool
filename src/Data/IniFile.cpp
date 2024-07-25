@@ -178,5 +178,13 @@ bool IniFile::Load()
 		if (line.find("#Layer") != std::string::npos && !LoadLayer(File))
 			return false;
 	}
+	for (auto l = LayerList.begin(); l != LayerList.end(); l++)
+	{
+		for (auto l2 = l + 1; l2 != LayerList.end(); l2++) 
+		{
+			if (l->get()->Name == l2->get()->Name)
+				l2->get()->Name += "_c";
+		}
+	}
 	return true;
 }

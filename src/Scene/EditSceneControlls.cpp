@@ -8,7 +8,7 @@ void EditScene::UpdateCamera(float fTime)
 		return;
 	FiestaScene::UpdateCamera(fTime);
 
-	if (ImGui::IsAnyItemHovered())
+	if (ImGui::IsAnyItemHovered() || ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
 		return;
 
 	if (ImGui::IsKeyPressed((ImGuiKey)0x52)) //R

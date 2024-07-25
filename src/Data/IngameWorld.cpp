@@ -240,6 +240,11 @@ void World::ShowHTDG(bool ShowOrbNode, bool ShowObjecs, NiNodePtr OrbNode)
 			m_spGroundScene->DetachChild(m_spGroundObject);
 			m_spNormalLightScene->DetachChild(m_spWaterScene);
 		}
+		else 
+		{
+			m_spGroundScene->AttachChild(m_spGroundObject);
+			m_spNormalLightScene->AttachChild(m_spWaterScene);
+		}
 		m_spGroundScene->AttachChild(OrbNode);
 		m_spGroundScene->CompactChildArray();
 		m_spNormalLightScene->CompactChildArray();

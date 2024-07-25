@@ -1,12 +1,13 @@
 #include "Brush.h"
+#include "PerlinNoise.hpp"
 
-class PixelBrush : public HTDTextureBrush 
+class PerlinTextureBrush : public HTDTextureBrush
 {
 public:
-	PixelBrush(std::shared_ptr<TerrainLayer> Layer, TerrainWorldPtr kWorld, NiNodePtr HTDOrbNode, int BrushSize) :
-		HTDTextureBrush(Layer,kWorld, HTDOrbNode, BrushSize){}
+	PerlinTextureBrush(std::shared_ptr<TerrainLayer> Layer, TerrainWorldPtr kWorld, NiNodePtr HTDOrbNode, int BrushSize) :
+		HTDTextureBrush(Layer, kWorld, HTDOrbNode, BrushSize) {}
 
-	virtual void Update() 
+	virtual void Update()
 	{
 		if (!Layer)
 			return;
@@ -20,6 +21,7 @@ public:
 		static int LastYPixel = 0;
 		if (!(xPixel != LastxPixel && yPixel != LastYPixel))
 			return;
+		
 		LastxPixel = xPixel;
 		LastYPixel = yPixel;
 		for (int w = xPixel - BrushSize; w <= xPixel + BrushSize && w < static_cast<int>(data->GetWidth()); w++)
@@ -40,7 +42,10 @@ public:
 				int PreFullLines = Layer->BlendTexture->GetWidth() * h;
 				int YPartNormal = PreFullLines;
 				int PointOffsetNormal = XPart + YPartNormal;
-				pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)BrushColor);
+				float PValue = perlin.octave2D_01(static_cast<float>(w) / data->GetWidth(), static_cast<float>(h) / data->GetHeight(), Octaves,persistance);
+				PValue *= 255.f;
+				pixel[PointOffsetNormal] = TerrainLayer::RGBAColor(static_cast<char>(PValue));
+				
 
 			}
 		}
@@ -48,16 +53,30 @@ public:
 		kWorld->CreateTerrainLayer(Layer);
 	}
 private:
-	virtual void DrawInternal() 
+	virtual void DrawInternal()
 	{
 		ImGui::BeginChild("BrushChildR", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 		HTDTextureBrush::DrawInternal();
-		float Col = static_cast<float>(BrushColor) / 255;
-		ImGui::ColorButton("##ColButton", ImVec4(Col, Col, Col, Col)); 
+		bool UpdateTexture = false;
+		if (ImGui::DragInt("Seed", (int*)&seed))
+			UpdateTexture = true;
 		ImGui::SameLine();
-		ImGui::DragInt("Color", &BrushColor, 1.f, 0, 255);
-		ImGui::EndChild();
+		if (ImGui::Button("Random"))
+		{
+			seed = std::rand();
+			UpdateTexture = true;
+		}
+		ImGui::InputInt("Ocatves", &Octaves);
+		if (UpdateTexture)
+		{
+			perlin = siv::PerlinNoise(seed);
+		}
+		ImGui::DragFloat("Persistance", &persistance, 0.01f, 0.0f, 1.0f);
 		
+		ImGui::EndChild();
 	}
-	int BrushColor = 0x0;
+	int Octaves = 16;
+	siv::PerlinNoise::seed_type seed = 123456u;
+	siv::PerlinNoise perlin{ seed };
+	float persistance = 0.99f;
 };

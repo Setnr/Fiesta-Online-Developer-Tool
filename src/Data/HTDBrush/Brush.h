@@ -58,6 +58,8 @@ public:
 	virtual BrushPtr Draw();
 	void UpdateViaHeight() 
 	{
+		if (!Layer)
+			return;
 		std::vector<std::vector<TerrainWorld::HTDHelper>>& _HTD = kWorld->GetHTD();
 		NiPixelDataPtr data = Layer->BlendTexture->GetSourcePixelData();
 		TerrainLayer::RGBAColor* pixel = (TerrainLayer::RGBAColor*)data->GetPixels();

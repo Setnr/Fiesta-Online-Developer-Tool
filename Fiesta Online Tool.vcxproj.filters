@@ -284,6 +284,9 @@
     <ClInclude Include="src\Data\HTDBrush\TextureSmoothingBrush.h">
       <Filter>Data\Brushes\HTDTextureBrush</Filter>
     </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\PerlinTextureBrush.h">
+      <Filter>Data\Brushes\HTDBrush</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">
