@@ -13,6 +13,7 @@
 #include <wininet.h>
 #include <EasyBMP/EasyBMP.h>
 #include <NiTextureTransform.h>
+#include "Logger/Logger.h"
 #define PICKABLEOBJECTS 1
 
 class PgUtil 
@@ -229,22 +230,33 @@ public:
     }
     static void SaveTexture(std::string Path, NiSourceTexturePtr Texture) 
     {
-        BMP bmp;
-        bmp.SetSize(Texture->GetWidth(), Texture->GetHeight());
-        RGBApixel* PixelData = (RGBApixel*)Texture->GetSourcePixelData()->GetPixels();
-        for (int w = 0; w < Texture->GetWidth(); w++) 
-        {
-            for (int h = Texture->GetHeight() - 1; h >= 0; h--)
+        try {
+            BMP bmp;
+            bmp.SetSize(Texture->GetWidth(), Texture->GetHeight());
+            RGBApixel* PixelData = (RGBApixel*)Texture->GetSourcePixelData()->GetPixels();
+            for (int w = 0; w < Texture->GetWidth(); w++)
             {
-                int XPart = w;
+                for (int h = Texture->GetHeight() - 1; h >= 0; h--)
+                {
+                    int XPart = w;
 
-                int PreFullLines = Texture->GetWidth() * h;
-                int YPartNormal = PreFullLines;
-                int PointOffsetNormal = XPart + YPartNormal;
-                bmp.SetPixel(w, Texture->GetHeight() - h - 1, PixelData[PointOffsetNormal]);
+                    int PreFullLines = Texture->GetWidth() * h;
+                    int YPartNormal = PreFullLines;
+                    int PointOffsetNormal = XPart + YPartNormal;
+                    bmp.SetPixel(w, Texture->GetHeight() - h - 1, PixelData[PointOffsetNormal]);
+                }
             }
+            bmp.WriteToFile(Path.c_str());
         }
-        bmp.WriteToFile(Path.c_str());
+        catch (std::exception e)
+        {
+            LogError("Failed to safe: " + Path);
+            LogError("Error-Msg: " + e.what());
+        }
+        catch (...) 
+        {
+            LogError("Failed to safe: " + Path);
+        }
     }
 
     static NiScreenElements* CreateScreenElement(float width, float height, NiSourceTexturePtr texture);

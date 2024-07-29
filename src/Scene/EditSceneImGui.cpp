@@ -119,6 +119,10 @@ void EditScene::CreateMenuBar()
 		{
 			kWorld->SaveHTDG();
 		}
+		if (ImGui::MenuItem("Save Ini", 0, false, kWorld != NULL))
+		{
+			kWorld->GetIni().Save();
+		}
 		if (ImGui::MenuItem("Save All", 0, false, kWorld != NULL))
 		{
 			this->SaveAll();
@@ -686,6 +690,13 @@ void EditScene::DrawTextureEditor()
 		if (ImGui::Button("Reload World"))
 		{
 			kWorld->ReloadTerrain();
+		} ImGui::SameLine();
+		if (ImGui::Button("Save Current BlendFile")) 
+		{
+			if (SelectedLayer)
+				PgUtil::SaveTexture(PgUtil::CreateFullFilePathFromBaseFolder(SelectedLayer->BlendFileName), SelectedLayer->BlendTexture);
+			else
+				LogWarning("No Layer Selected");
 		}
 		if (ImGui::BeginChild("Layer List", ImVec2(120.f, 200.f)))
 		{

@@ -123,6 +123,7 @@ public:
 	void UpdateFilePath(std::string FilePath) { _FilePath = FilePath; }
 	void Save(bool Backup = false)
 	{
+		auto start = std::chrono::steady_clock::now();
 		std::ofstream IniFile;
 		if(Backup)
 		{
@@ -133,7 +134,8 @@ public:
 
 			IniFile.open(_FilePath);
 			_FilePath = OrgPath;
-		}
+		}else
+			IniFile.open(_FilePath);
 		IniFile << std::fixed << std::setprecision(1);
 		IniFile << "#PGFILE\t:\t" << FileType << std::endl;
 		IniFile << "#FILE_VER\t:\t" << Version << std::endl << std::endl;
@@ -167,8 +169,10 @@ public:
 			
 			PgUtil::SaveTexture(PgUtil::CreateFullFilePathFromBaseFolder(layer->BlendFileName), layer->BlendTexture);
 		}
-		IniFile << "#END_FILE" << std::endl;
-		IniFile << "//Made With Fiesta Developer Tools by Set" << std::endl;
+		IniFile << "#END_FILE" <<std::endl<< "//Made With Fiesta Developer Tools by Set" << std::endl;
+		
+		IniFile.close();
+		LogTime("Saved Inifile ", start);
 	}
 
 	std::string FileType;
