@@ -45,8 +45,6 @@ public:
 				float PValue = perlin.octave2D_01(static_cast<float>(w) / data->GetWidth(), static_cast<float>(h) / data->GetHeight(), Octaves,persistance);
 				PValue *= 255.f;
 				pixel[PointOffsetNormal] = TerrainLayer::RGBAColor(static_cast<char>(PValue));
-				
-
 			}
 		}
 		data->MarkAsChanged();

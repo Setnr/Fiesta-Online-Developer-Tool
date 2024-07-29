@@ -7,9 +7,11 @@ class PerlinFractal : public Fractal
 {
 private:
     int _Octave = 10;
+    float _Persistance = 0.98f;
 public:
-    PerlinFractal(int Octave = 10, int grid_size = 129) : Fractal(grid_size) {
+    PerlinFractal(int Octave = 10, int grid_size = 129, float Perstistance = 0.98f) : Fractal(grid_size) {
         _Octave = Octave;
+        _Persistance = Perstistance;
     }
     void generateGrid(int grid_size, int seed, float noise, float random_min, float random_max)
     {
@@ -25,7 +27,7 @@ public:
         {
             for (int h = 0; h < grid_size; h++) 
             {
-                grid[w][h] = perlin.octave2D_01(static_cast<float>(w) / grid_size, static_cast<float>(h) / grid_size, _Octave) * (random_max - random_min) + random_min;
+                grid[w][h] = perlin.octave2D_01(static_cast<float>(w) / grid_size, static_cast<float>(h) / grid_size, _Octave, _Persistance) * (random_max - random_min) + random_min;
             }
         }
 

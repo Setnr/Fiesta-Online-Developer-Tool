@@ -70,8 +70,8 @@ void MapCreateScene::DrawImGui()
                 UpdateAlgo = true;
             if (ImGui::DragFloat("Max Height", &MaxValue, 1.0f, MinValue + 1, 5000.f))
                 UpdateAlgo = true;
-                
-            
+            if (ImGui::DragFloat("Persistance", &Persistance, 0.001f, 0.01f, 1.f))
+                UpdateAlgo = true;
             break;
         }
         case Worley:

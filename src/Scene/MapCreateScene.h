@@ -41,6 +41,7 @@ private:
 	float MaxValue = 40.f;
 	int NumPoints = 10;
 	int PointLoc = 0;
+	float Persistance = 0.98f;
 	enum CreateAlgorithm {
 		Perlin,
 		Worley,
@@ -53,7 +54,7 @@ private:
 			_Fractal->Show(false);
 		switch (_Algo) {
 		case Perlin:
-			_Fractal = NiNew PerlinFractal(Octave, MapSize);
+			_Fractal = NiNew PerlinFractal(Octave, MapSize,Persistance);
 			break;
 		case Worley:
 			_Fractal = NiNew WorleyFractal(NumPoints,PointLoc,Seed,MapSize);
