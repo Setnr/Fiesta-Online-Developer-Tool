@@ -43,24 +43,29 @@ void FiestaScene::UpdateCamera(float fTime)
 	{
 		POINT CurrentCursorPos;
 		GetCursorPos(&CurrentCursorPos);
-		CurrentCursorPos.x = CurrentCursorPos.x - CursorPos.x;
-		CurrentCursorPos.y = CurrentCursorPos.y - CursorPos.y;
-		SetCursorPos(CursorPos.x, CursorPos.y);
-
-		if (CurrentCursorPos.x || CurrentCursorPos.y)
+		static POINT LastCursorPos;
+		if(CurrentCursorPos.x != LastCursorPos.x || CurrentCursorPos.y != LastCursorPos.y)
 		{
-			unsigned int uiAppHeight = NiApplication::ms_pkApplication->GetAppWindow()->GetHeight();
-			unsigned int uiAppWidth = NiApplication::ms_pkApplication->GetAppWindow()->GetWidth();
-			if (uiAppHeight > 0 && uiAppWidth > 0)
+			LastCursorPos = CurrentCursorPos;
+			CurrentCursorPos.x = CurrentCursorPos.x - CursorPos.x;
+			CurrentCursorPos.y = CurrentCursorPos.y - CursorPos.y;
+			SetCursorPos(CursorPos.x, CursorPos.y);
+
+			if (CurrentCursorPos.x || CurrentCursorPos.y)
 			{
-				float fPitchDelta = NI_PI * 0.375f * ((float)CurrentCursorPos.y) / (float)uiAppHeight;
-				float fHeadingDelta = NI_PI * 0.375f * ((float)CurrentCursorPos.x) / (float)uiAppWidth;
-				
-				Pitch += fPitchDelta;
-				Yaw -= fHeadingDelta;
-				NiMatrix3 rotation;
-				rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
-				Camera->SetRotate(rotation);
+				unsigned int uiAppHeight = NiApplication::ms_pkApplication->GetAppWindow()->GetHeight();
+				unsigned int uiAppWidth = NiApplication::ms_pkApplication->GetAppWindow()->GetWidth();
+				if (uiAppHeight > 0 && uiAppWidth > 0)
+				{
+					float fPitchDelta = NI_PI * 0.375f * ((float)CurrentCursorPos.y) / (float)uiAppHeight;
+					float fHeadingDelta = NI_PI * 0.375f * ((float)CurrentCursorPos.x) / (float)uiAppWidth;
+
+					Pitch += fPitchDelta;
+					Yaw -= fHeadingDelta;
+					NiMatrix3 rotation;
+					rotation.FromEulerAnglesXYZ(Roll, Yaw, Pitch);
+					Camera->SetRotate(rotation);
+				}
 			}
 		}
 	}
