@@ -16,7 +16,7 @@ public:
 	virtual void Update()
 	{
 		IniFile& _InitFile = kWorld->GetIniFile();;
-		std::vector<std::vector<World::HTDHelper>>& HTD = kWorld->GetHTD();
+		std::vector<std::vector<TerrainWorld::PointInfos>>& HTD = kWorld->GetHTD();
 		static float LastUpdate = 0.0f;
 		float CurTime = NiGetCurrentTimeInSec();
 		if (LastUpdate + 0.05f > CurTime)
@@ -34,12 +34,15 @@ public:
 					continue;
 				if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
 					continue;
-				for (auto point : HTD[w][h].Vec)
-					if (point)
-						point->z += ChangeSize;
-				for (auto shape : HTD[w][h].Shape)
-					if (shape)
-						shape->MarkAsChanged(NiGeometryData::VERTEX_MASK);
+				HTD[w][h].Height += ChangeSize;
+				for (auto point : HTD[w][h].Data)
+				{
+					if (point.second.first)
+						point.second.first->z += ChangeSize;
+					if (point.second.second)
+						point.second.second->MarkAsChanged(NiGeometryData::VERTEX_MASK);
+				}
+					
 			}
 		}
 

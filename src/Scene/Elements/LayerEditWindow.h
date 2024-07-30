@@ -10,7 +10,7 @@ public:
 	void ChangeLayer(std::shared_ptr<TerrainLayer> Layer);
 
 	bool Show();
-	void UpdateLayer(std::vector<std::vector<TerrainWorld::HTDHelper>>& _HTD);
+	void UpdateLayer(std::vector<std::vector<TerrainWorld::PointInfos>>& _HTD);
 	NiScreenElementsPtr GetScreenEditTexture() 
 	{ 
 		if(ShowTexture)

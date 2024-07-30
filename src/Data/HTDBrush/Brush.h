@@ -12,7 +12,9 @@ class Brush : public NiRefObject
 {
 	NiDeclareRootRTTI(Brush);
 public:
-	Brush(TerrainWorldPtr World,NiNodePtr HTDOrbNode,int BrushSize) : kWorld(World), Node(HTDOrbNode), BrushSize(BrushSize) {}
+	Brush(TerrainWorldPtr World,NiNodePtr HTDOrbNode,int BrushSize) : kWorld(World), Node(HTDOrbNode), BrushSize(BrushSize) {
+		Node->SetScale((50.f / 160.f) * BrushSize);
+	}
 	virtual BrushPtr Draw() { return NULL; }
 	
 	virtual void Update(){}
@@ -60,7 +62,7 @@ public:
 	{
 		if (!Layer)
 			return;
-		std::vector<std::vector<TerrainWorld::HTDHelper>>& _HTD = kWorld->GetHTD();
+		std::vector<std::vector<TerrainWorld::PointInfos>>& _HTD = kWorld->GetHTD();
 		NiPixelDataPtr data = Layer->BlendTexture->GetSourcePixelData();
 		TerrainLayer::RGBAColor* pixel = (TerrainLayer::RGBAColor*)data->GetPixels();
 		for (int w = 0; w < data->GetWidth(); w++)

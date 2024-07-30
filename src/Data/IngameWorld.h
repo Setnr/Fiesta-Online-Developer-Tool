@@ -50,7 +50,7 @@ public:
 	void ShowHTDG(bool ShowOrbNode, bool ShowObjecs, NiNodePtr OrbNode);
 	void SaveHTDG(bool Backup = false);
 
-	std::vector<std::vector<HTDHelper>>& GetHTD() { return _HTD; }
+	std::vector<std::vector<PointInfos>>& GetHTD() { return VertexMap; }
 	IniFile& GetIni() { return _InitFile; }
 
 private:

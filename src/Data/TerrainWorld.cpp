@@ -64,7 +64,6 @@ bool TerrainWorld::LoadTerrain()
 	for (int w = 0; w < _InitFile.HeightMap_width; w++)
 	{
 		VertexMap.push_back(std::vector<PointInfos>(_InitFile.HeightMap_height));
-		_HTD.push_back(std::vector<HTDHelper>(_InitFile.HeightMap_height));
 	}
 
 	for (int h = 0; h < _InitFile.HeightMap_height; h++)
@@ -72,9 +71,7 @@ bool TerrainWorld::LoadTerrain()
 		for (int w = 0; w < _InitFile.HeightMap_width; w++)
 		{
 			HTDFile.read((char*)&VertexMap[w][h].Height, sizeof(VertexMap[w][h].Height));
-			_HTD[w][h].Height = VertexMap[w][h].Height;
-			_HTD[w][h].Vec = std::vector<NiPoint3*>();
-			_HTD[w][h].Shape = std::vector<NiGeometryData*>();
+			
 		}
 	}
 	HTDFile.close();
@@ -154,8 +151,22 @@ NiNodePtr TerrainWorld::GetLayerNode(std::string LayerName)
 		NiAVObjectPtr child = Terrain->GetAt(i);
 		if (child && child->GetName().Equals(LayerName.c_str())&& NiIsKindOf(NiNode, child))
 		{
-			Terrain->SetAt(i, LayerNode);
-			SkipAttach = true;;
+			NiAVObjectPtr OldNode = Terrain->SetAt(i, LayerNode);
+
+			for (int w = 0; w < VertexMap.size(); w++)
+			{
+				for (int h = 0; h < VertexMap[w].size(); h++)
+				{
+					auto itr = std::remove_if(VertexMap[w][h].Data.begin(), VertexMap[w][h].Data.end(),
+						[&](std::pair<NiNodePtr, std::pair<NiPoint3*, NiGeometryData*>> a) {
+							return OldNode == a.first;
+						}
+					);
+					if(itr != VertexMap[w][h].Data.end())
+						VertexMap[w][h].Data.erase(itr);
+				}
+			}
+			SkipAttach = true;
 		}
 	}
 	if(!SkipAttach)
@@ -400,8 +411,7 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 
 			for (int i = 0; i < WHList.size(); i++)
 			{
-				_HTD[WHList[i].first][WHList[i].second].Vec.push_back(&pkVertix[i]);
-				_HTD[WHList[i].first][WHList[i].second].Shape.push_back(Shape->GetModelData());
+				VertexMap[WHList[i].first][WHList[i].second].Data.push_back({ LayerNode, { &pkVertix[i],Shape->GetModelData() } });
 			}
 			LayerNode->AttachChild(Shape);
 		}

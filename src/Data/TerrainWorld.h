@@ -57,10 +57,14 @@ public:
 	static NiPoint3 ms_kWestDir; // idb
 	static NiPoint3 ms_kDefaultDirectionalLightDir; // idb
 #pragma endregion
-	struct HTDHelper {
+	struct PointInfos
+	{	
 		float Height;
-		std::vector<NiPoint3*> Vec;
-		std::vector<NiGeometryData*> Shape;
+		TerrainLayer::RGBAColor PixelColor;
+		NiColorA VertexColor;
+		std::vector<std::pair<NiNodePtr,std::pair<NiPoint3*, NiGeometryData*>>> Data;
+		//std::vector<std::pair<NiNodePtr,NiPoint3*>> Vec;
+		//std::vector< std::pair<NiNodePtr, NiGeometryData*>> Shape;
 	};
 #pragma region Init
 	bool InitScene();
@@ -196,7 +200,7 @@ public:
 	bool WasLoadedSuccessfully() { return LoadedSuccessfully; }
 	IniFile& GetIniFile() { return _InitFile; }
 	void CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer);
-	std::vector<std::vector<HTDHelper>>& GetHTD() { return _HTD; }
+	std::vector<std::vector<PointInfos>>& GetHTD() { return VertexMap; }
 	virtual NiPoint3 GetSpawnPoint();
 	virtual std::string GetFolderPath() 
 	{
@@ -251,14 +255,8 @@ protected:
 	bool LoadedSuccessfully = false;
 
 	bool LoadTerrain();
-	IniFile _InitFile;
-	std::vector<std::vector<HTDHelper>> _HTD;
-	struct PointInfos
-	{
-		float Height;
-		TerrainLayer::RGBAColor PixelColor;
-		NiColorA VertexColor;
-	};
+	IniFile _InitFile;	
+
 	struct Triangle
 	{
 		unsigned short one;

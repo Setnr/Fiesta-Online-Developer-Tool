@@ -78,10 +78,11 @@ public:
 			LogError("Failed to open and create SHBD for " + MapName);
 			return;
 		}
-		int SHBDSize = MapSize * 8;
+		int SHBDSize = MapSize * MapSize * 8;
+		int PixleSize = MapSize * 8;
 		char Walking = 0x0;
 		SHBDFile.write((char*)&MapSize, sizeof(MapSize));
-		SHBDFile.write((char*)&SHBDSize, sizeof(SHBDSize));
+		SHBDFile.write((char*)&PixleSize, sizeof(PixleSize));
 		for (int i = 0; i < SHBDSize; i++)
 			SHBDFile.write(&Walking, sizeof(char));
 		SHBDFile.close();

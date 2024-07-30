@@ -279,7 +279,7 @@ void LayerEditWindow::ChangeLayer(std::shared_ptr<TerrainLayer> Layer)
 	}
 }
 
-void LayerEditWindow::UpdateLayer(std::vector<std::vector<TerrainWorld::HTDHelper>>& _HTD) 
+void LayerEditWindow::UpdateLayer(std::vector<std::vector<TerrainWorld::PointInfos>>& _HTD) 
 {
 	NiPixelDataPtr data = Layer->BlendTexture->GetSourcePixelData();
 	TerrainLayer::RGBAColor* pixel = (TerrainLayer::RGBAColor*)data->GetPixels();

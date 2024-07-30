@@ -233,9 +233,6 @@
     <ClInclude Include="src\Data\WorleyFractal.h">
       <Filter>Data\Algorithms\FractalAlgorithms</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene\MapTextureScene.h">
-      <Filter>Scene\MapTextureScene</Filter>
-    </ClInclude>
     <ClInclude Include="src\Scene\Elements\MapMenu.h">
       <Filter>Scene\SceneElements</Filter>
     </ClInclude>
@@ -412,9 +409,6 @@
     </ClCompile>
     <ClCompile Include="src\Data\Fractal.cpp">
       <Filter>Data\Algorithms\FractalAlgorithms</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\MapTextureScene.cpp">
-      <Filter>Scene\MapTextureScene</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\Elements\MapMenu.cpp">
       <Filter>Scene\SceneElements</Filter>

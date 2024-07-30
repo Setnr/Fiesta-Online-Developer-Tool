@@ -42,7 +42,7 @@ public:
 	virtual void Update()
 	{
 		IniFile& _InitFile = kWorld->GetIniFile();;
-		std::vector<std::vector<World::HTDHelper>>& HTD = kWorld->GetHTD();
+		std::vector<std::vector<TerrainWorld::PointInfos>>& HTD = kWorld->GetHTD();
 		int middlew = _Intersect.x / _InitFile.OneBlock_width;
 		int middleh = _Intersect.y / _InitFile.OneBlock_height;
 
@@ -67,12 +67,15 @@ public:
 				int XA = XAnteil * data->GetWidth();
 				int YA = YAnteil * data->GetHeight();
 				float z = ((static_cast<float>(PixelColorA[XA + YA * data->GetWidth()].r) / 0xFF ) - .5f) * ChangeSize;
-				for (auto point : HTD[w][h].Vec)
-					if (point)
-						point->z += z;
-				for (auto shape : HTD[w][h].Shape)
-					if (shape)
-						shape->MarkAsChanged(NiGeometryData::VERTEX_MASK);
+				HTD[w][h].Height += z;
+				for (auto point : HTD[w][h].Data)
+				{
+					if (point.second.first)
+						point.second.first->z += z;
+					if (point.second.second)
+						point.second.second->MarkAsChanged(NiGeometryData::VERTEX_MASK);
+				}
+				
 			}
 		}
 	}
