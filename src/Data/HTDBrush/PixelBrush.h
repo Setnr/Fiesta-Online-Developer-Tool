@@ -45,7 +45,7 @@ public:
 			}
 		}
 		data->MarkAsChanged();
-		kWorld->CreateTerrainLayer(Layer);
+		//kWorld->CreateTerrainLayer(Layer);
 	}
 private:
 	virtual void DrawInternal() 

@@ -35,13 +35,13 @@ public:
 					continue;
 				if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
 					continue;
-				HTD[w][h].Height = ClickedPoint.z;
-				for (auto point : HTD[w][h].Data)
+				HTD[w][h].HTDGHeight = ClickedPoint.z - HTD[w][h].HTDHeight;
+				for (auto point : kWorld->GetHTDPoints(w, h))
 				{
-					if (point.second.first)
-						point.second.first->z = ClickedPoint.z;
-					if (point.second.second)
-						point.second.second->MarkAsChanged(NiGeometryData::VERTEX_MASK);
+					if (point.NiPoint)
+						point.NiPoint->z = HTD[w][h].GetHeight();
+					if (point.NiGeometry)
+						point.NiGeometry->MarkAsChanged(NiGeometryData::VERTEX_MASK);
 				}
 					
 			}

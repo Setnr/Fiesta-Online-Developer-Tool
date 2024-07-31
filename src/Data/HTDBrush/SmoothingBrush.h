@@ -19,11 +19,7 @@ public:
 	{
 		IniFile& _InitFile = kWorld->GetIniFile();;
 		std::vector<std::vector<TerrainWorld::PointInfos>>& HTD = kWorld->GetHTD();
-		static float LastUpdate = 0.0f;
-		float CurTime = NiGetCurrentTimeInSec();
-		if (LastUpdate + 0.25f > CurTime)
-			return;
-		LastUpdate = CurTime;
+		
 		int middlew = _Intersect.x / _InitFile.OneBlock_width;
 		int middleh = _Intersect.y / _InitFile.OneBlock_height;
 
@@ -54,7 +50,7 @@ public:
 				{
 					for (int j = StartJ; j <= EndJ; j++)
 					{
-						Sum += HTD[w - i][h - j].Data[0].second.first->z * KernelValue;
+						Sum += HTD[w - i][h - j].GetHeight() * KernelValue;
 					}
 				}
 				KernelMap[WHelper][HHelper] = Sum;
@@ -79,14 +75,16 @@ public:
 					if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
 						continue;
 
-					HTD[w][h].Height = KernelMap[WHelper][HHelper];
-					for (auto point : HTD[w][h].Data)
+					HTD[w][h].HTDGHeight = KernelMap[WHelper][HHelper] - HTD[w][h].HTDHeight;
+					for (auto point : kWorld->GetHTDPoints(w, h))
 					{
-						if (point.second.first)
-							point.second.first->z = KernelMap[WHelper][HHelper];
-						if (point.second.second)
-							point.second.second->MarkAsChanged(NiGeometryData::VERTEX_MASK);
+						if (point.NiPoint)
+							point.NiPoint->z = HTD[w][h].GetHeight();
+						if (point.NiGeometry)
+							point.NiGeometry->MarkAsChanged(NiGeometryData::VERTEX_MASK);
 					}
+
+					
 					HHelper++;
 				}
 				HHelper = 0;

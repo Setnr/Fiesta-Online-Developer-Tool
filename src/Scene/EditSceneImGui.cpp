@@ -129,7 +129,7 @@ void EditScene::CreateMenuBar()
 		}
 		if (ImGui::MenuItem("Export HTD as NIF", 0, false, kWorld != NULL))
 		{
-			PgUtil::SaveNode(kWorld->GetFolderPath() + "Export.nif", kWorld->GetTerrainScene());
+			PgUtil::SaveNode(PgUtil::CreateFullFilePathFromBaseFolder(kWorld->GetFolderPath() + "Export.nif"), kWorld->GetTerrainScene());
 		}
         ImGui::EndMenu();
 	}

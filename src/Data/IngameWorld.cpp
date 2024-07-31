@@ -299,7 +299,7 @@ void World::SaveHTDG(bool Backup)
 	{
 		for (int w = 0; w < _InitFile.HeightMap_width; w++)
 		{
-			float Value = VertexMap[w][h].Data[0].second.first->z - VertexMap[w][h].Height;
+			float Value = VertexMap[w][h].GetHeight() - VertexMap[w][h].HTDHeight;
 			file.write((char*)&Value, sizeof(Value));
 		}
 	}

@@ -67,15 +67,14 @@ public:
 				int XA = XAnteil * data->GetWidth();
 				int YA = YAnteil * data->GetHeight();
 				float z = ((static_cast<float>(PixelColorA[XA + YA * data->GetWidth()].r) / 0xFF ) - .5f) * ChangeSize;
-				HTD[w][h].Height += z;
-				for (auto point : HTD[w][h].Data)
+				HTD[w][h].HTDGHeight += z;
+				for (auto point : kWorld->GetHTDPoints(w, h))
 				{
-					if (point.second.first)
-						point.second.first->z += z;
-					if (point.second.second)
-						point.second.second->MarkAsChanged(NiGeometryData::VERTEX_MASK);
+					if (point.NiPoint)
+						point.NiPoint->z = HTD[w][h].GetHeight();
+					if (point.NiGeometry)
+						point.NiGeometry->MarkAsChanged(NiGeometryData::VERTEX_MASK);
 				}
-				
 			}
 		}
 	}

@@ -59,12 +59,11 @@ public:
 #pragma endregion
 	struct PointInfos
 	{	
-		float Height;
+		float HTDHeight;
+		float HTDGHeight;
 		TerrainLayer::RGBAColor PixelColor;
 		NiColorA VertexColor;
-		std::vector<std::pair<NiNodePtr,std::pair<NiPoint3*, NiGeometryData*>>> Data;
-		//std::vector<std::pair<NiNodePtr,NiPoint3*>> Vec;
-		//std::vector< std::pair<NiNodePtr, NiGeometryData*>> Shape;
+		float GetHeight() { return HTDHeight + HTDGHeight; }
 	};
 #pragma region Init
 	bool InitScene();
@@ -213,6 +212,117 @@ public:
 		{
 			CreateTerrainLayer(CurrentLayer);
 		}
+	}
+	struct HTDPointData 
+	{
+		NiPoint3* NiPoint;
+		NiGeometryData* NiGeometry;
+		NiColorA* NiColor;
+	};
+	std::vector<HTDPointData> GetHTDPoints(int w, int h)
+	{
+		std::vector<HTDPointData> vec;
+		int XBlocks = (_InitFile.HeightMap_width - 1) / _InitFile.QuadsWide;
+		int YBlocks = (_InitFile.HeightMap_height - 1) / _InitFile.QuadsHigh;
+
+		int SubLayerW = w / _InitFile.QuadsWide;
+		int SubLayerH = h / _InitFile.QuadsHigh;
+
+		int SubW = w % (_InitFile.QuadsWide );
+		int SubH = h % (_InitFile.QuadsHigh);
+
+		int CurWith = _InitFile.QuadsWide + 1;
+
+		NiSortAdjustNodePtr Terrain = GetTerrainScene();
+		for (int LayerID = 0; LayerID < Terrain->GetChildCount(); LayerID++)
+		{
+			NiAVObjectPtr obj = Terrain->GetAt(LayerID);
+			if(NiIsKindOf(NiNode,obj) && obj)
+			{
+				NiNodePtr Layer = NiSmartPointerCast(NiNode, obj);
+				struct POS
+				{
+					NiAVObjectPtr obj;
+					int w;
+					int h;
+				};
+				std::vector<POS> LayerList;
+				if(SubW == 0 && SubLayerW >= 1)
+				{
+					LayerList.push_back({ Layer->GetAt(SubLayerH + (SubLayerW - 1) * YBlocks), _InitFile.QuadsWide, SubH });
+				}
+				if (SubH == 0 && SubLayerH >= 1)
+				{
+					LayerList.push_back({ Layer->GetAt(SubLayerH + SubLayerW * YBlocks - 1), SubW, _InitFile.QuadsHigh });
+				}
+				if (SubW == 0 && SubLayerW >= 1 && SubH == 0 && SubLayerH >= 1)
+					LayerList.push_back({ Layer->GetAt(SubLayerH + (SubLayerW - 1) * YBlocks - 1), _InitFile.QuadsWide, _InitFile.QuadsHigh });
+				LayerList.push_back({Layer->GetAt(SubLayerH + SubLayerW * YBlocks), SubW, SubH });
+				for(auto _Layer : LayerList)
+				{
+					if (!_Layer.obj)
+						continue;
+					if (NiIsKindOf(NiTriShape, _Layer.obj))
+					{
+						NiTriShapePtr shape = NiSmartPointerCast(NiTriShape, _Layer.obj);
+						NiGeometryData* data = shape->GetModelData();
+
+						NiPoint3* Points = shape->GetVertices();
+						NiPoint3* RelevantPoint = NULL;
+						NiColorA* col = shape->GetColors();
+						NiColorA* RelevantCol = NULL;
+						if (_Layer.h <= 1)
+						{
+
+							if ((_Layer.h == 1 && _Layer.w == 0) || (_Layer.h == 0 && (_Layer.w == 0 || _Layer.w == 1)))
+							{
+								if (_Layer.h == 0 && _Layer.w == 0)
+								{
+									RelevantPoint = &Points[0];
+									RelevantCol = &col[0];
+								}
+								if (_Layer.h == 0 && _Layer.w == 1)
+								{
+									RelevantPoint = &Points[1];
+									RelevantCol = &col[1];
+								}
+								if (_Layer.h == 1 && _Layer.w == 0)
+								{
+									RelevantPoint = &Points[2];
+									RelevantCol = &col[2];
+								}
+							}
+							else
+							{
+								if (_Layer.h == 1)
+								{
+									RelevantPoint = &Points[(_Layer.w + 1) * 2 - 1];
+									RelevantCol = &col[(_Layer.w + 1) * 2 - 1];
+								}
+								if (_Layer.h == 0)
+								{
+									RelevantPoint = &Points[(_Layer.w) * 2];
+									RelevantCol = &col[(_Layer.w) * 2];
+								}
+							}
+
+						}
+						else
+						{
+							RelevantPoint = &Points[_Layer.w + _Layer.h * CurWith];
+							RelevantCol = &col[_Layer.w + _Layer.h * CurWith];
+						}
+						vec.push_back({ RelevantPoint,data,RelevantCol });
+					}
+					else
+					{
+						LogError("Ah NiTriShape was expected and GetHTDPoints havent recieved one");
+					}
+				}
+			}
+
+		}
+		return vec;
 	}
 protected:
 #pragma region WorldStructureNodes

@@ -70,7 +70,7 @@ bool TerrainWorld::LoadTerrain()
 	{
 		for (int w = 0; w < _InitFile.HeightMap_width; w++)
 		{
-			HTDFile.read((char*)&VertexMap[w][h].Height, sizeof(VertexMap[w][h].Height));
+			HTDFile.read((char*)&VertexMap[w][h].HTDHeight, sizeof(VertexMap[w][h].HTDHeight));
 			
 		}
 	}
@@ -99,7 +99,7 @@ bool TerrainWorld::LoadTerrain()
 				for (int w = 0; w < _InitFile.HeightMap_width; w++)
 				{
 					HTDGFile.read((char*)&Value, sizeof(Value));
-					VertexMap[w][h].Height += Value;
+					VertexMap[w][h].HTDGHeight = Value;
 				}
 			}
 		}
@@ -152,20 +152,6 @@ NiNodePtr TerrainWorld::GetLayerNode(std::string LayerName)
 		if (child && child->GetName().Equals(LayerName.c_str())&& NiIsKindOf(NiNode, child))
 		{
 			NiAVObjectPtr OldNode = Terrain->SetAt(i, LayerNode);
-
-			for (int w = 0; w < VertexMap.size(); w++)
-			{
-				for (int h = 0; h < VertexMap[w].size(); h++)
-				{
-					auto itr = std::remove_if(VertexMap[w][h].Data.begin(), VertexMap[w][h].Data.end(),
-						[&](std::pair<NiNodePtr, std::pair<NiPoint3*, NiGeometryData*>> a) {
-							return OldNode == a.first;
-						}
-					);
-					if(itr != VertexMap[w][h].Data.end())
-						VertexMap[w][h].Data.erase(itr);
-				}
-			}
 			SkipAttach = true;
 		}
 	}
@@ -209,7 +195,6 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 		for (int BlockY = 0; BlockY < (_InitFile.HeightMap_height - 1) / _InitFile.QuadsWide; BlockY++) //19
 		{
 			std::vector<NiPoint3> VerticesList;
-			std::vector<std::pair<int, int>> WHList;
 			std::vector<NiPoint3> NormalList;
 			std::vector<NiColorA> ColorList;
 			std::vector<NiPoint2> TextureList1;
@@ -230,7 +215,7 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 						continue;
 
 					PointInfos* PixelInfo = &VertexMap[PixelW][PixelH];
-					if (PixelInfo->PixelColor > TerrainLayer::RGBColor(static_cast<char>(CurrentLayer->UVScaleBlend)))
+					//if (PixelInfo->PixelColor > TerrainLayer::RGBColor(static_cast<char>(CurrentLayer->UVScaleBlend)))
 					{
 
 						PointUsed* info = &PointUsage[ActiveW][ActiveH];
@@ -292,8 +277,7 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 						{
 							info->BL = TriCt;
 							TriCt++;
-							VerticesList.push_back(NiPoint3(ActiveW * _InitFile.OneBlock_width, ActiveH * _InitFile.OneBlock_height, VertexMap[ActiveW][ActiveH].Height));
-							WHList.push_back({ ActiveW,ActiveH });
+							VerticesList.push_back(NiPoint3(ActiveW * _InitFile.OneBlock_width, ActiveH * _InitFile.OneBlock_height, VertexMap[ActiveW][ActiveH].GetHeight()));
 							NormalList.push_back(TerrainWorld::ms_kUpDir);
 							ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
 							TextureList1.push_back(NiPoint2(PixelW * FirstWScale, PixelH * FirstHScale));
@@ -303,8 +287,7 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 						{
 							info->BR = TriCt;
 							TriCt++;
-							VerticesList.push_back(NiPoint3((ActiveW + 1) * _InitFile.OneBlock_width, ActiveH * _InitFile.OneBlock_height, VertexMap[ActiveW + 1][ActiveH].Height));
-							WHList.push_back({ ActiveW + 1,ActiveH });
+							VerticesList.push_back(NiPoint3((ActiveW + 1) * _InitFile.OneBlock_width, ActiveH * _InitFile.OneBlock_height, VertexMap[ActiveW + 1][ActiveH].GetHeight()));
 							NormalList.push_back(TerrainWorld::ms_kUpDir);
 							ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
 							TextureList1.push_back(NiPoint2((PixelW + 1) * FirstWScale, PixelH * FirstHScale));
@@ -314,8 +297,7 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 						{
 							info->TL = TriCt;
 							TriCt++;
-							VerticesList.push_back(NiPoint3(ActiveW * _InitFile.OneBlock_width, (ActiveH + 1) * _InitFile.OneBlock_height, VertexMap[ActiveW][ActiveH + 1].Height));
-							WHList.push_back({ ActiveW,ActiveH + 1 });
+							VerticesList.push_back(NiPoint3(ActiveW * _InitFile.OneBlock_width, (ActiveH + 1) * _InitFile.OneBlock_height, VertexMap[ActiveW][ActiveH + 1].GetHeight()));
 							NormalList.push_back(TerrainWorld::ms_kUpDir);
 							ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
 							TextureList1.push_back(NiPoint2(PixelW * FirstWScale, (PixelH + 1) * FirstHScale));
@@ -325,8 +307,7 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 						{
 							info->TR = TriCt;
 							TriCt++;
-							VerticesList.push_back(NiPoint3((ActiveW + 1) * _InitFile.OneBlock_width, (ActiveH + 1) * _InitFile.OneBlock_height, VertexMap[ActiveW + 1][ActiveH + 1].Height));
-							WHList.push_back({ ActiveW + 1,ActiveH + 1 });
+							VerticesList.push_back(NiPoint3((ActiveW + 1) * _InitFile.OneBlock_width, (ActiveH + 1) * _InitFile.OneBlock_height, VertexMap[ActiveW + 1][ActiveH + 1].GetHeight()));
 							NormalList.push_back(TerrainWorld::ms_kUpDir);
 							ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
 							TextureList1.push_back(NiPoint2((PixelW + 1) * FirstWScale, (PixelH + 1) * FirstHScale));
@@ -409,10 +390,6 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 
 			Shape->SetConsistency(NiGeometryData::Consistency::MUTABLE);
 
-			for (int i = 0; i < WHList.size(); i++)
-			{
-				VertexMap[WHList[i].first][WHList[i].second].Data.push_back({ LayerNode, { &pkVertix[i],Shape->GetModelData() } });
-			}
 			LayerNode->AttachChild(Shape);
 		}
 	}

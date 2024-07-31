@@ -22,7 +22,39 @@ public:
 	virtual const char* GetName() { return "-"; }
 	virtual void Show(bool Show){}
 	virtual void Init() {}
-	void SetIntersect(NiPoint3 Intersect) { _Intersect = Intersect; }
+	/*float roundToNearest50or100(float number) {
+		// Extract the integer and fractional parts
+		int integerPart = static_cast<int>(number);
+
+		// Get the last two digits of the integer part
+		int lastTwoDigits = integerPart % 100;
+
+		// Determine the closest 0, 50, or 100
+		int lower = (lastTwoDigits / 50) * 50;
+		int upper = lower + 50;
+
+		int closest;
+		if (upper - lastTwoDigits < lastTwoDigits - lower) {
+			closest = upper;
+		}
+		else {
+			closest = lower;
+		}
+
+		// Adjust the integer part
+		int adjustment = closest - lastTwoDigits;
+		int adjustedIntegerPart = integerPart + adjustment;
+
+
+		return adjustedIntegerPart;
+	}*/
+	void SetIntersect(NiPoint3 Intersect) {
+		
+		_Intersect = Intersect;
+		//auto ini = kWorld->GetIniFile();
+		//_Intersect.x = roundToNearest50or100(std::round(_Intersect.x));
+		//_Intersect.y = roundToNearest50or100(std::round(_Intersect.y));
+	}
 	virtual void MouseClick() { InitMouse = true; }
 	void MouseRelease() { InitMouse = false; }
 	NiPoint3 GetIntersect() { return _Intersect; }
@@ -74,7 +106,7 @@ public:
 				int PreFullLines = Layer->BlendTexture->GetWidth() * h;
 				int YPartNormal = PreFullLines;
 				int PointOffsetNormal = XPart + YPartNormal;
-				if (_HTD[w][h].Height >= MinHeight && _HTD[w][h].Height <= MaxHeight)
+				if (_HTD[w][h].GetHeight() >= MinHeight && _HTD[w][h].GetHeight() <= MaxHeight)
 					pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)0xFF);
 				else
 					pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)0x0);

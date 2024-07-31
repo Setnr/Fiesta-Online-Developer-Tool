@@ -292,7 +292,7 @@ void LayerEditWindow::UpdateLayer(std::vector<std::vector<TerrainWorld::PointInf
 			int PreFullLines = Layer->BlendTexture->GetWidth() * h;
 			int YPartNormal = PreFullLines;
 			int PointOffsetNormal = XPart + YPartNormal;
-			if (_HTD[w][h].Height >= MinHeight && _HTD[w][h].Height <= MaxHeight)
+			if (_HTD[w][h].GetHeight() >= MinHeight && _HTD[w][h].GetHeight() <= MaxHeight)
 				pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)0xFF);
 			else
 				pixel[PointOffsetNormal] = TerrainLayer::RGBAColor((char)0x0);
