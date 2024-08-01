@@ -16,6 +16,9 @@ NiImplementRTTI(HTDTextureBrush, Brush);
 NiImplementRTTI(HTDBrush, Brush);
 NiImplementRTTI(VertexBrush, Brush);
 
+#define BrushSizeMax 100
+#define BrushSizeMin 0
+
 BrushPtr HTDBrush::Draw()
 {
 	BrushPtr ptr;
@@ -29,13 +32,13 @@ BrushPtr HTDBrush::Draw()
 
 	if (io.MouseWheel > 0.0f)
 	{
-		if (BrushSize <  20)
+		if (BrushSize < BrushSizeMax)
 			BrushSize++;
 		Node->SetScale((50.f / 160.f) * BrushSize);
 	}
 	if (io.MouseWheel < 0.0f) 
 	{
-		if (BrushSize > 1)
+		if (BrushSize > BrushSizeMin)
 			BrushSize--;
 		else
 			BrushSize = 1;
@@ -45,7 +48,7 @@ BrushPtr HTDBrush::Draw()
 	if (ImGui::Begin("HTDG-Editor"))
 	{
 		ImGui::LabelText("Current Brush", "%s", this->GetName());
-		if (ImGui::SliderInt("BrushSize", &BrushSize, 0, 20))
+		if (ImGui::SliderInt("BrushSize", &BrushSize, BrushSizeMin, BrushSizeMax))
 			Node->SetScale((50.f / 160.f) * BrushSize);
 
 		ImGui::LabelText("", "X: %.2f, Y: %.2f, Z: %.2f", _Intersect.x, _Intersect.y, _Intersect.z);
@@ -91,13 +94,13 @@ BrushPtr HTDTextureBrush::Draw()
 
 	if (io.MouseWheel > 0.0f)
 	{
-		if (BrushSize < 20)
+		if (BrushSize < BrushSizeMax)
 			BrushSize++;
 		Node->SetScale((50.f / 160.f) * BrushSize);
 	}
 	if (io.MouseWheel < 0.0f)
 	{
-		if (BrushSize > 1)
+		if (BrushSize > BrushSizeMin)
 			BrushSize--;
 		else
 			BrushSize = 1;
@@ -107,7 +110,7 @@ BrushPtr HTDTextureBrush::Draw()
 	if (ImGui::Begin("Color-Editor"))
 	{
 		ImGui::LabelText("Current Brush", "%s", this->GetName());
-		if (ImGui::SliderInt("BrushSize", &BrushSize, 0, 20))
+		if (ImGui::SliderInt("BrushSize", &BrushSize, BrushSizeMin, BrushSizeMax))
 			Node->SetScale((50.f / 160.f) * BrushSize);
 
 		ImGui::LabelText("", "X: %.2f, Y: %.2f, Z: %.2f", _Intersect.x, _Intersect.y, _Intersect.z);
@@ -196,13 +199,13 @@ BrushPtr VertexBrush::Draw()
 
 	if (io.MouseWheel > 0.0f)
 	{
-		if (BrushSize < 20)
+		if (BrushSize < BrushSizeMax)
 			BrushSize++;
 		Node->SetScale((50.f / 160.f) * BrushSize);
 	}
 	if (io.MouseWheel < 0.0f)
 	{
-		if (BrushSize > 1)
+		if (BrushSize > BrushSizeMin)
 			BrushSize--;
 		else
 			BrushSize = 1;
@@ -212,7 +215,7 @@ BrushPtr VertexBrush::Draw()
 	if (ImGui::Begin("VertexColor-Editor"))
 	{
 		ImGui::LabelText("Current Brush", "%s", this->GetName());
-		if (ImGui::SliderInt("BrushSize", &BrushSize, 0, 20))
+		if (ImGui::SliderInt("BrushSize", &BrushSize, BrushSizeMin, BrushSizeMax))
 			Node->SetScale((50.f / 160.f) * BrushSize);
 
 		ImGui::LabelText("", "X: %.2f, Y: %.2f, Z: %.2f", _Intersect.x, _Intersect.y, _Intersect.z);

@@ -327,10 +327,13 @@ public:
 
 	void SaveVertexColor(bool backup = false)
 	{
+		if (VertexMap.size() == 0)
+			return;
 		auto vertexpath = PgUtil::CreateFullFilePathFromBaseFolder(_InitFile.VertexColorTexture);
 		if (backup)
 			vertexpath += ".auto";
 		try {
+			
 			BMP bmp;
 			bmp.SetSize(VertexMap.size(), VertexMap[0].size());
 			for (int w = 0; w < VertexMap.size(); w++)

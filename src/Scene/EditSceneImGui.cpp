@@ -123,6 +123,10 @@ void EditScene::CreateMenuBar()
 		{
 			kWorld->GetIni().Save();
 		}
+		if (ImGui::MenuItem("Save VertexColor", 0, false, kWorld != NULL))
+		{
+			kWorld->SaveVertexColor();
+		}
 		if (ImGui::MenuItem("Save All", 0, false, kWorld != NULL))
 		{
 			this->SaveAll();
@@ -230,6 +234,12 @@ void EditScene::ShowAboutWindow()
 			ImGui::Text("F1 to Show/Hide SHMD-Objects");
 			break;
 		case VertexColor:
+			ImGui::Text("Move Camera with WASD");
+			ImGui::Text("Rotate Camera with Right Click");
+			ImGui::Text("Move Up/Down with Q/E");
+			ImGui::Text("Scroll to resize Brush");
+			ImGui::Text("Copy the Color of the Current Hovered Vertex ctrl + c");
+			ImGui::Text("F1 to Show/Hide SHMD-Objects");
 			break;
 		case None:
 		default:
