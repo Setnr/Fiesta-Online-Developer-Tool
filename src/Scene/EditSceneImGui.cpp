@@ -695,7 +695,7 @@ void EditScene::DrawTextureEditor()
 
 	ImGui::SetWindowPos("Texture Editor", ImVec2(io.DisplaySize.x - 380, io.DisplaySize.y - 230));
 	ImGui::SetWindowSize(ImVec2(380, 230.f));
-	if (ImGui::Begin("Texture Editor", 0, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoMove || ImGuiWindowFlags_NoResize))
+	if (ImGui::Begin("Texture Editor", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
 	{
 		if (ImGui::Button("Reload World"))
 		{
@@ -796,12 +796,6 @@ void EditScene::DrawTextureEditor()
 			ImGui::EndChild();
 		}
 		ImGui::End();
-	}
-	if (NiIsKindOf(HTDTextureBrush, _Brush))
-	{
-		HTDTextureBrushPtr ptr = NiSmartPointerCast(HTDTextureBrush, _Brush);
-		if(ptr->UpdateTerrain())
-			kWorld->CreateTerrainLayer(SelectedLayer);
 	}
 	
 

@@ -158,11 +158,7 @@ public:
 			FiestaOnlineTool::AddScreenElemets(obj);
 		}
 	}
-	bool UpdateTerrain() {
-		bool ret = _UpdateTerrain;
-		_UpdateTerrain = false;
-		return ret;
-	}
+
 	virtual void DrawInternal() 
 	{
 		if (!pScreenElementTextureEdit)
@@ -230,8 +226,6 @@ public:
 		}
 	}
 protected:
-	void UpdateHTD();
-	bool _UpdateTerrain = false;
 	float MinHeight = 0.0f;
 	float MaxHeight = 0.1f;
 	std::shared_ptr<TerrainLayer> Layer;
