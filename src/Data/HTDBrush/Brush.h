@@ -5,6 +5,7 @@
 #include "../IngameWorld.h"
 #include <NiRTTI.h>
 #include "../../NiApplication/FiestaOnlineTool.h"
+
 NiSmartPointer(Brush);
 NiSmartPointer(HTDBrush);
 NiSmartPointer(HTDTextureBrush);
@@ -48,7 +49,7 @@ public:
 
 		return adjustedIntegerPart;
 	}*/
-	void SetIntersect(NiPoint3 Intersect) {
+	virtual void SetIntersect(NiPoint3 Intersect) {
 		
 		_Intersect = Intersect;
 		//auto ini = kWorld->GetIniFile();
@@ -237,4 +238,24 @@ protected:
 	int LayerCt = 1;
 	NiScreenElementsPtr pScreenElementTextureEdit;
 	NiScreenElementsPtr pScreenElementTexturePreview;
+};
+
+class VertexBrush : public Brush
+{
+	NiDeclareRTTI;
+public:
+	VertexBrush(TerrainWorldPtr kWorld, NiNodePtr HTDOrbNode, int BrushSize) : Brush(kWorld, HTDOrbNode, BrushSize) {}
+	virtual BrushPtr Draw();
+	virtual void SetIntersect(NiPoint3 Intersect) 
+	{
+		Brush::SetIntersect(Intersect);
+		
+		IniFile& _InitFile = kWorld->GetIniFile();
+		int middlew = _Intersect.x / _InitFile.OneBlock_width;
+		int middleh = _Intersect.y / _InitFile.OneBlock_height;
+		std::vector<std::vector<TerrainWorld::PointInfos>>& htd = kWorld->GetHTD();
+		CurColor = htd[middlew][middleh].VertexColor;
+	}
+protected:
+	NiColorA CurColor;
 };

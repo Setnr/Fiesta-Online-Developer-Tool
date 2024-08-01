@@ -304,4 +304,5 @@ public:
         int xPixel = (data->GetWidth() * x);
         return { xPixel,yPixel };
     }
+
 };

@@ -92,6 +92,8 @@
     <ClInclude Include="src\Data\HTDBrush\SmoothingBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\TextureBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\TextureSmoothingBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\VertexBrush\ColorBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\VertexBrush\SmoothingBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\WorleyBrush.h" />
     <ClInclude Include="src\Data\IngameWorld.h" />
     <ClInclude Include="src\Data\IniFile.h" />

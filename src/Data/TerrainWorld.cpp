@@ -109,14 +109,27 @@ bool TerrainWorld::LoadTerrain()
 	NiImageConverter* conv = NiImageConverter::GetImageConverter();
 	std::string VertexShadowPath = PgUtil::CreateFullFilePathFromBaseFolder(_InitFile.VertexColorTexture);
 	NiPixelDataPtr VertexShadowImage = conv->ReadImageFile(VertexShadowPath.c_str(), 0);
-
-	auto VertexColorArray = (TerrainLayer::RGBColor*)VertexShadowImage->GetPixels();
+	NiPixelFormat format = VertexShadowImage->GetPixelFormat();
+	TerrainLayer::RGBColor* VertexColorArray = NULL;
+	TerrainLayer::RGBAColor* VertexColorArrayA = NULL;
+	if(format == NiPixelFormat::RGB24)
+		VertexColorArray = (TerrainLayer::RGBColor*)VertexShadowImage->GetPixels();
+	else 
+	{
+		if (format == NiPixelFormat::RGBA32)
+			VertexColorArrayA = (TerrainLayer::RGBAColor*)VertexShadowImage->GetPixels();
+		else
+			LogError("Not Supported NiPixelFormat for VertexColorTexture");
+	}
 	int PixelCounter = 0;
 	for (int h = 0; h < VertexShadowImage->GetHeight(); h++)
 	{
 		for (int w = 0; w < VertexShadowImage->GetWidth(); w++)
 		{
-			VertexMap[w][VertexShadowImage->GetHeight() - h - 1].VertexColor = NiColorA(static_cast<float>(VertexColorArray[PixelCounter].r) / 255.0f, static_cast<float>(VertexColorArray[PixelCounter].g) / 255.f, static_cast<float>(VertexColorArray[PixelCounter].b) / 255.f, 1.0f);
+			if(VertexColorArray)
+				VertexMap[w][VertexShadowImage->GetHeight() - h - 1].VertexColor = NiColorA(static_cast<float>(VertexColorArray[PixelCounter].r) / 255.0f, static_cast<float>(VertexColorArray[PixelCounter].g) / 255.f, static_cast<float>(VertexColorArray[PixelCounter].b) / 255.f, 1.0f);
+			if(VertexColorArrayA)
+				VertexMap[w][VertexShadowImage->GetHeight() - h - 1].VertexColor = NiColorA(static_cast<float>(VertexColorArrayA[PixelCounter].r) / 255.0f, static_cast<float>(VertexColorArrayA[PixelCounter].g) / 255.f, static_cast<float>(VertexColorArrayA[PixelCounter].b) / 255.f, static_cast<float>(VertexColorArrayA[PixelCounter].a) / 255.f);
 
 			PixelCounter++;
 		}

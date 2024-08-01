@@ -7,7 +7,7 @@
 #include <mutex>
 #include "../Data/IniFile.h"
 #include "PgUtil.h"
-
+#include "../../Includes/EasyBMP/EasyBMP.h"
 
 NiSmartPointer(TerrainWorld);
 class TerrainWorld : public NiRefObject
@@ -323,6 +323,39 @@ public:
 
 		}
 		return vec;
+	}
+
+	void SaveVertexColor(bool backup = false)
+	{
+		auto vertexpath = PgUtil::CreateFullFilePathFromBaseFolder(_InitFile.VertexColorTexture);
+		if (backup)
+			vertexpath += ".auto";
+		try {
+			BMP bmp;
+			bmp.SetSize(VertexMap.size(), VertexMap[0].size());
+			for (int w = 0; w < VertexMap.size(); w++)
+			{
+				for (int h = VertexMap[0].size() - 1; h >= 0; h--)
+				{
+					RGBApixel pixel;
+					pixel.Red =static_cast<unsigned char> (VertexMap[w][h].VertexColor.r * 255.f);
+					pixel.Green = static_cast<unsigned char> (VertexMap[w][h].VertexColor.g * 255.f);
+					pixel.Blue = static_cast<unsigned char> (VertexMap[w][h].VertexColor.b * 255.f);
+					pixel.Alpha = static_cast<unsigned char> (VertexMap[w][h].VertexColor.a * 255.f);
+					bmp.SetPixel(w, VertexMap[0].size() - h - 1, pixel);
+				}
+			}
+			bmp.WriteToFile(vertexpath.c_str());
+			}
+		catch (std::exception e)
+		{
+			LogError("Failed to safe: " + vertexpath);
+			LogError("Error-Msg: " + e.what());
+		}
+		catch (...)
+		{
+			LogError("Failed to safe: " + vertexpath);
+		}
 	}
 protected:
 #pragma region WorldStructureNodes

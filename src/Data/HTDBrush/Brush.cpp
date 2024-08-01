@@ -8,10 +8,13 @@
 #include "PixelBrush.h"
 #include "TextureSmoothingBrush.h"
 #include "PerlinTextureBrush.h"
+#include "./VertexBrush/ColorBrush.h"
+#include "./VertexBrush/SmoothingBrush.h"
 
 NiImplementRootRTTI(Brush);
 NiImplementRTTI(HTDTextureBrush, Brush);
 NiImplementRTTI(HTDBrush, Brush);
+NiImplementRTTI(VertexBrush, Brush);
 
 BrushPtr HTDBrush::Draw()
 {
@@ -178,4 +181,56 @@ void HTDTextureBrush::ChangeLayer(std::shared_ptr<TerrainLayer> Layer)
 	pScreenElementTextureEdit->UpdateBound();
 	ShowScreenElement(pScreenElementTextureEdit);
 	UpdateTexturePreview();
+}
+
+BrushPtr VertexBrush::Draw()
+{
+	BrushPtr ptr;
+	ImGuiIO& io = ImGui::GetIO();
+	auto flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove;
+
+	int h = 295;
+	int w = 400;
+	ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - w, io.DisplaySize.y - h));
+	ImGui::SetNextWindowSize(ImVec2(w, h));
+
+	if (io.MouseWheel > 0.0f)
+	{
+		if (BrushSize < 20)
+			BrushSize++;
+		Node->SetScale((50.f / 160.f) * BrushSize);
+	}
+	if (io.MouseWheel < 0.0f)
+	{
+		if (BrushSize > 1)
+			BrushSize--;
+		else
+			BrushSize = 1;
+		Node->SetScale((50.f / 160.f) * BrushSize);
+	}
+
+	if (ImGui::Begin("VertexColor-Editor"))
+	{
+		ImGui::LabelText("Current Brush", "%s", this->GetName());
+		if (ImGui::SliderInt("BrushSize", &BrushSize, 0, 20))
+			Node->SetScale((50.f / 160.f) * BrushSize);
+
+		ImGui::LabelText("", "X: %.2f, Y: %.2f, Z: %.2f", _Intersect.x, _Intersect.y, _Intersect.z);
+		ImGui::SameLine();
+		ImGui::ColorButton("Current Color", *(ImVec4*)&CurColor);
+		ImGui::BeginChild("BrushChildL", ImVec2(100, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+		bool s;
+		if (ImGui::Selectable("Color Brush", &s))
+			ptr = NiNew ColorBrush(kWorld, Node, BrushSize);
+		if (ImGui::Selectable("Smoothing Brush", &s))
+			ptr = NiNew VertexSmoothingBrush(kWorld, Node, BrushSize);
+
+		ImGui::EndChild();
+		ImGui::SameLine();
+		this->DrawInternal();
+		ImGui::End();
+	}
+	if (ptr)
+		ptr->Init();
+	return ptr;
 }

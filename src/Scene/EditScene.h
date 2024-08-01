@@ -81,6 +81,7 @@ private:
 		kWorld->SaveSHBD();
 		kWorld->SaveHTDG();
 		kWorld->GetIniFile().Save();
+		kWorld->SaveVertexColor();
 	}
 	void SaveAllBackUp() 
 	{
@@ -90,6 +91,7 @@ private:
 		kWorld->SaveSHBD(true);
 		kWorld->SaveHTDG(true);
 		kWorld->GetIniFile().Save(true);
+		kWorld->SaveVertexColor(true);
 	}
 	int BrushSize = 0;
 	bool MoveStatus = false;
@@ -133,7 +135,7 @@ private:
 				_Brush = NiNew HTDTextureBrush(SelectedLayer,NiSmartPointerCast(TerrainWorld, kWorld), HTDOrbNode, 5);
 			break;
 		case EditScene::VertexColor:
-			_Brush = NiNew HTDBrush(NiSmartPointerCast(TerrainWorld, kWorld), HTDOrbNode, 5);
+			_Brush = NiNew VertexBrush(NiSmartPointerCast(TerrainWorld, kWorld), HTDOrbNode, 5);
 			break;
 		default:
 			break;

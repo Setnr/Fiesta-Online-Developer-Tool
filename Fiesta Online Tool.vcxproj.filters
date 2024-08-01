@@ -82,6 +82,9 @@
     <Filter Include="Data\Brushes\HTDTextureBrush">
       <UniqueIdentifier>{1f71426e-3f0a-4dff-b2f2-6be04db2146e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Brushes\VertexBrush">
+      <UniqueIdentifier>{4cfc03ca-8bec-44e6-916c-6f588ec9790b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CustomNi\NiFileLoader.h">
@@ -283,6 +286,12 @@
     </ClInclude>
     <ClInclude Include="src\Data\HTDBrush\PerlinTextureBrush.h">
       <Filter>Data\Brushes\HTDBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\VertexBrush\ColorBrush.h">
+      <Filter>Data\Brushes\VertexBrush</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Data\HTDBrush\VertexBrush\SmoothingBrush.h">
+      <Filter>Data\Brushes\VertexBrush</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
