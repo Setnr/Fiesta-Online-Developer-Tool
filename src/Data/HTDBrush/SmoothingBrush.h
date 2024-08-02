@@ -17,6 +17,11 @@ public:
 
 	virtual void Update()
 	{
+		float CurTime = NiGetCurrentTimeInSec();
+		if (UpdateTime + 0.05f > CurTime)
+			return;
+		UpdateTime = CurTime;
+
 		IniFile& _InitFile = kWorld->GetIniFile();;
 		std::vector<std::vector<TerrainWorld::PointInfos>>& HTD = kWorld->GetHTD();
 		
@@ -97,4 +102,5 @@ public:
 private:
 	int KernelSize = 3;
 	int Cycles = 5;
+	float UpdateTime = 0.f;
 };

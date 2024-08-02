@@ -114,13 +114,16 @@ BrushPtr HTDTextureBrush::Draw()
 			Node->SetScale((50.f / 160.f) * BrushSize);
 
 		ImGui::LabelText("", "X: %.2f, Y: %.2f, Z: %.2f", _Intersect.x, _Intersect.y, _Intersect.z);
-		if (ImGui::DragFloat("Min Height", &MinHeight,1.f,-5000.f,MaxHeight))
+		if(ImGui::CollapsingHeader("Full Editing"))
 		{
-			UpdateViaHeight();
-		}
-		if (ImGui::DragFloat("Max Height", &MaxHeight, 1.f, MinHeight, 5000.f))
-		{
-			UpdateViaHeight();
+			if (ImGui::DragFloat("Min Height", &MinHeight, 1.f, -5000.f, MaxHeight))
+			{
+				UpdateViaHeight();
+			}
+			if (ImGui::DragFloat("Max Height", &MaxHeight, 1.f, MinHeight, 5000.f))
+			{
+				UpdateViaHeight();
+			}
 		}
 		ImGui::BeginChild("BrushChildL", ImVec2(100, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 		bool s;

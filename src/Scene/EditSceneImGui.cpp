@@ -10,6 +10,7 @@
 #include <NiPick.h>
 #include "FiestaOnlineTool.h"
 #include "MapCreateScene.h"
+#include <algorithm>
 
 
 glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
@@ -723,7 +724,9 @@ void EditScene::DrawTextureEditor()
 					SelectedLayer->BlendFileName = PgUtil::GetMapFolderPath(_Info->KingdomMap, _Info->MapFolderName) + SelectedLayer->Name + ".bmp";
 				else
 					LogError("MapInfo is Nullptr!");
-
+				if (std::find_if(Ini.LayerList.begin(), Ini.LayerList.end(), [&](const auto& val) {return SelectedLayer->Name == val->Name; })
+					!= Ini.LayerList.end())
+					SelectedLayer->Name += "_";
 				Ini.LayerList.push_back(SelectedLayer);
 			}
 			for (auto layer : Ini.LayerList)
