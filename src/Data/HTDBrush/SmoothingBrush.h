@@ -2,14 +2,14 @@
 #include "Brush.h"
 #include <vector>
 NiSmartPointer(World);
-class SmoothingBrush : public HTDBrush 
+class SmoothingBrush : public HTDBrush
 {
 public:
-	SmoothingBrush(TerrainWorldPtr kWorld, NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(kWorld, HTDOrbNode, BrushSize){}
-	virtual void DrawInternal() 
+	SmoothingBrush(TerrainWorldPtr kWorld, NiNodePtr HTDOrbNode, int BrushSize) : HTDBrush(kWorld, HTDOrbNode, BrushSize) {}
+	virtual void DrawInternal()
 	{
-		ImGui::BeginChild("BrushChildR", ImVec2(0,0), false, ImGuiWindowFlags_HorizontalScrollbar);
-		ImGui::DragInt("Kernel Size", &KernelSize,2.f,3,21);
+		ImGui::BeginChild("BrushChildR", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+		ImGui::DragInt("Kernel Size", &KernelSize, 2.f, 3, 21);
 		ImGui::DragInt("Cycles", &Cycles, 1.f, 1, 20);
 		ImGui::EndChild();
 	}
@@ -17,9 +17,14 @@ public:
 
 	virtual void Update()
 	{
+		float CurTime = NiGetCurrentTimeInSec();
+		if (UpdateTime + 0.05f > CurTime)
+			return;
+		UpdateTime = CurTime;
+
 		IniFile& _InitFile = kWorld->GetIniFile();;
 		std::vector<std::vector<TerrainWorld::PointInfos>>& HTD = kWorld->GetHTD();
-		
+
 		int middlew = _Intersect.x / _InitFile.OneBlock_width;
 		int middleh = _Intersect.y / _InitFile.OneBlock_height;
 
@@ -27,19 +32,19 @@ public:
 
 		for (int cycle = 0; cycle < Cycles; cycle++)
 		{
-			int AdjustedBrushSize = BrushSize;
-			if (cycle == Cycles - 1)
-				AdjustedBrushSize += (BrushSize / 10 + 3);
-			for (int w = middlew - AdjustedBrushSize; w <= middlew + AdjustedBrushSize && w + KernelSize / 2 < (int)HTD.size(); w++)
+			int CurBrushSize = BrushSize + cycle;
+			for (int w = middlew - CurBrushSize; w <= middlew + CurBrushSize && w + KernelSize / 2 < (int)HTD.size(); w++)
 			{
 				if (w - KernelSize / 2 < 0)
 					continue;
-				for (int h = middleh - AdjustedBrushSize; h <= middleh + AdjustedBrushSize && h + KernelSize / 2 < (int)HTD[w].size(); h++)
+				for (int h = middleh - CurBrushSize; h <= middleh + CurBrushSize && h + KernelSize / 2 < (int)HTD[w].size(); h++)
 				{
+
 					if (h - KernelSize / 2 < 0)
 						continue;
-					if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= AdjustedBrushSize * AdjustedBrushSize))
+					if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= CurBrushSize * CurBrushSize))
 						continue;
+					
 					float Sum = 0.f;
 					int StartI = -1 * (KernelSize / 2);
 					int EndI = KernelSize / 2;
@@ -52,6 +57,7 @@ public:
 							Sum += HTD[w - i][h - j].GetHeight() * KernelValue;
 						}
 					}
+
 					HTD[w][h].HTDGHeight = Sum - HTD[w][h].HTDHeight;
 					for (auto point : kWorld->GetHTDPoints(w, h))
 					{
@@ -68,4 +74,5 @@ public:
 private:
 	int KernelSize = 3;
 	int Cycles = 5;
+	float UpdateTime = 0.f;
 };
