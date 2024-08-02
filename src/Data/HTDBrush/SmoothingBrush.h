@@ -24,58 +24,35 @@ public:
 		int middleh = _Intersect.y / _InitFile.OneBlock_height;
 
 		float KernelValue = 1 / static_cast<float>(KernelSize * KernelSize);
-		std::vector<std::vector<float>> KernelMap((BrushSize + 1) * 2);
-		for (int w = 0; w < (BrushSize + 1) * 2; w++) 
-		{
-			KernelMap[w] = std::vector<float>((BrushSize + 1) * 2);
-		}
-		int WHelper = 0;
-		int HHelper = 0;
-		for (int w = middlew - BrushSize; w <= middlew + BrushSize && w + KernelSize / 2 < (int)HTD.size(); w++)
-		{
-			if (w - KernelSize / 2 < 0)
-				continue;
-			for (int h = middleh - BrushSize; h <= middleh + BrushSize && h + KernelSize / 2 < (int)HTD[w].size(); h++)
-			{
-				if (h - KernelSize / 2 < 0)
-					continue;
-				if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
-					continue;
-				float Sum = 0.f;
-				int StartI = -1 * (KernelSize / 2);
-				int EndI = KernelSize / 2;
-				int StartJ = -1 * (KernelSize / 2);
-				int EndJ = KernelSize / 2;
-				for (int i = StartI; i <= EndI; i++)
-				{
-					for (int j = StartJ; j <= EndJ; j++)
-					{
-						Sum += HTD[w - i][h - j].GetHeight() * KernelValue;
-					}
-				}
-				KernelMap[WHelper][HHelper] = Sum;
-				HHelper++;
-			}
-			HHelper = 0;
-			WHelper++;
-		}
 
-		for(int cycle = 0; cycle < Cycles; cycle++)
+		for (int cycle = 0; cycle < Cycles; cycle++)
 		{
-			WHelper = 0;
-			HHelper = 0;
-			for (int w = middlew - BrushSize; w <= middlew + BrushSize && w + KernelSize / 2 < (int)HTD.size(); w++)
+			int AdjustedBrushSize = BrushSize;
+			if (cycle == Cycles - 1)
+				AdjustedBrushSize += (BrushSize / 10 + 3);
+			for (int w = middlew - AdjustedBrushSize; w <= middlew + AdjustedBrushSize && w + KernelSize / 2 < (int)HTD.size(); w++)
 			{
 				if (w - KernelSize / 2 < 0)
 					continue;
-				for (int h = middleh - BrushSize; h <= middleh + BrushSize && h + KernelSize / 2 < (int)HTD[w].size(); h++)
+				for (int h = middleh - AdjustedBrushSize; h <= middleh + AdjustedBrushSize && h + KernelSize / 2 < (int)HTD[w].size(); h++)
 				{
 					if (h - KernelSize / 2 < 0)
 						continue;
-					if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
+					if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= AdjustedBrushSize * AdjustedBrushSize))
 						continue;
-
-					HTD[w][h].HTDGHeight = KernelMap[WHelper][HHelper] - HTD[w][h].HTDHeight;
+					float Sum = 0.f;
+					int StartI = -1 * (KernelSize / 2);
+					int EndI = KernelSize / 2;
+					int StartJ = -1 * (KernelSize / 2);
+					int EndJ = KernelSize / 2;
+					for (int i = StartI; i <= EndI; i++)
+					{
+						for (int j = StartJ; j <= EndJ; j++)
+						{
+							Sum += HTD[w - i][h - j].GetHeight() * KernelValue;
+						}
+					}
+					HTD[w][h].HTDGHeight = Sum - HTD[w][h].HTDHeight;
 					for (auto point : kWorld->GetHTDPoints(w, h))
 					{
 						if (point.NiPoint)
@@ -83,15 +60,9 @@ public:
 						if (point.NiGeometry)
 							point.NiGeometry->MarkAsChanged(NiGeometryData::VERTEX_MASK);
 					}
-
-					
-					HHelper++;
 				}
-				HHelper = 0;
-				WHelper++;
 			}
 		}
-		KernelMap.clear();
 	}
 
 private:
