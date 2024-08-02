@@ -366,7 +366,11 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 
 			NiTexturingPropertyPtr pkTP = NiNew NiTexturingProperty();
 			NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
-			//alphaprop->SetDestBlendMode(NiAlphaProperty::ALPHA_ZERO);
+			//alphaprop->SetAlphaBlending(true);
+			//alphaprop->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
+			//alphaprop->SetDestBlendMode(NiAlphaProperty::ALPHA_INVSRCALPHA);
+			//alphaprop->SetAlphaTesting(true);
+			//alphaprop->SetTestMode(NiAlphaProperty::TestFunction::TEST_ALWAYS);
 
 			BaseTextureMap->SetTexture(BaseTexture);
 			BlendTextureMap->SetTexture(BlendTexture);
