@@ -124,20 +124,67 @@ bool FiestaOnlineTool::Initialize()
 bool FiestaOnlineTool::CreateRenderer()
 {
     char Flag = NiDX9Renderer::USE_NOFLAGS;
-    Flag = NiDX9Renderer::USE_MULTITHREADED;//  | NiDX9Renderer::USE_STENCIL | NiDX9Renderer::USE_FULLSCREEN| NiDX9Renderer::USE_16BITBUFFERS;//  
+    Flag = NiDX9Renderer::USE_MULTITHREADED  | NiDX9Renderer::USE_STENCIL;// | NiDX9Renderer::USE_FULLSCREEN| NiDX9Renderer::USE_16BITBUFFERS;//  
 
     //m_spRenderer = NiDX9Select::CreateRenderer(this->GetWindowReference(), this->GetWindowReference(), true, this->m_uiBitDepth, this->GetAppWindow()->GetWidth(), this->GetAppWindow()->GetHeight(), this->m_bStencil, this->m_bMultiThread, this->m_bRefRast, this->m_bSWVertex, this->m_bNVPerfHUD, this->m_bFullscreen);
-    if (Settings::FullScreen())
+    /*if (Settings::FullScreen())
     {
         Flag = Flag | NiDX9Renderer::USE_FULLSCREEN;
-
+    }*/
+    if (Settings::FullScreen())
+    {
+        auto witdh = GetSystemMetrics(0);
+        auto height = GetSystemMetrics(1);
+        _Tool->m_pkAppWindow->SetWidth(witdh);
+        _Tool->m_pkAppWindow->SetHeight(height);
+        _devicemodeA dm;
+        dm.dmSize = 156;
+        dm.dmFields = 1835008;
+        dm.dmBitsPerPel = 32;
+        dm.dmPelsWidth = _Tool->m_pkAppWindow->GetWidth();
+        dm.dmPelsHeight = _Tool->m_pkAppWindow->GetHeight();
+        auto v4 = GetWindowLongA(_Tool->m_pkAppWindow->GetWindowReference(), -16);
+        SetWindowLongA(_Tool->m_pkAppWindow->GetWindowReference(), -16, v4 & 0xFF37FFFF | 0x80);
+        if (!ChangeDisplaySettingsA(&dm, 2u))
+        {
+            if (ChangeDisplaySettingsA(&dm, 4u))
+                ChangeDisplaySettingsA(&dm, 0);
+            ShowWindow(_Tool->m_pkAppWindow->GetWindowReference(), 3);
+            auto v5 = _Tool->m_pkAppWindow;
+            auto v6 = 0;
+            NiStatusWindowRef v7;
+            bool v8;
+            tagRECT statusRect;
+            if (v5->GetNumStatusPanes() && (v7 = v5->GetStatusWindowReference()) != 0)
+            {
+                auto hStatusWnd = *v7;
+                v8 = IsWindow(_Tool->m_pkAppWindow->GetWindowReference());
+            }
+            else
+            {
+                auto hStatusWnd = 0;
+                v8 = IsWindow(0);
+            }
+            if (v8)
+            {
+                GetWindowRect(_Tool->m_pkAppWindow->GetWindowReference(), &statusRect);
+                v6 = statusRect.bottom - statusRect.top;
+                ShowWindow(_Tool->m_pkAppWindow->GetWindowReference(), 0);
+            }
+            SetWindowPos(_Tool->m_pkAppWindow->GetWindowReference(), 0, 0, 0, _Tool->m_pkAppWindow->GetWidth(), _Tool->m_pkAppWindow->GetHeight() + v6, 0);
+        }
     }
     m_spRenderer = NiDX9Renderer::Create(this->m_pkAppWindow->GetWidth(), this->m_pkAppWindow->GetHeight(), Flag, this->m_pkAppWindow->GetWindowReference(), this->m_pkAppWindow->GetRenderWindowReference());
+
     //NiDX9Renderer* rend = (NiDX9Renderer*)&*m_spRenderer;
     //rend->CreateSwapChainRenderTargetGroup(Flag,)
+   
     if (m_spRenderer == NULL)
+    {
         NiMessageBox::DisplayMessage("Failed to Create Renderer, \ntry to downscale your Resolution in Settings.ini", "Error");
-
+        NiMessageBox::DisplayMessage(NiRenderer::GetLastErrorString(), "Msg");
+    }
+        
     if (m_spRenderer != NULL)
     {
         std::string LoadingScreen = PgUtil::CreateFullFilePathFromBaseFolder(".\\resmenu\\loading\\NowLoading.tga");
@@ -145,6 +192,7 @@ bool FiestaOnlineTool::CreateRenderer()
     }
     return (m_spRenderer != NULL);
 }
+
 void PgUtil::LoadingScreen(NiRenderer* Renderer, std::string LoadingScreen, float Percent, bool Map = true)
 {
 
