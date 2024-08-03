@@ -108,33 +108,46 @@ void EditScene::CreateMenuBar()
         {
             ShowSettingsMenu = true;
         }
-        if (ImGui::MenuItem("Save SHMD", 0, false, kWorld != NULL))
-        {
-            kWorld->SaveSHMD();
-        }
-        if (ImGui::MenuItem("Save SHBD", 0, false, kWorld != NULL))
-        {
-            kWorld->SaveSHBD();
-        }
-		if (ImGui::MenuItem("Save HTDG", 0, false, kWorld != NULL))
-		{
-			kWorld->SaveHTDG();
-		}
-		if (ImGui::MenuItem("Save Ini", 0, false, kWorld != NULL))
-		{
-			kWorld->GetIni().Save();
-		}
-		if (ImGui::MenuItem("Save VertexColor", 0, false, kWorld != NULL))
-		{
-			kWorld->SaveVertexColor();
-		}
 		if (ImGui::MenuItem("Save All", 0, false, kWorld != NULL))
 		{
 			this->SaveAll();
 		}
-		if (ImGui::MenuItem("Export HTD as NIF", 0, false, kWorld != NULL))
+		if (ImGui::BeginMenu("Save")) 
 		{
-			PgUtil::SaveNode(PgUtil::CreateFullFilePathFromBaseFolder(kWorld->GetFolderPath() + "Export.nif"), kWorld->GetTerrainScene());
+			if (ImGui::MenuItem("Save SHMD", 0, false, kWorld != NULL))
+			{
+				kWorld->SaveSHMD();
+			}
+			if (ImGui::MenuItem("Save SHBD", 0, false, kWorld != NULL))
+			{
+				kWorld->SaveSHBD();
+			}
+			if (ImGui::MenuItem("Save HTDG", 0, false, kWorld != NULL))
+			{
+				kWorld->SaveHTDG();
+			}
+			if (ImGui::MenuItem("Save Ini", 0, false, kWorld != NULL))
+			{
+				kWorld->GetIni().Save();
+			}
+			if (ImGui::MenuItem("Save VertexColor", 0, false, kWorld != NULL))
+			{
+				kWorld->SaveVertexColor();
+			}
+			
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Export")) 
+		{
+			if (ImGui::MenuItem("Export HTD-Data as NIF", 0, false, kWorld != NULL))
+			{
+				PgUtil::SaveNode(PgUtil::CreateFullFilePathFromBaseFolder(kWorld->GetFolderPath() + "Export.nif"), kWorld->GetTerrainScene());
+			}
+			if (ImGui::MenuItem("Export HTD-Data as R32", 0, false, kWorld != NULL))
+			{
+				kWorld->CreateR32();
+			}
+			ImGui::EndMenu();
 		}
         ImGui::EndMenu();
 	}

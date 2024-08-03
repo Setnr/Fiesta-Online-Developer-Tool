@@ -310,3 +310,59 @@ void World::SaveHTDG(bool Backup)
 		<< std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms)";
 	LogInfo(oss.str());
 }
+
+void World::CreateR32()
+{
+	if (_InitFile.HeightFileName == "")
+	{
+		LogInfo("This map does not have a HTD-Data to export");
+		return;
+	}
+	auto start = std::chrono::steady_clock::now();
+
+	std::string HTDPath = PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapName, "HTD.r32");
+	std::string HTDGPath = PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapName, "HTDG.r32");
+	std::string FullPath = PgUtil::CreateFilePathFromMapInfo(_Info->KingdomMap, _Info->MapName, "Full.r32");
+
+	if (std::filesystem::exists(HTDPath))
+		std::filesystem::remove(HTDPath);
+	if (std::filesystem::exists(HTDGPath))
+		std::filesystem::remove(HTDGPath);
+	if (std::filesystem::exists(FullPath))
+		std::filesystem::remove(FullPath);
+
+	int Size = _InitFile.HeightMap_height * _InitFile.HeightMap_width;
+
+	std::ofstream HTDFile;
+	std::ofstream HTDGFile;
+	std::ofstream FullFile;
+
+	HTDFile.open(HTDPath, std::ios::binary);
+	HTDGFile.open(HTDGPath, std::ios::binary);
+	FullFile.open(FullPath, std::ios::binary);
+
+	HTDFile.write((char*)&Size, sizeof(Size));
+	HTDGFile.write((char*)&Size, sizeof(Size));
+	FullFile.write((char*)&Size, sizeof(Size));
+
+	for (int h = 0; h < _InitFile.HeightMap_height; h++)
+	{
+		for (int w = 0; w < _InitFile.HeightMap_width; w++)
+		{
+			float Height = VertexMap[w][h].GetHeight();
+			float HTD = VertexMap[w][h].HTDHeight;
+			float HTDG = Height - HTD;
+			HTDFile.write((char*)&HTD, sizeof(HTD));
+			HTDGFile.write((char*)&HTDG, sizeof(HTDG));
+			FullFile.write((char*)&Height, sizeof(Height));
+		
+		}
+	}
+
+	HTDFile.close();
+	HTDGFile.close();
+	FullFile.close();
+
+	LogTime("Exported R32 in " , start);
+
+}

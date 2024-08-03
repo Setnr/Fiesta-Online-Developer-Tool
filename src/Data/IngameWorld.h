@@ -49,6 +49,7 @@ public:
 
 	void ShowHTDG(bool ShowOrbNode, bool ShowObjecs, NiNodePtr OrbNode);
 	void SaveHTDG(bool Backup = false);
+	void CreateR32();
 
 	std::vector<std::vector<PointInfos>>& GetHTD() { return VertexMap; }
 	IniFile& GetIni() { return _InitFile; }

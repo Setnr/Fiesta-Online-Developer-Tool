@@ -360,6 +360,7 @@ public:
 			LogError("Failed to safe: " + vertexpath);
 		}
 	}
+	
 protected:
 #pragma region WorldStructureNodes
 	NiNodePtr m_spLightArea;
