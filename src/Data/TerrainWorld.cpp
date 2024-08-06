@@ -4,6 +4,7 @@
 #include <future>
 #include "../Logger/Logger.h"
 #include <NiPick.h>
+
 NiPoint3 TerrainWorld::ms_kUpDir = NiPoint3(0.0, 0.0, 1.0);
 NiPoint3 TerrainWorld::ms_kDownDir = NiPoint3(0.0, 0.0, -1.0);
 NiPoint3 TerrainWorld::ms_kNorthDir = NiPoint3(0.0, 1.0, 0.0);
@@ -366,7 +367,7 @@ void TerrainWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer
 
 			NiTexturingPropertyPtr pkTP = NiNew NiTexturingProperty();
 			NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
-			//alphaprop->SetAlphaBlending(true);
+			//alphaprop->SetAlphaBlending(false);
 			//alphaprop->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
 			//alphaprop->SetDestBlendMode(NiAlphaProperty::ALPHA_INVSRCALPHA);
 			//alphaprop->SetAlphaTesting(true);

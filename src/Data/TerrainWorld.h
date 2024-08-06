@@ -360,7 +360,6 @@ public:
 			LogError("Failed to safe: " + vertexpath);
 		}
 	}
-	
 protected:
 #pragma region WorldStructureNodes
 	NiNodePtr m_spLightArea;
@@ -400,6 +399,9 @@ protected:
 	NiColor BackgroundColor;
 #pragma endregion
 	bool LoadedSuccessfully = false;
+
+	virtual float GetBlockWidth() { return 50.f; }
+	virtual float GetBlockHeight() { return 50.f; }
 
 	bool LoadTerrain();
 	IniFile _InitFile;	

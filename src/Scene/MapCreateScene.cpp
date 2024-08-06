@@ -4,8 +4,6 @@
 #include "../NiApplication/FiestaOnlineTool.h"
 //#include "MapTextureScene.h"
 
-
-
 void MapCreateScene::DrawImGui()
 {
     FiestaScene::DrawImGui();

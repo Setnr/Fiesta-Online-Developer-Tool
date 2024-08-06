@@ -58,6 +58,8 @@ private:
 	bool LoadSHMD();
 	bool LoadSHBD();
 
+	virtual float GetBlockWidth() { return _InitFile.OneBlock_width; }
+	virtual float GetBlockHeight() { return _InitFile.OneBlock_height; }
 private:
 	MapInfo* _Info;
 

@@ -10,6 +10,7 @@
 #include "PerlinTextureBrush.h"
 #include "./VertexBrush/ColorBrush.h"
 #include "./VertexBrush/SmoothingBrush.h"
+#include "./VertexBrush/VertexSoftBrush.h"
 
 NiImplementRootRTTI(Brush);
 NiImplementRTTI(HTDTextureBrush, Brush);
@@ -221,6 +222,9 @@ BrushPtr VertexBrush::Draw()
 		if (ImGui::SliderInt("BrushSize", &BrushSize, BrushSizeMin, BrushSizeMax))
 			Node->SetScale((50.f / 160.f) * BrushSize);
 
+		//if (ImGui::Button("Create Base Shadow Map"))
+			//kWorld->CreateBaseShadowMap();
+
 		ImGui::LabelText("", "X: %.2f, Y: %.2f, Z: %.2f", _Intersect.x, _Intersect.y, _Intersect.z);
 		ImGui::SameLine();
 		ImGui::ColorButton("Current Color", *(ImVec4*)&CurColor);
@@ -230,6 +234,8 @@ BrushPtr VertexBrush::Draw()
 			ptr = NiNew ColorBrush(kWorld, Node, BrushSize);
 		if (ImGui::Selectable("Smoothing Brush", &s))
 			ptr = NiNew VertexSmoothingBrush(kWorld, Node, BrushSize);
+		if (ImGui::Selectable("Soft Brush", &s))
+			ptr = NiNew VertexSoftBrush(kWorld, Node, BrushSize);
 
 		ImGui::EndChild();
 		ImGui::SameLine();

@@ -55,6 +55,8 @@
     <ClInclude Include="Includes\EasyBMP\EasyBMP_BMP.h" />
     <ClInclude Include="Includes\EasyBMP\EasyBMP_DataStructures.h" />
     <ClInclude Include="Includes\EasyBMP\EasyBMP_VariousBMPutilities.h" />
+    <ClInclude Include="Includes\height-map\HeightMapShadow.h" />
+    <ClInclude Include="Includes\height-map\VL234f.h" />
     <ClInclude Include="Includes\ImGui\GraphEditor.h" />
     <ClInclude Include="Includes\ImGui\ImApp.h" />
     <ClInclude Include="Includes\ImGui\imconfig.h" />
@@ -94,6 +96,7 @@
     <ClInclude Include="src\Data\HTDBrush\TextureSmoothingBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\VertexBrush\ColorBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\VertexBrush\SmoothingBrush.h" />
+    <ClInclude Include="src\Data\HTDBrush\VertexBrush\VertexSoftBrush.h" />
     <ClInclude Include="src\Data\HTDBrush\WorleyBrush.h" />
     <ClInclude Include="src\Data\IngameWorld.h" />
     <ClInclude Include="src\Data\IniFile.h" />
@@ -124,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Includes\EasyBMP\EasyBMP.cpp" />
+    <ClCompile Include="Includes\height-map\HeightMapShadow.cpp" />
     <ClCompile Include="Includes\ImGui\GraphEditor.cpp" />
     <ClCompile Include="Includes\ImGui\ImCurveEdit.cpp" />
     <ClCompile Include="Includes\ImGui\ImGradient.cpp" />
@@ -313,7 +317,7 @@
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|Win32'">
-    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;$(IncludePath)</IncludePath>
+    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;./Includes/height-map;$(IncludePath)</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\DebugLib;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
@@ -337,7 +341,7 @@
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
-    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;./Includes/EasyBMP;$(IncludePath)</IncludePath>
+    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;./Includes/EasyBMP;./Includes/height-map;$(IncludePath)</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\ShippingLib;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)\</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>

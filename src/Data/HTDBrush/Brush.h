@@ -57,7 +57,7 @@ public:
 		//_Intersect.y = roundToNearest50or100(std::round(_Intersect.y));
 	}
 	virtual void MouseClick() { InitMouse = true; }
-	void MouseRelease() { InitMouse = false; }
+	virtual void MouseRelease() { InitMouse = false; }
 	NiPoint3 GetIntersect() { return _Intersect; }
 	void UpdateWorld(TerrainWorldPtr World) { kWorld = World; }
 protected:
@@ -121,10 +121,10 @@ public:
 	{
 		NiSourceTexturePtr ptr = NiSourceTexture::Create(PgUtil::CreateFullFilePathFromBaseFolder(Layer->DiffuseFileName).c_str());
 		HideScreenElement(pScreenElementTexturePreview);
-		pScreenElementTexturePreview = PgUtil::CreateScreenElement(128, 128, ptr);
+		pScreenElementTexturePreview = PgUtil::CreateScreenElement(120, 120, ptr);
 		auto& io = ImGui::GetIO();
-		float fLeft = 1.f - 128 / io.DisplaySize.x;
-		float fTop = 1.f - 128 / io.DisplaySize.y;
+		float fLeft = 1.f - 120 / io.DisplaySize.x;
+		float fTop = 1.f - 120 / io.DisplaySize.y;
 		float fBottom = 1.f;
 		float fRight = 1.f;
 		pScreenElementTexturePreview->SetVertex(0, 0, NiPoint2(fLeft, fBottom));
@@ -250,6 +250,7 @@ public:
 		std::vector<std::vector<TerrainWorld::PointInfos>>& htd = kWorld->GetHTD();
 		CurColor = htd[middlew][middleh].VertexColor;
 	}
+
 protected:
 	NiColorA CurColor;
 };

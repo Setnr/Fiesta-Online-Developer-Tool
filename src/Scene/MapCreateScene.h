@@ -72,7 +72,7 @@ private:
 	{
 		if (!kWorld)
 		{
-			kWorld = NiNew TerrainWorld;
+			kWorld = NiNew TerrainWorld("");
 			Camera = kWorld->GetCamera();
 			LookAndMoveAtWorldPoint(NiPoint3(0.0f, 0.0f, 0.0f));
 			kWorld->SetAmbientLightAmbientColor(NiColor::WHITE);

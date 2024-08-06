@@ -139,7 +139,12 @@ public:
         if (!File.empty()) 
         {
             if (File.at(0) == '.')
-                return FolderPath + File.substr(1);
+            {
+                if(File.at(1) == '\\')
+                    return FolderPath + File.substr(1);
+                else
+                    return FolderPath + "\\"+ File.substr(1);
+            }
             else
                 return FolderPath + "\\" + File;
         }

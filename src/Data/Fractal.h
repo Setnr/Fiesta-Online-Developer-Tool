@@ -125,11 +125,24 @@ protected:
     template<typename T>
     void cleanUpGrid(T** grid);
 
-   
+    void CreateShadowMap();
+        
     bool _Show = false;
     NiNodePtr Node;
     NiPixelDataPtr data;
     NiSourceTexturePtr pkTexture;
     NiScreenTexturePtr pkScreenTexture;
+    struct PointInfos
+    {
+        int BL = -1;
+        int BR = -1;
+        int TL = -1;
+        int TR = -1;
+        float Height;
+        bool Used = false;
+        NiColorA VertexColor = NiColorA(0.82f, 0.82f, 0.82f, 1.0f);
+        bool Shadow = false;
+    };
+    std::vector<std::vector<PointInfos>> VertexMap;
 };
 

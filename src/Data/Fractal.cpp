@@ -308,28 +308,25 @@ void Fractal::SaveHTD(std::string FilePath)
     HTDGFile.close();
 }
 
+void Fractal::CreateShadowMap() 
+{
+    if (!ImGui::IsKeyPressed((ImGuiKey)VK_TAB))
+        return;
+}
+
 void Fractal::CreateTerrain(TerrainWorldPtr world, int Size)
 {
     auto start = std::chrono::steady_clock::now();
-    struct PointInfos
-    {
-        int BL = -1;
-        int BR = -1;
-        int TL = -1;
-        int TR = -1;
-        float Height;
-        bool Used = false;
-        NiColorA VertexColor = NiColorA(0.82f,0.82f,0.82f, 1.0f);
-    };
     struct Triangle
     {
         unsigned short one;
         unsigned short two;
         unsigned short three;
     };
-    std::vector<std::vector<PointInfos>> VertexMap;
+
     float minh = 0.0f;
     float mhax = 0.0f;
+    VertexMap.clear();
     for (int w = 0; w < grid_size; w++)
     {
         VertexMap.push_back(std::vector<PointInfos>(grid_size));
@@ -363,6 +360,8 @@ void Fractal::CreateTerrain(TerrainWorldPtr world, int Size)
             VertexMap[w][h].VertexColor = height_color_map.at(round);
         }
     }
+    CreateShadowMap();
+    auto HTD = world->GetHTD();
     for (int BlockX = 0; BlockX < (grid_size - 1) / QuadsHeight; BlockX++) //19
     {
         for (int BlockY = 0; BlockY < (grid_size - 1) / QuadsWidth; BlockY++) //19
@@ -444,7 +443,7 @@ void Fractal::CreateTerrain(TerrainWorldPtr world, int Size)
                         VerticesList.push_back(NiPoint3(ActiveW * BlockWidth, ActiveH * BlockHeight, info->Height));
                         WHList.push_back({ ActiveW,ActiveH });
                         NormalList.push_back(NiPoint3(0.0f,0.0f,1.0f));
-                        ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
+                        ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor );
                     }
                     if (AddBR)
                     {
@@ -453,7 +452,7 @@ void Fractal::CreateTerrain(TerrainWorldPtr world, int Size)
                         VerticesList.push_back(NiPoint3((ActiveW + 1) * BlockWidth, ActiveH * BlockHeight, VertexMap[ActiveW + 1][ActiveH].Height));
                         WHList.push_back({ ActiveW + 1,ActiveH });
                         NormalList.push_back(NiPoint3(0.0f,0.0f,1.0f));
-                        ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor);
+                        ColorList.push_back(VertexMap[ActiveW][ActiveH].VertexColor );
                     }
                     if (AddTL)
                     {
