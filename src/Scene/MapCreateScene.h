@@ -78,7 +78,7 @@ private:
 			kWorld->SetAmbientLightAmbientColor(NiColor::WHITE);
 		}
 		kWorld->ClearTerrainScene();
-		_Fractal->CreateTerrain(kWorld, MapSize);
+		_Fractal->CreateTerrain(kWorld, MapSize, ShadowMap);
 		kWorld->GetTerrainScene()->UpdateEffects();
 		kWorld->GetTerrainScene()->UpdateProperties();
 		kWorld->GetTerrainScene()->Update(0.0f);
@@ -88,4 +88,6 @@ private:
 	FractalPtr _Fractal;
 	TerrainWorldPtr kWorld;
 	bool ShowHTDSave = false;
+	bool ShadowMap = false;
+	NiPoint3 SunVector;
 };

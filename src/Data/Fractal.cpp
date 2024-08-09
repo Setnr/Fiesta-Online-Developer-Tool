@@ -14,7 +14,8 @@ Fractal::~Fractal() {
     Show(false);
     cleanUpGrid<float>(grid);
 }
-
+float MaxHeight = -5000.f;
+float MinHeight = 5000.f;
 void Fractal::generateGrid(int grid_size, int seed, float noise, float random_min, float random_max) {
     this->grid_size = grid_size;
     int s = grid_size - 1;
@@ -308,13 +309,148 @@ void Fractal::SaveHTD(std::string FilePath)
     HTDGFile.close();
 }
 
-void Fractal::CreateShadowMap() 
+
+void Fractal::CalculateRay(NiPoint3 StartPoint, NiPoint3 SunVector, std::vector<std::vector<PointData>>& Shadowed)
 {
-    if (!ImGui::IsKeyPressed((ImGuiKey)VK_TAB))
+    NiPoint3 ActivePoint = StartPoint;
+    if (SunVector.x == 0.0f && SunVector.y == 0.0f)
         return;
+    int x = static_cast<int>(StartPoint.x / 50.f);
+    int y = static_cast<int>(StartPoint.y / 50.f);
+    int prevx = x;
+    int prevy = y;
+
+    while (true) 
+    {
+        if (x >= grid_size || x < 0 || y < 0 || y >= grid_size)
+            return;
+        if (x != prevx || y != prevy)
+        {
+            if (VertexMap[x][y].Height > ActivePoint.z || ActivePoint.z < MinHeight)
+                return;
+            else
+                Shadowed[x][y].Shadow = true;
+            prevx = x;
+            prevy = y;
+        }
+        ActivePoint += SunVector;
+        x = static_cast<int>(ActivePoint.x / 50.f);
+        y = static_cast<int>(ActivePoint.y / 50.f);
+    }
+}
+void CreateNormalMap(int size, float hscale, std::vector<std::vector<Fractal::PointInfos>> hmap, std::vector<std::vector<NiPoint3>>& nmap)
+{
+    
+    for (int w = 1; w < hmap.size()-1; w++)
+    {
+        for (int h = 1; h < hmap.size()-1; h++)
+        {
+            const float strength = 5.0f;
+
+            
+            float tl = hmap[w - 1][h - 1].Height; // top left
+            float  l = hmap[w - 1][h].Height;   // left
+            float bl = hmap[w - 1][h + 1].Height; // bottom left
+            float  t = hmap[w][h - 1].Height;   // top
+            float  b = hmap[w][h + 1].Height;   // bottom
+            float tr = hmap[w + 1][h - 1].Height; // top right
+            float  r = hmap[w + 1][h].Height;   // right
+            float br = hmap[w + 1][h + 1].Height; // bottom right
+
+            // sobel filter
+            const float dX = (tr + 2.0 * r + br) - (tl + 2.0 * l + bl);
+            const float dY = (bl + 2.0 * b + br) - (tl + 2.0 * t + tr);
+            const float dZ = 1.0 / strength;
+
+            NiPoint3 vec(dX, dY, dZ);
+            vec.Unitize(); 
+            vec.x += 1.f;
+            vec.y += 1.f;
+            vec.z += 1.f;
+            vec = vec / 2;
+            nmap[w][h] = vec;
+            
+        }
+    }
+}
+void Fractal::CreateShadowMap(TerrainWorldPtr world)
+{
+    auto start = std::chrono::steady_clock::now();
+    for (int w = 0; w < grid_size; w++)
+    {
+        for (int h = 0; h < grid_size; h++)
+        {
+            if (VertexMap[w][h].Height < MinHeight)
+                MinHeight = VertexMap[w][h].Height;
+        }
+    }
+    NiPoint3 SunPos = world->GetCamera()->GetTranslate();
+    NiPoint3 SunVector = NiPoint3(grid_size * 50.f / 2 + 250.f, grid_size * 50.f / 2, VertexMap[grid_size / 2][grid_size  /2].Height) - SunPos;
+    SunVector.Unitize();
+
+    LogInfo("SunVector " + " x: " + std::to_string(SunVector.x) + " y: " + std::to_string(SunVector.y) + " z: " + std::to_string(SunVector.z));
+
+    NiColorA AmbientLight = NiColorA(98.f / 255.f, 192.f / 255.f, 255.f / 255.f, 1.f);
+    NiColorA SunLight = NiColorA(255.f / 255.f, 244.f / 255.f, 222.f / 255.f, 1.f);
+    std::vector<std::vector<PointData>> Shadowed(grid_size, std::vector<PointData>(grid_size));
+    std::vector<std::vector<NiPoint3>> Normals(grid_size, std::vector<NiPoint3>(grid_size));
+    CreateNormalMap(grid_size, 1.f, VertexMap, Normals);
+    int RaysSent = 0; 
+    for (int w = 0; w < grid_size; w++) 
+    {
+        for (int h = 0; h < grid_size; h++) 
+        {
+            NiPoint3 CurPoint(w * 50.f, h * 50.f, VertexMap[w][h].Height);
+            if(!Shadowed[w][h].Shadow)
+            {
+                CalculateRay(CurPoint, SunVector, Shadowed);
+                RaysSent++;
+            }
+        }
+    }
+
+    if (SunVector.x < 0.0f)
+        SunVector.x *= -1.f;
+    if (SunVector.y < 0.0f)
+        SunVector.y *= -1.f;
+    if (SunVector.z < 0.0f)
+        SunVector.z *= -1.f;
+    
+    for (int w = 0; w < grid_size; w++)
+    {
+        for (int h = 0; h < grid_size; h++)
+        {
+            float AmbLightAdjust = (Normals[w][h].z + 1) / 2;
+            VertexMap[w][h].VertexColor = AmbientLight * AmbLightAdjust;
+            if (!Shadowed[w][h].Shadow)
+            {
+                float DotProduct = Normals[w][h].Dot(SunVector);
+                NiColorA DotColor = SunLight * DotProduct;
+                VertexMap[w][h].VertexColor = VertexMap[w][h].VertexColor + DotColor;// VertexMap[w][h].VertexColor + SunLight * Normals[w][h].Dot(SunVector);;//VertexMap[w][h].VertexColor + SunLight * Normals[w][h].Dot(OldS); //NormalVector ScalarProduct LightVector
+            }
+
+            if (VertexMap[w][h].VertexColor.r < 0.0f)
+                VertexMap[w][h].VertexColor.r = 0.f;
+            if (VertexMap[w][h].VertexColor.g < 0.0f)
+                VertexMap[w][h].VertexColor.g = 0.f;
+            if (VertexMap[w][h].VertexColor.b < 0.0f)
+                VertexMap[w][h].VertexColor.b = 0.f;
+            if (VertexMap[w][h].VertexColor.r > 1.0f)
+                VertexMap[w][h].VertexColor.r = 1.f;
+            if (VertexMap[w][h].VertexColor.g > 1.0f)
+                VertexMap[w][h].VertexColor.g = 1.f;
+            if (VertexMap[w][h].VertexColor.b > 1.0f)
+                VertexMap[w][h].VertexColor.b = 1.f;
+
+            VertexMap[w][h].VertexColor.a = 1.f;
+            
+        }
+    }
+    
+    LogTime("Created Shadow map with " + std::to_string(RaysSent ) + "from " + std::to_string(grid_size*grid_size) + " in", start);
 }
 
-void Fractal::CreateTerrain(TerrainWorldPtr world, int Size)
+void Fractal::CreateTerrain(TerrainWorldPtr world, int Size , bool Shadow)
 {
     auto start = std::chrono::steady_clock::now();
     struct Triangle
@@ -360,7 +496,8 @@ void Fractal::CreateTerrain(TerrainWorldPtr world, int Size)
             VertexMap[w][h].VertexColor = height_color_map.at(round);
         }
     }
-    CreateShadowMap();
+    if(Shadow)
+        CreateShadowMap(world);
     auto HTD = world->GetHTD();
     for (int BlockX = 0; BlockX < (grid_size - 1) / QuadsHeight; BlockX++) //19
     {

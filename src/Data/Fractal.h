@@ -53,7 +53,7 @@ public:
             FiestaOnlineTool::RemoveScreenTexture(pkScreenTexture);
         }
     }
-    void CreateTerrain(TerrainWorldPtr world, int Size);
+    void CreateTerrain(TerrainWorldPtr world, int Size, bool Shadow = false);
 
     void UpdatePixelData(float min, float max) 
     {
@@ -124,14 +124,19 @@ protected:
 
     template<typename T>
     void cleanUpGrid(T** grid);
-
-    void CreateShadowMap();
+    struct PointData {
+        bool Shadow = false;
+    };
+    void CalculateRay(NiPoint3 StartPoint, NiPoint3 SunVector, std::vector<std::vector<PointData>>& Shadowed);
+    void CreateShadowMap(TerrainWorldPtr world);
         
     bool _Show = false;
     NiNodePtr Node;
     NiPixelDataPtr data;
     NiSourceTexturePtr pkTexture;
     NiScreenTexturePtr pkScreenTexture;
+    public:
+    
     struct PointInfos
     {
         int BL = -1;
@@ -144,5 +149,6 @@ protected:
         bool Shadow = false;
     };
     std::vector<std::vector<PointInfos>> VertexMap;
+    
 };
 

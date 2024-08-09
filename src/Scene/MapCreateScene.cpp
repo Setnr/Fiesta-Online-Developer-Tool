@@ -104,6 +104,11 @@ void MapCreateScene::DrawImGui()
             _Fractal->applyHydraulicErosion(0.01f,0.05f);
             CreateTerrain();
         }
+        ImGui::Checkbox("Shadow Map", &ShadowMap);
+        if(ShadowMap)
+            CreateTerrain();
+        if (ImGui::DragFloat3("SunVector", (float*) & SunVector,0.01f,-1.f,1.f))
+            CreateTerrain();
         ImGui::SameLine();
         if (ImGui::Button("Reset Grid"))
             UpdateAlgo = true;
