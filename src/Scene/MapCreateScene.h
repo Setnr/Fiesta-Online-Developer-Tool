@@ -77,11 +77,87 @@ private:
 			LookAndMoveAtWorldPoint(NiPoint3(0.0f, 0.0f, 0.0f));
 			kWorld->SetAmbientLightAmbientColor(NiColor::WHITE);
 		}
-		kWorld->ClearTerrainScene();
 		_Fractal->CreateTerrain(kWorld, MapSize, ShadowMap);
-		kWorld->GetTerrainScene()->UpdateEffects();
-		kWorld->GetTerrainScene()->UpdateProperties();
-		kWorld->GetTerrainScene()->Update(0.0f);
+	}        
+	enum MapType {
+		Field,
+		IDField,
+		KDField
+	};
+	MapType SaveType = Field;
+	char MapName[128] = "SetTool";
+	void Save() 
+	{
+		std::string SubPath = ".\\resmap\\";
+		switch (SaveType)
+		{
+		case Field: SubPath += "field";
+			break;
+		case IDField: SubPath += "IDField";
+			break;
+		case KDField: SubPath += "KDField";
+			break;
+		}
+		std::string _MapName = std::string(MapName);
+		SubPath += "\\" + _MapName;
+		std::string Direcotry = PgUtil::CreateFullFilePathFromBaseFolder(SubPath);
+		if (!std::filesystem::exists(Direcotry))
+		{
+			std::filesystem::create_directories(Direcotry);
+		}
+
+		_Fractal->SaveHTD(Direcotry + "\\" + _MapName + ".HTD");
+		IniFile file(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\BaseIni.ini"));
+		if (!file.Load())
+		{
+			NiMessageBox::DisplayMessage("Cant Find BaseIni.ini", "ERROR");
+			return;
+		}
+		file.HeightMap_height = MapSize;
+		file.HeightMap_width = MapSize;
+		file.HeightFileName = SubPath + "\\" + _MapName + ".HTD";
+		file.VertexColorTexture = SubPath + "\\Vertex" + _MapName + ".bmp";
+		file.LayerList[0]->Height = MapSize - 1;
+		file.LayerList[0]->Width = MapSize - 1;
+		file.LayerList[0]->Name = "0 BaseTexture";
+		file.LayerList[0]->BlendFileName = SubPath + "\\0 BaseTexture.bmp";
+
+		file.LayerList[0]->BlendTexture = _Fractal->GetSourceTexture();
+		PgUtil::SaveTexture(Direcotry + "\\Vertex" + _MapName + ".bmp", _Fractal->GetSourceTexture());
+		file.UpdateFilePath(Direcotry + "\\" + _MapName + ".ini");
+
+		RGBApixel* PixelData = (RGBApixel*)_Fractal->GetSourceTexture()->GetSourcePixelData()->GetPixels();
+		for (int w = 0; w < _Fractal->GetSourceTexture()->GetWidth(); w++)
+		{
+			for (int h = _Fractal->GetSourceTexture()->GetHeight() - 1; h >= 0; h--)
+			{
+				int XPart = w;
+
+				int PreFullLines = _Fractal->GetSourceTexture()->GetWidth() * h;
+				int YPartNormal = PreFullLines;
+				int PointOffsetNormal = XPart + YPartNormal;
+				PixelData[PointOffsetNormal] = RGBApixel(0xFF, 0xFF, 0xFF, 0xFF);
+			}
+		}
+
+		file.Save();
+		std::string FullSubPath = PgUtil::CreateFullFilePathFromBaseFolder(SubPath);
+
+		if (std::filesystem::exists(FullSubPath + "\\" + _MapName + ".shmd.bak"))
+			std::filesystem::remove(FullSubPath + "\\" + _MapName + ".shmd.bak");
+		if (std::filesystem::exists(FullSubPath + "\\" + _MapName + ".shmd"))
+		{
+			std::filesystem::copy(FullSubPath + "\\" + _MapName + ".shmd", FullSubPath + "\\" + _MapName + ".shmd.bak");
+			std::filesystem::remove(FullSubPath + "\\" + MapName + ".shmd");
+		}
+		std::filesystem::copy(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\Base.shmd"), FullSubPath + "\\" + _MapName + ".shmd");
+		ShineBlockData::Save(FullSubPath, _MapName, file.HeightMap_width - 1);
+
+		_Fractal->SaveShadows(PgUtil::CreateFullFilePathFromBaseFolder(file.VertexColorTexture));
+
+		LogInfo("Saved Everything Successfully, you can now add the Map to your MapInfo with Spawn 0 / 0\nPlease reload the MapInfo afterwards!");
+
+
 	}
 	int Octave = 10;
 	bool AlgoPreview = false;
@@ -89,5 +165,5 @@ private:
 	TerrainWorldPtr kWorld;
 	bool ShowHTDSave = false;
 	bool ShadowMap = false;
-	NiPoint3 SunVector;
+	bool RenderShadowsLive = false;
 };

@@ -31,6 +31,17 @@ protected:
 
 };
 public:
+    struct PointInfos
+    {
+        int BL = -1;
+        int BR = -1;
+        int TL = -1;
+        int TR = -1;
+        float Height;
+        bool Used = false;
+        NiColorA VertexColor = NiColorA(0.82f, 0.82f, 0.82f, 1.0f);
+        bool Shadow = false;
+    };
     explicit Fractal(int grid_size = 129);
     ~Fractal();
     virtual void generateGrid(int grid_size, int seed, float noise, float random_min = 0.0f, float random_max = 40.0f);
@@ -54,7 +65,7 @@ public:
         }
     }
     void CreateTerrain(TerrainWorldPtr world, int Size, bool Shadow = false);
-
+    bool ShowColorPickers();
     void UpdatePixelData(float min, float max) 
     {
         RGBAColor* PixelColorA = (RGBAColor*)data->GetPixels();
@@ -92,6 +103,24 @@ public:
         Show(_Show);
     }
     void SaveHTD(std::string FilePath);
+    void SaveShadows(std::string FilePath)
+    {
+        BMP bmp;
+        bmp.SetSize(VertexMap.size(), VertexMap[0].size());
+        for (int w = 0; w < VertexMap.size(); w++)
+        {
+            for (int h = VertexMap[0].size() - 1; h >= 0; h--)
+            {
+                RGBApixel pixel;
+                pixel.Red = static_cast<unsigned char> (VertexMap[w][h].VertexColor.r * 255.f);
+                pixel.Green = static_cast<unsigned char> (VertexMap[w][h].VertexColor.g * 255.f);
+                pixel.Blue = static_cast<unsigned char> (VertexMap[w][h].VertexColor.b * 255.f);
+                pixel.Alpha = static_cast<unsigned char> (VertexMap[w][h].VertexColor.a * 255.f);
+                bmp.SetPixel(w, VertexMap[0].size() - h - 1, pixel);
+            }
+        }
+        bmp.WriteToFile(FilePath.c_str());
+    }
     NiSourceTexturePtr GetSourceTexture() { return pkTexture; }
 protected:
     int grid_size;
@@ -124,10 +153,7 @@ protected:
 
     template<typename T>
     void cleanUpGrid(T** grid);
-    struct PointData {
-        bool Shadow = false;
-    };
-    void CalculateRay(NiPoint3 StartPoint, NiPoint3 SunVector, std::vector<std::vector<PointData>>& Shadowed);
+    void CalculateRay(NiPoint3 StartPoint, NiPoint3 SunVector, std::vector<std::vector<bool>>& Shadowed);
     void CreateShadowMap(TerrainWorldPtr world);
         
     bool _Show = false;
@@ -135,20 +161,93 @@ protected:
     NiPixelDataPtr data;
     NiSourceTexturePtr pkTexture;
     NiScreenTexturePtr pkScreenTexture;
-    public:
     
-    struct PointInfos
-    {
-        int BL = -1;
-        int BR = -1;
-        int TL = -1;
-        int TR = -1;
-        float Height;
-        bool Used = false;
-        NiColorA VertexColor = NiColorA(0.82f, 0.82f, 0.82f, 1.0f);
-        bool Shadow = false;
-    };
     std::vector<std::vector<PointInfos>> VertexMap;
-    
+
+    float minh = 0.0f;
+    float mhax = 0.0f;
+
+    static std::unordered_map<unsigned int, NiColorA> height_color_map;
+    std::vector<std::vector<NiPoint3>> Normals;
+
+    bool SmoothShadows = true;
+
+    void CreateNormalMap()
+    {
+        Normals = std::vector<std::vector<NiPoint3>>(grid_size, std::vector<NiPoint3>(grid_size));
+
+        const float strength = 8.0f;
+        const float dZ = 1.0 / strength;
+
+        for (int w = 0; w < VertexMap.size(); w++)
+        {
+            for (int h = 0; h < VertexMap.size(); h++)
+            {
+                float tl = GetHeight(w - 1, h - 1); // top left
+                float  l = GetHeight(w - 1, h);   // left
+                float bl = GetHeight(w - 1, h + 1); // bottom left
+                float  t = GetHeight(w, h - 1);   // top
+                float  b = GetHeight(w, h + 1);   // bottom
+                float tr = GetHeight(w + 1, h - 1); // top right
+                float  r = GetHeight(w + 1, h);   // right
+                float br = GetHeight(w + 1, h + 1); // bottom right
+
+                // sobel filter
+                const float dX = (tr + 2.0 * r + br) - (tl + 2.0 * l + bl);
+                const float dY = (bl + 2.0 * b + br) - (tl + 2.0 * t + tr);
+
+                NiPoint3 vec(dX, dY, dZ);
+                vec.Unitize();
+                vec.x += 1.f;
+                vec.y += 1.f;
+                vec.z += 1.f;
+                vec = vec / 2;
+                Normals[w][h] = vec;
+
+            }
+        }
+    }
+
+    inline float GetHeight(int w, int h)
+    {
+        if(w >= 0 && w < grid_size && h >= 0 && h < grid_size)
+            return VertexMap[w][h].Height;
+
+        if (w < 0)
+            w = 0;
+        if (w >= grid_size)
+            w = grid_size - 1;
+
+        if (h < 0)
+            h = 0;
+
+        if (h >= grid_size)
+            h = grid_size - 1;
+
+        return VertexMap[w][h].Height;
+    }
+    inline NiColorA GetColor(int w, int h)
+    {
+        if (w >= 0 && w < grid_size && h >= 0 && h < grid_size)
+            return VertexMap[w][h].VertexColor;
+
+        if (w < 0)
+            w = 0;
+        if (w >= grid_size)
+            w = grid_size - 1;
+
+        if (h < 0)
+            h = 0;
+
+        if (h >= grid_size)
+            h = grid_size - 1;
+
+        return VertexMap[w][h].VertexColor;
+    }
+
+    NiColorA AmbientLight = NiColorA(98.f / 255.f, 192.f / 255.f, 255.f / 255.f, 1.f);
+    NiColorA SunLight = NiColorA(255.f / 255.f, 244.f / 255.f, 222.f / 255.f, 1.f);
+
+    NiPoint3 OldSunPos;
 };
 

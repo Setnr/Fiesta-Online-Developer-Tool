@@ -9,7 +9,7 @@ void MapCreateScene::DrawImGui()
     FiestaScene::DrawImGui();
     _MapMenu.RenderMenu();
 
-    if (ImGui::Begin("Create Map", 0 , ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove))
+    if (ImGui::Begin("Create Map", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove))
     {
         bool UpdateAlgo = false;
         if (ImGui::RadioButton("64x64", MapSize == 65))
@@ -104,17 +104,13 @@ void MapCreateScene::DrawImGui()
             _Fractal->applyHydraulicErosion(0.01f,0.05f);
             CreateTerrain();
         }
-        ImGui::Checkbox("Shadow Map", &ShadowMap);
-        if(ShadowMap)
-            CreateTerrain();
-        if (ImGui::DragFloat3("SunVector", (float*) & SunVector,0.01f,-1.f,1.f))
-            CreateTerrain();
+        
         ImGui::SameLine();
         if (ImGui::Button("Reset Grid"))
             UpdateAlgo = true;
-        if (ImGui::Button("Procced To Texturing")) 
+        if (ImGui::Button("Procced To Shadowing")) 
         {
-            ShowHTDSave = true;
+            ShadowMap = true;
         }
         ImGui::SameLine();
         if(ImGui::Button("Save as .nif"))
@@ -124,98 +120,40 @@ void MapCreateScene::DrawImGui()
         ImGui::End();
     }
 
-    if (ShowHTDSave) 
+    if (ShadowMap && ImGui::Begin("Create Shadows", &ShadowMap, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove))
     {
-        if (ImGui::Begin("Save HTD", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove))
+        auto io = ImGui::GetIO();
+        ImGui::SetWindowSize("Create Shadows", ImVec2(200, 500));
+        ImGui::SetWindowPos("Create Shadows", ImVec2(io.DisplaySize.x - 200,io.DisplaySize.y - 800));
+        if(ImGui::Button("Create Shadows"))
+            CreateTerrain();
+        if (_Fractal->ShowColorPickers())
+            CreateTerrain();
+        if (ImGui::Checkbox("Render Shadows Live", &RenderShadowsLive) || RenderShadowsLive)
+            CreateTerrain();
+        if(ImGui::Button("Save Map"))
+            ShowHTDSave = true;
+        ImGui::End();
+    }
+
+    if (ShowHTDSave && ImGui::Begin("Save HTD", &ShowHTDSave, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove))
+    {
+
+        if (ImGui::RadioButton("Field Map", SaveType == Field))
+            SaveType = Field;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("ID Map", SaveType == IDField))
+            SaveType = IDField;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("KD Map", SaveType == KDField))
+            SaveType = KDField;
+     
+        ImGui::InputText("MapName", MapName, sizeof(MapName));
+        if (ImGui::Button("Save"))
         {
-            static enum MapType {
-                Field,
-                IDField,
-                KDField
-            } SaveType = Field;
-            if (ImGui::RadioButton("Field Map", SaveType == Field))
-                SaveType = Field;
-            ImGui::SameLine();
-            if (ImGui::RadioButton("ID Map", SaveType == IDField))
-                SaveType = IDField;
-            ImGui::SameLine();
-            if (ImGui::RadioButton("KD Map", SaveType == KDField))
-                SaveType = KDField;
-            static char MapName[128] = "SetTool";
-            ImGui::InputText("MapName", MapName, sizeof(MapName));
-            if (ImGui::Button("Save"))
-            {
-                std::string SubPath = ".\\resmap\\";
-                switch (SaveType)
-                {
-                case Field: SubPath += "field";
-                    break;
-                case IDField: SubPath += "IDField";
-                    break;
-                case KDField: SubPath += "KDField";
-                    break;
-                }
-                std::string _MapName = std::string(MapName);
-                SubPath += "\\" + _MapName;
-                std::string Direcotry = PgUtil::CreateFullFilePathFromBaseFolder(SubPath);
-                if (!std::filesystem::exists(Direcotry))
-                {
-                    std::filesystem::create_directories(Direcotry);
-                }
-
-                _Fractal->SaveHTD(Direcotry + "\\" + _MapName + ".HTD");
-                IniFile file(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\BaseIni.ini"));
-                if (!file.Load()) 
-                {
-                    NiMessageBox::DisplayMessage("Cant Find BaseIni.ini", "ERROR");
-                    return;
-                }
-                file.HeightMap_height = MapSize;
-                file.HeightMap_width = MapSize;
-                file.HeightFileName = SubPath + "\\" + _MapName + ".HTD";
-                file.VertexColorTexture = SubPath + "\\Vertex" + _MapName + ".bmp";
-                file.LayerList[0]->Height = MapSize - 1;
-                file.LayerList[0]->Width = MapSize - 1;
-                file.LayerList[0]->Name = "0 BaseTexture";
-                file.LayerList[0]->BlendFileName = SubPath + "\\0 BaseTexture.bmp";
-
-                file.LayerList[0]->BlendTexture = _Fractal->GetSourceTexture();
-                PgUtil::SaveTexture(Direcotry + "\\Vertex" + _MapName + ".bmp", _Fractal->GetSourceTexture());
-                file.UpdateFilePath(Direcotry + "\\" + _MapName + ".ini");
-
-                RGBApixel* PixelData = (RGBApixel*)_Fractal->GetSourceTexture()->GetSourcePixelData()->GetPixels();
-                for (int w = 0; w < _Fractal->GetSourceTexture()->GetWidth(); w++)
-                {
-                    for (int h = _Fractal->GetSourceTexture()->GetHeight() - 1; h >= 0; h--)
-                    {
-                        int XPart = w;
-
-                        int PreFullLines = _Fractal->GetSourceTexture()->GetWidth() * h;
-                        int YPartNormal = PreFullLines;
-                        int PointOffsetNormal = XPart + YPartNormal;
-                        PixelData[PointOffsetNormal] = RGBApixel(0xFF, 0xFF, 0xFF, 0xFF);
-                    }
-                }
-
-                file.Save();
-                std::string FullSubPath = PgUtil::CreateFullFilePathFromBaseFolder(SubPath);
-
-                if (std::filesystem::exists(FullSubPath + "\\" + _MapName + ".shmd.bak"))
-                    std::filesystem::remove(FullSubPath + "\\" + _MapName + ".shmd.bak");
-                if (std::filesystem::exists(FullSubPath + "\\" + _MapName + ".shmd"))
-                {
-                    std::filesystem::copy(FullSubPath + "\\" + _MapName + ".shmd", FullSubPath + "\\" + _MapName + ".shmd.bak");
-                    std::filesystem::remove(FullSubPath + "\\" + MapName + ".shmd");
-                }
-                std::filesystem::copy(PgUtil::CreateFullFilePathFromApplicationFolder(".\\FiestaOnlineTool\\Base.shmd"), FullSubPath + "\\" + _MapName + ".shmd");
-                ShineBlockData::Save(FullSubPath, _MapName, file.HeightMap_width - 1);
-                LogInfo("Saved Everything Successfully, you can now add the Map to your MapInfo with Spawn 0 / 0\nPlease reload the MapInfo afterwards!");
-                //MapTextureScenePtr ptr = NiNew MapTextureScene(Direcotry + "\\" + _MapName + ".ini", SubPath);
-                //FiestaScenePtr scene = (FiestaScene*)&*ptr;
-                //FiestaOnlineTool::UpdateScene(scene);
-            }
-            ImGui::End();
+            Save();
         }
+        ImGui::End();
     }
     if (ImGui::IsKeyPressed((ImGuiKey)0x52)) //R
     {

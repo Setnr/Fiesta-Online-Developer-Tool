@@ -309,5 +309,34 @@ public:
         int xPixel = (data->GetWidth() * x);
         return { xPixel,yPixel };
     }
+    static void FixColor(NiColorA& Color)
+    {
+        if (Color.r < 0.0f)
+            Color.r = 0.f;
+        if (Color.g < 0.0f)
+            Color.g = 0.f;
+        if (Color.b < 0.0f)
+            Color.b = 0.f;
+
+        if (Color.r > 1.0f)
+            Color.r = 1.f;
+        if (Color.g > 1.0f)
+            Color.g = 1.f;
+        if (Color.b > 1.0f)
+            Color.b = 1.f;
+    }
+    static void MakePositiveVector(NiPoint3& Vector)
+    {
+        if (Vector.x < 0.0f)
+            Vector.x *= -1.f;
+        if (Vector.y < 0.0f)
+            Vector.y *= -1.f;
+        if (Vector.z < 0.0f)
+            Vector.z *= -1.f;
+    }
+    static void RotateVector(NiPoint3& Vector) {
+        Vector *= -1.f;
+    }
+    
 
 };

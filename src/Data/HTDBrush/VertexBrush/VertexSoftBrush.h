@@ -9,9 +9,8 @@ public:
 	{
 		ImGui::BeginChild("BrushChildR", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
-		ImGui::ColorPicker4("Color", (float*)&color);
-		float backup = color.a;
-		ImGui::DragFloat("Deckcraft", &backup);
+		ImGui::DragFloat("Opacity", &color.a,0.01,0.f,1.f);
+		ImGui::ColorPicker3("Color", (float*)&color);
 		if (ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x43))  // ctrl c 
 			color = CurColor;
 		ImGui::EndChild();
@@ -38,7 +37,7 @@ public:
 					continue;
 				if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
 					continue;
-				HTD[w][h].VertexColor = color * color.a + OrgPoints[w][h].VertexColor * (1.f- color.a);
+				HTD[w][h].VertexColor = color * color.a + OrgPoints[w][h].VertexColor * (1.f - color.a);
 				for (auto point : kWorld->GetHTDPoints(w, h))
 				{
 					if (point.NiColor)
