@@ -311,6 +311,10 @@ public:
     }
     static void FixColor(NiColorA& Color)
     {
+        Color.r = std::clamp(Color.r, 0.0f, 1.0f);
+        Color.g = std::clamp(Color.g, 0.0f, 1.0f);
+        Color.b = std::clamp(Color.b, 0.0f, 1.0f);
+        return;
         if (Color.r < 0.0f)
             Color.r = 0.f;
         if (Color.g < 0.0f)

@@ -153,7 +153,7 @@ protected:
 
     template<typename T>
     void cleanUpGrid(T** grid);
-    void CalculateRay(NiPoint3 StartPoint, NiPoint3 SunVector, std::vector<std::vector<bool>>& Shadowed);
+    void CalculateRay(NiPoint3& StartPoint, NiPoint3& SunVector, std::vector<std::vector<bool>>& Shadowed);
     void CreateShadowMap(TerrainWorldPtr world);
         
     bool _Show = false;
@@ -163,13 +163,12 @@ protected:
     NiScreenTexturePtr pkScreenTexture;
     
     std::vector<std::vector<PointInfos>> VertexMap;
-
     float minh = 0.0f;
     float mhax = 0.0f;
 
     static std::unordered_map<unsigned int, NiColorA> height_color_map;
     std::vector<std::vector<NiPoint3>> Normals;
-
+    std::vector<std::vector<NiColorA>> Smoothed;
     bool SmoothShadows = true;
 
     void CreateNormalMap()
@@ -228,8 +227,13 @@ protected:
     }
     inline NiColorA GetColor(int w, int h)
     {
+        w = (w < 0) ? 0 : (w >= grid_size ? grid_size - 1 : w);
+        h = (h < 0) ? 0 : (h >= grid_size ? grid_size - 1 : h);
+
+        return Smoothed[w][h];
+
         if (w >= 0 && w < grid_size && h >= 0 && h < grid_size)
-            return VertexMap[w][h].VertexColor;
+            return Smoothed[w][h];
 
         if (w < 0)
             w = 0;
@@ -242,12 +246,13 @@ protected:
         if (h >= grid_size)
             h = grid_size - 1;
 
-        return VertexMap[w][h].VertexColor;
+        return Smoothed[w][h];
     }
 
     NiColorA AmbientLight = NiColorA(98.f / 255.f, 192.f / 255.f, 255.f / 255.f, 1.f);
     NiColorA SunLight = NiColorA(255.f / 255.f, 244.f / 255.f, 222.f / 255.f, 1.f);
 
     NiPoint3 OldSunPos;
+    int RayLoopCt;
 };
 
