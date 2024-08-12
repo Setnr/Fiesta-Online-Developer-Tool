@@ -752,7 +752,16 @@ void EditScene::DrawTextureEditor()
 						ptr->ChangeLayer(SelectedLayer);
 					}
 				}
-
+			if (ImGui::Button("Sort Layers")) 
+			{
+				struct
+				{
+					bool operator()(std::shared_ptr<TerrainLayer> a, std::shared_ptr<TerrainLayer> b) const { return a->Name < b->Name; }
+				}
+				CompareFunc;
+				std::sort(Ini.LayerList.begin(), Ini.LayerList.end(), CompareFunc);
+				kWorld->ReloadTerrain();
+			}
 			ImGui::EndChild();
 		}
 		ImGui::SameLine();

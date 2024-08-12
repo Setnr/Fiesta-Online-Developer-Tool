@@ -40,6 +40,13 @@ public:
 			b = _b;
 			a = _a;
 		}
+		RGBAColor(NiColorA& Col) 
+		{
+			r = static_cast<unsigned char>(Col.r * 255.f);
+			g = static_cast<unsigned char>(Col.g * 255.f);
+			b = static_cast<unsigned char>(Col.b * 255.f);
+			a = static_cast<unsigned char>(Col.a * 255.f);
+		}
 		RGBAColor(RGBColor c) {
 			r = c.r;
 			g = c.g;

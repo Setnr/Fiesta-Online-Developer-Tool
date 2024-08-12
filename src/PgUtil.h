@@ -315,19 +315,6 @@ public:
         Color.g = std::clamp(Color.g, 0.0f, 1.0f);
         Color.b = std::clamp(Color.b, 0.0f, 1.0f);
         return;
-        if (Color.r < 0.0f)
-            Color.r = 0.f;
-        if (Color.g < 0.0f)
-            Color.g = 0.f;
-        if (Color.b < 0.0f)
-            Color.b = 0.f;
-
-        if (Color.r > 1.0f)
-            Color.r = 1.f;
-        if (Color.g > 1.0f)
-            Color.g = 1.f;
-        if (Color.b > 1.0f)
-            Color.b = 1.f;
     }
     static void MakePositiveVector(NiPoint3& Vector)
     {

@@ -67,8 +67,9 @@ bool World::LoadSHMD()
 					Obj = (NiPickable*)MainObj->Clone();
 					NiNodePtr ptr = &*Obj;
 					this->AttachGroundObj(ptr);
-
+#if PICKABLEOBJECTS
 					Obj->SetSHMDPath(obj.first);
+#endif
 					Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
 					Obj->SetTranslate(pos->pos);
 					NiMatrix3 m;
