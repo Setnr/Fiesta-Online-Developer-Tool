@@ -22,6 +22,10 @@ public:
 	{
 		if (!InitMouse)
 			return;
+		float CurTime = NiGetCurrentTimeInSec();
+		if (LastUpdate + 0.05f > CurTime)
+			return;
+		LastUpdate = CurTime;
 		IniFile& _InitFile = kWorld->GetIniFile();;
 		
 		int middlew = _Intersect.x / _InitFile.OneBlock_width;
@@ -37,7 +41,8 @@ public:
 					continue;
 				if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
 					continue;
-				HTD[w][h].VertexColor = color * color.a + OrgPoints[w][h].VertexColor * (1.f - color.a);
+				NiColorA col = color * color.a + OrgPoints[w][h].VertexColor * (1.f - color.a);
+				kWorld->UpdateTerrainVertexColor(w, h, col);
 				for (auto point : kWorld->GetHTDPoints(w, h))
 				{
 					if (point.NiColor)

@@ -200,6 +200,7 @@ public:
 	IniFile& GetIniFile() { return _InitFile; }
 	void CreateTerrainLayer(std::shared_ptr<TerrainLayer> CurrentLayer);
 	std::vector<std::vector<PointInfos>>& GetHTD() { return VertexMap; }
+	void UpdateTerrainVertexColor(int w, int h, NiColorA& col) { VertexMap[w][h].VertexColor = col; }
 	virtual NiPoint3 GetSpawnPoint();
 	virtual std::string GetFolderPath() 
 	{
@@ -349,11 +350,12 @@ public:
 				}
 			}
 			bmp.WriteToFile(vertexpath.c_str());
+			LogInfo("Safed Vertex to \n" + vertexpath);
 			}
 		catch (std::exception e)
 		{
-			LogError("Failed to safe: " + vertexpath);
-			LogError("Error-Msg: " + e.what());
+			LogError("Failed to safe: \n" + vertexpath);
+			LogError("Error-Msg: \n" + e.what());
 		}
 		catch (...)
 		{

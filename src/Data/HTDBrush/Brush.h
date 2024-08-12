@@ -65,7 +65,8 @@ protected:
 	int BrushSize;
 	bool InitMouse = false;
 	NiPoint3 _Intersect;
-	TerrainWorldPtr kWorld;
+	TerrainWorldPtr kWorld; 
+	float LastUpdate = 0.0f;
 };
 
 class HTDBrush : public Brush

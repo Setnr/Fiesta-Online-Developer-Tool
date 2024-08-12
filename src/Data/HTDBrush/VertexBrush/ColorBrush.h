@@ -22,7 +22,7 @@ public:
 	virtual void Update()
 	{
 		IniFile& _InitFile = kWorld->GetIniFile();;
-		static float LastUpdate = 0.0f;
+		 
 		float CurTime = NiGetCurrentTimeInSec();
 		if (LastUpdate + 0.05f > CurTime)
 			return;
@@ -40,7 +40,8 @@ public:
 					continue;
 				if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
 					continue;
-				HTD[w][h].VertexColor = color;
+				kWorld->UpdateTerrainVertexColor(w, h, color);
+				//HTD[w][h].VertexColor = color;
 				for (auto point : kWorld->GetHTDPoints(w, h))
 				{
 					if (point.NiColor)

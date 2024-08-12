@@ -16,6 +16,11 @@ public:
 
 	virtual void Update()
 	{
+		float CurTime = NiGetCurrentTimeInSec();
+		if (LastUpdate + 0.05f > CurTime)
+			return;
+		LastUpdate = CurTime;
+
 		IniFile& _InitFile = kWorld->GetIniFile();;
 		std::vector<std::vector<TerrainWorld::PointInfos>>& HTD = kWorld->GetHTD();
 		
@@ -57,9 +62,11 @@ public:
 							SumA += HTD[w - i][h - j].VertexColor.a * KernelValue;
 						}
 					}
+					NiColorA color(SumR, SumG, SumB, SumA);
+					kWorld->UpdateTerrainVertexColor(w, h, color);
 					for (auto point : kWorld->GetHTDPoints(w, h))
 					{
-						UpdateVector.push_back({ NiColorA(SumR,SumG,SumB,SumA) , point});
+						UpdateVector.push_back({ color , point});
 					}
 
 				}
