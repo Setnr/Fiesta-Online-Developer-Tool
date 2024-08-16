@@ -51,8 +51,10 @@ If you're interested in experimenting with the latest features and improvements,
 ### SHMD Editor
 
 1. Middle Mouse Button Menu<br></br>
-   ![Middle Mouse Button Menu](https://setnr12.work/static/images/MovableObject.gif)
-
+   
+   <video width="1080" height="450" controls>
+   <source src="./Images/MovableObjects.mp4" type="video/mp4">
+   </video>
 2. Start Screen<br></br>
    ![Start Screen](./Images/StartScreen.jpg)
 
