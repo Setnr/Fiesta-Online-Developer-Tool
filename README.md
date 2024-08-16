@@ -51,10 +51,10 @@ If you're interested in experimenting with the latest features and improvements,
 ### SHMD Editor
 
 1. Middle Mouse Button Menu<br></br>
-   
-   <video width="1080" height="450" controls>
-   <source src="./Images/MovableObjects.mp4" type="video/mp4">
-   </video>
+
+[<img src="./Images/Screenshot_1.jpg" width="600" height="300"
+/>](./Images/MovableObjects.mp4)
+
 2. Start Screen<br></br>
    ![Start Screen](./Images/StartScreen.jpg)
 
