@@ -99,6 +99,8 @@ private:
 	BrushPtr _Brush;
 	NiNodePtr HTDOrbNode;
 
+	void CopyObject();
+
 	enum EditMode : int
 	{
 		None,

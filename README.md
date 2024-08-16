@@ -1,12 +1,16 @@
 # Fiesta Online Developer Tool
 
-Welcome to the Fiesta Online Developer Tool repository! This tool is designed to aid developers and modders in working with Fiesta Online game files. Please note that this tool is provided "as is" without any warranties or guarantees, and the developer does not claim any copyright over it.
+Welcome to the Fiesta Online Developer Tool repository! This tool is designed to aid developers and modders in working with Fiesta Online game files. Please note that this tool is provided "as is" without any warranties or guarantees, and the developer does not claim any copyright over it and is created out of curiosity how the Fiesta Online Files work and interact with each other. Use this to learn and understand Stuff on your own :)
 
 ## Disclaimer
 
 Please be aware that the Fiesta Online Developer Tool will replace a shader in the original game client. This replacement is necessary because the tool uses a newer version of the Gamebryo engine, which requires some adjustments.
 
 As far as testing has shown, this change should not affect the game client's functionality in any way. However, please use the tool at your own risk and ensure you have backups of your original game files before making any modifications.
+
+## Developer Builds
+
+If you're interested in experimenting with the latest features and improvements, you can access the developer builds by checking out the other branches in this repository. For detailed installation instructions, please refer to the [Install.md](./Install.md) file. These builds are more experimental and may contain unfinished features or bugs, so proceed with caution!
 
 ## Features
 
@@ -24,7 +28,7 @@ As far as testing has shown, this change should not affect the game client's fun
 
 ### HTDG-Editor Submodule
 
-- **Heightmap Editing**: Change the heightmap to update the visual of the map using various tools (e.g., leveling, smoothing, texturing via Perlin). Updates are shown in real-time.
+- **Heightmap Editing**: Change the heightmap to update the visual of the map using various tools (e.g., leveling, smoothing, texturing). Updates are shown in real-time.
 
 ### Texture-Editor Submodule
 
@@ -32,7 +36,7 @@ As far as testing has shown, this change should not affect the game client's fun
 
 ### Map-Creator Submodule
 
-- **Map Generation**: Generate new maps using algorithms like Perlin, Worley, or DiamondSquare. Customize parameters to create endless map variations. The generated maps can be instantly edited with all other tools, but need to be added to the .shn files manually. Apply erosion to smooth the entire map.
+- **Map Generation**: Generate new maps using algorithms like Perlin, Worley, or DiamondSquare. Customize parameters to create endless map variations. The generated maps can be instantly edited with all other tools, but need to be added to the .shn files manually. Apply erosion to smooth the entire map and create Shadows for the VertexColors.
 
 ### General Features
 
@@ -47,18 +51,15 @@ As far as testing has shown, this change should not affect the game client's fun
 ### SHMD Editor
 
 1. Middle Mouse Button Menu<br></br>
-   ![Middle Mouse Button Menu](./Images/PopUp.jpg)
+   ![Middle Mouse Button Menu](https://setnr12.work/static/images/MovableObject.gif)
 
-2. Folder Dialog<br></br>
-   ![Folder Dialog](./Images/AddPickable.jpg)
-
-3. Start Screen<br></br>
+2. Start Screen<br></br>
    ![Start Screen](./Images/StartScreen.jpg)
 
-4. Translate Gizmo<br></br>
+3. Translate Gizmo<br></br>
    ![Translate Gizmo](./Images/Translate.jpg)
 
-5. Rotate Gizmo<br></br>
+4. Rotate Gizmo<br></br>
    ![Rotate Gizmo](./Images/Rotate.jpg)
 
 ### SHBD Editor
@@ -69,25 +70,28 @@ As far as testing has shown, this change should not affect the game client's fun
 ### HTDG-Editor
 
 1. Heightmap Editing<br></br>
-   *(Add screenshots or videos here)* To be done
+   ![Height Adjusting 1](https://setnr12.work/static/images/TerrainEdit_2.gif)
+   ![Height Adjusting 2](https://setnr12.work/static/images/TerrainEdit_1.gif)
 
 ### Texture-Editor
 
 1. Texture Editing<br></br>
-   *(Add screenshots or videos here)* To be done
+   ![Texture Editing](https://setnr12.work/static/images/TextureEdit.gif)
 
 ### Map-Creator
 
 1. Map Generation<br></br>
-   *(Add screenshots or videos here)* To be done
+   ![MapCreation Parameters](./Images/MapCreateAlgorithmParameters.gif)
+   ![MapCreation Random Maps](./Images/MapCreateRandom.gif)
+   ![MapCreation Create Shadows](./Images/MapCreateShadow.gif)
 
 ## Usage
 
-To get started with the Fiesta Online Developer Tool, simply download the latest release from the Releases section of this repository. Once downloaded, run the executable file to launch the tool. You can then load .shmd or .shbd files, make edits, and save your changes as needed.
+To get started with the Fiesta Online Developer Tool, simply download the latest release from the Releases section of this repository. Once downloaded, run the executable file to launch the tool. You can then select your client path and after a restart the Tool with prompt you with an overview of your MapInfo.shn .
 
 ## License
 
-This tool is provided under an open-source license. Please refer to the LICENSE file in this repository for more information.
+This tool is provided under an open-source license. 
 
 ## Acknowledgements
 

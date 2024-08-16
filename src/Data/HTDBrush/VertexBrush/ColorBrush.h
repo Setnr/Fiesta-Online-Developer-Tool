@@ -41,7 +41,6 @@ public:
 				if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= BrushSize * BrushSize))
 					continue;
 				kWorld->UpdateTerrainVertexColor(w, h, color);
-				//HTD[w][h].VertexColor = color;
 				for (auto point : kWorld->GetHTDPoints(w, h))
 				{
 					if (point.NiColor)

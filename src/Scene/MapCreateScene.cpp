@@ -56,7 +56,13 @@ void MapCreateScene::DrawImGui()
         }
 
         if (ImGui::DragInt("Seed", &Seed))
-            UpdateAlgo = true;;
+            UpdateAlgo = true;
+        ImGui::SameLine();
+        if (ImGui::Button("Random Seed")) 
+        {
+            Seed = rand();
+            UpdateAlgo = true;
+        }
         
         switch (_Algo) 
         {

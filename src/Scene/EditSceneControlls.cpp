@@ -70,43 +70,8 @@ void EditScene::SHMDCopyPaste()
 	if (LastPasteTime + Settings::PasteDelay() < CurTime && CopyObj && ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x56))   // ctrl v
 	{
 		LastPasteTime = CurTime;
-			
-		NiPoint3 kOrigin, kDir;
-		long X, Y;
-		FiestaOnlineTool::GetMousePosition(X, Y);
-		if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
-		{
-			NiPick _Pick;
-			_Pick.SetPickType(NiPick::FIND_FIRST);
-			_Pick.SetSortType(NiPick::SORT);
-			_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
-			_Pick.SetFrontOnly(true);
-			_Pick.SetReturnNormal(true);
-			_Pick.SetObserveAppCullFlag(true);
-			_Pick.SetTarget(kWorld->GetWorldScene());
-			if (_Pick.PickObjects(kOrigin, kDir, true))
-			{
-				NiPick::Results& results = _Pick.GetResults();
-				CopyObj->HideBoundingBox(BoundingBox);
-				NiPickablePtr Obj = (NiPickable*)CopyObj->Clone();
+		CopyObject();
 
-				NiNodePtr ptr = (NiNode*)&*Obj;
-				kWorld->AttachGroundObj(ptr);
-
-				Obj->SetName(CopyObj->GetName());
-				Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
-
-				Obj->SetSelectiveUpdateRigid(true);
-				auto node = kWorld->GetGroundObjNode();
-				node->UpdateEffects();
-				node->UpdateProperties();
-				node->Update(0.0);
-				SelectedObj = Obj;
-				UpdateGeneralInfoNode((NiNode*)&*SelectedObj);
-				SelectedObj->SetTranslate(results.GetAt(0)->GetIntersection());
-				SelectedObjAngels[0] = 0; SelectedObjAngels[1] = 0; SelectedObjAngels[2] = 0;
-			}
-		}
 	}
 }
 
@@ -206,4 +171,49 @@ void EditScene::MoveSHBDTexture(float fTime)
 		SHBDNode->SetTranslate(NodePositon);
 	}
 
+}
+
+void EditScene::CopyObject() 
+{
+	if (!CopyObj)
+	{
+		LogError("Tried to Copy Object, but nothing was selcted to be copied!");
+		return;
+	}
+	NiPoint3 kOrigin, kDir;
+	long X, Y;
+	FiestaOnlineTool::GetMousePosition(X, Y);
+	if (this->Camera->WindowPointToRay(X, Y, kOrigin, kDir))
+	{
+		NiPick _Pick;
+		_Pick.SetPickType(NiPick::FIND_FIRST);
+		_Pick.SetSortType(NiPick::SORT);
+		_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+		_Pick.SetFrontOnly(true);
+		_Pick.SetReturnNormal(true);
+		_Pick.SetObserveAppCullFlag(true);
+		_Pick.SetTarget(kWorld->GetWorldScene());
+		if (_Pick.PickObjects(kOrigin, kDir, true))
+		{
+			NiPick::Results& results = _Pick.GetResults();
+			CopyObj->HideBoundingBox(BoundingBox);
+			NiPickablePtr Obj = (NiPickable*)CopyObj->Clone();
+
+			NiNodePtr ptr = (NiNode*)&*Obj;
+			kWorld->AttachGroundObj(ptr);
+
+			Obj->SetName(CopyObj->GetName());
+			Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
+
+			Obj->SetSelectiveUpdateRigid(true);
+			auto node = kWorld->GetGroundObjNode();
+			node->UpdateEffects();
+			node->UpdateProperties();
+			node->Update(0.0);
+			SelectedObj = Obj;
+			UpdateGeneralInfoNode((NiNode*)&*SelectedObj);
+			SelectedObj->SetTranslate(results.GetAt(0)->GetIntersection());
+			SelectedObjAngels[0] = 0; SelectedObjAngels[1] = 0; SelectedObjAngels[2] = 0;
+		}
+	}
 }

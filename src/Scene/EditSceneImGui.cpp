@@ -327,22 +327,13 @@ void EditScene::MiddleMouseButtonMenu()
 			{
 				if (NiIsKindOf(NiPickable, SelectedObj))
 				{
-					NiPickablePtr Obj = (NiPickable*)SelectedObj->Clone();
-					NiNodePtr ptr = (NiNode*)&*Obj;
-					kWorld->AttachGroundObj(ptr);
-
-					Obj->SetName(SelectedObj->GetName());
-					Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
-
-					Obj->SetSelectiveUpdateRigid(true);
-					auto node = kWorld->GetGroundCollidee();
-					node->UpdateEffects();
-					node->UpdateProperties();
-					node->Update(0.0);
-					SelectedObj = Obj;
-				}
-				else
+					CopyObj = SelectedObj;
+				}else
 					LogError("Can´t clone selcted Object");
+			}
+			if (CopyObj && ImGui::Selectable("Paste Copied Obj")) 
+			{
+				CopyObject();
 			}
 			if (ImGui::Selectable("Delete Selected Obj"))
 			{
