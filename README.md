@@ -73,13 +73,17 @@ https://github.com/user-attachments/assets/7eee7437-4e08-4128-87f4-9f2f427d706b
 ### HTDG-Editor
 
 1. Heightmap Editing<br></br>
-   ![Height Adjusting 1](https://setnr12.work/static/images/TerrainEdit_2.gif)
-   ![Height Adjusting 2](https://setnr12.work/static/images/TerrainEdit_1.gif)
+   
+https://github.com/user-attachments/assets/798623bc-5faa-4f25-853e-7b66d69b122c
+
 
 ### Texture-Editor
 
 1. Texture Editing<br></br>
-   ![Texture Editing](https://setnr12.work/static/images/TextureEdit.gif)
+
+https://github.com/user-attachments/assets/88eaa050-bef6-4b47-ba06-5489043abe3f
+
+
 
 ### Map-Creator
 
