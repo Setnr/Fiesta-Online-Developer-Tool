@@ -62,6 +62,7 @@ bool World::LoadSHMD()
 					if (!MainObj)
 					{
 						MainObj = PgUtil::LoadNifFile(Path.c_str(), NULL, PICKABLEOBJECTS);
+						RemoveCDAndM(MainObj, this);
 
 					}
 					Obj = (NiPickable*)MainObj->Clone();

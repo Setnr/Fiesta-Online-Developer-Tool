@@ -89,7 +89,7 @@ void RemoveCDAndM(NiNodePtr& obj, World* kWorld)
 		else if (NiIsKindOf(NiNode, child))
 		{
 			NiNodePtr p = (NiNode*)(NiAVObject*)child;
-			RemoveCDAndM(p,kWorld);
+			RemoveCDAndM(p, kWorld);
 		}
 	}
 	for (auto rem : Removes)

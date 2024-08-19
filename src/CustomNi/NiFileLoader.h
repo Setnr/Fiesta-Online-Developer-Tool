@@ -114,6 +114,7 @@ public:
 			{
 				LastUsePath = UsePath;
 				NiNodePtr nif = PgUtil::LoadNifFile(File.c_str(), 0, _Pickable);
+				
 				if (NiIsKindOf(NiPickable, nif))
 				{
 					nif->SetTranslate(NiPoint3::ZERO);
@@ -189,6 +190,8 @@ private:
 	NiCameraPtr Camera;
 	std::string LastUsePath;
 	NiAmbientLightPtr m_spAmbientLight;
+
+	
 };
 
 

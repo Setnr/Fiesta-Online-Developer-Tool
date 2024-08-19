@@ -85,9 +85,6 @@
     <Filter Include="Data\Brushes\VertexBrush">
       <UniqueIdentifier>{4cfc03ca-8bec-44e6-916c-6f588ec9790b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Includes\Height-Map-Shadows">
-      <UniqueIdentifier>{2a507451-dd28-40c7-ae96-fe8ec2f597c5}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CustomNi\NiFileLoader.h">
@@ -299,12 +296,6 @@
     <ClInclude Include="src\Data\HTDBrush\VertexBrush\VertexSoftBrush.h">
       <Filter>Data\Brushes\VertexBrush</Filter>
     </ClInclude>
-    <ClInclude Include="Includes\height-map\HeightMapShadow.h">
-      <Filter>Includes\Height-Map-Shadows</Filter>
-    </ClInclude>
-    <ClInclude Include="Includes\height-map\VL234f.h">
-      <Filter>Includes\Height-Map-Shadows</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CustomNi\NiPickable.cpp">
@@ -448,9 +439,6 @@
     </ClCompile>
     <ClCompile Include="src\Data\HTDBrush\WorleyBrush.cpp">
       <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClCompile>
-    <ClCompile Include="Includes\height-map\HeightMapShadow.cpp">
-      <Filter>Includes\Height-Map-Shadows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

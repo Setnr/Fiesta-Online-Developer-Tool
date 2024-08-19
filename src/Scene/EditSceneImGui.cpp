@@ -12,7 +12,6 @@
 #include "MapCreateScene.h"
 #include <algorithm>
 
-
 glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
 {
 	if (q.w == 1.f)
@@ -269,6 +268,7 @@ void EditScene::MiddleMouseButtonMenu()
 	if (MiddleMouseLoader.DrawImGui())
 	{
 		NiNodePtr obj = MiddleMouseLoader.Load();
+		RemoveCDAndM(obj, kWorld);
 		if (NiIsKindOf(NiPickable, obj))
 			SelectedObj = (NiPickable*)(NiNode*)obj;
 

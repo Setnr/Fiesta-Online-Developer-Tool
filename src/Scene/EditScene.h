@@ -171,5 +171,35 @@ private:
 	}
 	NiFileLoader MiddleMouseLoader; 
 	NiFileLoader SHMDWindowLoader;
+
+	void RemoveCDAndM(NiNodePtr& obj, World* kWorld)
+	{
+		std::vector<NiAVObjectPtr> Removes;
+		for (int i = 0; i < obj->GetChildCount(); i++)
+		{
+			NiAVObjectPtr child = obj->GetAt(i);
+			if (!child)
+				continue;
+			if (NiIsKindOf(NiGeometry, child))
+			{
+				auto Name = child->GetName();
+				if (Name.Contains("#CD") || Name.Contains("#M"))
+				{
+					Removes.push_back(child);
+				}
+			}
+			else if (NiIsKindOf(NiNode, child))
+			{
+				NiNodePtr p = (NiNode*)(NiAVObject*)child;
+				RemoveCDAndM(p, kWorld);
+			}
+		}
+		for (auto rem : Removes)
+		{
+			obj->DetachChild(rem);
+			if (NiIsKindOf(NiNode, rem))
+				kWorld->AttachGroundCollidee((NiNodePtr)(NiNode*)&*rem);
+		}
+	}
 };
 
