@@ -15,9 +15,9 @@ Everything else should be included in the repository and all paths should adjust
  
 ### Debug Builds
  
-If you wish to create a debug build of the tool, you will also need to install **Visual Studio 2005**. You can find the installer for Visual Studio 2005 in this repository under the following path:
+If you wish to create a debug build of the tool, you will also need to install **Visual Studio 2005**. You can find a installer for Visual Studio 2005 under the following path:
  
-- [Visual Studio 2005 Installer](./Images/en_vc_2005_express.iso)
+- [Visual Studio 2005 Installer](https://archive.org/details/MicrosoftVisualStudio2005ProfessionalEditionX11-86811X11-45575X11-45582)
  
 ## Building the Tool
  
