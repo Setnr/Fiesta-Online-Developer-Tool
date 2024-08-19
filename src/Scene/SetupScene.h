@@ -67,7 +67,7 @@ public:
 			if (std::filesystem::exists(PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\AlphaTextureBlender.NSF")))
 			{
 				std::filesystem::copy(
-					PgUtil::CreateFullFilePathFromBaseFolder(".\\FiestaOnlineTool\\AlphaTextureBlender.NSF"),
+					PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\AlphaTextureBlender.NSF"),
 					PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\AlphaTextureBlender.NSF.bak"));
 				std::filesystem::remove(PgUtil::CreateFullFilePathFromBaseFolder(".\\shader\\AlphaTextureBlender.NSF"));
 			}
