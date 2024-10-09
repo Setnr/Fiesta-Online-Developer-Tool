@@ -206,6 +206,12 @@ public:
 	{
 		return _InitFile.HeightFileName.substr(0, _InitFile.HeightFileName.find_last_of("\\"));
 	}
+	bool IsLightOn() { return m_spMapDirectionalLight->GetSwitch(); }
+	void ChangeLight(bool state) { return m_spMapDirectionalLight->SetSwitch(state); }
+	NiDirectionalLightPtr GetLight() 
+	{
+		return m_spMapDirectionalLight;
+	}
 #pragma endregion
 	void ReloadTerrain() {
 		ClearTerrainScene();

@@ -156,5 +156,9 @@ bool TerrainWorld::InitLightFog()
 	m_spMapDirectionalLight->SetAmbientColor(NiColor(.75, .75, .75));
 	m_spMapDirectionalLight->SetDiffuseColor(NiColor::WHITE);
 	m_spMapDirectionalLight->SetSpecularColor(NiColor::WHITE);
+
+	m_spMapDirectionalLight->AttachAffectedNode(m_spAllGroundScene);
+	m_spAllGroundScene->AttachChild(m_spMapDirectionalLight);
+	m_spAllGroundScene->UpdateEffects();
 	return 1;
 }

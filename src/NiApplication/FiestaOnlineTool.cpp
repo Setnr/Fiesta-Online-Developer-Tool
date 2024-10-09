@@ -9,8 +9,24 @@
 #include "ImGui/ImApp.h"
 #include "ImGui/ImGuizmo.h"
 #include "Logger.h"
+
+#include <NiD3DShaderFactory.h>
+
+bool init = false;
+NiScreenElementsPtr element = nullptr;
 void FiestaOnlineTool::OnIdle()
 {
+    if (!init) 
+    {
+        init = true;
+        NiScreenElementsDataPtr data = NiNew NiScreenElementsData(0, 0, 1);
+        element = NiNew NiScreenElements(data);
+        data->Insert(4);
+        data->SetRectangle(0, 0.f, 0.f, 1.f, 1.f);
+        data->SetTextures(0, 0, 0.f, 0.f, 1.f, 1.f);
+        NiTexturingProperty::Map* map = NiNew NiTexturingProperty::Map();
+        NiTexturingPropertyPtr prop = NiNew NiTexturingProperty();
+    }
     if(MeasureTime())
     {
         /*Update FrameRate*/
@@ -60,6 +76,12 @@ void FiestaOnlineTool::OnIdle()
         /*Draws the Cursor*/
         DrawCursor();
 
+        NiPoint2 kBottom(0.f, -0.0020000001);
+        NiPoint2 kCenter(0.0f,0.0f); 
+        NiPoint2 kRight(0.001f,0.f);
+        NiPoint2 kLeft(-0.001f,0.f);
+        NiPoint2 kTop(0.f,0.0020000001f);
+        NiD3DShaderFactory::UpdateGlobalShaderConstant("g_ScreenSift", 8, &kCenter);
         m_spRenderer->EndUsingRenderTargetGroup();
         this->EndFrame();
 

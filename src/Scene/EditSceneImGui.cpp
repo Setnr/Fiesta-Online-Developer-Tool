@@ -575,6 +575,7 @@ void EditScene::DrawSHMDWindow()
 	DrawSHMDHeader("Water", kWorld->GetWaterNode());
 	DrawSHMDHeader("GroundObject", kWorld->GetGroundObjNode());
 	ImGui::ColorEdit3("Global Light", (float*)&kWorld->GetAmbientLightAmbientColor().r);
+	
 	ImGui::ColorEdit3("Fog Color", (float*)&kWorld->GetFogColor().r);
 
 	float depth = kWorld->GetFogDepth();
@@ -585,7 +586,12 @@ void EditScene::DrawSHMDWindow()
 
 	ImGui::ColorEdit3("AmbientLight Color", (float*)&kWorld->GetMapDirectionalLightAmbientColor().r);
 	ImGui::ColorEdit3("DiffuseLight Color", (float*)&kWorld->GetMapDirectionalLightDiffuseColor().r);
-	
+	bool Light = kWorld->IsLightOn();
+	if (ImGui::Checkbox("Global Light Switch", &Light))
+	{
+		kWorld->ChangeLight(Light);
+		kWorld->GetWorldScene()->UpdateEffects();
+	}
 
 	ImGui::End();
 	if (SHMDWindowLoader.DrawImGui())

@@ -1,6 +1,6 @@
 #pragma once
 #include "Version.h"
-std::string Version::CurVersion = "V0.0.2";
+std::string Version::CurVersion = "V0.0.3";
 
 std::string parseLatestVersion(const std::string& jsonResponse)
 {
