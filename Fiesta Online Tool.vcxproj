@@ -51,6 +51,50 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.h" />
+    <ClInclude Include="Includes\lua\lapi.h" />
+    <ClInclude Include="Includes\lua\lauxlib.h" />
+    <ClInclude Include="Includes\lua\lcode.h" />
+    <ClInclude Include="Includes\lua\lctype.h" />
+    <ClInclude Include="Includes\lua\ldebug.h" />
+    <ClInclude Include="Includes\lua\ldo.h" />
+    <ClInclude Include="Includes\lua\lfunc.h" />
+    <ClInclude Include="Includes\lua\lgc.h" />
+    <ClInclude Include="Includes\lua\ljumptab.h" />
+    <ClInclude Include="Includes\lua\llex.h" />
+    <ClInclude Include="Includes\lua\llimits.h" />
+    <ClInclude Include="Includes\lua\lmem.h" />
+    <ClInclude Include="Includes\lua\lobject.h" />
+    <ClInclude Include="Includes\lua\lopcodes.h" />
+    <ClInclude Include="Includes\lua\lopnames.h" />
+    <ClInclude Include="Includes\lua\lparser.h" />
+    <ClInclude Include="Includes\lua\lprefix.h" />
+    <ClInclude Include="Includes\lua\lstate.h" />
+    <ClInclude Include="Includes\lua\lstring.h" />
+    <ClInclude Include="Includes\lua\ltable.h" />
+    <ClInclude Include="Includes\lua\ltm.h" />
+    <ClInclude Include="Includes\lua\lua.h" />
+    <ClInclude Include="Includes\lua\lua.hpp" />
+    <ClInclude Include="Includes\lua\luaconf.h" />
+    <ClInclude Include="Includes\lua\lualib.h" />
+    <ClInclude Include="Includes\lua\lundump.h" />
+    <ClInclude Include="Includes\lua\lvm.h" />
+    <ClInclude Include="Includes\lua\lzio.h" />
+    <ClInclude Include="src\Data\IngameWorld\WorldChanges\FogChange.h" />
+    <ClInclude Include="src\Data\IngameWorld\WorldChanges\WorldChanges.h" />
+    <ClInclude Include="src\Data\NiCustom\NiBoundingBox.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\EditMode.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\SHMDMode.h" />
+    <ClInclude Include="src\Scene\ScreenElements\LuaElement\LuaElement.h" />
+    <ClInclude Include="src\Scene\ScreenElements\LuaElement\LuaFunctions\LuaElementFunctions.h" />
+    <ClInclude Include="src\Scene\ScreenElements\MapLoad\MapLoadElement.h" />
+    <ClInclude Include="src\Scene\ScreenElements\ScreenElement.h" />
+    <ClInclude Include="src\Data\NiCustom\NiFog.h" />
+    <ClInclude Include="src\Data\NiCustom\NiPickable.h" />
+    <ClInclude Include="src\Data\ShineMapData\ShineMapData.h" />
+    <ClInclude Include="src\Data\ShineBlockData\ShineBlockData.h" />
+    <ClInclude Include="src\Data\ShineIni\ShineIni.h" />
+    <ClInclude Include="src\Data\HeightTerrainData\HeightTerrainData.h" />
     <ClInclude Include="Includes\EasyBMP\EasyBMP.h" />
     <ClInclude Include="Includes\EasyBMP\EasyBMP_BMP.h" />
     <ClInclude Include="Includes\EasyBMP\EasyBMP_DataStructures.h" />
@@ -75,55 +119,67 @@
     <ClInclude Include="Includes\Ini\ini.h" />
     <ClInclude Include="Includes\Ini\INIReader.h" />
     <ClInclude Include="Includes\md5\md5.h" />
-    <ClInclude Include="src\CustomNi\NiBoundingBox.h" />
-    <ClInclude Include="src\CustomNi\NiFileLoader.h" />
-    <ClInclude Include="src\CustomNi\NiPickable.h" />
-    <ClInclude Include="src\CustomNi\TextureFileLoader.h" />
-    <ClInclude Include="src\Data\Algorithms\worley.h" />
-    <ClInclude Include="src\Data\DiamondSquareFractal.h" />
-    <ClInclude Include="src\Data\Fractal.h" />
-    <ClInclude Include="src\Data\HTDBrush\ChangeBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\HightBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\Brush.h" />
-    <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\PerlinBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\PerlinTextureBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\PixelBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\SmoothingBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\TextureBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\TextureSmoothingBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\VertexBrush\ColorBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\VertexBrush\SmoothingBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\VertexBrush\VertexSoftBrush.h" />
-    <ClInclude Include="src\Data\HTDBrush\WorleyBrush.h" />
-    <ClInclude Include="src\Data\IngameWorld.h" />
-    <ClInclude Include="src\Data\IniFile.h" />
-    <ClInclude Include="src\Data\PerlinFractal.h" />
-    <ClInclude Include="src\Data\SHBD\SHBD.h" />
-    <ClInclude Include="src\Data\SHMD\SHMD.h" />
-    <ClInclude Include="src\Data\SHNManager.h" />
-    <ClInclude Include="src\Data\SHNStruct.h" />
-    <ClInclude Include="src\Data\TerrainWorld.h" />
-    <ClInclude Include="src\Data\Version.h" />
-    <ClInclude Include="src\Data\WorleyFractal.h" />
-    <ClInclude Include="src\ImGuiConstantFuncs.h" />
-    <ClInclude Include="src\Logger\Logger.h" />
-    <ClInclude Include="src\NiApplication\FiestaOnlineTool.h" />
-    <ClInclude Include="src\NiApplication\FiestaOnlineTool_GeneralHeaders.h" />
-    <ClInclude Include="src\NiInterface\NiViewPort\NiViewPort.h" />
-    <ClInclude Include="src\NiInterface\PgWin.h" />
-    <ClInclude Include="src\NiInterface\PgWinMgr.h" />
-    <ClInclude Include="src\NiInterface\PgWinObj.h" />
-    <ClInclude Include="src\PgUtil.h" />
-    <ClInclude Include="src\Scene\EditScene.h" />
-    <ClInclude Include="src\Scene\Elements\LayerEditWindow.h" />
-    <ClInclude Include="src\Scene\Elements\MapMenu.h" />
-    <ClInclude Include="src\Scene\FiestaScene.h" />
-    <ClInclude Include="src\Scene\MapCreateScene.h" />
-    <ClInclude Include="src\Scene\SetupScene.h" />
+    <ClInclude Include="src\Data\IngameWorld\IngameWorld.h" />
+    <ClInclude Include="src\Data\SHN\SHNManager.h" />
+    <ClInclude Include="src\Data\SHN\SHNStruct.h" />
+    <ClInclude Include="src\Global\Logger\Logger.h" />
+    <ClInclude Include="src\Global\Version\Version.h" />
+    <ClInclude Include="src\Scene\EditorScene\EditorScene.h" />
+    <ClInclude Include="src\Scene\FiestaScene\FiestaScene.h" />
+    <ClInclude Include="src\Scene\InitializeScene\InitializeScene.h" />
     <ClInclude Include="src\Settings\Settings.h" />
+    <ClInclude Include="src\NiApplication\FiestaOnlineTool.h" />
+    <ClInclude Include="src\NiApplication\NiHeaders.h" />
+    <ClInclude Include="src\PgUtil.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.cpp" />
+    <ClCompile Include="Includes\lua\lapi.c" />
+    <ClCompile Include="Includes\lua\lauxlib.c" />
+    <ClCompile Include="Includes\lua\lbaselib.c" />
+    <ClCompile Include="Includes\lua\lcode.c" />
+    <ClCompile Include="Includes\lua\lcorolib.c" />
+    <ClCompile Include="Includes\lua\lctype.c" />
+    <ClCompile Include="Includes\lua\ldblib.c" />
+    <ClCompile Include="Includes\lua\ldebug.c" />
+    <ClCompile Include="Includes\lua\ldo.c" />
+    <ClCompile Include="Includes\lua\ldump.c" />
+    <ClCompile Include="Includes\lua\lfunc.c" />
+    <ClCompile Include="Includes\lua\lgc.c" />
+    <ClCompile Include="Includes\lua\linit.c" />
+    <ClCompile Include="Includes\lua\liolib.c" />
+    <ClCompile Include="Includes\lua\llex.c" />
+    <ClCompile Include="Includes\lua\lmathlib.c" />
+    <ClCompile Include="Includes\lua\lmem.c" />
+    <ClCompile Include="Includes\lua\loadlib.c" />
+    <ClCompile Include="Includes\lua\lobject.c" />
+    <ClCompile Include="Includes\lua\lopcodes.c" />
+    <ClCompile Include="Includes\lua\loslib.c" />
+    <ClCompile Include="Includes\lua\lparser.c" />
+    <ClCompile Include="Includes\lua\lstate.c" />
+    <ClCompile Include="Includes\lua\lstring.c" />
+    <ClCompile Include="Includes\lua\lstrlib.c" />
+    <ClCompile Include="Includes\lua\ltable.c" />
+    <ClCompile Include="Includes\lua\ltablib.c" />
+    <ClCompile Include="Includes\lua\ltm.c" />
+    <ClCompile Include="Includes\lua\lua.c" />
+    <ClCompile Include="Includes\lua\luac.c" />
+    <ClCompile Include="Includes\lua\lundump.c" />
+    <ClCompile Include="Includes\lua\lutf8lib.c" />
+    <ClCompile Include="Includes\lua\lvm.c" />
+    <ClCompile Include="Includes\lua\lzio.c" />
+    <ClCompile Include="src\Data\IngameWorld\WorldChanges\NiRTTIDeclares.cpp" />
+    <ClCompile Include="src\Data\IngameWorld\WorldChanges\WorldChanges.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\EditMode.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\SHMDMode.cpp" />
+    <ClCompile Include="src\Scene\ScreenElements\LuaElement\LuaElement.cpp" />
+    <ClCompile Include="src\Scene\ScreenElements\MapLoad\MapLoadElement.cpp" />
+    <ClCompile Include="src\Scene\ScreenElements\ScreenElement.cpp" />
+    <ClCompile Include="src\Data\NiCustom\NiPickable.cpp" />
+    <ClCompile Include="src\Data\ShineMapData\ShineMapData.cpp" />
+    <ClCompile Include="src\Data\ShineBlockData\ShineBlockData.cpp" />
+    <ClCompile Include="src\Data\ShineIni\ShineIni.cpp" />
+    <ClCompile Include="src\Data\HeightTerrainData\HeightTerrainData.cpp" />
     <ClCompile Include="Includes\EasyBMP\EasyBMP.cpp" />
     <ClCompile Include="Includes\ImGui\GraphEditor.cpp" />
     <ClCompile Include="Includes\ImGui\ImCurveEdit.cpp" />
@@ -141,40 +197,41 @@
     <ClCompile Include="Includes\Ini\ini.c" />
     <ClCompile Include="Includes\Ini\INIReader.cpp" />
     <ClCompile Include="Includes\md5\md5.cpp" />
-    <ClCompile Include="src\CustomNi\NiPickable.cpp" />
-    <ClCompile Include="src\Data\Algorithms\worley.cpp" />
-    <ClCompile Include="src\Data\Fractal.cpp" />
-    <ClCompile Include="src\Data\HTDBrush\Brush.cpp" />
-    <ClCompile Include="src\Data\HTDBrush\PerlinBrush.cpp" />
-    <ClCompile Include="src\Data\HTDBrush\TextureBrush.cpp" />
-    <ClCompile Include="src\Data\HTDBrush\WorleyBrush.cpp" />
-    <ClCompile Include="src\Data\IngameWorld.cpp" />
-    <ClCompile Include="src\Data\IngameWorldInit.cpp" />
-    <ClCompile Include="src\Data\IniFile.cpp" />
-    <ClCompile Include="src\Data\SHBD\SHBD.cpp" />
-    <ClCompile Include="src\Data\SHNManager.cpp" />
-    <ClCompile Include="src\Data\TerrainWorld.cpp" />
-    <ClCompile Include="src\Data\TerrainWorldInit.cpp" />
-    <ClCompile Include="src\Data\Version.cpp" />
-    <ClCompile Include="src\Logger\Logger.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Data\IngameWorld\IngameWorld.cpp" />
+    <ClCompile Include="src\Data\IngameWorld\IngameWorldInit.cpp" />
+    <ClCompile Include="src\Data\SHN\SHNManager.cpp" />
+    <ClCompile Include="src\Global\Logger\Logger.cpp" />
+    <ClCompile Include="src\Global\Version\Version.cpp" />
     <ClCompile Include="src\NiApplication\FiestaOnlineTool.cpp" />
-    <ClCompile Include="src\NiApplication\FiestaOnlineTool_Init.cpp" />
-    <ClCompile Include="src\NiApplication\FiestaOnlineTool_StaticDefines.cpp" />
-    <ClCompile Include="src\NiApplication\FiestaOnlineTool_UI.cpp" />
-    <ClCompile Include="src\NiInterface\PgWin.cpp" />
-    <ClCompile Include="src\Scene\EditScene.cpp" />
-    <ClCompile Include="src\Scene\EditSceneControlls.cpp" />
-    <ClCompile Include="src\Scene\EditSceneImGui.cpp" />
-    <ClCompile Include="src\Scene\Elements\LayerEditWindow.cpp" />
-    <ClCompile Include="src\Scene\Elements\MapMenu.cpp" />
-    <ClCompile Include="src\Scene\FiestaScene.cpp" />
-    <ClCompile Include="src\Scene\MapCreateScene.cpp" />
-    <ClCompile Include="src\Scene\SetupScene.cpp" />
+    <ClCompile Include="src\NiApplication\FiestaOnlineToolGlobalAccess.cpp" />
+    <ClCompile Include="src\NiApplication\FiestaOnlineToolInit.cpp" />
+    <ClCompile Include="src\PgUtil.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\EditorScene.cpp" />
+    <ClCompile Include="src\Scene\FiestaScene\FiestaScene.cpp" />
+    <ClCompile Include="src\Scene\InitializeScene\InitializeScene.cpp" />
     <ClCompile Include="src\Settings\Settings.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="Includes\ImGui\imgui.ini" />
+    <None Include="Install.md" />
+    <None Include="README.md" />
+    <None Include="Required\AlphaTextureBlender.NSF" />
+    <None Include="Required\Base.shmd" />
+    <None Include="Required\BaseIni.ini" />
+    <None Include="Required\BoundingBox.nif" />
+    <None Include="Required\HTDCircle.nif" />
+    <None Include="Required\imgui.ini" />
+    <None Include="Required\Interface.nif" />
+    <None Include="Required\Settings.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Required\Box02.dds" />
+    <Image Include="Required\Box02Darker.dds" />
+    <Image Include="Required\NorCursor.tga" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -307,59 +364,69 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;$(IncludePath)</IncludePath>
+    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Global/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;$(IncludePath);./Includes/lua</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\DebugDLL;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
     <SourcePath>$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|Win32'">
-    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;./Includes/height-map;$(IncludePath)</IncludePath>
+    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Global/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;./Includes/height-map;$(IncludePath);./Includes/lua</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\DebugLib;$(LibraryPath)</LibraryPath>
-    <OutDir>.\Build\$(Configuration)</OutDir>
-    <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
+    <OutDir>.\Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\BuildFiles\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;$(IncludePath)</IncludePath>
+    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Global/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;$(IncludePath);./Includes/lua</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\ReleaseDLL;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
-    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;$(IncludePath)</IncludePath>
+    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Global/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;$(IncludePath);./Includes/lua</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\ShippingDLL;$(LibraryPath)</LibraryPath>
     <OutDir>.\Build\$(Configuration)</OutDir>
     <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|Win32'">
-    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;$(IncludePath)</IncludePath>
+    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Global/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;$(IncludePath);./Includes/lua</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\ReleaseLib;$(LibraryPath)</LibraryPath>
-    <OutDir>.\Build\$(Configuration)</OutDir>
-    <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
+    <OutDir>.\Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\BuildFiles\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
-    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Logger;./src/Settings;./src/Data/SHBD;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;./Includes/EasyBMP;$(IncludePath)</IncludePath>
+    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Global/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;./Includes/EasyBMP;$(IncludePath);./Includes/lua</IncludePath>
     <LibraryPath>.\Includes\DirectX9\Lib\x86;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\VC80\ShippingLib;$(LibraryPath)</LibraryPath>
-    <OutDir>.\Build\$(Configuration)\</OutDir>
-    <IntDir>.\BuildFiles\$(Configuration)\</IntDir>
+    <OutDir>.\Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\BuildFiles\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath);./Includes/lua</IncludePath>
+    <LibraryPath>.\Includes\lua;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLib|x64'">
-    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Global/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;./Includes/height-map;$(IncludePath);./Includes/lua</IncludePath>
+    <OutDir>.\Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\BuildFiles\$(Platform)\$(Configuration)\</IntDir>
+    <LibraryPath>.\Includes\DirectX9\Lib\x64;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\x64\DebugLib;.\Includes\lua;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath);./Includes/lua</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
-    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath);./Includes/lua</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Lib|x64'">
-    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Global/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;$(IncludePath);./Includes/lua</IncludePath>
+    <OutDir>.\Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\BuildFiles\$(Platform)\$(Configuration)\</IntDir>
+    <LibraryPath>.\Includes\DirectX9\Lib\x64;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\x64\ReleaseLib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|x64'">
-    <IncludePath>E:\Coding\Gamebryo 2.3 Evaluation\SDK\Win32\Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(WindowsSDK_IncludePath);./src/CustomNi;./src/Scene;./src/NiInterface;./src/NiApplication;./src/Global/Logger;./src/Settings;./src/Data;./src;./Includes;./Includes/Ini;./Includes/DirectX9/Include;./Includes/Gamebryo 2.3/Include;./Includes/nlohmann;./Includes/Perlin;./Includes/EasyBMP;$(IncludePath);./Includes/lua</IncludePath>
+    <OutDir>.\Build\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>.\BuildFiles\$(Platform)\$(Configuration)\</IntDir>
+    <LibraryPath>.\Includes\DirectX9\Lib\x64;.\Includes\md5;.\Includes\Detours;.\Includes\Gamebryo 2.3\Lib\x64\ShippingLib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -367,7 +434,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_USRDLL;WIN32;_DEBUG;_CONSOLE;NIDEBUG;_CRT_SECURE_NO_WARNINGS;NIMAIN_IMPORT;NIDX9RENDERER_IMPORT;NISYSTEM_IMPORT;NSFPARSERLIB_IMPORT;NIINPUT_IMPORT;NSBSHADERLIB_IMPORT;NIVIEWMATH_IMPORT;NIOPTIMIZATION_IMPORT;NIPORTAL_IMPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
     </ClCompile>
@@ -388,6 +455,7 @@ copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\Bou
 copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
 copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"
 copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCircle.nif"
+copy ".\Required\LoginBackground.nif" ".\Build\$(Configuration)\FiestaOnlineTool\LoginBackground.nif"
 
 copy ".\Includes\Gamebryo 2.3\DLL\d3dx9d_32.dll" ".\Build\$(Configuration)\d3dx9d_32.dll" 
 
@@ -416,7 +484,7 @@ copy ".\Includes\Gamebryo 2.3\DLL\ShaderLibraryDX923VC80D.dll" ".\Build\$(Config
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_USRDLL;WIN32;_DEBUG;_CONSOLE;NIDEBUG;_CRT_SECURE_NO_WARNINGS;_COMPILENILIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AdditionalIncludeDirectories>
@@ -431,14 +499,12 @@ copy ".\Includes\Gamebryo 2.3\DLL\ShaderLibraryDX923VC80D.dll" ".\Build\$(Config
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"
-copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
-copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
-copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
-copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
-copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
-copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"
-copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCircle.nif"</Command>
+      <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
+copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -449,7 +515,7 @@ copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCi
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NIRELEASE;_CRT_SECURE_NO_WARNINGS;NIMAIN_IMPORT;NIDX9RENDERER_IMPORT;NISYSTEM_IMPORT;NSFPARSERLIB_IMPORT;NIINPUT_IMPORT;NSBSHADERLIB_IMPORT;NIVIEWMATH_IMPORT;NIOPTIMIZATION_IMPORT;NIPORTAL_IMPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
     </ClCompile>
@@ -470,6 +536,7 @@ copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\Bou
 copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
 copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"
 copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCircle.nif"
+copy ".\Required\LoginBackground.nif" ".\Build\$(Configuration)\FiestaOnlineTool\LoginBackground.nif"
 
 copy ".\Includes\Gamebryo 2.3\DLL\NiAnimation23VC80R.dll" ".\Build\$(Configuration)\NiAnimation23VC80R.dll" 
 copy ".\Includes\Gamebryo 2.3\DLL\NiBinaryShaderLibDX923VC80R.dll" ".\Build\$(Configuration)\NiBinaryShaderLibDX923VC80R.dll"
@@ -498,7 +565,7 @@ copy ".\Includes\Gamebryo 2.3\DLL\ShaderLibraryDX923VC80R.dll" ".\Build\$(Config
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NISHIPPING;_CRT_SECURE_NO_WARNINGS;NIMAIN_IMPORT;NIDX9RENDERER_IMPORT;NISYSTEM_IMPORT;NSFPARSERLIB_IMPORT;NIINPUT_IMPORT;NSBSHADERLIB_IMPORT;NIVIEWMATH_IMPORT;NIOPTIMIZATION_IMPORT;NIPORTAL_IMPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
     </ClCompile>
@@ -519,6 +586,7 @@ copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\Bou
 copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
 copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"
 copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCircle.nif"
+copy ".\Required\LoginBackground.nif" ".\Build\$(Configuration)\FiestaOnlineTool\LoginBackground.nif"
 
 copy ".\Includes\Gamebryo 2.3\DLL\NiAnimation23VC80S.dll" ".\Build\$(Configuration)\NiAnimation23VC80S.dll" 
 copy ".\Includes\Gamebryo 2.3\DLL\NiBinaryShaderLibDX923VC80S.dll" ".\Build\$(Configuration)\NiBinaryShaderLibDX923VC80S.dll"
@@ -546,7 +614,7 @@ copy ".\Includes\Gamebryo 2.3\DLL\NSFParserLibDX923VC80S.dll" ".\Build\$(Configu
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NIRELEASE;_CRT_SECURE_NO_WARNINGS;_COMPILENILIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
     </ClCompile>
@@ -559,14 +627,12 @@ copy ".\Includes\Gamebryo 2.3\DLL\NSFParserLibDX923VC80S.dll" ".\Build\$(Configu
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"
-copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
-copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
-copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
-copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
-copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
-copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"
-copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCircle.nif"</Command>
+      <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
+copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
@@ -577,7 +643,7 @@ copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCi
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NISHIPPING;_COMPILENILIB;_CRT_SECURE_NO_WARNINGS;STRICT;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
     </ClCompile>
@@ -590,15 +656,12 @@ copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCi
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
     <PostBuildEvent>
-      <Command>mkdir ".\Build\$(Configuration)\FiestaOnlineTool"
-copy ".\Required\imgui.ini" ".\Build\$(Configuration)\FiestaOnlineTool\imgui.ini"
-copy ".\Required\NorCursor.tga" ".\Build\$(Configuration)\FiestaOnlineTool\NorCursor.tga"
-copy ".\Required\Settings.ini" ".\Build\$(Configuration)\FiestaOnlineTool\Settings.ini"
-copy ".\Required\AlphaTextureBlender.NSF" ".\Build\$(Configuration)\FiestaOnlineTool\AlphaTextureBlender.NSF"
-copy ".\Required\BoundingBox.nif" ".\Build\$(Configuration)\FiestaOnlineTool\BoundingBox.nif"
-copy ".\Required\BaseIni.ini" ".\Build\$(Configuration)\FiestaOnlineTool\BaseIni.ini"
-copy ".\Required\Base.shmd" ".\Build\$(Configuration)\FiestaOnlineTool\Base.shmd"
-copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCircle.nif"</Command>
+      <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
+copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -607,6 +670,7 @@ copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCi
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -617,13 +681,23 @@ copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCi
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;WIN32;_DEBUG;_CONSOLE;NIDEBUG;_CRT_SECURE_NO_WARNINGS;_COMPILENILIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>NiSystem.lib;legacy_stdio_definitions.lib;NiSample.lib;NiApplication.lib;NiCollision.lib;NiAnimation.lib;NiParticle.lib;NiMain.lib;NiVisualTracker.lib;NiInput.lib;NiFont.lib;NiCursor.lib;NiD3DXEffectShaderLibDX9.lib;NSBShaderLibDX9.lib;NiBinaryShaderLibDX9.lib;NiD3D10BinaryShaderLibD3D10.lib;NSFParserLibDX9.lib;NiUserInterface.lib;NiViewMath.lib;NiOptimization.lib;NiPortal.lib;syelog.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
+copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -663,15 +737,25 @@ copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCi
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NIRELEASE;_CRT_SECURE_NO_WARNINGS;_COMPILENILIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem.lib;NiCollision.lib;NiAnimation.lib;NiParticle.lib;NiMain.lib;NiVisualTracker.lib;NiInput.lib;NiFont.lib;NiCursor.lib;NiD3DXEffectShaderLibDX9.lib;NSBShaderLibDX9.lib;NiBinaryShaderLibDX9.lib;NiD3D10BinaryShaderLibD3D10.lib;NSFParserLibDX9.lib;legacy_stdio_definitions.lib;NiUserInterface.lib;NiViewMath.lib;NiOptimization.lib;NiPortal.lib;syelog.lib;Detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
+copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|x64'">
     <ClCompile>
@@ -679,17 +763,26 @@ copy ".\Required\HTDCircle.nif" ".\Build\$(Configuration)\FiestaOnlineTool\HTDCi
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;WIN32;_RELEASE;_CONSOLE;NISHIPPING;_COMPILENILIB;_CRT_SECURE_NO_WARNINGS;STRICT;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>NiSample.lib;NiApplication.lib;NiSystem.lib;NiCollision.lib;NiAnimation.lib;NiParticle.lib;NiMain.lib;NiVisualTracker.lib;NiInput.lib;NiFont.lib;NiCursor.lib;NiD3DXEffectShaderLibDX9.lib;NSBShaderLibDX9.lib;NiBinaryShaderLibDX9.lib;NiD3D10BinaryShaderLibD3D10.lib;NSFParserLibDX9.lib;legacy_stdio_definitions.lib;NiUserInterface.lib;NiPortal.lib;syelog.lib;Detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
+copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

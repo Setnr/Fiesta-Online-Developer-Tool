@@ -25,16 +25,22 @@ static inline int FastFloatToInt(float fValue)
     // There is not currently a fast path implemented for Xenon.
     return (int)fValue;
 #else   //#if defined(_XENON)
+#ifdef WIN32
     int iValue;
+#ifndef _WIN64
     _asm fld fValue
     _asm fistp iValue
+#else
+    iValue = fValue;
+#endif
+#endif
     return iValue;
 #endif  //#if defined(_XENON)
 }
 //---------------------------------------------------------------------------
-static inline DWORD F2DW(float fValue) 
-{ 
-    return *((DWORD*)&fValue); 
+static inline DWORD F2DW(float fValue)
+{
+    return *((DWORD*)&fValue);
 }
 //---------------------------------------------------------------------------
 

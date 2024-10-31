@@ -1,6 +1,5 @@
 #pragma once
 #include "FiestaOnlineTool.h"
-#include "FiestaOnlineTool_GeneralHeaders.h"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "ImGui/imgui.h"
@@ -8,27 +7,16 @@
 #define IMAPP_IMPL
 #include "ImGui/ImApp.h"
 #include "ImGui/ImGuizmo.h"
-#include "Logger.h"
 
 #include <NiD3DShaderFactory.h>
+#include <NiDX9Renderer.h>
+std::atomic<float> FiestaOnlineTool::DeltaTime = 0.f;
 
-bool init = false;
-NiScreenElementsPtr element = nullptr;
 void FiestaOnlineTool::OnIdle()
 {
-    if (!init) 
+    if (MeasureTime())
     {
-        init = true;
-        NiScreenElementsDataPtr data = NiNew NiScreenElementsData(0, 0, 1);
-        element = NiNew NiScreenElements(data);
-        data->Insert(4);
-        data->SetRectangle(0, 0.f, 0.f, 1.f, 1.f);
-        data->SetTextures(0, 0, 0.f, 0.f, 1.f, 1.f);
-        NiTexturingProperty::Map* map = NiNew NiTexturingProperty::Map();
-        NiTexturingPropertyPtr prop = NiNew NiTexturingProperty();
-    }
-    if(MeasureTime())
-    {
+        ResetFrameTimings();
         /*Update FrameRate*/
         if (m_pkFrameRate)
         {
@@ -36,29 +24,22 @@ void FiestaOnlineTool::OnIdle()
             m_pkFrameRate->Update();
         }
         //MainWorldScene
+        if (_Scene)
         {
-            std::lock_guard<std::mutex> lock(SceneLock);
             float Time = NiGetCurrentTimeInSec();
+            DeltaTime = Time - m_fLastUpdateTime;
+            m_fLastUpdateTime = Time;
+            _Scene->ProcessInput();
             _Scene->Update(Time);
             _Scene->UpdateCamera(Time);
-            m_fLastUpdateTime = Time;
-            //Interface Scene
-            Pgg_kWinMgr->Update();
-
+        
             /*Prepare Framerendering*/
             this->UpdateFrame();
             this->BeginFrame();
 
             m_spRenderer->BeginUsingDefaultRenderTargetGroup(NiRenderer::CLEAR_ALL);
 
-            /*Set BackgroundColor of Renderer*/
-            NiColorA m_kBackGroundColor;
-            this->m_spRenderer->SetBackgroundColor(m_kBackGroundColor);
-
-            /*Draw MainScene (GameWorld)*/
             _Scene->Draw(this->m_spRenderer);
-
-            
 
             NiDX9RendererPtr renderer = (NiDX9Renderer*)(NiRenderer*)this->m_spRenderer; //Reset some TextureStage Shit to fix some broken Rendering
             renderer->GetRenderState()->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, 0);
@@ -67,59 +48,19 @@ void FiestaOnlineTool::OnIdle()
             _Scene->StartImGuiFrame();
             _Scene->DrawImGui();
             _Scene->EndImGuiFrame();
+
             /*Draw NiScreenElements Maybe needs Work so it Draws Player HP Hud and stuff*/
             this->RenderScreenItems();
         }
 
-        /*Draw Interface Windows*/
-        Pgg_kWinMgr->Draw(m_spRenderer);
         /*Draws the Cursor*/
         DrawCursor();
-
-        NiPoint2 kBottom(0.f, -0.0020000001);
-        NiPoint2 kCenter(0.0f,0.0f); 
-        NiPoint2 kRight(0.001f,0.f);
-        NiPoint2 kLeft(-0.001f,0.f);
-        NiPoint2 kTop(0.f,0.0020000001f);
-        NiD3DShaderFactory::UpdateGlobalShaderConstant("g_ScreenSift", 8, &kCenter);
         m_spRenderer->EndUsingRenderTargetGroup();
         this->EndFrame();
 
         this->DisplayFrame();
-        
+
         ++this->m_iClicks;
-        this->UpdateSceneInternal();
     }
 
-}
-
-void FiestaOnlineTool::DrawCursor()
-{
-    long X, Y;
-    FiestaOnlineTool::GetMousePosition(X, Y);
-    _Tool->cursor->SetPosition(0.0, X + 5, Y + 9);
-    cursor->Draw();
-}
-
-void FiestaOnlineTool::UpdateScene(FiestaScenePtr Scene)
-{
-    if (!_Tool)
-        return;
-    _Tool->UpdateSceneInternal(Scene);
-}
-void FiestaOnlineTool::UpdateSceneInternal(FiestaScenePtr Scene)
-{
-    std::lock_guard<std::mutex> lock(UpdateLock);
-    NewScene = Scene; 
-}
-void FiestaOnlineTool::UpdateSceneInternal()
-{
-    std::lock_guard<std::mutex> lock(UpdateLock);
-    if (!NewScene)
-        return;
-    std::lock_guard<std::mutex> lock2(SceneLock);
-    
-    if(NewScene->CanBeSwitched())
-        _Scene = NewScene;
-    NewScene = nullptr;
 }

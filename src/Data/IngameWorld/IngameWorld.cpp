@@ -1,0 +1,363 @@
+#include "IngameWorld.h"
+#include <Logger.h>
+#include <filesystem>
+#include <PgUtil.h>
+#include "WorldChanges/FogChange.h"
+#include <NiPick.h>
+#include <FiestaOnlineTool.h>
+
+#pragma region Gizmo-Calc
+glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
+{
+	if (q.w == 1.f)
+	{
+		return { 0.f, 1.f, 0.f, 0.f };
+	}
+
+	float_t angle_rad = acos(q.w) * 2;
+
+	float_t x = q.x / sin(angle_rad / 2);
+	float_t y = q.y / sin(angle_rad / 2);
+	float_t z = q.z / sin(angle_rad / 2);
+
+	return { angle_rad, x, y, z };
+}
+#pragma endregion
+
+IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
+{
+
+	if (!InitScene())
+		return;
+	if (!InitCamera())
+		return;
+	if (!InitSkyCtrl())
+		return;
+	if (!InitLightFog())
+		return;
+	if (!InitShadow())
+		return; 
+
+	_SHBD = NiNew ShineBlockData();
+	_SHMD = NiNew ShineMapData();
+	_INI = NiNew ShineIni();
+
+	if (_MapInfo->KingdomMap == -1)
+	{
+		/*New Map*/
+		_SHBD->CreateEmpty(256);
+		_SHMD->CreateEmpty();
+		_INI->CreateEmpty(_MapInfo);
+	}
+	else
+	{
+		if (!_SHBD->Load(_MapInfo))
+			LogError("Failed to Load SHBD for " + _MapInfo->MapName);
+		if (!_SHMD->Load(_MapInfo))
+			LogError("Failed to Load SHMD for " + _MapInfo->MapName);
+
+		std::string Path = PgUtil::PathFromClientFolder(PgUtil::GetMapFolderPath(_MapInfo->KingdomMap, _MapInfo->MapFolderName) + _MapInfo->MapFolderName + ".ini");
+		if (std::filesystem::exists(Path))
+			if (!_INI->Load(Path))
+				LogError("Failed to Load INI for " + _MapInfo->MapName);
+	}
+
+	if(_INI->GetHTDPath() != "")
+		if (LoadHTD())
+			CreateAndAttachTerrain();
+
+	for (auto obj : _SHMD->GetSkyList())
+		m_spSkyScene->AttachChild(obj);
+
+	for (auto obj : _SHMD->GetWaterList())
+		m_spWaterScene->AttachChild(obj);
+
+	for (auto obj : _SHMD->GetGlobalGroundObjectList())
+		m_spGroundObject->AttachChild(obj);
+
+	for (auto obj : _SHMD->GetGroundObjectListList())
+		m_spGroundObject->AttachChild(obj);
+
+	for (auto obj : _SHMD->GetCollisionObjectListList())
+		m_spGroundCollidee->AttachChild(obj);
+
+	SetFogColor(_SHMD->GetFogColor(),false);
+	SetFogDepth(_SHMD->GetFogDepth(),false);
+	SetGlobalLight(_SHMD->GetGlobalLight());
+	SetGlobalLightNode(_SHMD->GetGlobalLightNode());
+	SetFarFrustum(_SHMD->GetFarFrustum());
+	SetDirectionalLightAmbientColor(_SHMD->GetDirectionalLightAmbientColor());
+	SetDirectionalLightDiffuseColor(_SHMD->GetDirectionalLightDiffuseColor());
+
+	m_spWorldScene->Update(0.f);
+	m_spWorldScene->UpdateProperties();
+	m_spWorldScene->UpdateEffects();
+	m_spWorldScene->Update(0.f);
+	PgUtil::LookAndMoveAtWorldPoint(m_spCamera, NiPoint3(_MapInfo->RegenX, _MapInfo->RegenY, 500));
+}
+void IngameWorld::SetFogColor(NiColor kColor, bool Backup) 
+{
+	NiFogProperty* fog = (NiFogProperty*)m_spWorldScene->GetProperty(NiProperty::FOG);
+	if(Backup)
+		AttachStack(NiNew FogChangeColor(this, fog->GetFogColor(), kColor));
+	fog->SetFogColor(kColor);
+	fog->SetFog(true);
+	_SHMD->SetFogColor(kColor);
+}
+void IngameWorld::SetFogDepth(float depth, bool Backup)
+{
+	NiFogProperty* fog = (NiFogProperty*)m_spWorldScene->GetProperty(NiProperty::FOG);
+	if (depth < 0.0)
+		depth = 0.0;
+	if (Backup)
+		AttachStack(NiNew FogChangeDepth(this, _SHMD->GetFogDepth(), depth));
+	fog->SetDepth(depth);
+	_SHMD->SetFogDepth(depth);
+}
+void IngameWorld::SetGlobalLightNode(NiNodePtr LightNode, bool Backup) 
+{
+	if (!LightNode)
+		return;
+	if (Backup)
+		AttachStack(NiNew GlobalLightNodeChange(this, NiSmartPointerCast(NiNode,m_spLightArea->GetAt(0)), LightNode));
+	m_spLightArea->RemoveAllChildren();
+	m_spLightArea->AttachChild(LightNode);
+	_SHMD->SetGlobalLightNode(LightNode);
+}
+void IngameWorld::SetFarFrustum(float Frustum, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew ChangeFarFrustum(this, m_kWorldFrustum.m_fFar, Frustum));
+	m_kWorldFrustum.m_fFar = Frustum;
+	_SHMD->SetFarFrustum(Frustum);
+}
+void IngameWorld::SetDirectionalLightAmbientColor(NiColor kColor, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew ChangeDirectionalAmbientLightColor(this, _SHMD->GetDirectionalLightAmbientColor(), kColor));
+	m_spMapDirectionalLight->SetAmbientColor(kColor);
+	_SHMD->SetDirectionalLightAmbientColor(kColor);
+
+}
+void IngameWorld::SetDirectionalLightDiffuseColor(NiColor kColor, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew ChangeDirectionalDiffuseLightColor(this, _SHMD->GetDirectionalLightDiffuseColor(), kColor));
+	m_spMapDirectionalLight->SetDiffuseColor(kColor);
+	_SHMD->SetDirectionalLightDiffuseColor(kColor);
+}
+void IngameWorld::SetBackgroundColor(NiColor kColor, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew ChangeBackgroundColor(this, _SHMD->GetBackgroundColor(), kColor));
+	_SHMD->SetBackgroundColor(kColor);
+}
+void IngameWorld::SetGlobalLight(NiColor kColor, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew ChangeGlobalLightColor(this, _SHMD->GetGlobalLight(), kColor));
+	m_spAmbientLight->SetAmbientColor(kColor);
+	_SHMD->SetGlobalLight(kColor);
+}
+NiPoint3 IngameWorld::GetWorldPoint() 
+{
+	NiPoint3 kOrigin, kDir;
+	auto Point = FiestaOnlineTool::CurrentMousePosition();
+	if (m_spCamera->WindowPointToRay(Point.x, Point.y, kOrigin, kDir))
+	{
+		NiPick _Pick;
+		_Pick.SetPickType(NiPick::FIND_FIRST);
+		_Pick.SetSortType(NiPick::SORT);
+		_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+		_Pick.SetFrontOnly(true);
+		_Pick.SetReturnNormal(true);
+		_Pick.SetObserveAppCullFlag(true);
+		_Pick.SetTarget(m_spGroundScene);
+		if (_Pick.PickObjects(kOrigin, kDir, true))
+		{
+			NiPick::Results& results = _Pick.GetResults();
+			if (results.GetSize() > 0)
+				return results.GetAt(0)->GetIntersection();
+		}
+	}
+}
+NiPickablePtr IngameWorld::PickObject() 
+{
+	NiPoint3 kOrigin, kDir;
+	auto Point = FiestaOnlineTool::CurrentMousePosition();
+	if (m_spCamera->WindowPointToRay(Point.x, Point.y, kOrigin, kDir))
+	{
+		NiPick _Pick;
+		_Pick.SetPickType(NiPick::FIND_FIRST);
+		_Pick.SetSortType(NiPick::SORT);
+		_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+		_Pick.SetFrontOnly(true);
+		_Pick.SetReturnNormal(true);
+		_Pick.SetObserveAppCullFlag(true);
+		_Pick.SetTarget(GetWorldNode());
+		if (_Pick.PickObjects(kOrigin, kDir, true))
+		{
+			NiPick::Results& results = _Pick.GetResults();
+
+			std::set<NiPickable*> PossibleObjects;
+
+			for (int i = 0; i < results.GetSize(); i++)
+			{
+				auto record = results.GetAt(i);
+				auto obj = record->GetAVObject();
+				if (NiIsKindOf(NiPickable, obj))
+				{
+					PossibleObjects.insert((NiPickable*)obj);
+				}
+				else
+				{
+					//We only earch Upwards, 
+					//if we search Downwards we can click the terrain and select the first 
+					//NiPickable which must not be the actually targeted Node
+					//Picking only works when compiled with the define of PICKABLEOBJECTS being true
+					while (obj = obj->GetParent())
+					{
+						if (NiIsKindOf(NiPickable, obj))
+						{
+							PossibleObjects.insert((NiPickable*)obj);
+							break;
+						}
+					}
+				}
+			}
+			if (PossibleObjects.size() != 0)
+			{
+				return *PossibleObjects.begin();
+
+			}
+			return NULL;
+		}
+	}
+}
+void IngameWorld::UpdatePos(std::vector<NiPickablePtr> Node, NiPoint3 PosChange, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew UpdateNodePos(this, Node, PosChange));
+	for (auto obj : Node)
+	{
+		NiPoint3 OldPos = obj->GetTranslate();
+		obj->SetTranslate(OldPos + PosChange);
+	}
+}
+void IngameWorld::UpdateRotation(std::vector<NiPickablePtr> Node, glm::vec3 RotationChange, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew UpdateNodeRotation(this, Node, RotationChange));
+	
+	for (auto obj : Node)
+	{
+		float angle, x, y, z;
+		obj->GetRotate().ExtractAngleAndAxis(angle, x, y, z);
+		glm::vec3 SelectedObjAngels = glm::degrees(glm::vec3{ eulerAngles(glm::angleAxis((float)angle, glm::vec3(x, y, z))) });
+		SelectedObjAngels -= RotationChange;
+
+		if (abs(SelectedObjAngels[0]) > 180.f)
+		{
+			SelectedObjAngels[0] = -SelectedObjAngels[0] + 2 * fmod(SelectedObjAngels[0], 180.f);
+		}
+
+		if (abs(SelectedObjAngels[1]) > 180.f)
+		{
+			SelectedObjAngels[1] = -SelectedObjAngels[1] + 2 * fmod(SelectedObjAngels[1], 180.f);
+		}
+
+		if (abs(SelectedObjAngels[2]) > 180.f)
+		{
+			SelectedObjAngels[2] = -SelectedObjAngels[2] + 2 * fmod(SelectedObjAngels[2], 180.f);
+		}
+
+		glm::vec4 angleAxis = ConvertQuatToAngleAxis(glm::quat(glm::radians(SelectedObjAngels)));
+
+		NiMatrix3 m;
+		m.MakeRotation(angleAxis[0], angleAxis[1], angleAxis[2], angleAxis[3]);
+
+		obj->SetRotate(m);
+	}
+}
+void IngameWorld::RemoveSky(NiNodePtr Node, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew AttachingNode(this, Node, &IngameWorld::RemoveSky, &IngameWorld::AddSky));
+	_SHMD->RemoveSky(Node); m_spSkyScene->DetachChild(Node); m_spSkyScene->CompactChildArray();
+	m_spSkyScene->UpdateProperties();
+	m_spSkyScene->UpdateEffects();
+	m_spSkyScene->Update(0.f);
+}
+void IngameWorld::RemoveWater(NiNodePtr Node, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew AttachingNode(this, Node, &IngameWorld::RemoveWater, &IngameWorld::AddWater));
+	_SHMD->RemoveWater(Node); m_spWaterScene->DetachChild(Node); m_spWaterScene->CompactChildArray();
+	m_spWaterScene->UpdateProperties();
+	m_spWaterScene->UpdateEffects();
+	m_spWaterScene->Update(0.f);
+}
+void IngameWorld::RemoveGroundObject(NiNodePtr Node, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew AttachingNode(this, Node, &IngameWorld::RemoveGroundObject, &IngameWorld::AddGroundObject));
+	_SHMD->RemoveGroundObject(Node); m_spGroundObject->DetachChild(Node); m_spGroundObject->CompactChildArray();
+	m_spGroundObject->UpdateProperties();
+	m_spGroundObject->UpdateEffects();
+	m_spGroundObject->Update(0.f);
+}
+void IngameWorld::AddSky(NiNodePtr Node, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew AttachingNode(this, Node, &IngameWorld::AddSky, &IngameWorld::RemoveSky));
+	_SHMD->AddSky(Node); m_spSkyScene->AttachChild(Node);
+	m_spSkyScene->UpdateProperties();
+	m_spSkyScene->UpdateEffects();
+	m_spSkyScene->Update(0.f);
+}
+void IngameWorld::AddWater(NiNodePtr Node, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew AttachingNode(this, Node, &IngameWorld::AddWater, &IngameWorld::RemoveWater));
+	_SHMD->AddWater(Node); m_spWaterScene->AttachChild(Node);
+	m_spWaterScene->UpdateProperties();
+	m_spWaterScene->UpdateEffects();
+	m_spWaterScene->Update(0.f);
+}
+void IngameWorld::AddGroundObject(NiNodePtr Node, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew AttachingNode(this, Node, &IngameWorld::AddGroundObject, &IngameWorld::RemoveGroundObject));
+	_SHMD->AddGroundObject(Node); m_spGroundObject->AttachChild(Node);
+	m_spGroundObject->UpdateProperties();
+	m_spGroundObject->UpdateEffects();
+	m_spGroundObject->Update(0.f);
+}
+void IngameWorld::RemoveObject(std::vector<NiPickablePtr> objs, bool Backup) 
+{
+	if (Backup)
+		AttachStack(NiNew AttachingNodeList(this, objs, &IngameWorld::RemoveObject, &IngameWorld::AddObject));
+	for (auto obj : objs) 
+	{
+		m_spGroundObject->DetachChild(obj);
+		_SHMD->RemoveObject(NiSmartPointerCast(NiNode, obj));
+	}
+	m_spGroundObject->CompactChildArray();
+	m_spGroundObject->UpdateProperties();
+	m_spGroundObject->UpdateEffects();
+	m_spGroundObject->Update(0.f);
+}
+void IngameWorld::AddObject(std::vector<NiPickablePtr> objs, bool Backup)
+{
+	if (Backup)
+		AttachStack(NiNew AttachingNodeList(this, objs, &IngameWorld::AddObject, &IngameWorld::RemoveObject));
+	for (auto obj : objs)
+	{
+		m_spGroundObject->AttachChild(obj);
+		_SHMD->AddObject(NiSmartPointerCast(NiNode, obj));
+	}
+	m_spGroundObject->CompactChildArray();
+	m_spGroundObject->UpdateProperties();
+	m_spGroundObject->UpdateEffects();
+	m_spGroundObject->Update(0.f);
+}

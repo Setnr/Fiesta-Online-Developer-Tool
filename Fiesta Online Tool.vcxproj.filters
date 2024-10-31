@@ -87,35 +87,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\CustomNi\NiFileLoader.h">
-      <Filter>CustomNi</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CustomNi\NiPickable.h">
-      <Filter>CustomNi</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Logger\Logger.h">
-      <Filter>Logger</Filter>
-    </ClInclude>
     <ClInclude Include="src\NiApplication\FiestaOnlineTool.h">
       <Filter>NiApplication</Filter>
     </ClInclude>
-    <ClInclude Include="src\NiApplication\FiestaOnlineTool_GeneralHeaders.h">
-      <Filter>NiApplication</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\FiestaScene.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ImGuiConstantFuncs.h" />
     <ClInclude Include="src\PgUtil.h" />
-    <ClInclude Include="src\NiInterface\PgWin.h">
-      <Filter>NiInterface</Filter>
-    </ClInclude>
-    <ClInclude Include="src\NiInterface\PgWinMgr.h">
-      <Filter>NiInterface</Filter>
-    </ClInclude>
-    <ClInclude Include="src\NiInterface\PgWinObj.h">
-      <Filter>NiInterface</Filter>
-    </ClInclude>
     <ClInclude Include="Includes\ImGui\GraphEditor.h">
       <Filter>Includes\ImGui</Filter>
     </ClInclude>
@@ -179,66 +154,6 @@
     <ClInclude Include="Includes\Ini\INIReader.h">
       <Filter>Includes\Ini</Filter>
     </ClInclude>
-    <ClInclude Include="src\Data\SHBD\SHBD.h">
-      <Filter>Data\ShineData\SHBD</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\Version.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CustomNi\NiBoundingBox.h">
-      <Filter>CustomNi</Filter>
-    </ClInclude>
-    <ClInclude Include="src\NiInterface\NiViewPort\NiViewPort.h">
-      <Filter>CustomNi</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\IngameWorld.h">
-      <Filter>Data\IngameWorld</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\Brush.h">
-      <Filter>Data\Brushes</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\Algorithms\worley.h">
-      <Filter>Data\Algorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\EditScene.h">
-      <Filter>Scene\Edit Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\SetupScene.h">
-      <Filter>Scene\Setup Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\MapCreateScene.h">
-      <Filter>Scene\MapCreateScene</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\IniFile.h">
-      <Filter>Data\ShineData\IniFile</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\SHNStruct.h">
-      <Filter>Data\SHN</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\SHNManager.h">
-      <Filter>Data\SHN</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\SHMD\SHMD.h">
-      <Filter>Data\ShineData</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\TerrainWorld.h">
-      <Filter>Data\IngameWorld</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\DiamondSquareFractal.h">
-      <Filter>Data\Algorithms\FractalAlgorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\Fractal.h">
-      <Filter>Data\Algorithms\FractalAlgorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\PerlinFractal.h">
-      <Filter>Data\Algorithms\FractalAlgorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\WorleyFractal.h">
-      <Filter>Data\Algorithms\FractalAlgorithms</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\Elements\MapMenu.h">
-      <Filter>Scene\SceneElements</Filter>
-    </ClInclude>
     <ClInclude Include="Includes\EasyBMP\EasyBMP.h">
       <Filter>Includes\EasyBMP</Filter>
     </ClInclude>
@@ -251,77 +166,63 @@
     <ClInclude Include="Includes\EasyBMP\EasyBMP_VariousBMPutilities.h">
       <Filter>Includes\EasyBMP</Filter>
     </ClInclude>
-    <ClInclude Include="src\CustomNi\TextureFileLoader.h">
-      <Filter>CustomNi</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene\Elements\LayerEditWindow.h">
-      <Filter>Scene\SceneElements</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\ChangeBrush.h">
-      <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\HightBrush.h">
-      <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\LevelingBrush.h">
-      <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\PerlinBrush.h">
-      <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\SmoothingBrush.h">
-      <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\TextureBrush.h">
-      <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\WorleyBrush.h">
-      <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\PixelBrush.h">
-      <Filter>Data\Brushes\HTDTextureBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\TextureSmoothingBrush.h">
-      <Filter>Data\Brushes\HTDTextureBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\PerlinTextureBrush.h">
-      <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\VertexBrush\ColorBrush.h">
-      <Filter>Data\Brushes\VertexBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\VertexBrush\SmoothingBrush.h">
-      <Filter>Data\Brushes\VertexBrush</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Data\HTDBrush\VertexBrush\VertexSoftBrush.h">
-      <Filter>Data\Brushes\VertexBrush</Filter>
-    </ClInclude>
+    <ClInclude Include="src\Data\SHN\SHNManager.h" />
+    <ClInclude Include="src\Data\SHN\SHNStruct.h" />
+    <ClInclude Include="src\Global\Logger\Logger.h" />
+    <ClInclude Include="src\Global\Version\Version.h" />
+    <ClInclude Include="src\Scene\EditorScene\EditorScene.h" />
+    <ClInclude Include="src\Scene\FiestaScene\FiestaScene.h" />
+    <ClInclude Include="src\Scene\InitializeScene\InitializeScene.h" />
+    <ClInclude Include="src\NiApplication\NiHeaders.h" />
+    <ClInclude Include="src\Data\IngameWorld\IngameWorld.h" />
+    <ClInclude Include="src\Data\HeightTerrainData\HeightTerrainData.h" />
+    <ClInclude Include="src\Data\ShineIni\ShineIni.h" />
+    <ClInclude Include="src\Data\ShineBlockData\ShineBlockData.h" />
+    <ClInclude Include="src\Data\ShineMapData\ShineMapData.h" />
+    <ClInclude Include="src\Data\NiCustom\NiFog.h" />
+    <ClInclude Include="src\Data\NiCustom\NiPickable.h" />
+    <ClInclude Include="src\Scene\ScreenElements\ScreenElement.h" />
+    <ClInclude Include="src\Scene\ScreenElements\MapLoad\MapLoadElement.h" />
+    <ClInclude Include="src\Scene\ScreenElements\LuaElement\LuaElement.h" />
+    <ClInclude Include="Includes\lua\lapi.h" />
+    <ClInclude Include="Includes\lua\lauxlib.h" />
+    <ClInclude Include="Includes\lua\lcode.h" />
+    <ClInclude Include="Includes\lua\lctype.h" />
+    <ClInclude Include="Includes\lua\ldebug.h" />
+    <ClInclude Include="Includes\lua\ldo.h" />
+    <ClInclude Include="Includes\lua\lfunc.h" />
+    <ClInclude Include="Includes\lua\lgc.h" />
+    <ClInclude Include="Includes\lua\ljumptab.h" />
+    <ClInclude Include="Includes\lua\llex.h" />
+    <ClInclude Include="Includes\lua\llimits.h" />
+    <ClInclude Include="Includes\lua\lmem.h" />
+    <ClInclude Include="Includes\lua\lobject.h" />
+    <ClInclude Include="Includes\lua\lopcodes.h" />
+    <ClInclude Include="Includes\lua\lopnames.h" />
+    <ClInclude Include="Includes\lua\lparser.h" />
+    <ClInclude Include="Includes\lua\lprefix.h" />
+    <ClInclude Include="Includes\lua\lstate.h" />
+    <ClInclude Include="Includes\lua\lstring.h" />
+    <ClInclude Include="Includes\lua\ltable.h" />
+    <ClInclude Include="Includes\lua\ltm.h" />
+    <ClInclude Include="Includes\lua\lua.h" />
+    <ClInclude Include="Includes\lua\lua.hpp" />
+    <ClInclude Include="Includes\lua\luaconf.h" />
+    <ClInclude Include="Includes\lua\lualib.h" />
+    <ClInclude Include="Includes\lua\lundump.h" />
+    <ClInclude Include="Includes\lua\lvm.h" />
+    <ClInclude Include="Includes\lua\lzio.h" />
+    <ClInclude Include="src\Scene\ScreenElements\LuaElement\LuaFunctions\LuaElementFunctions.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\EditMode.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\SHMDMode.h" />
+    <ClInclude Include="src\Data\IngameWorld\WorldChanges\WorldChanges.h" />
+    <ClInclude Include="src\Data\IngameWorld\WorldChanges\FogChange.h" />
+    <ClInclude Include="src\Data\NiCustom\NiBoundingBox.h" />
+    <ClInclude Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\CustomNi\NiPickable.cpp">
-      <Filter>CustomNi</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Logger\Logger.cpp">
-      <Filter>Logger</Filter>
-    </ClCompile>
     <ClCompile Include="src\NiApplication\FiestaOnlineTool.cpp">
       <Filter>NiApplication</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NiApplication\FiestaOnlineTool_Init.cpp">
-      <Filter>NiApplication</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NiApplication\FiestaOnlineTool_StaticDefines.cpp">
-      <Filter>NiApplication</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NiApplication\FiestaOnlineTool_UI.cpp">
-      <Filter>NiApplication</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\FiestaScene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\NiInterface\PgWin.cpp">
-      <Filter>NiInterface</Filter>
     </ClCompile>
     <ClCompile Include="Includes\ImGui\GraphEditor.cpp">
       <Filter>Includes\ImGui</Filter>
@@ -374,76 +275,90 @@
     <ClCompile Include="Includes\Ini\INIReader.cpp">
       <Filter>Includes\Ini</Filter>
     </ClCompile>
-    <ClCompile Include="src\Data\SHBD\SHBD.cpp">
-      <Filter>Data\ShineData\SHBD</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\Version.cpp">
-      <Filter>Data</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\IngameWorldInit.cpp">
-      <Filter>Data\IngameWorld</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\IngameWorld.cpp">
-      <Filter>Data\IngameWorld</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\HTDBrush\Brush.cpp">
-      <Filter>Data\Brushes</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\Algorithms\worley.cpp">
-      <Filter>Data\Algorithms</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\EditSceneImGui.cpp">
-      <Filter>Scene\Edit Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\EditSceneControlls.cpp">
-      <Filter>Scene\Edit Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\EditScene.cpp">
-      <Filter>Scene\Edit Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\SetupScene.cpp">
-      <Filter>Scene\Setup Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\MapCreateScene.cpp">
-      <Filter>Scene\MapCreateScene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\IniFile.cpp">
-      <Filter>Data\ShineData\IniFile</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\SHNManager.cpp">
-      <Filter>Data\SHN</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\TerrainWorld.cpp">
-      <Filter>Data\IngameWorld</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\TerrainWorldInit.cpp">
-      <Filter>Data\IngameWorld</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\Fractal.cpp">
-      <Filter>Data\Algorithms\FractalAlgorithms</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\Elements\MapMenu.cpp">
-      <Filter>Scene\SceneElements</Filter>
-    </ClCompile>
     <ClCompile Include="Includes\EasyBMP\EasyBMP.cpp">
       <Filter>Includes\EasyBMP</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Elements\LayerEditWindow.cpp">
-      <Filter>Scene\SceneElements</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\HTDBrush\PerlinBrush.cpp">
-      <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\HTDBrush\TextureBrush.cpp">
-      <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Data\HTDBrush\WorleyBrush.cpp">
-      <Filter>Data\Brushes\HTDBrush</Filter>
-    </ClCompile>
+    <ClCompile Include="src\NiApplication\FiestaOnlineToolInit.cpp" />
+    <ClCompile Include="src\Data\SHN\SHNManager.cpp" />
+    <ClCompile Include="src\Global\Logger\Logger.cpp" />
+    <ClCompile Include="src\Global\Version\Version.cpp" />
+    <ClCompile Include="src\NiApplication\FiestaOnlineToolGlobalAccess.cpp" />
+    <ClCompile Include="src\PgUtil.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\EditorScene.cpp" />
+    <ClCompile Include="src\Scene\FiestaScene\FiestaScene.cpp" />
+    <ClCompile Include="src\Scene\InitializeScene\InitializeScene.cpp" />
+    <ClCompile Include="src\Data\IngameWorld\IngameWorld.cpp" />
+    <ClCompile Include="src\Data\IngameWorld\IngameWorldInit.cpp" />
+    <ClCompile Include="src\Data\HeightTerrainData\HeightTerrainData.cpp" />
+    <ClCompile Include="src\Data\ShineIni\ShineIni.cpp" />
+    <ClCompile Include="src\Data\ShineBlockData\ShineBlockData.cpp" />
+    <ClCompile Include="src\Data\ShineMapData\ShineMapData.cpp" />
+    <ClCompile Include="src\Data\NiCustom\NiPickable.cpp" />
+    <ClCompile Include="src\Scene\ScreenElements\ScreenElement.cpp" />
+    <ClCompile Include="src\Scene\ScreenElements\MapLoad\MapLoadElement.cpp" />
+    <ClCompile Include="src\Scene\ScreenElements\LuaElement\LuaElement.cpp" />
+    <ClCompile Include="Includes\lua\lapi.c" />
+    <ClCompile Include="Includes\lua\lauxlib.c" />
+    <ClCompile Include="Includes\lua\lbaselib.c" />
+    <ClCompile Include="Includes\lua\lcode.c" />
+    <ClCompile Include="Includes\lua\lcorolib.c" />
+    <ClCompile Include="Includes\lua\lctype.c" />
+    <ClCompile Include="Includes\lua\ldblib.c" />
+    <ClCompile Include="Includes\lua\ldebug.c" />
+    <ClCompile Include="Includes\lua\ldo.c" />
+    <ClCompile Include="Includes\lua\ldump.c" />
+    <ClCompile Include="Includes\lua\lfunc.c" />
+    <ClCompile Include="Includes\lua\lgc.c" />
+    <ClCompile Include="Includes\lua\linit.c" />
+    <ClCompile Include="Includes\lua\liolib.c" />
+    <ClCompile Include="Includes\lua\llex.c" />
+    <ClCompile Include="Includes\lua\lmathlib.c" />
+    <ClCompile Include="Includes\lua\lmem.c" />
+    <ClCompile Include="Includes\lua\loadlib.c" />
+    <ClCompile Include="Includes\lua\lobject.c" />
+    <ClCompile Include="Includes\lua\lopcodes.c" />
+    <ClCompile Include="Includes\lua\loslib.c" />
+    <ClCompile Include="Includes\lua\lparser.c" />
+    <ClCompile Include="Includes\lua\lstate.c" />
+    <ClCompile Include="Includes\lua\lstring.c" />
+    <ClCompile Include="Includes\lua\lstrlib.c" />
+    <ClCompile Include="Includes\lua\ltable.c" />
+    <ClCompile Include="Includes\lua\ltablib.c" />
+    <ClCompile Include="Includes\lua\ltm.c" />
+    <ClCompile Include="Includes\lua\lua.c" />
+    <ClCompile Include="Includes\lua\luac.c" />
+    <ClCompile Include="Includes\lua\lundump.c" />
+    <ClCompile Include="Includes\lua\lutf8lib.c" />
+    <ClCompile Include="Includes\lua\lvm.c" />
+    <ClCompile Include="Includes\lua\lzio.c" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\EditMode.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\SHMDMode.cpp" />
+    <ClCompile Include="src\Data\IngameWorld\WorldChanges\WorldChanges.cpp" />
+    <ClCompile Include="src\Data\IngameWorld\WorldChanges\NiRTTIDeclares.cpp" />
+    <ClCompile Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Includes\ImGui\imgui.ini">
       <Filter>Includes\ImGui</Filter>
     </None>
+    <None Include=".gitignore" />
+    <None Include="Install.md" />
+    <None Include="README.md" />
+    <None Include="Required\AlphaTextureBlender.NSF" />
+    <None Include="Required\Base.shmd" />
+    <None Include="Required\BaseIni.ini" />
+    <None Include="Required\BoundingBox.nif" />
+    <None Include="Required\HTDCircle.nif" />
+    <None Include="Required\imgui.ini" />
+    <None Include="Required\Interface.nif" />
+    <None Include="Required\Settings.ini" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Required\Box02.dds" />
+    <Image Include="Required\Box02Darker.dds" />
+    <Image Include="Required\NorCursor.tga" />
   </ItemGroup>
 </Project>

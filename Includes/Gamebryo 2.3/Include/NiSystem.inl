@@ -45,6 +45,27 @@ inline NiUInt32 NiAtomicDecrement(NiUInt32& ui32Value)
     return InterlockedDecrement((LONG*)&ui32Value);
 }
 //---------------------------------------------------------------------------
+inline NiInt64 NiAtomicIncrement(NiInt64& i32Value)
+{
+    return InterlockedIncrement((LONG*)&i32Value);
+}
+//---------------------------------------------------------------------------
+inline NiInt64 NiAtomicDecrement(NiInt64& i32Value)
+{
+    return InterlockedDecrement((LONG*)&i32Value);
+}
+//---------------------------------------------------------------------------
+inline NiUInt64 NiAtomicIncrement(NiUInt64& ui32Value)
+{
+    return InterlockedIncrement((LONG*)&ui32Value);
+}
+//---------------------------------------------------------------------------
+inline NiUInt64 NiAtomicDecrement(NiUInt64& ui32Value)
+{
+    NIASSERT(ui32Value > 0);
+    return InterlockedDecrement((LONG*)&ui32Value);
+}
+//---------------------------------------------------------------------------
 inline float NiSelectGE(float fCondition, float fResultIfGreaterThanEqualZero, 
     float fResultIfLessThanZero)
 {
