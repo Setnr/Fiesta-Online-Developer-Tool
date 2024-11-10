@@ -175,7 +175,6 @@ bool FiestaOnlineTool::CreateRenderer()
         NiMessageBox::DisplayMessage("Failed to Create Renderer, \ntry to downscale your Resolution in Settings.ini", "Error");
         NiMessageBox::DisplayMessage(NiRenderer::GetLastErrorString(), "Msg");
     }
-    
     return (m_spRenderer != NULL);
 }
 

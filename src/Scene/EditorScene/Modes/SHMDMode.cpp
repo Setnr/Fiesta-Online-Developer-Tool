@@ -1,22 +1,28 @@
 #include "SHMDMode.h"
 #include <Scene/ScreenElements/LuaElement/LuaElement.h>
+#include <Scene/ScreenElements/LoadObject/AddSingleObject.h>
+#include <Scene/ScreenElements/LoadObject/AddMultipleObject.h>
+#include <Scene/ScreenElements/LoadObject/ReplaceObjects.h>
 
 NiImplementRTTI(SHMDMode, EditMode);
 
 void SHMDMode::Draw()
 {
 	EditMode::Draw();
-	DrawGizmo();
+	DrawGizmo(); 
 }
 
 void SHMDMode::Update(float fTime)
 {
 }
 
+void SHMDMode::UpdateScale(float Scale) 
+{
+	kWorld->UpdateScale(GetSelectedNodes(), Scale);
+}  
+
 void SHMDMode::ProcessInput() 
 {
-	if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
-		return;
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) 
 	{
 		SelectObject(kWorld->PickObject(), ImGui::IsKeyDown((ImGuiKey)VK_CONTROL));
@@ -66,7 +72,19 @@ void SHMDMode::ProcessInput()
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
 	{
 		if(NiIsKindOf(EditorScene,_Scene))
-			ScreenElements.push_back(NiNew LuaElement(NiSmartPointerCast(EditorScene,_Scene), "EditorELements/SHMDMiddleMouse.lua"));
+		{
+			bool HasElement = false;
+			for (auto element : ScreenElements)
+			{
+				if (NiIsKindOf(LuaElement, element)) {
+					LuaElementPtr ptr = NiSmartPointerCast(LuaElement, element);
+					if (ptr->GetFileName() == "EditorELements/SHMDMiddleMouse.lua")
+						HasElement = true;
+				}
+			}
+			if(!HasElement)
+				ScreenElements.push_back(NiNew LuaElement(NiSmartPointerCast(EditorScene, _Scene), "EditorELements/SHMDMiddleMouse.lua", ImGui::GetIO().MousePos));
+		}
 	}
 }
 
@@ -122,32 +140,47 @@ void SHMDMode::CreateAddElement(std::string name)
 {
 	if (name == "Moveable Object") 
 	{
-		auto UnDoFunc = &IngameWorld::RemoveObject;
-		auto ReDoFunc = &IngameWorld::AddObject;
-		ScreenElements.push_back(NiNew AddMultipleObject(kWorld, UnDoFunc, ReDoFunc, kWorld->GetWorldPoint()));
+		auto AddFunc = &IngameWorld::AddObject;
+		for (auto element : ScreenElements) 
+		{
+			if (NiIsKindOf(AddMultipleObject, element))
+				return;
+		}
+		ScreenElements.push_back(NiNew AddMultipleObject(kWorld, AddFunc, kWorld->GetWorldPoint()));
 	}
-	else 
+	else if ("Replace Object") 
 	{
-		void (IngameWorld:: * UnDoFunc)(NiNodePtr, bool);
-		void (IngameWorld:: * ReDoFunc)(NiNodePtr, bool);
+		auto nodes = GetSelectedNodes();
+		for (auto element : ScreenElements)
+		{
+			if (NiIsKindOf(ReplaceObjects, element))
+				return;
+		}
+		ScreenElements.push_back(NiNew ReplaceObjects(kWorld, nodes));
+	}
+	else
+	{
+		void (IngameWorld:: * AddFunc)(NiNodePtr, bool);
 		if (name == "Sky") 
 		{
-			UnDoFunc = &IngameWorld::RemoveSky;
-			ReDoFunc = &IngameWorld::AddSky;
+			AddFunc = &IngameWorld::AddSky;
 		}
 		else if (name == "Water")
 		{
-			UnDoFunc = &IngameWorld::RemoveWater;
-			ReDoFunc = &IngameWorld::AddWater;
+			AddFunc = &IngameWorld::AddWater;
 		}
 		else if (name == "Ground") 
 		{
-			UnDoFunc = &IngameWorld::RemoveGroundObject;
-			ReDoFunc = &IngameWorld::AddGroundObject;
+			AddFunc = &IngameWorld::AddGroundObject;
 		}else
 		{
 			return;
 		}
-		ScreenElements.push_back(NiNew AddSingleObject(kWorld, UnDoFunc, ReDoFunc, kWorld->GetWorldPoint()));
+		for (auto element : ScreenElements)
+		{
+			if (NiIsKindOf(AddSingleObject, element))
+				return;
+		}
+		ScreenElements.push_back(NiNew AddSingleObject(kWorld, AddFunc,NiPoint3::ZERO));
 	}
 }

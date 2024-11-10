@@ -361,3 +361,29 @@ void IngameWorld::AddObject(std::vector<NiPickablePtr> objs, bool Backup)
 	m_spGroundObject->UpdateEffects();
 	m_spGroundObject->Update(0.f);
 }
+void IngameWorld::UpdateScale(std::vector<NiPickablePtr> Node, float Scale, bool Backup) 
+{
+	if (Backup)
+		AttachStack(NiNew UpdateNodeScale(this, Node, Scale));
+	for (auto obj : Node)
+	{
+		float OldScale = obj->GetScale();
+		obj->SetScale(OldScale - Scale);
+	}
+}
+void IngameWorld::ShowSHMDElements(bool Show) 
+{
+	if (Show) 
+	{
+		m_spGroundScene->AttachChild(m_spGroundObject);
+	}
+	else
+	{
+		m_spGroundScene->DetachChild(m_spGroundObject);
+	}
+}
+void IngameWorld::ReplaceObjects(std::vector<NiPickablePtr> OldNodes, std::vector<NiPickablePtr> NewNodes, bool Backup)
+{
+	RemoveObject(OldNodes, Backup);
+	AddObject(NewNodes, Backup);
+}

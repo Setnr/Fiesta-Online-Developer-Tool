@@ -29,14 +29,25 @@ void FiestaOnlineTool::OnIdle()
             float Time = NiGetCurrentTimeInSec();
             DeltaTime = Time - m_fLastUpdateTime;
             m_fLastUpdateTime = Time;
-            _Scene->ProcessInput();
+            if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) || ImGui::IsAnyItemHovered())
+            {
+                WasPreviousFrameHovered = true;
+            }
+            else if (WasPreviousFrameHovered)
+            {
+                WasPreviousFrameHovered = false;
+            }
+            else
+            {
+                _Scene->ProcessInput();
+            }
+                   
             _Scene->Update(Time);
             _Scene->UpdateCamera(Time);
         
             /*Prepare Framerendering*/
             this->UpdateFrame();
             this->BeginFrame();
-
             m_spRenderer->BeginUsingDefaultRenderTargetGroup(NiRenderer::CLEAR_ALL);
 
             _Scene->Draw(this->m_spRenderer);
@@ -51,6 +62,7 @@ void FiestaOnlineTool::OnIdle()
 
             /*Draw NiScreenElements Maybe needs Work so it Draws Player HP Hud and stuff*/
             this->RenderScreenItems();
+           
         }
 
         /*Draws the Cursor*/

@@ -106,8 +106,13 @@ public:
 	NiPickablePtr PickObject();
 	void UpdatePos(std::vector<NiPickablePtr> Node, NiPoint3 PosChange, bool Backup = true);
 	void UpdateRotation(std::vector<NiPickablePtr> Node, glm::vec3 RotationChange, bool Backup = true);
+	void UpdateScale(std::vector<NiPickablePtr> Node, float Scale, bool Backup = true);
 	float GetFOV() { return m_fCameraFOV; }
+	ShineBlockDataPtr GetSHBD() { return _SHBD; }
+	ShineIniPtr GetShineIni() { return _INI; }
 	NiPoint3 GetWorldPoint();
+	void ReplaceObjects(std::vector<NiPickablePtr> OldNodes, std::vector<NiPickablePtr> NewNodes, bool Backup = true);
+	void ShowSHMDElements(bool Show);
 private:
 
 	ShineBlockDataPtr _SHBD;

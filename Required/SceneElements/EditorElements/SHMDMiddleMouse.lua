@@ -25,6 +25,12 @@ function render(ElementPtr)
         CreateAddElement(EditModePtr,"Moveable Object")
         ret = false
     end
+    if GetSelectedNode(EditModePtr) then
+        if Selectable("Replace Selected Object") then
+            CreateAddElement(EditModePtr,"Replace Object")
+            ret = false
+        end
+    end
     return ret
 end
 

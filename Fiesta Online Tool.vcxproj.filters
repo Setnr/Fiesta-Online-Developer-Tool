@@ -219,6 +219,9 @@
     <ClInclude Include="src\Data\IngameWorld\WorldChanges\FogChange.h" />
     <ClInclude Include="src\Data\NiCustom\NiBoundingBox.h" />
     <ClInclude Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.h" />
+    <ClInclude Include="src\Scene\ScreenElements\LoadObject\AddMultipleObject.h" />
+    <ClInclude Include="src\Scene\ScreenElements\LoadObject\ReplaceObjects.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\SHBDMode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NiApplication\FiestaOnlineTool.cpp">
@@ -335,7 +338,7 @@
     <ClCompile Include="src\Scene\EditorScene\Modes\SHMDMode.cpp" />
     <ClCompile Include="src\Data\IngameWorld\WorldChanges\WorldChanges.cpp" />
     <ClCompile Include="src\Data\IngameWorld\WorldChanges\NiRTTIDeclares.cpp" />
-    <ClCompile Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\SHBDMode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Includes\ImGui\imgui.ini">

@@ -1,6 +1,7 @@
 #include "lua.hpp"
 #include "Logger.h"
 #include <Scene/EditorScene/Modes/SHMDMode.h>
+#include <Scene/EditorScene/Modes/SHBDMode.h>
 
 int LogFromLua(lua_State* Script)
 {
@@ -681,6 +682,8 @@ int GetSelectedNode(lua_State* Script)
 	{
 		SHMDModePtr _EditMode = (SHMDMode*)lua_tointeger(Script, 1);
 		auto objs = _EditMode->GetSelectedNodes();
+		if (objs.size() == 0)
+			return 0;
 		NiPickablePtr lastobj = objs.at(objs.size() - 1);
 		lua_pushinteger(Script, (long long)&*lastobj);
 		return 1;
@@ -782,9 +785,11 @@ int SetScale(lua_State* Script)
 {
 	if (lua_isinteger(Script, 1) && lua_isnumber(Script,2))
 	{
-		NiNodePtr obj = (NiNode*)lua_tointeger(Script, 1);
+		SHMDModePtr _EditMode = (SHMDMode*)lua_tointeger(Script, 1);
+		
 		float Scale = lua_tonumber(Script, 2);
-		obj->SetScale(Scale);
+
+		_EditMode->UpdateScale(Scale);
 	}
 	return 0;
 }
@@ -856,6 +861,109 @@ int CreateAddElement(lua_State* Script)
 	}
 	return 0;
 }
+int GetBrushSize(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1))
+	{
+		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(SHBDMode, mode))
+		{
+			SHBDModePtr ptr = NiSmartPointerCast(SHBDMode, mode);
+			lua_pushinteger(Script,ptr->GetBrushSize());
+			return 1;
+		}
+	}
+	return 0;
+}
+int DragInt(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isstring(Script, 2)
+		&& lua_isnumber(Script, 3) && lua_isinteger(Script, 4) && lua_isinteger(Script, 5))
+	{
+		int number = lua_tointeger(Script, 1);
+		auto name = lua_tostring(Script, 2);
+		float Speed = lua_tonumber(Script, 3);
+		int Min = lua_tointeger(Script, 4);
+		int Max = lua_tointeger(Script, 5);
+
+		bool changed = ImGui::DragInt(name, &number, Speed, Min, Max);
+		lua_pushboolean(Script, changed);
+		lua_pushinteger(Script, number);
+		return 2;
+	}
+	return 0;
+}
+int SetBrushSize(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2))
+	{
+		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(SHBDMode, mode))
+		{
+			int Size =lua_tointeger(Script, 2);
+			SHBDModePtr ptr = NiSmartPointerCast(SHBDMode, mode);
+			ptr->SetBrushSize(Size);
+		}
+	}
+	return 0;
+}
+int ShowSHMDElements(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1))
+	{
+		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(SHBDMode, mode))
+		{
+			SHBDModePtr ptr = NiSmartPointerCast(SHBDMode, mode);
+			lua_pushboolean(Script, ptr->GetShowElements());
+			return 1;
+		}
+	}
+	return 0;
+}
+int SetShowSHMDElements(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isboolean(Script, 2))
+	{
+		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(SHBDMode, mode))
+		{
+			bool Show = lua_toboolean(Script, 2);
+			SHBDModePtr ptr = NiSmartPointerCast(SHBDMode, mode);
+			ptr->SetShowElements(Show);
+		}
+	}
+	return 0;
+}
+int GetWalkable(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1))
+	{
+		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(SHBDMode, mode))
+		{
+			SHBDModePtr ptr = NiSmartPointerCast(SHBDMode, mode);
+			lua_pushboolean(Script, ptr->GetWalkable());
+			return 1;
+		}
+	}
+	return 0;
+}
+int SetWalkable(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isboolean(Script, 2))
+	{
+		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(SHBDMode, mode))
+		{
+			bool Show = lua_toboolean(Script, 2);
+			SHBDModePtr ptr = NiSmartPointerCast(SHBDMode, mode);
+			ptr->SetWalkable(Show);
+		}
+	}
+	return 0;
+}
+
 void SetFunctions(lua_State* Script) 
 {
 	lua_pushcclosure(Script, LogFromLua, 0);
@@ -973,4 +1081,12 @@ void SetFunctions(lua_State* Script)
 	lua_register(Script, "SetSnapMove", SetSnapMove);
 	lua_register(Script, "GetSnapMove", GetSnapMove);
 	lua_register(Script, "CreateAddElement", CreateAddElement);
+
+	lua_register(Script, "GetBrushSize", GetBrushSize);
+	lua_register(Script, "DragInt", DragInt);
+	lua_register(Script, "SetBrushSize", SetBrushSize);
+	lua_register(Script, "ShowSHMDElements", ShowSHMDElements);
+	lua_register(Script, "SetShowSHMDElements", SetShowSHMDElements);
+	lua_register(Script, "SetWalkable", SetWalkable);
+	lua_register(Script, "GetWalkable", GetWalkable);
 }

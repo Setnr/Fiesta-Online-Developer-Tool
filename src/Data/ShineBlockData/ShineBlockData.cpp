@@ -21,17 +21,19 @@ bool ShineBlockData::Load(MapInfo* Info)
 	SHBDFile.close();
 	return true;
 }
-void ShineBlockData::UpdateSHBDData(int offset, int Shift, bool Status)
+void ShineBlockData::UpdateSHBDData(int w, int h, bool Walkable)
 {
-	if (offset >= Data.size())
+	if (w * h >= Data.size() * 8)
 		return;
-	if (Status)
+	int offset = w / 8 + h * MapSize;
+	int Shift = w % 8;
+	if (Walkable)
 	{
-		Data[offset] |= (1 << Shift);
+		Data[offset] &= ~(1 << Shift); //it bit is walkable bit needs to be 0
 	}
 	else
 	{
-		Data[offset] &= ~(1 << Shift);
+		Data[offset] |= (1 << Shift);
 	}
 }
 bool ShineBlockData::Save(std::string Path)
@@ -63,7 +65,7 @@ void ShineBlockData::CreateEmpty(int Size)
 }
 bool ShineBlockData::IsWalkable(int w, int h)
 {
-	int offset = w / 8 * SHBDSize;
+	int offset = w / 8 + h * MapSize;
 	int Shift = w % 8;
-	return (Data[SHBDSize * offset] >> Shift) & 0x1; // Not Sure if Shift is correct!
+	return !((Data[offset] >> Shift) & 0x1); // bit is 1 if pixel is blocked
 }

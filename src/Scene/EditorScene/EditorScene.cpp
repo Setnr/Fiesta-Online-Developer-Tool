@@ -11,6 +11,8 @@
 #include <Scene/ScreenElements/LuaElement/LuaElement.h>
 #include <filesystem>
 #include "EditorScene/Modes/SHMDMode.h"
+#include "EditorScene/Modes/SHBDMode.h"
+#include <NiDX9Renderer.h>
 NiImplementRTTI(EditorScene, FiestaScene);
 
 EditorScene::EditorScene() 
@@ -101,10 +103,9 @@ void EditorScene::Update(float fTime)
 	{
 		kWorld = NewWorldLoaded;
 		NewWorldLoaded = NULL;
+		_EditMode = NULL;
 		BaseNode = kWorld->GetWorldNode();
 		Camera = kWorld->GetCamera();
-
-		_EditMode = NiNew SHMDMode(kWorld, this);
 
 		NiMatrix3 mat = Camera->GetRotate();
 		mat.ToEulerAnglesXYZ(Roll, Yaw, Pitch);
@@ -138,7 +139,21 @@ void EditorScene::ProcessInput()
 			if (ImGui::IsKeyPressed((ImGuiKey)0x59))
 				kWorld->Redo();
 		}
+		if (ImGui::IsKeyPressed((ImGuiKey)VK_TAB))
+			UpdateEditMode();
 		if (_EditMode)
 			_EditMode->ProcessInput();
 	}
 }	
+
+void EditorScene::UpdateEditMode() 
+{
+	if (!_EditMode)
+		_EditMode = NiNew SHMDMode(kWorld, this);
+	else if (NiIsKindOf(SHMDMode, _EditMode))
+	{
+		_EditMode = NiNew SHBDMode(kWorld, this);
+	}
+	else
+		_EditMode = NULL;
+}

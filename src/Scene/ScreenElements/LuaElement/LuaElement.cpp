@@ -1,7 +1,7 @@
 #include "LuaElement.h"
 #include "LuaFunctions/LuaElementFunctions.h"
 
-LuaElement::LuaElement(EditorScenePtr Scene, std::string FileName) : _Scene(Scene), _FileName(FileName)
+LuaElement::LuaElement(EditorScenePtr Scene, std::string FileName, ImVec2 Pos) : _Scene(Scene), _FileName(FileName), _Pos(Pos)
 {
 	Script = luaL_newstate();
 	luaL_openlibs(Script);
@@ -31,6 +31,8 @@ LuaElement::LuaElement(EditorScenePtr Scene, std::string FileName) : _Scene(Scen
 bool LuaElement::Draw()
 {
 	bool ret = true;
+	if (_Pos.x != -1 && _Pos.y != -1)
+		ImGui::SetNextWindowPos(_Pos);
 	if(ImGui::Begin(WindowName.c_str(),&open, flags))
 	{ 
 		lua_getglobal(Script, "render");

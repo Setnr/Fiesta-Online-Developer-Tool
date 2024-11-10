@@ -6,11 +6,13 @@
 NiSmartPointer(LuaElement);
 class LuaElement : public ScreenElement
 {
+	NiDeclareRTTI;
 public:
-	LuaElement(EditorScenePtr Scene, std::string FileName);
+	LuaElement(EditorScenePtr Scene, std::string FileName, ImVec2 Pos = {-1,-1});
 	bool Draw();
 	EditorScenePtr GetScene() { return _Scene; }
 	void AddFlag(int flag) { flags |= flag; }
+	std::string GetFileName() { return _FileName; }
 private:
 	EditorScenePtr _Scene;
 
@@ -19,5 +21,6 @@ private:
 	std::string WindowName;
 	bool open = true;
 	int flags = 0; 
+	ImVec2 _Pos;
 };
 

@@ -72,6 +72,7 @@ private:
 	static std::atomic<float> DeltaTime;
 
 	void DrawCursor();
+	bool WasPreviousFrameHovered = false;
 #pragma region ShaderInit
 	static unsigned int ShaderErrorCallback(const char* pacError, NiShaderError eError, bool bRecoverable);
 	virtual bool RunShaderParser();

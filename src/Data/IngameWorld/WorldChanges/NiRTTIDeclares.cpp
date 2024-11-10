@@ -5,6 +5,7 @@ NiImplementRTTI(FloatChange, WorldChange);
 NiImplementRTTI(NodeChange, WorldChange);
 NiImplementRTTI(UpdateNodePos, WorldChange);
 NiImplementRTTI(UpdateNodeRotation, WorldChange);
+NiImplementRTTI(UpdateNodeScale, WorldChange);
 NiImplementRTTI(AttachingNode, WorldChange);
 NiImplementRTTI(AttachingNodeList, WorldChange);
 

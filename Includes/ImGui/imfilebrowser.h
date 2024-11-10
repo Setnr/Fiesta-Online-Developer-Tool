@@ -102,7 +102,7 @@ namespace ImGui
         // this function will pre-fill the input dialog with a filename.
         void SetInputName(std::string_view input);
 
-
+        bool IsOpenFlag();
     private:
 
         template <class Functor>
@@ -295,6 +295,7 @@ inline void ImGui::FileBrowser::Open()
     openFlag_ = true;
     closeFlag_ = false;
 }
+inline bool ImGui::FileBrowser::IsOpenFlag() { return openFlag_; }
 
 inline void ImGui::FileBrowser::Close()
 {

@@ -24,10 +24,10 @@ public:
 			{
 				NiDrawScene(Camera, sky, m_spCuller);
 			}
-
 			Camera->SetViewFrustum(kWorld->GetWorldFrustum());
 		}
 		NiDrawScene(Camera, BaseNode, m_spCuller);
+
 	}
 	virtual void DrawImGui();
 	void LoadNewMap(MapInfo* info);
@@ -40,6 +40,7 @@ public:
 	virtual void ProcessInput();
 	EditModePtr GetCurrentEditMode() { return _EditMode; }
 private:
+	void UpdateEditMode();
 	IngameWorldPtr NewWorldLoaded;
 	IngameWorldPtr kWorld;
 

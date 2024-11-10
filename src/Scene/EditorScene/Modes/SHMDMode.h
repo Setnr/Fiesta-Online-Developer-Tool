@@ -61,6 +61,7 @@ class SHMDMode : public EditMode
 	void SetSnapeMovement(bool Snap) { SnapMovement = Snap; }
 	bool GetSnapMovement() { return SnapMovement; }
 	void CreateAddElement(std::string type);
+	void UpdateScale(float Scale);
 private:
 	ImGuizmo::OPERATION OperationMode = ImGuizmo::OPERATION::TRANSLATE;
 	void DrawGizmo();

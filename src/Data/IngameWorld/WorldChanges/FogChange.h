@@ -175,6 +175,52 @@ protected:
 	glm::vec3 _RotChange;
 };
 
+NiSmartPointer(UpdateNodeScale);
+class UpdateNodeScale : public WorldChange
+{
+public:
+	NiDeclareRTTI;
+	UpdateNodeScale(IngameWorldPtr World, std::vector<NiPickablePtr> NodeList, float Scale)
+	{
+		world = World;
+		_NodeList = NodeList;
+		_Scale = Scale;
+	}
+	void Update(WorldChangePtr NewObject)
+	{
+		if (NiIsKindOf(UpdateNodeScale, NewObject))
+		{
+			UpdateNodeScalePtr _NewObject = NiSmartPointerCast(UpdateNodeScale, NewObject);
+			_Scale += _NewObject->GetChange();
+		}
+	}
+	std::vector<NiPickablePtr> GetList() { return _NodeList; }
+	float GetChange() { return _Scale; }
+	virtual void Undo()
+	{
+		world->UpdateScale(_NodeList, -1.f * _Scale, false);
+	};
+	virtual void Redo()
+	{
+		world->UpdateScale(_NodeList, _Scale, false);
+	};
+	bool ExtraCheck(WorldChangePtr NewObject)
+	{
+		if (NiIsKindOf(UpdateNodeScale, NewObject))
+		{
+			UpdateNodeScalePtr _NewObject = NiSmartPointerCast(UpdateNodeScale, NewObject);
+			if (_NewObject->GetList() != _NodeList)
+				return true;
+			else
+				return false;
+		}
+		return true;
+	}
+protected:
+	IngameWorldPtr world;
+	std::vector<NiPickablePtr> _NodeList;
+	float _Scale;
+};
 
 
 NiSmartPointer(FogChangeColor);

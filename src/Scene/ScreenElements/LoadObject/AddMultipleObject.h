@@ -4,11 +4,11 @@
 #include <ImGui/imfilebrowser.h>
 #include <Data/IngameWorld/IngameWorld.h>
 #include <NiDX9Renderer.h>
-class AddSingleObject : public ScreenElement
+class AddMultipleObject : public ScreenElement
 {
 	NiDeclareRTTI;
 public:
-	AddSingleObject(IngameWorldPtr world, void (IngameWorld::* AttacFunc)(NiNodePtr, bool), NiPoint3 pos) : _FileBrowser(ImGuiFileBrowserFlags_NoTitleBar | ImGuiFileBrowserFlags_CloseOnEsc | ImGuiFileBrowserFlags_NoModal)
+	AddMultipleObject(IngameWorldPtr world, void (IngameWorld::* AttacFunc)(std::vector<NiPickablePtr>, bool), NiPoint3 pos) : _FileBrowser(ImGuiFileBrowserFlags_NoTitleBar | ImGuiFileBrowserFlags_CloseOnEsc | ImGuiFileBrowserFlags_NoModal)
 	{
 		_FileBrowser.SetWindowPos(0, 50);
 		_World = world;
@@ -19,7 +19,7 @@ public:
 		_FileBrowser.SetTypeFilters({ ".nif" });
 		Camera = PgUtil::CreateNewCamera();
 		_BaseNode = NiNew NiNode;
-		Light = NiNew NiAmbientLight(); 
+		Light = NiNew NiAmbientLight();
 		Light->SetAmbientColor(NiColor(0.792157f, 0.792157f, 0.792157f));
 		Light->SetDiffuseColor(NiColor::WHITE);
 		Light->SetSpecularColor(NiColor::BLACK);
@@ -30,31 +30,31 @@ public:
 		_BaseNode->UpdateEffects();
 		_BaseNode->UpdateProperties();
 		_BaseNode->Update(0.f);
-		 
+
 		Camera->SetTranslate(NiPoint3(250.f, 250.f, 250.f));
 		Camera->Update(0.0f);
 		Camera->LookAtWorldPoint(NiPoint3::ZERO, NiPoint3(0.0, 0.0, 1.0));
 		Camera->Update(0.0f);
 	}
-	virtual bool Draw() 
-	{ 
+	virtual bool Draw()
+	{
 		_FileBrowser.Display();
-		
+
 		if (!_FileBrowser.IsOpened())
 			return false;
-		
+
 		if (CurPath != _FileBrowser.GetSelected())
 		{
 			CurPath = _FileBrowser.GetSelected().string();
-			NiStream stream;
-			stream.Load(CurPath.c_str());
-			if (!stream.GetLastError())
+			if(CurPath.ends_with(".nif"))
 			{
-				NiObjectPtr ptr = stream.GetObjectAt(0);
-				if (NiIsKindOf(NiNode, ptr))
+				NiNodePtr ptr = PgUtil::LoadNifFile(CurPath.c_str(), 0, true);
+				if (NiIsKindOf(NiPickable, ptr))
 				{
 					_BaseNode->DetachChild(_Obj);
-					_Obj = NiSmartPointerCast(NiNode, ptr);
+
+					_Obj = NiSmartPointerCast(NiPickable, ptr);
+					_Obj->SetSHMDPath(CurPath);
 
 					auto io = ImGui::GetIO();
 					NiPoint3 kOrigin, kDir;
@@ -62,8 +62,7 @@ public:
 					{
 						_Obj->SetTranslate(kOrigin + (kOrigin.x * kDir * 6.f)); //Set Position on Screen of Object
 					}
-					auto len = PgUtil::PathFromClientFolder("").length() + 1;
-					_Obj->SetName(CurPath.substr(len).c_str());
+
 					_BaseNode->AttachChild(_Obj);
 
 					_BaseNode->UpdateEffects();
@@ -78,7 +77,7 @@ public:
 				}
 			}
 		}
-		if (_Obj) 
+		if (_Obj)
 		{
 			NiMatrix3 mat = _Obj->GetRotate();
 			float Roll, Yaw, Pitch;
@@ -100,7 +99,7 @@ public:
 			_Obj->SetTranslate(_Pos);
 			_Obj->SetScale(Scale);
 
-			(_World->*_AttachFunc)(_Obj, true);
+			(_World->*_AttachFunc)({ _Obj }, true);
 
 			_World = NULL;
 			_BaseNode = NULL;
@@ -112,15 +111,15 @@ public:
 		}
 		return true;
 	}
-	
+
 private:
 	IngameWorldPtr _World;
-	void (IngameWorld::* _AttachFunc)(NiNodePtr, bool);
+	void (IngameWorld::* _AttachFunc)(std::vector<NiPickablePtr>, bool);
 	NiPoint3 _Pos;
 	ImGui::FileBrowser _FileBrowser;
 	std::string CurPath = "";
 	NiNodePtr _BaseNode;
-	NiNodePtr _Obj;
+	NiPickablePtr _Obj;
 	NiCameraPtr Camera;
 	NiAmbientLightPtr Light;
 	float Scale;

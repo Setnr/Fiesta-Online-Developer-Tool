@@ -154,3 +154,40 @@ void PgUtil::LookAndMoveAtWorldPoint(NiCameraPtr Camera, NiPoint3 Point)
     
     Camera->Update(0.0f);
 }
+NiCamera* PgUtil::CreateNewCamera() 
+{
+    NiCamera* Camera = NiNew NiCamera;
+    if (!Camera)
+        return NULL;
+    NiFrustum WorldFrustum(-0.25, 0.25, 0.1875, -0.1875, 1.0, 6000.0, false);
+    //
+    float m_fCameraFOV = 50.0f;
+    float fTop = m_fCameraFOV / 180.0 * 0.5 * NI_PI;
+    float fTopa = tan(fTop);
+    float v4 = fTopa;
+    float fRight = fTopa;
+    float v5 = 1600; /*TODO DYNAMIC*/
+    float v6 = 900;
+    float fTopb;
+    if (900 >= (double)1600)
+    {
+        fTopb = v4 * (v6 / v5);
+        v4 = fTopb;
+    }
+    else
+    {
+        fRight = v5 / v6 * v4;
+    }
+    float fTopc = -fRight;
+    float v7 = fTopc;
+    WorldFrustum.m_fLeft = fTopc;
+    WorldFrustum.m_fRight = fRight;
+    WorldFrustum.m_fTop = v4;
+    float fTopd = -v4;
+    WorldFrustum.m_fBottom = fTopd;
+    //
+
+
+    Camera->SetViewFrustum(WorldFrustum);
+    return Camera;
+}
