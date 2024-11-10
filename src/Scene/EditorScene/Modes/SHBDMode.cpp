@@ -43,7 +43,7 @@ void SHBDMode::ProcessInput()
 		auto ini = kWorld->GetShineIni();
 		auto SHBD = kWorld->GetSHBD();
 
-		int PixelSize = SHBD->GetMapSize() * ini->GetOneBlockWidht() / SHBD->GetSHBDSize();
+		float PixelSize = SHBD->GetMapSize() * ini->GetOneBlockWidht() / SHBD->GetSHBDSize();
 
 		int middlew = MouseIntersect.x / PixelSize;
 		int middleh = MouseIntersect.y / PixelSize;
@@ -114,7 +114,7 @@ void SHBDMode::CreateSHBDNode()
 	auto ini = kWorld->GetShineIni();
 	_SHBDNode = NiNew NiNode;
 
-	int PixelSize = SHBD->GetMapSize() * ini->GetOneBlockWidht() / SHBD->GetSHBDSize();
+	float PixelSize = SHBD->GetMapSize() * ini->GetOneBlockWidht() / SHBD->GetSHBDSize();
 
 	std::vector<NiPoint3> NormalList = { NiPoint3::UNIT_Z ,NiPoint3::UNIT_Z ,NiPoint3::UNIT_Z ,NiPoint3::UNIT_Z };
 	std::vector<NiColorA> ColorList = { NiColorA(0.f,1.0f,0.f,1.f), NiColorA(0.f,1.0f,0.f,1.f),NiColorA(0.f,1.0f,0.f,1.f), NiColorA(0.f,1.0f,0.f,1.f) };
