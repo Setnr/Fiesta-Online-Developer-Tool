@@ -23,6 +23,8 @@ function render(ElementPtr)
             Text("Switch to Rotate Mode ctrl + e");
             Text("Enable/Disable Snap Mode ctrl + d");
             Text("Undo/Redo ctrl + z/y")
+            Text("Select all copies of the last selcted Object ctrl + a")
+            Text("Select ALL Objects ctrl + alt + a")
             EndTabWindow()
         end
         if CreateTabWindow("SHBD") then
@@ -30,6 +32,7 @@ function render(ElementPtr)
             Text("Rotate Camera with Right Click");
             Text("Move Up/Down with Q/E");
             Text("Scroll to Move SHBD Up/Down");
+            Text("Scrollt + alt to Resize Brush")
             Text("Change SHBD with Left Click");
             EndTabWindow()
         end

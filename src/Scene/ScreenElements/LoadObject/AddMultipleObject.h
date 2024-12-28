@@ -54,7 +54,8 @@ public:
 					_BaseNode->DetachChild(_Obj);
 
 					_Obj = NiSmartPointerCast(NiPickable, ptr);
-					_Obj->SetSHMDPath(CurPath);
+					auto len = PgUtil::PathFromClientFolder("").length() + 1;
+					_Obj->SetSHMDPath(CurPath.substr(len).c_str());
 
 					auto io = ImGui::GetIO();
 					NiPoint3 kOrigin, kDir;

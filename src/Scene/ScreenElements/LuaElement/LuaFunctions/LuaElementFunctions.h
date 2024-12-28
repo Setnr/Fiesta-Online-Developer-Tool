@@ -866,9 +866,9 @@ int GetBrushSize(lua_State* Script)
 	if (lua_isinteger(Script, 1))
 	{
 		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
-		if (NiIsKindOf(SHBDMode, mode))
+		if (NiIsKindOf(TerrainMode, mode))
 		{
-			SHBDModePtr ptr = NiSmartPointerCast(SHBDMode, mode);
+			TerrainModePtr ptr = NiSmartPointerCast(TerrainMode, mode);
 			lua_pushinteger(Script,ptr->GetBrushSize());
 			return 1;
 		}
@@ -898,10 +898,10 @@ int SetBrushSize(lua_State* Script)
 	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2))
 	{
 		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
-		if (NiIsKindOf(SHBDMode, mode))
+		if (NiIsKindOf(TerrainMode, mode))
 		{
 			int Size =lua_tointeger(Script, 2);
-			SHBDModePtr ptr = NiSmartPointerCast(SHBDMode, mode);
+			TerrainModePtr ptr = NiSmartPointerCast(TerrainMode, mode);
 			ptr->SetBrushSize(Size);
 		}
 	}
@@ -912,9 +912,9 @@ int ShowSHMDElements(lua_State* Script)
 	if (lua_isinteger(Script, 1))
 	{
 		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
-		if (NiIsKindOf(SHBDMode, mode))
+		if (NiIsKindOf(TerrainMode, mode))
 		{
-			SHBDModePtr ptr = NiSmartPointerCast(SHBDMode, mode);
+			TerrainModePtr ptr = NiSmartPointerCast(TerrainMode, mode);
 			lua_pushboolean(Script, ptr->GetShowElements());
 			return 1;
 		}
@@ -926,10 +926,10 @@ int SetShowSHMDElements(lua_State* Script)
 	if (lua_isinteger(Script, 1) && lua_isboolean(Script, 2))
 	{
 		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
-		if (NiIsKindOf(SHBDMode, mode))
+		if (NiIsKindOf(TerrainMode, mode))
 		{
 			bool Show = lua_toboolean(Script, 2);
-			SHBDModePtr ptr = NiSmartPointerCast(SHBDMode, mode);
+			TerrainModePtr ptr = NiSmartPointerCast(TerrainMode, mode);
 			ptr->SetShowElements(Show);
 		}
 	}

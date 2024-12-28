@@ -222,7 +222,6 @@ protected:
 	float _Scale;
 };
 
-
 NiSmartPointer(FogChangeColor);
 class FogChangeColor : public ChangeNiColor
 {
@@ -425,3 +424,30 @@ protected:
 	void(IngameWorld::* _UnDo)(std::vector<NiPickablePtr> , bool);
 	void(IngameWorld::* _ReDo)(std::vector<NiPickablePtr> , bool);
 };
+
+NiSmartPointer(SHBDChange);
+class SHBDChange : public WorldChange
+{
+public:
+	NiDeclareRTTI;
+	SHBDChange(IngameWorldPtr World, std::vector<char> From, std::vector<char> To)
+	{
+		world = World;
+		_From = From;
+		_To = To;
+	}
+	virtual void Undo()
+	{
+		world->UpdateSHBDData(_From);
+	};
+	virtual void Redo()
+	{
+		world->UpdateSHBDData(_To);
+	};
+	bool ExtraCheck(WorldChangePtr NewObject) { return true; }
+protected:
+	IngameWorldPtr world;
+	std::vector<char> _From, _To;
+	std::vector<std::vector<NiPixelDataPtr>> _TextureConnector;
+};
+

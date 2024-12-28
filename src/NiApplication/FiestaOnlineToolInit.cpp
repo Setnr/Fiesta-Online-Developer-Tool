@@ -22,6 +22,7 @@ NiCursorPtr FiestaOnlineTool::cursor;
 POINT FiestaOnlineTool::MousePos;
 NiNodePtr FiestaOnlineTool::BoundingBox;
 
+
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 #ifdef _WIN64 
 static const char* ApplicaitonName = "DeveloperTools bei Set(x64)";

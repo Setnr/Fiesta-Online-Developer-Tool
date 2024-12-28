@@ -16,8 +16,8 @@ public:
 	The Following Functions dont check if w or h are valid values
 	Maybe this will get added need to be checked what the later Performance is saying
 	*/
-	inline float GetHTD(int w, int h) { return HTD[_Width * h + w]; }
-	inline float GetHTDG(int w, int h) { return HTDG[_Width * h + w]; }
+	inline float GetHTD(int w, int h) { return (HTD.size()) ? HTD[_Width * h + w] : 0.f;}
+	inline float GetHTDG(int w, int h) { return (HTDG.size()) ? HTDG[_Width * h + w] : 0.f; }
 
 
 	inline void SetHTD(int w, int h, float value) 

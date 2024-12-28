@@ -16,9 +16,22 @@ public:
 	bool IsWalkable(int w, int h);
 	unsigned int GetMapSize() { return MapSize; }
 	unsigned int GetSHBDSize() { return SHBDSize; }
+	void UpdateSHBDData(std::vector<char> NewData) 
+	{
+		Data = NewData;
+		_HadDirectDataUpdate = true;
+	}
+	bool HadDirectUpdate()
+	{
+		bool b = _HadDirectDataUpdate;
+		_HadDirectDataUpdate = false;
+		return b;
+	}
+	std::vector<char> GetSHBDData() { return Data; }
 private:
 	unsigned int MapSize; //Größer der Map Generell
 	unsigned int SHBDSize; //Anzahl an Bytes für eine Breite der Map
 	std::vector<char> Data;
+	bool _HadDirectDataUpdate = false;
 };
 

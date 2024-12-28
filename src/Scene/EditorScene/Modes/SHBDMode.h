@@ -1,25 +1,19 @@
-#include "EditMode.h"
+#pragma once
+#include "TerrainMode.h"
 #include <Scene/ScreenElements/LuaElement/LuaElement.h>
 #include "ImGui/ImGuizmo.h"
 
 NiSmartPointer(SHBDMode);
-class SHBDMode : public EditMode
+class SHBDMode : public TerrainMode
 {
 	NiDeclareRTTI;
-	SHBDMode(IngameWorldPtr World, EditorScenePtr Scene) : EditMode(World, (FiestaScenePtr)&* Scene)
+	SHBDMode(IngameWorldPtr World, EditorScenePtr Scene) : TerrainMode(World, Scene)
 	{
-		Camera = World->GetCamera();
-		MouseOrb = PgUtil::LoadNifFile(PgUtil::PathFromApplicationFolder(".\\FiestaOnlineTool\\HTDCircle.nif").c_str());
-		NiWireframePropertyPtr ptr = NiNew NiWireframeProperty;
-		ptr->SetWireframe(true);
-		MouseOrb->AttachProperty(ptr);
-		MouseOrb->SetScale((50.f / 160.f) * _BrushSize);
+		ScreenElements.push_back(NiNew LuaElement(Scene, "EditorELements/SHBD.lua"));
+
+		_BaseNode->DetachChild(MouseOrb);//We need to remove it from the Terrain ebcause this mode does use it on its own
+
 		_BaseNode = NiNew NiNode;
-
-		CreateSHBDNode();
-
-		_BaseNode->AttachChild(MouseOrb);
-		_BaseNode->AttachChild(_SHBDNode);
 
 		Light = NiNew NiAmbientLight();
 		Light->SetAmbientColor(NiColor(0.792157f, 0.792157f, 0.792157f));
@@ -33,54 +27,35 @@ class SHBDMode : public EditMode
 		_BaseNode->UpdateProperties();
 		_BaseNode->Update(0.f);
 
-		ScreenElements.push_back(NiNew LuaElement(Scene, "EditorELements/SHBD.lua"));
-		SetBrushSize(_BrushSize);
-		_FarFrustum = kWorld->GetFarFrustum();
-		_FogDepth = kWorld->GetFogDepth();
-		kWorld->SetFarFrustum(50000.f, false);
-		kWorld->SetFogDepth(0.0f, false);
+		
+		_SHBDNode = NiNew NiNode;
+		_BaseNode->AttachChild(_SHBDNode);
+		_BaseNode->AttachChild(MouseOrb);
 	}
 	~SHBDMode()
 	{
-		kWorld->SetFarFrustum(_FarFrustum, false);
-		kWorld->SetFogDepth(_FogDepth, false);
-		TextureConnector.clear();
-		_BaseNode = NULL;
-		MouseOrb = NULL;
-		Light = NULL;
+
 		_SHBDNode = NULL;
-		Camera = NULL;
-		SetShowElements(true);
 	}
 	virtual void Draw();
 	virtual void Update(float fTime);
 	virtual void ProcessInput();
 	virtual std::string GetEditModeName() { return "SHBD"; }
 	
-	int GetBrushSize() { return _BrushSize; }
-	void SetBrushSize(int Size) { _BrushSize = Size; MouseOrb->SetScale((6.25f / 160.f) * _BrushSize);	}
-	void SetShowElements(bool Show);
-	bool GetShowElements() { return _ShowElements; }
 	void SetWalkable(bool Walkable) { _Walkable = Walkable; }
 	bool GetWalkable() { return _Walkable; }
 private:
+	void UpdateSHBD();
 
-	int _BrushSize = 1;
-	bool _ShowElements = true;
-	bool _Walkable = true;
-	float _FarFrustum,_FogDepth;
-	
-
-	void UpdateMouseIntersect();
-	void CreateSHBDNode();
-	NiNodePtr _BaseNode;
 	NiNodePtr _SHBDNode;
-	NiAmbientLightPtr Light;
-	NiNodePtr MouseOrb;
-	NiCameraPtr Camera;
-	NiPoint3 MouseIntersect;
+
+	void CreateSHBDNode();
+	void UpdateMouseIntersect();
+
 	std::vector<std::vector<NiPixelDataPtr>> TextureConnector;
 	int TextureSize = 128;
 
+	std::vector<char> _Data;
 	unsigned int Walkable, Blocked;
+
 };

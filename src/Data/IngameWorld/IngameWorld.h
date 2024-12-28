@@ -100,8 +100,10 @@ public:
 	}
 	void ClearStacks()
 	{
-		UnDoStack.clear();
-		ReDoStack.clear();
+		if(!UnDoStack.empty())
+			UnDoStack.clear();
+		if (!ReDoStack.empty())
+			ReDoStack.clear();
 	}
 	NiPickablePtr PickObject();
 	void UpdatePos(std::vector<NiPickablePtr> Node, NiPoint3 PosChange, bool Backup = true);
@@ -113,6 +115,31 @@ public:
 	NiPoint3 GetWorldPoint();
 	void ReplaceObjects(std::vector<NiPickablePtr> OldNodes, std::vector<NiPickablePtr> NewNodes, bool Backup = true);
 	void ShowSHMDElements(bool Show);
+	void UpdateSHBDData(std::vector<char> newData) 
+	{
+		_SHBD->UpdateSHBDData(newData);
+	}
+	void AttachStack(WorldChangePtr change)
+	{
+		if (UnDoStack.size() == 0)
+		{
+			UnDoStack.push_back(change);
+			ReDoStack.clear();
+			return;
+		}
+		auto topobject = UnDoStack.back();
+		if (!change->IsKindOf(topobject->GetRTTI()) || topobject->ExtraCheck(change))
+		{
+			if (UnDoStack.size() > 25)
+				UnDoStack.pop_front();
+			UnDoStack.push_back(change);
+			ReDoStack.clear();
+		}
+		else
+			topobject->Update(change);
+	}
+	void ShowTerrain(bool show);
+	NiSortAdjustNodePtr GetTerrainNode() { return m_spGroundTerrain; }
 private:
 
 	ShineBlockDataPtr _SHBD;
@@ -133,25 +160,7 @@ private:
 	void CreateAndAttachTerrain();
 	void CreateTerrainLayer(std::shared_ptr<TerrainLayerData> CurrentLayer);
 
-	void AttachStack(WorldChangePtr change)
-	{
-		if (UnDoStack.size() == 0)
-		{
-			UnDoStack.push_back(change);
-			ReDoStack.clear();
-			return;
-		}
-		auto topobject = UnDoStack.back();
-		if (!change->IsKindOf(topobject->GetRTTI()) || topobject->ExtraCheck(change))
-		{
-			if (UnDoStack.size() > 25)
-				UnDoStack.pop_front();
-			UnDoStack.push_back(change);
-			ReDoStack.clear();
-		}
-		else
-			topobject->Update(change);
-	}
+
 	 
 	std::deque<WorldChangePtr>UnDoStack;
 	std::deque<WorldChangePtr>ReDoStack;

@@ -25,8 +25,14 @@ bool MapLoadElement::Draw()
 				for (int i = 0; i < reader->GetRows(); i++)
 				{
 					MapInfo* row = (MapInfo*)reader->GetRow(i);
-					if (std::string(row->MapName).find(buffer) == std::string::npos)
+					std::string MapName = row->MapName;
+					std::string Buffer = buffer;
+
+					if (std::search(MapName.begin(), MapName.end(),
+						Buffer.begin(), Buffer.end(),
+						[](char a, char b) {return tolower(a) == tolower(b); }) == MapName.end())
 						continue;
+
 					row->DrawTableRow();
 
 					if (ImGui::Button(std::string("Load Map##" + std::to_string(i)).c_str()))

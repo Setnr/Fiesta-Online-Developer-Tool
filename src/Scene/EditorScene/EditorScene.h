@@ -34,7 +34,7 @@ public:
 	void SetWorld(IngameWorldPtr NewWorld) { NewWorldLoaded = NewWorld; }
 	virtual void Update(float fTime);
 	
-	virtual void Terminate() { _EditMode = NULL; ScreenElements.clear(); kWorld->ClearStacks(); }
+	virtual void Terminate() { _EditMode = NULL; ScreenElements.clear(); if(kWorld) kWorld->ClearStacks(); }
 	virtual void CreateMenuBar();
 	IngameWorldPtr GetWorld() { return kWorld; }
 	virtual void ProcessInput();

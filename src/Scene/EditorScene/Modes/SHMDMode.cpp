@@ -56,14 +56,15 @@ void SHMDMode::ProcessInput()
 	}
 	if (HasSelectedObject() && ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x41)) 
 	{
+
 		auto obj = SelectedObjects.back();
 		auto list = kWorld->GetGroundObjects();
-		for (auto listentry : list) 
+		for (auto listentry : list)
 		{
-			if (NiIsKindOf(NiPickable, listentry)) 
+			if (NiIsKindOf(NiPickable, listentry))
 			{
 				NiPickablePtr ptr = NiSmartPointerCast(NiPickable, listentry);
-				if (ptr->GetSHMDPath() == obj->GetSHMDPath())
+				if (ptr->GetSHMDPath() == obj->GetSHMDPath() || ImGui::IsKeyDown((ImGuiKey)VK_MENU)) //Select ALL Objects if alt is pressed
 					SelectObject(ptr, true);
 			}
 		}

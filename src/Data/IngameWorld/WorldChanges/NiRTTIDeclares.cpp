@@ -8,6 +8,7 @@ NiImplementRTTI(UpdateNodeRotation, WorldChange);
 NiImplementRTTI(UpdateNodeScale, WorldChange);
 NiImplementRTTI(AttachingNode, WorldChange);
 NiImplementRTTI(AttachingNodeList, WorldChange);
+NiImplementRTTI(SHBDChange, WorldChange);
 
 NiImplementRTTI(FogChangeColor, ChangeNiColor);
 NiImplementRTTI(ChangeDirectionalAmbientLightColor, ChangeNiColor);

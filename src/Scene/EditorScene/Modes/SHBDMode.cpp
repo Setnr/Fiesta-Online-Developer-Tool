@@ -3,8 +3,9 @@
 #include <FiestaOnlineTool.h>
 #include <thread>
 #include <future>
+#include <Data/IngameWorld/WorldChanges/FogChange.h>
 
-NiImplementRTTI(SHBDMode, EditMode);
+NiImplementRTTI(SHBDMode, TerrainMode);
 
 void SHBDMode::Draw()
 {
@@ -14,97 +15,90 @@ void SHBDMode::Draw()
 	NiCullingProcess kCuller(&kVisible);
 	NiDrawScene(Camera, _BaseNode, kCuller);
 }
-
 void SHBDMode::Update(float fTime)
 {
-	UpdateMouseIntersect();
-	MouseOrb->SetTranslate(MouseIntersect);
+	TerrainMode::Update(fTime);
+	if (_Update)
+	{
+		UpdateSHBD();
+	}
+	auto SHBD = kWorld->GetSHBD();
+	if (SHBD->HadDirectUpdate() || TextureConnector.empty())
+		CreateSHBDNode();
+
 	_BaseNode->Update(fTime);
 	_BaseNode->UpdateProperties();
 }
 void SHBDMode::ProcessInput()
 {
+	TerrainMode::ProcessInput();
+
 	ImGuiIO& io = ImGui::GetIO();
 	float DeltaTime = FiestaOnlineTool::GetDeltaTime();
 	if (io.MouseWheel != 0.0f)
 	{
-		NiPoint3 NodePositon = _SHBDNode->GetTranslate();
-		NiPoint3 MoveDirect(0.0f, 0.0f, 0.0f);
-
-		float SpeedUp = io.MouseWheel;
-		if (io.KeyShift)
-			SpeedUp *= 5.0f;
-		NodePositon.z = NodePositon.z + 115.f * DeltaTime * SpeedUp;
-
-		_SHBDNode->SetTranslate(NodePositon);
-	}
-	if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) 
-	{
-		auto ini = kWorld->GetShineIni();
-		auto SHBD = kWorld->GetSHBD();
-
-		float PixelSize = SHBD->GetMapSize() * ini->GetOneBlockWidht() / SHBD->GetSHBDSize();
-
-		int middlew = MouseIntersect.x / PixelSize;
-		int middleh = MouseIntersect.y / PixelSize;
-		for (int w = middlew - _BrushSize; w <= middlew + _BrushSize && w < (int)SHBD->GetSHBDSize(); w++)
+		if (!ImGui::IsKeyDown((ImGuiKey)VK_MENU))
 		{
-			if (w < 0)
-				continue;
-			for (int h = middleh - _BrushSize; h <= middleh + _BrushSize && h < (int)SHBD->GetSHBDSize(); h++)
-			{
-				if (h < 0)
-					continue;
-				if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= _BrushSize * _BrushSize))
-					continue;
+			NiPoint3 NodePositon = _SHBDNode->GetTranslate();
+			NiPoint3 MoveDirect(0.0f, 0.0f, 0.0f);
 
-				SHBD->UpdateSHBDData(w, h, _Walkable);
+			float SpeedUp = io.MouseWheel;
+			if (io.KeyShift)
+				SpeedUp *= 5.0f;
+			NodePositon.z = NodePositon.z + 115.f * DeltaTime * SpeedUp;
 
-				int TextureH = h / TextureSize;
-				int TextureW = w / TextureSize;
-				NiPixelDataPtr pixleData = TextureConnector[TextureH][TextureW];
-
-				pixleData->MarkAsChanged();
-				int TextureInternH = h % TextureSize;
-				int TextureInternW = w % TextureSize;
-				unsigned int* NewPtr = ((unsigned int*)pixleData->GetPixels()) + (TextureInternH * pixleData->GetWidth()) + TextureInternW;
-				if(_Walkable)
-					*NewPtr = Walkable;
-				else
-					*NewPtr = Blocked;
-			}
+			_SHBDNode->SetTranslate(NodePositon);
 		}
 	}
-}
-
-void SHBDMode::SetShowElements(bool Show)
-{
-	_ShowElements = Show;
-	kWorld->ShowSHMDElements(Show);
-}
-
-void SHBDMode::UpdateMouseIntersect()
-{
-	NiPoint3 kOrigin, kDir;
-	auto Point = FiestaOnlineTool::CurrentMousePosition();
-	if (Camera->WindowPointToRay(Point.x, Point.y, kOrigin, kDir))
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) 
 	{
-		NiPick _Pick;
-		_Pick.SetPickType(NiPick::FIND_FIRST);
-		_Pick.SetSortType(NiPick::SORT);
-		_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
-		_Pick.SetFrontOnly(true);
-		_Pick.SetReturnNormal(true);
-		_Pick.SetObserveAppCullFlag(true);
-		_Pick.SetTarget(_SHBDNode);
-		if (_Pick.PickObjects(kOrigin, kDir, true))
+		auto SHBD = kWorld->GetSHBD();
+		_Data = SHBD->GetSHBDData();
+		_Update = true;
+	}
+	if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) 
+	{
+		auto SHBD = kWorld->GetSHBD();
+		auto NewData = SHBD->GetSHBDData();
+		SHBDChangePtr Change = NiNew SHBDChange(kWorld, _Data, NewData);
+		kWorld->AttachStack(NiSmartPointerCast(WorldChange, Change));
+		_Update = false;
+	}
+}
+void SHBDMode::UpdateSHBD() 
+{
+	auto ini = kWorld->GetShineIni();
+	auto SHBD = kWorld->GetSHBD();
+
+	float PixelSize = SHBD->GetMapSize() * ini->GetOneBlockWidht() / SHBD->GetSHBDSize();
+
+	int middlew = MouseIntersect.x / PixelSize;
+	int middleh = MouseIntersect.y / PixelSize;
+	for (int w = middlew - _BrushSize; w <= middlew + _BrushSize && w < (int)SHBD->GetSHBDSize(); w++)
+	{
+		if (w < 0)
+			continue;
+		for (int h = middleh - _BrushSize; h <= middleh + _BrushSize && h < (int)SHBD->GetSHBDSize(); h++)
 		{
-			NiPick::Results& results = _Pick.GetResults();
-			if (results.GetSize() > 0)
-			{
-				MouseIntersect = results.GetAt(0)->GetIntersection();
-				return;
-			}
+			if (h < 0)
+				continue;
+			if (!((w - middlew) * (w - middlew) + (h - middleh) * (h - middleh) <= _BrushSize * _BrushSize))
+				continue;
+
+			SHBD->UpdateSHBDData(w, h, _Walkable);
+
+			int TextureH = h / TextureSize;
+			int TextureW = w / TextureSize;
+			NiPixelDataPtr pixleData = TextureConnector[TextureH][TextureW];
+
+			pixleData->MarkAsChanged();
+			int TextureInternH = h % TextureSize;
+			int TextureInternW = w % TextureSize;
+			unsigned int* NewPtr = ((unsigned int*)pixleData->GetPixels()) + (TextureInternH * pixleData->GetWidth()) + TextureInternW;
+			if (_Walkable)
+				*NewPtr = Walkable;
+			else
+				*NewPtr = Blocked;
 		}
 	}
 }
@@ -112,8 +106,9 @@ void SHBDMode::CreateSHBDNode()
 {
 	auto SHBD = kWorld->GetSHBD();
 	auto ini = kWorld->GetShineIni();
-	_SHBDNode = NiNew NiNode;
 
+	TextureConnector.clear();
+	_SHBDNode->RemoveAllChildren();
 	float PixelSize = SHBD->GetMapSize() * ini->GetOneBlockWidht() / SHBD->GetSHBDSize();
 
 	std::vector<NiPoint3> NormalList = { NiPoint3::UNIT_Z ,NiPoint3::UNIT_Z ,NiPoint3::UNIT_Z ,NiPoint3::UNIT_Z };
@@ -209,6 +204,8 @@ void SHBDMode::CreateSHBDNode()
 							int index = hges * SHBD->GetSHBDSize() + wges;
 
 							size_t charIndex = index / 8;
+							if (charIndex >= SHBD->GetMapSize() * SHBD->GetSHBDSize())
+								continue;
 							if (SHBD->IsWalkable(wges,hges))
 							{
 								*pixeloffset = Walkable;
@@ -256,4 +253,29 @@ void SHBDMode::CreateSHBDNode()
 	_SHBDNode->UpdateEffects();
 	_SHBDNode->UpdateProperties();
 	_SHBDNode->Update(0.0f);
+}
+void SHBDMode::UpdateMouseIntersect()
+{
+	NiPoint3 kOrigin, kDir;
+	auto Point = FiestaOnlineTool::CurrentMousePosition();
+	if (Camera->WindowPointToRay(Point.x, Point.y, kOrigin, kDir))
+	{
+		NiPick _Pick;
+		_Pick.SetPickType(NiPick::FIND_FIRST);
+		_Pick.SetSortType(NiPick::SORT);
+		_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+		_Pick.SetFrontOnly(true);
+		_Pick.SetReturnNormal(true);
+		_Pick.SetObserveAppCullFlag(true);
+		_Pick.SetTarget(_SHBDNode);
+		if (_Pick.PickObjects(kOrigin, kDir, true))
+		{
+			NiPick::Results& results = _Pick.GetResults();
+			if (results.GetSize() > 0)
+			{
+				MouseIntersect = results.GetAt(0)->GetIntersection();
+				return;
+			}
+		}
+	}
 }

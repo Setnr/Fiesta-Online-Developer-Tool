@@ -11,6 +11,7 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_dx9.h"
 #include "ImGui/imgui_impl_win32.h"
+
 class FiestaOnlineTool : public NiApplication
 {
 public:
@@ -81,5 +82,4 @@ private:
 	static bool LibraryClassCreate(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char* apcDirectories[], bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary);
 	static bool EffectLibraryClassCreate(const char* pcLibFile, NiRenderer* pkRenderer, int iDirectoryCount, char* apcDirectories[], bool bRecurseSubFolders, NiShaderLibrary** ppkLibrary);
 #pragma endregion
-
 };

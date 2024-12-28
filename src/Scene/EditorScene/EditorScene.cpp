@@ -12,6 +12,7 @@
 #include <filesystem>
 #include "EditorScene/Modes/SHMDMode.h"
 #include "EditorScene/Modes/SHBDMode.h"
+#include "EditorScene/Modes/HTDGMode.h"
 #include <NiDX9Renderer.h>
 NiImplementRTTI(EditorScene, FiestaScene);
 
@@ -124,7 +125,6 @@ void EditorScene::Update(float fTime)
 		}
 		if (_EditMode)
 			_EditMode->Update(fTime);
-		
 	}
 }
 void EditorScene::ProcessInput() 
@@ -139,13 +139,12 @@ void EditorScene::ProcessInput()
 			if (ImGui::IsKeyPressed((ImGuiKey)0x59))
 				kWorld->Redo();
 		}
-		if (ImGui::IsKeyPressed((ImGuiKey)VK_TAB))
+		if (ImGui::IsKeyReleased((ImGuiKey)VK_TAB))
 			UpdateEditMode();
 		if (_EditMode)
 			_EditMode->ProcessInput();
 	}
 }	
-
 void EditorScene::UpdateEditMode() 
 {
 	if (!_EditMode)
@@ -154,6 +153,23 @@ void EditorScene::UpdateEditMode()
 	{
 		_EditMode = NiNew SHBDMode(kWorld, this);
 	}
+	else if (NiIsKindOf(SHBDMode, _EditMode))
+	{
+	/*	_EditMode = NiNew HTDMode(kWorld, this);
+	}
+	else if (NiIsKindOf(HTDMode, _EditMode))
+	{*/
+		_EditMode = NULL; 
+		_EditMode = NiNew HTDGMode(kWorld, this);
+	}
+	/*else if (NiIsKindOf(HTDGMode, _EditMode))
+	{
+		_EditMode = NiNew TextureMode(kWorld, this);
+	}
+	else if (NiIsKindOf(TextureMode, _EditMode))
+	{
+		_EditMode = NiNew VertexColorMode(kWorld, this);
+	}*/
 	else
 		_EditMode = NULL;
 }

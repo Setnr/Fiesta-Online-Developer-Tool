@@ -387,3 +387,26 @@ void IngameWorld::ReplaceObjects(std::vector<NiPickablePtr> OldNodes, std::vecto
 	RemoveObject(OldNodes, Backup);
 	AddObject(NewNodes, Backup);
 }
+void IngameWorld::ShowTerrain(bool show)
+{
+	m_spGroundTerrain->RemoveAllChildren();;
+	if (show) 
+	{
+		CreateAndAttachTerrain();
+	}
+	else 
+	{
+		auto layerlist = _INI->GetLayers();
+		if(layerlist.size() == 0)
+		{
+			LogError("No TerrainLayers exist!");
+			return;
+		}
+		CreateTerrainLayer(layerlist.at(0));
+		
+	}
+	m_spGroundTerrain->Update(0.f);
+	m_spGroundTerrain->UpdateProperties();
+	m_spGroundTerrain->UpdateEffects();
+	m_spGroundTerrain->Update(0.f);
+}

@@ -183,6 +183,8 @@ bool IngameWorld::InitShadow()
 }
 void IngameWorld::CreateAndAttachTerrain() 
 {
+	auto terrainNode = GetTerrainNode();
+	terrainNode = NULL;
 	for (auto CurrentLayer : _INI->GetLayers())
 	{
 		CreateTerrainLayer(CurrentLayer);
