@@ -1,0 +1,50 @@
+#include "LuaBrush.h"
+#include <ScreenElements/LuaElement/LuaFunctions/LuaElementFunctions.h>
+
+NiImplementRTTI(LuaBrush, Brush);
+
+LuaBrush::LuaBrush(std::string FileName) : _FileName(FileName)
+{
+	Script = luaL_newstate();
+	luaL_openlibs(Script);
+	if (luaL_loadfilex(Script, FileName.c_str(), 0))
+	{
+		LogLua(_FileName, lua_tostring(Script, -1));
+	}
+	else {
+		if (lua_pcallk(Script, 0, 0, 0, 0, 0))
+			LogLua(_FileName, lua_tostring(Script, -1));
+
+		SetFunctions(Script);
+
+		lua_getglobal(Script, "BrushName");
+		if (lua_isstring(Script, 1))
+			_BrushName = lua_tostring(Script, 1);
+		else
+			_BrushName = "Unknown Name";
+	}
+}
+
+void LuaBrush::Draw()
+{
+	lua_getglobal(Script, "render");
+	lua_pushinteger(Script, (long long)this);
+	if (lua_pcallk(Script, 1, 0, 0, 0, 0))
+		LogLua(_FileName, lua_tostring(Script, -1));
+}
+void LuaBrush::RunAlgorithm(int middelw, int middleh,float z, int SizeW, int SizeH, int BrushSize,IngameWorldPtr World)
+{
+	lua_getglobal(Script, "algorithm");
+
+	lua_pushinteger(Script, middelw);
+	lua_pushinteger(Script, middleh);
+	lua_pushinteger(Script, z);
+	lua_pushinteger(Script, SizeW);
+	lua_pushinteger(Script, SizeH);
+	lua_pushinteger(Script, BrushSize);
+	lua_pushinteger(Script, (long long)&*World);
+
+
+	if (lua_pcallk(Script, 7, 0, 0, 0, 0))
+		LogLua(_FileName, lua_tostring(Script, -1));
+}

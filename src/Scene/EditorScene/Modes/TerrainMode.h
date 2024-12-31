@@ -1,13 +1,11 @@
 #pragma once
 #include "EditMode.h"
-#include <Scene/ScreenElements/LuaElement/LuaElement.h>
-#include "ImGui/ImGuizmo.h"
 
 NiSmartPointer(TerrainMode);
 class TerrainMode : public EditMode
 {
 	NiDeclareRTTI;
-	TerrainMode(IngameWorldPtr World, EditorScenePtr Scene) : EditMode(World, (FiestaScenePtr)&* Scene)
+	TerrainMode(IngameWorldPtr World, FiestaScenePtr Scene) : EditMode(World, Scene)
 	{
 		Camera = World->GetCamera();
 		MouseOrb = PgUtil::LoadNifFile(PgUtil::PathFromApplicationFolder(".\\FiestaOnlineTool\\HTDCircle.nif").c_str());
@@ -46,7 +44,7 @@ class TerrainMode : public EditMode
 	virtual void ProcessInput();
 
 	int GetBrushSize() { return _BrushSize; }
-	void SetBrushSize(int Size) { _BrushSize = Size; MouseOrb->SetScale((6.25f / 160.f) * _BrushSize); }
+	virtual void SetBrushSize(int Size) { _BrushSize = Size; MouseOrb->SetScale((50.f / 160.f) * _BrushSize); }
 	void SetShowElements(bool Show);
 	bool GetShowElements() { return _ShowElements; }
 	void SetWalkable(bool Walkable) { _Walkable = Walkable; }

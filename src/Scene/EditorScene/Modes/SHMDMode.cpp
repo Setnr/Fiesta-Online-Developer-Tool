@@ -87,7 +87,7 @@ void SHMDMode::ProcessInput()
 				ScreenElements.push_back(NiNew LuaElement(NiSmartPointerCast(EditorScene, _Scene), "EditorELements/SHMDMiddleMouse.lua", ImGui::GetIO().MousePos));
 		}
 	}
-}
+} 
 
 void SHMDMode::DrawGizmo() 
 {
@@ -149,7 +149,7 @@ void SHMDMode::CreateAddElement(std::string name)
 		}
 		ScreenElements.push_back(NiNew AddMultipleObject(kWorld, AddFunc, kWorld->GetWorldPoint()));
 	}
-	else if ("Replace Object") 
+	else if (name == "Replace Object") 
 	{
 		auto nodes = GetSelectedNodes();
 		for (auto element : ScreenElements)

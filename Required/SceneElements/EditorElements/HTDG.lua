@@ -23,7 +23,7 @@ function render(ElementPtr)
             end 
             SetShowSHMDElements(EditModePtr,SnapMove)
         end
+        RenderBrushes(EditModePtr)
     end
-   
 end
 

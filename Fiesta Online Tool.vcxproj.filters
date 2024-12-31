@@ -224,6 +224,9 @@
     <ClInclude Include="src\Scene\EditorScene\Modes\SHBDMode.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\HTDGMode.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\TerrainMode.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\Brush\LuaBrush.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\Brush\Brush.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\TerrainBrushMode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NiApplication\FiestaOnlineTool.cpp">
@@ -343,6 +346,10 @@
     <ClCompile Include="src\Scene\EditorScene\Modes\SHBDMode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\HTDGMode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\TerrainMode.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\Brush\LuaBrush.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\Brush\Brush.cpp" />
+    <ClCompile Include="src\Scene\ScreenElements\LuaElement\LuaFunctions\LuaElementFunctions.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\TerrainBrushMode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Includes\ImGui\imgui.ini">

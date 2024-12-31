@@ -140,6 +140,16 @@ public:
 	}
 	void ShowTerrain(bool show);
 	NiSortAdjustNodePtr GetTerrainNode() { return m_spGroundTerrain; }
+	bool HasHTD() { return _HTD; }
+	HeightTerrainDataPtr GetHTD() { return _HTD; }
+	void SetHTD(int w, int h, float level);
+	float GetHTD(int w, int h);
+	void CreateAndAttachTerrain();
+	void SetHTD(HeightTerrainData data) 
+	{
+		*_HTD = data;
+	}
+	bool GetShowTerrain() { return _ShowTerrain; }
 private:
 
 	ShineBlockDataPtr _SHBD;
@@ -148,7 +158,6 @@ private:
 	HeightTerrainDataPtr _HTD;
 
 	MapInfo* _MapInfo;
-	bool HasHTD() { return _HTD; }
 
 	bool InitScene();
 	bool InitCamera();
@@ -157,10 +166,9 @@ private:
 	bool InitShadow();
 
 	bool LoadHTD();
-	void CreateAndAttachTerrain();
 	void CreateTerrainLayer(std::shared_ptr<TerrainLayerData> CurrentLayer);
 
-
+	bool _ShowTerrain = true;
 	 
 	std::deque<WorldChangePtr>UnDoStack;
 	std::deque<WorldChangePtr>ReDoStack;

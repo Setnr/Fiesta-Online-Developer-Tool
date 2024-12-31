@@ -1,3 +1,4 @@
+#pragma once
 #include "EditMode.h"
 #include <Scene/ScreenElements/LuaElement/LuaElement.h>
 #include "ImGui/ImGuizmo.h"

@@ -183,8 +183,7 @@ bool IngameWorld::InitShadow()
 }
 void IngameWorld::CreateAndAttachTerrain() 
 {
-	auto terrainNode = GetTerrainNode();
-	terrainNode = NULL;
+	m_spGroundTerrain->RemoveAllChildren();
 	for (auto CurrentLayer : _INI->GetLayers())
 	{
 		CreateTerrainLayer(CurrentLayer);
@@ -358,18 +357,11 @@ void IngameWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayerData> CurrentLa
 			memcpy(pusTriList, &TriangleList[0], (int)TriangleList.size() * 3 * sizeof(unsigned short));
 
 			NiTriShapeDataPtr data = NiNew NiTriShapeData((unsigned short)VerticesList.size(), pkVertix, pkNormal, pkColor, pkTexture, 2, NiGeometryData::DataFlags::NBT_METHOD_NONE, (unsigned short)TriangleList.size(), pusTriList);
+
 			NiTriShapePtr Shape = NiNew NiTriShape(data);
 
-			NiSourceTexturePtr BaseTexture = CurrentLayer->BaseTexture;
-			NiSourceTexturePtr BlendTexture = CurrentLayer->BlendTexture;
+
 			Shape->SetSortObject(false);
-
-			NiTexturingProperty::ShaderMap* BaseTextureMap = NiNew NiTexturingProperty::ShaderMap(BaseTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
-			BaseTextureMap->SetID(0);
-			NiTexturingProperty::ShaderMap* BlendTextureMap = NiNew NiTexturingProperty::ShaderMap(BlendTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
-			BlendTextureMap->SetID(1);
-
-			NiTexturingPropertyPtr pkTP = NiNew NiTexturingProperty();
 			NiAlphaPropertyPtr alphaprop = NiNew NiAlphaProperty();
 			//alphaprop->SetAlphaBlending(false);
 			//alphaprop->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
@@ -377,28 +369,35 @@ void IngameWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayerData> CurrentLa
 			//alphaprop->SetAlphaTesting(true);
 			//alphaprop->SetTestMode(NiAlphaProperty::TestFunction::TEST_ALWAYS);
 
-			BaseTextureMap->SetTexture(BaseTexture);
-			BlendTextureMap->SetTexture(BlendTexture);
 
-			pkTP->SetShaderMap(0, BaseTextureMap);
-			pkTP->SetShaderMap(1, BlendTextureMap);
 			NiTexturingProperty::Map* NormalMap = NiNew NiTexturingProperty::Map(NULL, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP_MIPNEAREST, 0);
 
 			NormalMap->SetFilterMode(NiTexturingProperty::FILTER_BILERP_MIPNEAREST);
 			NormalMap->SetClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
 			NormalMap->SetTexture(NULL);
 
+			NiTexturingPropertyPtr pkTP = NiNew NiTexturingProperty();
+			NiSourceTexturePtr BaseTexture = CurrentLayer->BaseTexture;
+			NiSourceTexturePtr BlendTexture = CurrentLayer->BlendTexture;
+			NiTexturingProperty::ShaderMap* BaseTextureMap = NiNew NiTexturingProperty::ShaderMap(BaseTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
+			BaseTextureMap->SetID(0);
+			NiTexturingProperty::ShaderMap* BlendTextureMap = NiNew NiTexturingProperty::ShaderMap(BlendTexture, 0, NiTexturingProperty::WRAP_S_WRAP_T, NiTexturingProperty::FILTER_BILERP, 0);
+			BlendTextureMap->SetID(1);
+			BaseTextureMap->SetTexture(BaseTexture);
+			BlendTextureMap->SetTexture(BlendTexture);
+			pkTP->SetShaderMap(0, BaseTextureMap);
+			pkTP->SetShaderMap(1, BlendTextureMap);
 			pkTP->SetBaseClampMode(NiTexturingProperty::WRAP_S_WRAP_T);
+
 
 			pkTP->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
 			pkTP->SetBaseMap(NormalMap);
-
+			Shape->AttachProperty(pkTP);
 			NiVertexColorPropertyPtr vertex = NiNew NiVertexColorProperty;
 			vertex->SetLightingMode(NiVertexColorProperty::LIGHTING_E_A_D);
 			vertex->SetSourceMode(NiVertexColorProperty::SOURCE_AMB_DIFF);
 			Shape->AttachProperty(vertex);
 
-			Shape->AttachProperty(pkTP);
 			Shape->AttachProperty(alphaprop);
 
 			Shape->CalculateNormals();
@@ -412,7 +411,6 @@ void IngameWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayerData> CurrentLa
 
 			Shape->SetConsistency(NiGeometryData::Consistency::MUTABLE);
 			m_spGroundTerrain->AttachChild(Shape);
-
 		}
 	}
 }

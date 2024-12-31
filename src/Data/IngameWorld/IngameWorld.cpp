@@ -389,7 +389,7 @@ void IngameWorld::ReplaceObjects(std::vector<NiPickablePtr> OldNodes, std::vecto
 }
 void IngameWorld::ShowTerrain(bool show)
 {
-	m_spGroundTerrain->RemoveAllChildren();;
+	m_spGroundTerrain->RemoveAllChildren();
 	if (show) 
 	{
 		CreateAndAttachTerrain();
@@ -409,4 +409,119 @@ void IngameWorld::ShowTerrain(bool show)
 	m_spGroundTerrain->UpdateProperties();
 	m_spGroundTerrain->UpdateEffects();
 	m_spGroundTerrain->Update(0.f);
+	_ShowTerrain = show;
+}
+void IngameWorld::SetHTD(int w, int h, float level) 
+{
+	if (w >= _INI->GetMapWidth() || h >= _INI->GetMapHeight() || w < 0 || h < 0)
+		return;
+	auto htdlevel = _HTD->GetHTD(w, h);
+	auto htdglevel = _HTD->GetHTDG(w, h);
+	_HTD->SetHTDG(w, h, level - htdlevel);
+
+	int XBlocks = (_INI->GetMapWidth() - 1) / _INI->GetQuadsWide();
+	int YBlocks = (_INI->GetMapHeight() - 1) / _INI->GetQuadsHigh();
+
+	int SubLayerW = w / _INI->GetQuadsWide();
+	int SubLayerH = h / _INI->GetQuadsHigh();
+
+	int SubW = w % (_INI->GetQuadsWide());
+	int SubH = h % (_INI->GetQuadsHigh());
+
+	int CurWith = _INI->GetQuadsWide() + 1;
+
+	if (NiIsKindOf(NiNode, m_spGroundTerrain) && m_spGroundTerrain)
+	{
+		NiNodePtr Layer = NiSmartPointerCast(NiNode, m_spGroundTerrain);
+		struct POS
+		{
+			NiAVObjectPtr obj;
+			int w;
+			int h;
+		};
+		std::vector<POS> LayerList;
+		if (SubW == 0 && SubLayerW >= 1)
+		{
+			LayerList.push_back({ Layer->GetAt(SubLayerH + (SubLayerW - 1) * YBlocks), _INI->GetQuadsWide(), SubH });
+		}
+		if (SubH == 0 && SubLayerH >= 1)
+		{
+			LayerList.push_back({ Layer->GetAt(SubLayerH + SubLayerW * YBlocks - 1), SubW, _INI->GetQuadsHigh() });
+		}
+		if (SubW == 0 && SubLayerW >= 1 && SubH == 0 && SubLayerH >= 1)
+			LayerList.push_back({ Layer->GetAt(SubLayerH + (SubLayerW - 1) * YBlocks - 1), _INI->GetQuadsWide(), _INI->GetQuadsHigh() });
+		LayerList.push_back({ Layer->GetAt(SubLayerH + SubLayerW * YBlocks), SubW, SubH });
+		for (auto _Layer : LayerList)
+		{
+			if (!_Layer.obj)
+				continue;
+			if (NiIsKindOf(NiTriShape, _Layer.obj))
+			{
+				NiTriShapePtr shape = NiSmartPointerCast(NiTriShape, _Layer.obj);
+				NiGeometryData* data = shape->GetModelData();
+
+				NiPoint3* Points = shape->GetVertices();
+				NiPoint3* RelevantPoint = NULL;
+				NiColorA* col = shape->GetColors();
+				NiColorA* RelevantCol = NULL;
+				if (_Layer.h <= 1)
+				{
+
+					if ((_Layer.h == 1 && _Layer.w == 0) || (_Layer.h == 0 && (_Layer.w == 0 || _Layer.w == 1)))
+					{
+						if (_Layer.h == 0 && _Layer.w == 0)
+						{
+							RelevantPoint = &Points[0];
+							RelevantCol = &col[0];
+						}
+						if (_Layer.h == 0 && _Layer.w == 1)
+						{
+							RelevantPoint = &Points[1];
+							RelevantCol = &col[1];
+						}
+						if (_Layer.h == 1 && _Layer.w == 0)
+						{
+							RelevantPoint = &Points[2];
+							RelevantCol = &col[2];
+						}
+					}
+					else
+					{
+						if (_Layer.h == 1)
+						{
+							RelevantPoint = &Points[(_Layer.w + 1) * 2 - 1];
+							RelevantCol = &col[(_Layer.w + 1) * 2 - 1];
+						}
+						if (_Layer.h == 0)
+						{
+							RelevantPoint = &Points[(_Layer.w) * 2];
+							RelevantCol = &col[(_Layer.w) * 2];
+						}
+					}
+
+				}
+				else
+				{
+					RelevantPoint = &Points[_Layer.w + _Layer.h * CurWith];
+					RelevantCol = &col[_Layer.w + _Layer.h * CurWith];
+				}
+
+				RelevantPoint->z = level;
+				data->MarkAsChanged(NiGeometryData::VERTEX_MASK);
+			}
+			else
+			{
+				LogError("Ah NiTriShape was expected and GetHTDPoints havent recieved one");
+			}
+		}
+	}
+		
+
+	
+}
+float IngameWorld::GetHTD(int w, int h) 
+{
+	auto htdlevel = _HTD->GetHTD(w, h);
+	auto htdglevel = _HTD->GetHTDG(w, h); 
+	return htdlevel + htdglevel;
 }

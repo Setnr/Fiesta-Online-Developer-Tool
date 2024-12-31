@@ -451,3 +451,30 @@ protected:
 	std::vector<std::vector<NiPixelDataPtr>> _TextureConnector;
 };
 
+
+NiSmartPointer(HTDGChange);
+class HTDGChange : public WorldChange
+{
+public:
+	NiDeclareRTTI;
+	HTDGChange(IngameWorldPtr World, HeightTerrainData From, HeightTerrainData To)
+	{
+		world = World;
+		_From = From;
+		_To = To;
+	}
+	virtual void Undo()
+	{
+		world->SetHTD(_From);
+		world->ShowTerrain(world->GetShowTerrain());
+	};
+	virtual void Redo()
+	{
+		world->SetHTD(_To);
+		world->ShowTerrain(world->GetShowTerrain());
+	};
+	bool ExtraCheck(WorldChangePtr NewObject) { return true; }
+protected:
+	IngameWorldPtr world;
+	HeightTerrainData _From, _To;
+};

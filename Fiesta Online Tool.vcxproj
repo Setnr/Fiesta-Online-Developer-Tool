@@ -51,8 +51,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Scene\EditorScene\Modes\Brush\Brush.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\Brush\LuaBrush.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\HTDGMode.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\SHBDMode.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\TerrainBrushMode.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\TerrainMode.h" />
     <ClInclude Include="src\Scene\ScreenElements\LoadObject\AddMultipleObject.h" />
     <ClInclude Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.h" />
@@ -174,12 +177,16 @@
     <ClCompile Include="Includes\lua\lzio.c" />
     <ClCompile Include="src\Data\IngameWorld\WorldChanges\NiRTTIDeclares.cpp" />
     <ClCompile Include="src\Data\IngameWorld\WorldChanges\WorldChanges.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\Brush\Brush.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\Brush\LuaBrush.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\EditMode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\HTDGMode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\SHBDMode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\SHMDMode.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\TerrainBrushMode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\TerrainMode.cpp" />
     <ClCompile Include="src\Scene\ScreenElements\LuaElement\LuaElement.cpp" />
+    <ClCompile Include="src\Scene\ScreenElements\LuaElement\LuaFunctions\LuaElementFunctions.cpp" />
     <ClCompile Include="src\Scene\ScreenElements\MapLoad\MapLoadElement.cpp" />
     <ClCompile Include="src\Scene\ScreenElements\ScreenElement.cpp" />
     <ClCompile Include="src\Data\NiCustom\NiPickable.cpp" />
@@ -509,9 +516,11 @@ copy ".\Includes\Gamebryo 2.3\DLL\ShaderLibraryDX923VC80D.dll" ".\Build\$(Config
       <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -637,9 +646,11 @@ copy ".\Includes\Gamebryo 2.3\DLL\NSFParserLibDX923VC80S.dll" ".\Build\$(Configu
       <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
@@ -666,9 +677,11 @@ copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutD
       <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -701,9 +714,11 @@ copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutD
       <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -759,9 +774,11 @@ copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutD
       <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|x64'">
@@ -785,9 +802,11 @@ copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutD
       <Command>mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

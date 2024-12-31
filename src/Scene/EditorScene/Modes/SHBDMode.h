@@ -7,7 +7,7 @@ NiSmartPointer(SHBDMode);
 class SHBDMode : public TerrainMode
 {
 	NiDeclareRTTI;
-	SHBDMode(IngameWorldPtr World, EditorScenePtr Scene) : TerrainMode(World, Scene)
+	SHBDMode(IngameWorldPtr World, EditorScenePtr Scene) : TerrainMode(World, (FiestaScenePtr)&* Scene)
 	{
 		ScreenElements.push_back(NiNew LuaElement(Scene, "EditorELements/SHBD.lua"));
 
@@ -31,6 +31,7 @@ class SHBDMode : public TerrainMode
 		_SHBDNode = NiNew NiNode;
 		_BaseNode->AttachChild(_SHBDNode);
 		_BaseNode->AttachChild(MouseOrb);
+		SetBrushSize(1);
 	}
 	~SHBDMode()
 	{
@@ -44,6 +45,7 @@ class SHBDMode : public TerrainMode
 	
 	void SetWalkable(bool Walkable) { _Walkable = Walkable; }
 	bool GetWalkable() { return _Walkable; }
+	void SetBrushSize(int Size) { _BrushSize = Size; MouseOrb->SetScale((6.25f / 160.f) * _BrushSize); }
 private:
 	void UpdateSHBD();
 
