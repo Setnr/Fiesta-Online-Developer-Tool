@@ -227,6 +227,7 @@
     <ClInclude Include="src\Scene\EditorScene\Modes\Brush\LuaBrush.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\Brush\Brush.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\TerrainBrushMode.h" />
+    <ClInclude Include="Includes\FastNoiseLite\FastNoiseLite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NiApplication\FiestaOnlineTool.cpp">
@@ -350,6 +351,9 @@
     <ClCompile Include="src\Scene\EditorScene\Modes\Brush\Brush.cpp" />
     <ClCompile Include="src\Scene\ScreenElements\LuaElement\LuaFunctions\LuaElementFunctions.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\TerrainBrushMode.cpp" />
+    <ClCompile Include="src\Data\NiCustom\NiFastNoiseLite.h" />
+    <ClCompile Include="src\Data\NiCustom\NiFastNoiseLite.cpp" />
+    <ClCompile Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Includes\ImGui\imgui.ini">

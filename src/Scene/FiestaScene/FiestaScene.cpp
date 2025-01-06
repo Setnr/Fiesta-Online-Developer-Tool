@@ -38,23 +38,29 @@ bool FiestaScene::SetupScene()
 }
 void FiestaScene::UpdateCamera(float fTime)
 {
-	if (!EnableKeyStrokes)
+	if (!EnableKeyStrokes)https://github.com/
 		return;
 	ImGuiIO& io = ImGui::GetIO();
 	static POINT CursorPos;
 	static bool UpdateMouse = false;
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
 	{
 		GetCursorPos(&CursorPos);
 		UpdateMouse = true;
-		FiestaOnlineTool::DisableCursor();
+		if(!ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
+		{
+			FiestaOnlineTool::DisableCursor();
+		}
 	}
-	if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+	if (ImGui::IsMouseReleased(ImGuiMouseButton_Right) || ImGui::IsMouseReleased(ImGuiMouseButton_Middle))
 	{
 		UpdateMouse = false;
-		FiestaOnlineTool::EnableCursor();
+		if (!ImGui::IsMouseReleased(ImGuiMouseButton_Middle))
+		{
+			FiestaOnlineTool::EnableCursor();
+		}
 	}
-	if (ImGui::IsMouseDown(ImGuiMouseButton_Right) && UpdateMouse)
+	if ((ImGui::IsMouseDown(ImGuiMouseButton_Right) || ImGui::IsMouseDown(ImGuiMouseButton_Middle)) && UpdateMouse )
 	{
 		POINT CurrentCursorPos;
 		GetCursorPos(&CurrentCursorPos);

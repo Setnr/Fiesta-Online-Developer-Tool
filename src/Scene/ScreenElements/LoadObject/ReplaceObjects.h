@@ -14,7 +14,7 @@ public:
 		_World = world;
 		_OldNodes = OldNodes;
 		_FileBrowser.Open();
-		_FileBrowser.SetPwd(PgUtil::PathFromClientFolder(""));
+		_FileBrowser.SetPwd(AddSingleObject::GetInitPath());
 		_FileBrowser.SetTypeFilters({ ".nif" });
 		Camera = PgUtil::CreateNewCamera();
 		_BaseNode = NiNew NiNode;
@@ -119,6 +119,7 @@ public:
 			Camera = NULL;
 			Light = NULL;
 
+			AddSingleObject::SetInitPath(_FileBrowser.GetPwd().string());
 			return false;
 		}
 		return true;

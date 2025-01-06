@@ -8,6 +8,8 @@ class AddSingleObject : public ScreenElement
 {
 	NiDeclareRTTI;
 public:
+	static void SetInitPath(std::string Path) { _InitPath = Path; }
+	static std::string GetInitPath() { return _InitPath; }
 	AddSingleObject(IngameWorldPtr world, void (IngameWorld::* AttacFunc)(NiNodePtr, bool), NiPoint3 pos) : _FileBrowser(ImGuiFileBrowserFlags_NoTitleBar | ImGuiFileBrowserFlags_CloseOnEsc | ImGuiFileBrowserFlags_NoModal)
 	{
 		_FileBrowser.SetWindowPos(0, 50);
@@ -15,7 +17,7 @@ public:
 		_AttachFunc = AttacFunc;
 		_Pos = pos;
 		_FileBrowser.Open();
-		_FileBrowser.SetPwd(PgUtil::PathFromClientFolder(""));
+		_FileBrowser.SetPwd(_InitPath);
 		_FileBrowser.SetTypeFilters({ ".nif" });
 		Camera = PgUtil::CreateNewCamera();
 		_BaseNode = NiNew NiNode;
@@ -108,12 +110,14 @@ public:
 			Camera = NULL;
 			Light = NULL;
 
+			SetInitPath(_FileBrowser.GetPwd().string());
 			return false;
 		}
 		return true;
 	}
 	
 private:
+	static std::string _InitPath;
 	IngameWorldPtr _World;
 	void (IngameWorld::* _AttachFunc)(NiNodePtr, bool);
 	NiPoint3 _Pos;

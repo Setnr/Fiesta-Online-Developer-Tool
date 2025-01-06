@@ -50,6 +50,11 @@ public:
 	int GetMapHeight() { return HeightMap_height; }
 	int GetQuadsWide() { return QuadsWide; }
 	int GetQuadsHigh() { return QuadsHigh; }
+	void SetMapSize(int MapSize) 
+	{
+		HeightMap_width = MapSize + 1;
+		HeightMap_height = MapSize + 1;
+	}
 	float GetOneBlockWidht() { return OneBlock_width; }
 	float GetOneBlockHeight() { return OneBlock_height; }
 	std::vector<std::shared_ptr<TerrainLayerData>> GetLayers() { return LayerList; }

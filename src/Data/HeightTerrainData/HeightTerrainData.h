@@ -16,6 +16,15 @@ public:
 	The Following Functions dont check if w or h are valid values
 	Maybe this will get added need to be checked what the later Performance is saying
 	*/
+	void ResizeHTD(int MapSize) 
+	{
+		_Width = MapSize + 1;
+		_Height = MapSize + 1;
+		HTD.clear();
+		HTDG.clear();
+		HTD.resize(_Width * _Height);
+		HTDG.resize(_Width * _Height);
+	}
 	inline float GetHTD(int w, int h) { return (HTD.size()) ? HTD[_Width * h + w] : 0.f;}
 	inline float GetHTDG(int w, int h) { return (HTDG.size()) ? HTDG[_Width * h + w] : 0.f; }
 

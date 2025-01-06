@@ -3,7 +3,6 @@
 #include <filesystem>
 #include "Logger.h"
 #include "Brush/LuaBrush.h"
-#include <Data/IngameWorld/WorldChanges/FogChange.h>
 NiImplementRTTI(TerrainBrushMode, TerrainMode);
 
 void TerrainBrushMode::Update(float fTime)
@@ -30,19 +29,6 @@ void TerrainBrushMode::Update(float fTime)
 void TerrainBrushMode::ProcessInput()
 {
 	TerrainMode::ProcessInput();
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-	{
-		_Data = *kWorld->GetHTD();
-		_Update = true;
-	}
-	if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-	{
-		auto NewData = *kWorld->GetHTD();
-		
-		HTDGChangePtr Change = NiNew HTDGChange(kWorld, _Data, NewData);
-		kWorld->AttachStack(NiSmartPointerCast(WorldChange, Change));
-		_Update = false;
-	}
 }
 
 void TerrainBrushMode::LoadBrushes(std::string BrushFolder)
@@ -52,7 +38,9 @@ void TerrainBrushMode::LoadBrushes(std::string BrushFolder)
 
 	for (std::filesystem::directory_iterator itr(Folder); itr != std::filesystem::directory_iterator(); itr++)
 	{
-		_Brushes.push_back(NiNew LuaBrush(itr->path().string()));
+		auto brush = NiNew LuaBrush(itr->path().string());
+		_Brushes.push_back(brush);
+		brush->Init(kWorld);
 	}
 }
 

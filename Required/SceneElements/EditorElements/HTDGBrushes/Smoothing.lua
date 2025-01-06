@@ -6,6 +6,7 @@ BrushData = {
     UpdateTime = 0.05,
     LastUpdateTime = 0.0
 }
+function Init(BrushPtr , world) end
 
 function render(BrushPtr)
     local changed, value = DragInt(BrushData["KernelSize"],"KernelSize",2,3,21)

@@ -12,6 +12,7 @@
 #include "../Global/Version/Version.h"
 #include <InitializeScene/InitializeScene.h>
 #include <EditorScene/EditorScene.h>
+#include "ScreenElements/LoadObject/AddSingleObject.h"
 #include <NiSystemCursor.h>
 
 #include <SHN/SHNManager.h>
@@ -49,6 +50,8 @@ bool FiestaOnlineTool::Initialize()
 {
     if(!Settings::Load())
         NiMessageBox("Failed to Load Settings!\nContinue with DefaultSettings", "Settings Error");
+
+    AddSingleObject::SetInitPath(PgUtil::PathFromClientFolder(""));
 
     std::thread SHNThread(StartSHNLoadingThread);
     SHNThread.detach();

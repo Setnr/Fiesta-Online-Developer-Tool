@@ -17,6 +17,9 @@ class HTDGMode : public TerrainBrushMode
 	{
 		kWorld->ShowTerrain(true);
 	} 
+
+	virtual void ProcessInput();
+	
 	virtual std::string GetEditModeName() { return "HTDG"; }
 
 private:

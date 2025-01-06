@@ -1,6 +1,8 @@
 BrushName = "Leveling"
 
 BrushData = { }
+function Init(BrushPtr , world) end
+
 function render(BrushPtr)
 
 end

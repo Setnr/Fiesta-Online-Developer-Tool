@@ -6,6 +6,7 @@
 #include <NiNode.h>
 #include <NiCamera.h>
 #include <NiSourceTexture.h>
+#include <NiScreenElements.h>
 
 class PgUtil 
 {
@@ -21,4 +22,5 @@ public:
 	static NiNodePtr LoadNifFile(const char* File, NiTexturePalette* = NULL/*Currently Unused */, bool IsPickable = false);
 	static void LookAndMoveAtWorldPoint(NiCameraPtr Camera, NiPoint3 Point);
 	static NiCamera* CreateNewCamera();
+	static NiScreenElements* CreateScreenElement(float width, float height, NiSourceTexturePtr texture);
 };

@@ -2,6 +2,8 @@ BrushName = "Height"
 BrushData = {
     Height = 100
 }
+function Init(BrushPtr, world) end
+
 function render(BrushPtr)
     local changed, Height = DragFloat(BrushData["Height"],"Brush Height",0.01,-5000,5000)
     BrushData["Height"] = Height

@@ -51,6 +51,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Includes\FastNoiseLite\FastNoiseLite.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\Brush\Brush.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\Brush\LuaBrush.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\HTDGMode.h" />
@@ -177,6 +178,8 @@
     <ClCompile Include="Includes\lua\lzio.c" />
     <ClCompile Include="src\Data\IngameWorld\WorldChanges\NiRTTIDeclares.cpp" />
     <ClCompile Include="src\Data\IngameWorld\WorldChanges\WorldChanges.cpp" />
+    <ClCompile Include="src\Data\NiCustom\NiFastNoiseLite.cpp" />
+    <ClCompile Include="src\Data\NiCustom\NiFastNoiseLite.h" />
     <ClCompile Include="src\Scene\EditorScene\Modes\Brush\Brush.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\Brush\LuaBrush.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\EditMode.cpp" />
@@ -185,6 +188,7 @@
     <ClCompile Include="src\Scene\EditorScene\Modes\SHMDMode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\TerrainBrushMode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\TerrainMode.cpp" />
+    <ClCompile Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.cpp" />
     <ClCompile Include="src\Scene\ScreenElements\LuaElement\LuaElement.cpp" />
     <ClCompile Include="src\Scene\ScreenElements\LuaElement\LuaFunctions\LuaElementFunctions.cpp" />
     <ClCompile Include="src\Scene\ScreenElements\MapLoad\MapLoadElement.cpp" />

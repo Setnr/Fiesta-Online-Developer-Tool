@@ -1,5 +1,6 @@
 #include "LuaBrush.h"
 #include <ScreenElements/LuaElement/LuaFunctions/LuaElementFunctions.h>
+#include <Data/IngameWorld/WorldChanges/FogChange.h>
 
 NiImplementRTTI(LuaBrush, Brush);
 
@@ -11,7 +12,8 @@ LuaBrush::LuaBrush(std::string FileName) : _FileName(FileName)
 	{
 		LogLua(_FileName, lua_tostring(Script, -1));
 	}
-	else {
+	else 
+	{
 		if (lua_pcallk(Script, 0, 0, 0, 0, 0))
 			LogLua(_FileName, lua_tostring(Script, -1));
 
@@ -22,6 +24,7 @@ LuaBrush::LuaBrush(std::string FileName) : _FileName(FileName)
 			_BrushName = lua_tostring(Script, 1);
 		else
 			_BrushName = "Unknown Name";
+
 	}
 }
 
@@ -43,8 +46,28 @@ void LuaBrush::RunAlgorithm(int middelw, int middleh,float z, int SizeW, int Siz
 	lua_pushinteger(Script, SizeH);
 	lua_pushinteger(Script, BrushSize);
 	lua_pushinteger(Script, (long long)&*World);
+	lua_pushinteger(Script, (long long)this);
 
 
-	if (lua_pcallk(Script, 7, 0, 0, 0, 0))
+	if (lua_pcallk(Script, 8, 0, 0, 0, 0))
 		LogLua(_FileName, lua_tostring(Script, -1));
+}
+
+void LuaBrush::RecreateHTD(IngameWorldPtr world, int MapSize, float MapHeight)
+{
+	HeightTerrainData _OldData = *world->GetHTD(); 
+	HeightTerrainDataPtr data = world->GetHTD();
+	auto ini = world->GetShineIni();
+	ini->SetMapSize(MapSize); 
+	data->ResizeHTD(MapSize);
+	for (int w = 0; w <= MapSize; w++) 
+	{
+		for (int h = 0; h <= MapSize; h++) 
+		{
+			data->SetHTD(w, h, _Noise->GetNoise((float)w, (float)h) * MapHeight);
+		}
+	}
+	world->ShowTerrain(world->GetShowTerrain());
+	HTDGChangePtr Change = NiNew HTDGChange(world, _OldData, *data);
+	world->AttachStack(NiSmartPointerCast(WorldChange, Change));
 }

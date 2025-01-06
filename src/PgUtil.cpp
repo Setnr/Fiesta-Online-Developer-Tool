@@ -3,6 +3,8 @@
 #include <Logger.h>
 #include <NiCustom/NiPickable.h>
 #include <NiGeometry.h>
+#include <NiTexturingProperty.h>
+#include <NiVertexColorProperty.h>
 
 std::string PgUtil::ClientFolderPath = "";
 std::string PgUtil::ApplicationPath = "";
@@ -190,4 +192,52 @@ NiCamera* PgUtil::CreateNewCamera()
 
     Camera->SetViewFrustum(WorldFrustum);
     return Camera;
+}
+NiScreenElements* PgUtil::CreateScreenElement(float width, float height, NiSourceTexturePtr texture)
+{
+    NiScreenElements* pkScreenTexture = NiNew NiScreenElements(NiNew NiScreenElementsData(false, true, 1));
+    pkScreenTexture->Insert(4);
+    pkScreenTexture->SetRectangle(0, 0.4f, 0.4f, 0.8f, 0.8f);
+    pkScreenTexture->UpdateBound();
+    pkScreenTexture->SetTextures(0, 0, 0.0f, 0.0f, 1.0f, 1.0f);
+    pkScreenTexture->SetColors(0, NiColorA::WHITE);
+    auto& io = ImGui::GetIO();
+
+    float fLeft = 0.0f;
+    float fBottom = 0.0f;
+    float fRight = width / io.DisplaySize.x + fLeft;
+    float fTop = height / io.DisplaySize.y + fBottom;
+    pkScreenTexture->SetVertex(0, 0, NiPoint2(fLeft, 1.0f - fBottom));
+    pkScreenTexture->SetVertex(0, 1, NiPoint2(fRight, 1.0f - fBottom));
+    pkScreenTexture->SetVertex(0, 2, NiPoint2(fRight, 1.0f - fTop));
+    pkScreenTexture->SetVertex(0, 3, NiPoint2(fLeft, 1.0f - fTop));
+    pkScreenTexture->UpdateBound();
+
+    NiTexturingPropertyPtr pTexture = NiNew NiTexturingProperty();
+    pTexture->SetBaseTexture(texture);
+    pTexture->SetApplyMode(NiTexturingProperty::APPLY_MODULATE);
+    pTexture->SetBaseFilterMode(NiTexturingProperty::FILTER_BILERP);
+
+    auto transform = NiNew NiTextureTransform();
+    //transform->SetScale(NiPoint2(-1.f, 1.f));
+    transform->SetRotate(-3.14159 / 2);
+    //transform->SetTransformMethod(NiTextureTransform::MAYA_DEPRECATED_TRANSFORM);
+
+    pTexture->SetBaseTextureTransform(transform);
+    pkScreenTexture->AttachProperty(pTexture);
+
+    NiVertexColorProperty* pVertex = NiNew NiVertexColorProperty;
+    pVertex->SetSourceMode(NiVertexColorProperty::SOURCE_EMISSIVE);
+    pVertex->SetLightingMode(NiVertexColorProperty::LIGHTING_E);
+    pkScreenTexture->AttachProperty(pVertex);
+
+    NiAlphaProperty* pAlpha = NiNew NiAlphaProperty;
+    pAlpha->SetAlphaBlending(true);
+    pAlpha->SetSrcBlendMode(NiAlphaProperty::ALPHA_SRCALPHA);
+    pkScreenTexture->AttachProperty(pAlpha);
+
+    pkScreenTexture->UpdateProperties();
+    pkScreenTexture->UpdateEffects();
+    pkScreenTexture->Update(0.0f);
+    return pkScreenTexture;
 }

@@ -61,6 +61,11 @@ public:
 			return NiSmartPointerCast(NiNode,newobj);
 		return  NULL;
 	}
+	static NiRendererPtr GetRenderer() { 
+		FiestaOnlineTool* tool = (FiestaOnlineTool*)ms_pkApplication;
+		auto renderer = tool->m_spRenderer;
+		return renderer;
+	}
 private:
 	static POINT MousePos;
 	static NiNodePtr BoundingBox;

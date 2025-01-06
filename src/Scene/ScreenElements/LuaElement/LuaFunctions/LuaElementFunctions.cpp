@@ -3,6 +3,7 @@
 #include <Scene/EditorScene/Modes/SHMDMode.h>
 #include <Scene/EditorScene/Modes/SHBDMode.h>
 #include <Scene/EditorScene/Modes/TerrainBrushMode.h>
+#include <Scene/EditorScene/Modes/Brush/LuaBrush.h>
 
 int LogFromLua(lua_State* Script)
 {
@@ -96,11 +97,15 @@ int ImGuiTreeView(lua_State* Script)
 	return 0;
 }
 int ImGuiSelectable(lua_State* Script)
-{
+{  
 	if (lua_isstring(Script, 1))
 	{
 		std::string Name = lua_tostring(Script, 1);
-		bool selected = ImGui::Selectable(Name.c_str());
+		bool selected;
+		if(lua_isboolean(Script,2))
+			selected = ImGui::Selectable(Name.c_str(), lua_toboolean(Script,2));
+		else
+			selected = ImGui::Selectable(Name.c_str());
 		lua_pushboolean(Script, selected);
 		return 1;
 	}
@@ -974,9 +979,9 @@ int RenderBrushes(lua_State* Script)
 			TerrainBrushModePtr ptr = NiSmartPointerCast(TerrainBrushMode, mode);
 			ptr->DrawBrushes();
 		}
-	}
-	return 0;
-}
+	} 
+	return 0;   
+} 
 int SetHTD(lua_State* Script)
 {
 	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2) 
@@ -1001,12 +1006,397 @@ int GetHTD(lua_State* Script)
 		lua_pushnumber(Script,world->GetHTD(w, h));
 		return 1;
 	}
-	return 0;
+	return 0; 
 }
 int GetCurrentClientTime(lua_State* Script) 
 {
 	lua_pushnumber(Script, NiGetCurrentTimeInSec());
 	return 1;
+}
+int CreateNoise(lua_State* Script) 
+{ 
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script,2)) 
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			luabrush->CreateNoise(lua_tointeger(Script,2));
+		}
+	}  
+	return 0;
+}
+int SetNoiseSeed(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise) 
+			{
+				noise->SetSeed(lua_tointeger(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int SetNoiseFrequency(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isnumber(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->SetFrequency(lua_tonumber(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int SetNoiseType(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise) 
+			{
+				noise->SetNoiseType((FastNoiseLite::NoiseType)lua_tointeger(Script, 2));
+			}
+		} 
+	} 
+	return 0;
+}
+int SetFractalType(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->SetFractalType((FastNoiseLite::FractalType)lua_tointeger(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int SetNoiseOctaves(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->SetFractalOctaves(lua_tointeger(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int SetNoiseLacunarity(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isnumber(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->SetFractalLacunarity(lua_tonumber(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int SetNoiseGain(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isnumber(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->SetFractalGain(lua_tonumber(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int SetNoiseWeightedStrength(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isnumber(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->SetFractalWeightedStrength(lua_tonumber(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int SetNoisePingPongStrength(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isnumber(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->SetFractalPingPongStrength(lua_tonumber(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int SetCellularDistanceFunction(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->SetCellularDistanceFunction((FastNoiseLite::CellularDistanceFunction)lua_tointeger(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int SetCellularReturnType(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->SetCellularReturnType((FastNoiseLite::CellularReturnType)lua_tointeger(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int SetDomainWarpType(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->SetDomainWarpType((FastNoiseLite::DomainWarpType)lua_tointeger(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int SetNoiseDomainWarpAmp(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isnumber(Script, 2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->SetDomainWarpAmp(lua_tonumber(Script, 2));
+			}
+		}
+	}
+	return 0;
+}
+int GetNoiseValue(lua_State* Script) 
+{
+	if (lua_isinteger(Script, 1) && lua_isnumber(Script, 2) && lua_isnumber(Script, 3))
+	{ 
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{ 
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			float x = lua_tonumber(Script, 2);
+			float y = lua_tonumber(Script, 3);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{ 
+				float h = noise->GetNoise(x, y);
+				lua_pushnumber(Script,h);
+			}else
+				lua_pushnumber(Script,0.f);
+			return 1;
+		}
+	}
+	return 0;
+}
+int Combo(lua_State* Script)
+{ 
+	int id = 0;
+	bool changed = false;
+	if (lua_isstring(Script, 1) && lua_tostring(Script,2))
+	{
+		auto Name = lua_tostring(Script, 1);
+		std::string CurValue = lua_tostring(Script, 2);
+		if(lua_istable(Script, 3))
+		{
+			if (ImGui::BeginCombo(Name, CurValue.c_str()))
+			{
+				lua_pushnil(Script); // Start der Iteration
+				while (lua_next(Script, 3)) {
+					if (lua_istable(Script, -1)) {
+						lua_getfield(Script, -1, "Name"); // Hole das Feld "Name"
+						if (lua_isstring(Script, -1)) {
+							std::string Type = lua_tostring(Script, -1); // Name speichern
+							bool is_selected = (CurValue == Type);
+
+							if (ImGui::Selectable(Type.c_str(), is_selected)) {
+								lua_getfield(Script, -2, "ID"); // Hole das Feld "ID" aus der Tabelle
+								if (lua_isinteger(Script, -1)) {
+									id = lua_tointeger(Script, -1); // ID speichern
+									CurValue = Type;
+									changed = true;
+								}
+								lua_pop(Script, 1); // Entferne "ID" vom Stack
+							}
+
+							if (is_selected)
+								ImGui::SetItemDefaultFocus();
+						}
+						lua_pop(Script, 1); // Entferne "Name" vom Stack
+					}
+					lua_pop(Script, 1); // Entferne den Wert (Tabelle) vom Stack, behalte den Schlüssel
+				}
+				ImGui::EndCombo();
+			}
+		}
+		lua_pushboolean(Script, changed);
+		lua_pushstring(Script, CurValue.c_str());
+		lua_pushinteger(Script, id);
+		return 3;
+	} 
+	lua_pushboolean(Script, changed);
+	lua_pushstring(Script, "");
+	lua_pushinteger(Script, 0);
+	return 3;
+}
+int RandomInt(lua_State* Script) 
+{
+	lua_pushinteger(Script, rand());
+	return 1;
+}
+int HasNoise(lua_State* Script)
+{
+	bool hasnoise = false;
+	if (lua_isinteger(Script, 1) )
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				hasnoise = true;
+			}
+		}
+	}
+	lua_pushboolean(Script, hasnoise);
+	return 1;
+}
+int RenderNoise(lua_State* Script)
+{
+	bool hasnoise = false;
+	if (lua_isinteger(Script, 1))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				noise->Draw();
+			}
+		}
+	}
+	return 0;
+}
+int CreateTexture(lua_State* Script)
+{
+	bool hasnoise = false;
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script,2))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			NiFastNoiseLitePtr noise = luabrush->GetNoise();
+			if (noise)
+			{
+				int size = lua_tointeger(Script, 2);
+				noise->CreateTexture(size);
+			}
+		}
+	}
+	return 0;
+}
+
+int RecreateHTD(lua_State* Script) 
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2) 
+		&& lua_isinteger(Script, 3) && lua_isnumber(Script, 4))
+	{
+		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(LuaBrush, brush))
+		{
+			IngameWorldPtr world = (IngameWorld*)lua_tointeger(Script, 2);
+			int MapSize = lua_tointeger(Script, 3);
+			int Height = lua_tonumber(Script, 4);
+			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
+			luabrush->RecreateHTD(world, MapSize, Height);
+		}
+	}
+	return 0;
 }
 
 void SetFunctions(lua_State* Script)
@@ -1138,4 +1528,27 @@ void SetFunctions(lua_State* Script)
 	lua_register(Script, "SetHTD", SetHTD);
 	lua_register(Script, "GetHTD", GetHTD);
 	lua_register(Script, "GetCurrentTime", GetCurrentClientTime);
+	lua_register(Script, "CreateNoise", CreateNoise);
+
+	lua_register(Script, "SetNoiseSeed", SetNoiseSeed);
+	lua_register(Script, "SetNoiseFrequency", SetNoiseFrequency);
+	lua_register(Script, "SetNoiseType", SetNoiseType);
+	lua_register(Script, "SetFractalType", SetFractalType);
+	lua_register(Script, "SetNoiseOctaves", SetNoiseOctaves);
+	lua_register(Script, "SetNoiseLacunarity", SetNoiseLacunarity);
+	lua_register(Script, "SetNoiseGain", SetNoiseGain);
+	lua_register(Script, "SetNoiseWeightedStrength", SetNoiseWeightedStrength);
+	lua_register(Script, "SetNoisePingPongStrength", SetNoisePingPongStrength);
+	lua_register(Script, "SetCellularDistanceFunction", SetCellularDistanceFunction);
+	lua_register(Script, "SetCellularReturnType", SetCellularReturnType);
+	lua_register(Script, "SetDomainWarpType", SetDomainWarpType);
+	lua_register(Script, "SetNoiseDomainWarpAmp", SetNoiseDomainWarpAmp);
+	lua_register(Script, "GetNoiseValue", GetNoiseValue);
+	lua_register(Script, "HasNoise", HasNoise);
+	lua_register(Script, "RenderNoise", RenderNoise);
+	lua_register(Script, "Combo", Combo);
+	lua_register(Script, "RandomInt", RandomInt);
+	lua_register(Script, "CreateTexture", CreateTexture);
+	lua_register(Script, "RecreateHTD", RecreateHTD);
+	
 }
