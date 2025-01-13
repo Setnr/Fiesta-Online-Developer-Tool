@@ -15,6 +15,7 @@ class IngameWorld : public NiRefObject
 {
 public:
 	IngameWorld(MapInfo* Info);
+	IngameWorld(MapInfo* Info, int MapSize);
 	NiNodePtr GetWorldNode() { return m_spWorldScene; }
 	NiCameraPtr GetCamera() { return m_spCamera; }
 

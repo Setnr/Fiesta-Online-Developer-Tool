@@ -25,5 +25,4 @@ protected:
 	BrushPtr GetCurrentBrush() { return _CurrentBrush; }
 	std::vector<BrushPtr> _Brushes;
 	BrushPtr _CurrentBrush;
-	HeightTerrainData _Data;
 };

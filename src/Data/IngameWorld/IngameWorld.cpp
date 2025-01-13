@@ -45,9 +45,13 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 	if (_MapInfo->KingdomMap == -1)
 	{
 		/*New Map*/
-		_SHBD->CreateEmpty(256);
+		int MapSize = 256;
+		_SHBD->CreateEmpty(MapSize);
 		_SHMD->CreateEmpty();
-		_INI->CreateEmpty(_MapInfo);
+		_INI->CreateEmpty(_MapInfo,MapSize);
+		_HTD = NiNew HeightTerrainData;
+		_HTD->ResizeHTD(MapSize);
+		CreateAndAttachTerrain();
 	}
 	else
 	{
@@ -60,11 +64,12 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 		if (std::filesystem::exists(Path))
 			if (!_INI->Load(Path))
 				LogError("Failed to Load INI for " + _MapInfo->MapName);
+		if (_INI->GetHTDPath() != "")
+			if (LoadHTD())
+				CreateAndAttachTerrain();
 	}
 
-	if(_INI->GetHTDPath() != "")
-		if (LoadHTD())
-			CreateAndAttachTerrain();
+	
 
 	for (auto obj : _SHMD->GetSkyList())
 		m_spSkyScene->AttachChild(obj);
@@ -83,6 +88,69 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 
 	SetFogColor(_SHMD->GetFogColor(),false);
 	SetFogDepth(_SHMD->GetFogDepth(),false);
+	SetGlobalLight(_SHMD->GetGlobalLight());
+	SetGlobalLightNode(_SHMD->GetGlobalLightNode());
+	SetFarFrustum(_SHMD->GetFarFrustum());
+	SetDirectionalLightAmbientColor(_SHMD->GetDirectionalLightAmbientColor());
+	SetDirectionalLightDiffuseColor(_SHMD->GetDirectionalLightDiffuseColor());
+
+	m_spWorldScene->Update(0.f);
+	m_spWorldScene->UpdateProperties();
+	m_spWorldScene->UpdateEffects();
+	m_spWorldScene->Update(0.f);
+	PgUtil::LookAndMoveAtWorldPoint(m_spCamera, NiPoint3(_MapInfo->RegenX, _MapInfo->RegenY, 500));
+}
+
+IngameWorld::IngameWorld(MapInfo* Info, int MapSize) : _MapInfo(Info)
+{
+
+	if (!InitScene())
+		return;
+	if (!InitCamera())
+		return;
+	if (!InitSkyCtrl())
+		return;
+	if (!InitLightFog())
+		return;
+	if (!InitShadow())
+		return;
+	std::string MapFolderPath = PgUtil::PathFromClientFolder(PgUtil::GetMapFolderPath(_MapInfo->KingdomMap, _MapInfo->MapFolderName));
+
+	if (std::filesystem::exists(MapFolderPath)) 
+	{
+		std::filesystem::remove_all(MapFolderPath);
+	}
+	std::filesystem::create_directory(MapFolderPath);
+
+
+	_SHBD = NiNew ShineBlockData();
+	_SHMD = NiNew ShineMapData();
+	_INI = NiNew ShineIni();
+
+	_SHBD->CreateEmpty(MapSize);
+	_SHMD->CreateEmpty();
+	_INI->CreateEmpty(_MapInfo, MapSize);
+	_HTD = NiNew HeightTerrainData;
+	_HTD->ResizeHTD(MapSize);
+	CreateAndAttachTerrain();
+
+	for (auto obj : _SHMD->GetSkyList())
+		m_spSkyScene->AttachChild(obj);
+
+	for (auto obj : _SHMD->GetWaterList())
+		m_spWaterScene->AttachChild(obj);
+
+	for (auto obj : _SHMD->GetGlobalGroundObjectList())
+		m_spGroundObject->AttachChild(obj);
+
+	for (auto obj : _SHMD->GetGroundObjectListList())
+		m_spGroundObject->AttachChild(obj);
+
+	for (auto obj : _SHMD->GetCollisionObjectListList())
+		m_spGroundCollidee->AttachChild(obj);
+
+	SetFogColor(_SHMD->GetFogColor(), false);
+	SetFogDepth(_SHMD->GetFogDepth(), false);
 	SetGlobalLight(_SHMD->GetGlobalLight());
 	SetGlobalLightNode(_SHMD->GetGlobalLightNode());
 	SetFarFrustum(_SHMD->GetFarFrustum());

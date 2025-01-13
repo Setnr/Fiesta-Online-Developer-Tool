@@ -13,6 +13,7 @@
 #include "EditorScene/Modes/SHMDMode.h"
 #include "EditorScene/Modes/SHBDMode.h"
 #include "EditorScene/Modes/HTDGMode.h"
+#include "EditorScene/Modes/TextureMode.h"
 #include <NiDX9Renderer.h>
 NiImplementRTTI(EditorScene, FiestaScene);
 
@@ -47,6 +48,12 @@ void EditorScene::LoadNewMap(MapInfo* info)
 {
 	auto start = std::chrono::steady_clock::now();
 	NewWorldLoaded = NiNew IngameWorld(info);
+	LogTime(std::string("Loaded ") + info->MapName, start);
+}
+void EditorScene::CreateNewMap(MapInfo* info, int MapSize) 
+{
+	auto start = std::chrono::steady_clock::now();
+	NewWorldLoaded = NiNew IngameWorld(info,MapSize);
 	LogTime(std::string("Loaded ") + info->MapName, start);
 }
 void EditorScene::CreateMenuBar() 
@@ -91,6 +98,31 @@ void EditorScene::CreateMenuBar()
 		ImGui::EndMenu();
 	}
 
+	if (ImGui::BeginCombo("Edit Mode", _EditMode->GetEditModeName().c_str()))
+	{
+		if (ImGui::Selectable("SHMD", NiIsKindOf(SHMDMode, _EditMode)))
+		{
+			_EditMode = NULL;
+			_EditMode = NiNew SHMDMode(kWorld, this);
+		}
+		if (ImGui::Selectable("SHBD", NiIsKindOf(SHBDMode, _EditMode)))
+		{
+			_EditMode = NULL;
+			_EditMode = NiNew SHBDMode(kWorld, this);
+		}
+		if (ImGui::Selectable("HTD", NiIsKindOf(HTDGMode, _EditMode)))
+		{
+			_EditMode = NULL;
+			_EditMode = NiNew HTDGMode(kWorld, this);
+		}
+		if (ImGui::Selectable("Texture", NiIsKindOf(TextureMode, _EditMode)))
+		{
+			_EditMode = NULL;
+			_EditMode = NiNew TextureMode(kWorld, this);
+		}
+		ImGui::EndCombo();
+	}
+
 	ImGui::SameLine(ImGui::GetWindowWidth() - 30);
 	ImGui::Text("(?)");
 	if (ImGui::IsItemClicked())
@@ -104,7 +136,7 @@ void EditorScene::Update(float fTime)
 	{
 		kWorld = NewWorldLoaded;
 		NewWorldLoaded = NULL;
-		_EditMode = NULL;
+		_EditMode = NiNew SHMDMode(kWorld, this);
 		BaseNode = kWorld->GetWorldNode();
 		Camera = kWorld->GetCamera();
 
@@ -147,29 +179,23 @@ void EditorScene::ProcessInput()
 }	
 void EditorScene::UpdateEditMode() 
 {
-	if (!_EditMode)
-		_EditMode = NiNew SHMDMode(kWorld, this);
-	else if (NiIsKindOf(SHMDMode, _EditMode))
+	if (NiIsKindOf(SHMDMode, _EditMode))
 	{
 		_EditMode = NiNew SHBDMode(kWorld, this);
 	}
 	else if (NiIsKindOf(SHBDMode, _EditMode))
 	{
-	/*	_EditMode = NiNew HTDMode(kWorld, this);
-	}
-	else if (NiIsKindOf(HTDMode, _EditMode))
-	{*/
 		_EditMode = NULL; 
 		_EditMode = NiNew HTDGMode(kWorld, this);
 	}
-	/*else if (NiIsKindOf(HTDGMode, _EditMode))
+	else if (NiIsKindOf(HTDGMode, _EditMode))
 	{
 		_EditMode = NiNew TextureMode(kWorld, this);
 	}
-	else if (NiIsKindOf(TextureMode, _EditMode))
+	/*else if (NiIsKindOf(TextureMode, _EditMode))
 	{
 		_EditMode = NiNew VertexColorMode(kWorld, this);
 	}*/
 	else
-		_EditMode = NULL;
+		_EditMode = NiNew SHMDMode(kWorld, this);
 }

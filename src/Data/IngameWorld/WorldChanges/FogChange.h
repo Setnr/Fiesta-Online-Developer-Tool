@@ -478,3 +478,32 @@ protected:
 	IngameWorldPtr world;
 	HeightTerrainData _From, _To;
 };
+
+NiSmartPointer(TextureChange);
+class TextureChange : public WorldChange
+{
+public:
+	NiDeclareRTTI;
+	TextureChange(std::shared_ptr<TerrainLayerData> Layer, NiPixelDataPtr From, NiPixelDataPtr To)
+	{
+		_Layer = Layer;
+		_From = From;
+		_To = To;
+	}
+	virtual void Undo()
+	{
+		auto data = _Layer->BlendTexture->GetSourcePixelData();
+		memcpy_s(data->GetPixels(), data->GetSizeInBytes(), _From->GetPixels(), _From->GetSizeInBytes());
+		data->MarkAsChanged();
+	};
+	virtual void Redo()
+	{
+		auto data = _Layer->BlendTexture->GetSourcePixelData();
+		memcpy_s(data->GetPixels(), data->GetSizeInBytes(), _To->GetPixels(), _To->GetSizeInBytes());
+		data->MarkAsChanged();
+	};
+	bool ExtraCheck(WorldChangePtr NewObject) { return true; }
+protected:
+	std::shared_ptr<TerrainLayerData> _Layer;
+	NiPixelDataPtr _From, _To;
+};

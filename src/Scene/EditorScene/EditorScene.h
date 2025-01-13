@@ -31,6 +31,7 @@ public:
 	}
 	virtual void DrawImGui();
 	void LoadNewMap(MapInfo* info);
+	void CreateNewMap(MapInfo* info, int MapSize);
 	void SetWorld(IngameWorldPtr NewWorld) { NewWorldLoaded = NewWorld; }
 	virtual void Update(float fTime);
 	

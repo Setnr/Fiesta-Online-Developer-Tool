@@ -47,8 +47,7 @@ class TerrainMode : public EditMode
 	virtual void SetBrushSize(int Size) { _BrushSize = Size; MouseOrb->SetScale((50.f / 160.f) * _BrushSize); }
 	void SetShowElements(bool Show);
 	bool GetShowElements() { return _ShowElements; }
-	void SetWalkable(bool Walkable) { _Walkable = Walkable; }
-	bool GetWalkable() { return _Walkable; }
+	
 protected:
 	int _BrushSize = 1;
 	bool _ShowElements = true;

@@ -23,6 +23,6 @@ class HTDGMode : public TerrainBrushMode
 	virtual std::string GetEditModeName() { return "HTDG"; }
 
 private:
-
+	HeightTerrainData _Data;
 	
 };

@@ -35,8 +35,15 @@ class LuaBrush : public Brush
 		if (lua_pcallk(Script, 2, 0, 0, 0, 0))
 			LogLua(_FileName, lua_tostring(Script, -1));
 	}
-	void RecreateHTD(IngameWorldPtr world, int MapSize, float MapHeight);
+	void RecreateHTD(IngameWorldPtr world, float MapHeight);
 	NiFastNoiseLitePtr GetNoise() { return _Noise; }
+	void SetPointer(long long ptr, const char* Func) 
+	{
+		lua_getglobal(Script, Func);
+		lua_pushinteger(Script, ptr);
+		if (lua_pcallk(Script, 1, 0, 0, 0, 0))
+			LogLua(_FileName, lua_tostring(Script, -1));
+	}
 
 private:
 	lua_State* Script;

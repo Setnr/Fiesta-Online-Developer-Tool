@@ -10,6 +10,7 @@ NiImplementRTTI(AttachingNode, WorldChange);
 NiImplementRTTI(AttachingNodeList, WorldChange);
 NiImplementRTTI(SHBDChange, WorldChange);
 NiImplementRTTI(HTDGChange, WorldChange);
+NiImplementRTTI(TextureChange, WorldChange);
 
 NiImplementRTTI(FogChangeColor, ChangeNiColor);
 NiImplementRTTI(ChangeDirectionalAmbientLightColor, ChangeNiColor);

@@ -1,4 +1,4 @@
-BrushName = "HTD-Recreation"
+BrushName = "Noise"
 
 NoiseType = {
     OpenSimplex2 = {ID = 0, Name = "Simplex2" },
@@ -42,7 +42,7 @@ DomainWarpType = {
 }
 
 BrushData = { 
-    Height = 500.0,
+    Height = 10.0,
     Seed = 195201418,
     Frequency = 0.01,
     NoiseType = NoiseType.Perlin.Name,
@@ -58,12 +58,14 @@ BrushData = {
     DomainWarpAmp = 1.0,
     Show = false
 }
-WorldPtr = nil
 function Init(BrushPtr, world)
     CreateNoise(BrushPtr, BrushData.Seed)
     SetNoiseType(BrushPtr,BrushData.NoiseType)
     CreateTexture(BrushPtr, 350)
-    WorldPtr = world
+end
+
+function SetLayer(LayerPtr)
+    BrushData.layer = LayerPtr
 end
 
 function render(BrushPtr)
@@ -87,18 +89,7 @@ function render(BrushPtr)
         end
     end
 
-    if Button("Recreate HTD") then
-        RecreateHTD(BrushPtr,WorldPtr, BrushData.Height)
-    end
-
     changed, BrushData.Height = DragFloat(BrushData["Height"],"Brush Height",0.01,-5000,5000)
-    changed, BrushData.MapSize = DragInt(BrushData.MapSize,"MapSize",2,64,1024)
-    if changed then
-        if  BrushData.MapSize ~= 64 and BrushData.MapSize ~= 128 and BrushData.MapSize ~= 256 and BrushData.MapSize ~= 512 and BrushData.MapSize ~= 1024 then
-            BrushData.MapSize = 256
-        end   
-    
-    end
     BrushData.Seed = ShowEntry(BrushPtr, BrushData.Seed,"Seed", 1.0, math.mininteger, math.maxinteger,SetNoiseSeed,DragInt)
     BrushData.Frequency = ShowEntry(BrushPtr, BrushData.Frequency,"Frequency", 0.01,-2.0, 2.0,SetNoiseFrequency,DragFloat)
     BrushData.NoiseType = ShowTable("NoiseType",NoiseType,BrushData.NoiseType, SetNoiseType,BrushPtr)
@@ -120,8 +111,6 @@ function render(BrushPtr)
     if HasNoise(BrushPtr) and BrushData.Show then
         RenderNoise(BrushPtr)
     end
-
-
 end
 
 function ShowTable(Name,Table, TableValue, Func,BrushPtr) 
@@ -147,5 +136,18 @@ function ShowEntry(BrushPtr, value,name, step,min,max, SetFunc,DragFunc)
 end
 
 function algorithm(MiddleW,MiddleH, z, SizeW, SizeH ,BrushSize,WorldPtr, BrushPtr)
+    for w = MiddleW - BrushSize, MiddleW + BrushSize , 1 do
+        if w >= 0 and w < SizeW then
+            for h = MiddleH - BrushSize, MiddleH + BrushSize , 1 do
+                if h >= 0 and h <= SizeH then
+                    if (((w - MiddleW) * (w - MiddleW) + (h - MiddleH) * (h - MiddleH) <= BrushSize * BrushSize)) then
+                        noise = (GetNoiseValue(BrushPtr,w ,h ) + 1.0) / 2.0
+                        
+                        SetTextureColor(BrushData.layer,w,h,noise)
+                    end
+                end
+            end
+        end
+    end
 end
 

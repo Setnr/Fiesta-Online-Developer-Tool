@@ -191,7 +191,8 @@ void IngameWorld::CreateAndAttachTerrain()
 }
 void IngameWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayerData> CurrentLayer) 
 {
-
+	if (!HasHTD())
+		return;
 	struct PointUsed
 	{
 		short BL = -1;

@@ -9,11 +9,24 @@ class TerrainLayerData
 {
 public:
 	struct RGBAColor {
-		RGBAColor(char val) { r = val; g = val; b = val; a = val; }
-		char r, g, b, a;
+		RGBAColor(unsigned char val) { r = val; g = val; b = val; a = val; }
+		RGBAColor(float col)
+		{
+			r = col * 255;
+			g = r;
+			b = r;
+			a = 0xFF;
+		}
+		unsigned char r, g, b, a;
 	};
 	struct RGBColor {
-		char r, g, b;
+		RGBColor(float col) 
+		{
+			r = col * 255;
+			g = r;
+			b = r;
+		}
+		unsigned char r, g, b;
 	};
 	TerrainLayerData() = default;
 	std::string Name;
@@ -34,6 +47,8 @@ public:
 	void LoadDiffuseFile();
 
 	bool Load(std::ifstream& File);
+
+	void SetColor(int w, int h, float Color);
 };
 
 NiSmartPointer(ShineIni);
@@ -54,11 +69,16 @@ public:
 	{
 		HeightMap_width = MapSize + 1;
 		HeightMap_height = MapSize + 1;
+		for(auto layer : LayerList)
+		{
+			layer->Width = HeightMap_width;
+			layer->Height = HeightMap_height;
+		}
 	}
 	float GetOneBlockWidht() { return OneBlock_width; }
 	float GetOneBlockHeight() { return OneBlock_height; }
 	std::vector<std::shared_ptr<TerrainLayerData>> GetLayers() { return LayerList; }
-	void CreateEmpty(MapInfo* Info);
+	void CreateEmpty(MapInfo* Info, int MapSize);
 	NiColorA GetColor(int w, int h);
 private:
 	std::string FileType;

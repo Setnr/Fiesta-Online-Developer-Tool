@@ -228,6 +228,7 @@
     <ClInclude Include="src\Scene\EditorScene\Modes\Brush\Brush.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\TerrainBrushMode.h" />
     <ClInclude Include="Includes\FastNoiseLite\FastNoiseLite.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\TextureMode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NiApplication\FiestaOnlineTool.cpp">
@@ -354,6 +355,7 @@
     <ClCompile Include="src\Data\NiCustom\NiFastNoiseLite.h" />
     <ClCompile Include="src\Data\NiCustom\NiFastNoiseLite.cpp" />
     <ClCompile Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\TextureMode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Includes\ImGui\imgui.ini">

@@ -47,7 +47,7 @@ void TerrainLayerData::CreateTexture()
 	BlendPref.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
 
 	BlendTexture = NiSourceTexture::Create(pixldata, BlendPref);
-
+	BlendTexture->SetStatic(false);
 	LoadDiffuseFile();
 }
 void TerrainLayerData::LoadDiffuseFile()
@@ -249,15 +249,15 @@ bool ShineIni::Save(std::string Path)
 	IniFile.close();
 	return true;
 }
-void ShineIni::CreateEmpty(MapInfo* Info) 
+void ShineIni::CreateEmpty(MapInfo* Info, int MapSize) 
 {
 	FileType = "HeightMap";
 	Version = "0.01";
 
-	HeightFileName = PgUtil::PathFromClientFolder(PgUtil::GetMapFolderPath(Info->KingdomMap, Info->MapFolderName) + Info->MapName + ".htd");
-	VertexColorTexture = PgUtil::PathFromClientFolder(PgUtil::GetMapFolderPath(Info->KingdomMap, Info->MapFolderName) + Info->MapName + ".bmp");
-	HeightMap_width = 257;
-	HeightMap_height = 257;
+	HeightFileName = PgUtil::GetMapFolderPath(Info->KingdomMap, Info->MapFolderName) + Info->MapName + ".htd";
+	VertexColorTexture = PgUtil::GetMapFolderPath(Info->KingdomMap, Info->MapFolderName) + Info->MapName + ".bmp";
+	HeightMap_width = MapSize + 1;
+	HeightMap_height = MapSize + 1;
 	OneBlock_width = 50.f;
 	OneBlock_height = 50.f;
 	QuadsWide = 64;
@@ -268,11 +268,15 @@ void ShineIni::CreateEmpty(MapInfo* Info)
 	data->BlendFileName = ".\\resmap\\fieldtexture\\L1_A.BMP";
 	data->StartPos_X = 0.f;
 	data->StartPos_Y = 0.f;
-	data->Width = 257.f;
-	data->Height = 257.f;
+	data->Width = static_cast<float>(MapSize + 1);
+	data->Height = static_cast<float>(MapSize + 1);
 	data->UVScaleDiffuse = 5.f;
 	data->UVScaleBlend = 1.f;
 	LayerList.push_back(data);
+	data->CreateTexture();
+
+	std::string VertexShadowPath = PgUtil::PathFromClientFolder(GetVertexColor());
+	VertexShadowImage = NiNew NiPixelData(HeightMap_width, HeightMap_height, NiPixelFormat::RGB24);
 }
 NiColorA ShineIni::GetColor(int w, int h) 
 {
@@ -281,6 +285,7 @@ NiColorA ShineIni::GetColor(int w, int h)
 	{
 		TerrainLayerData::RGBColor* VertexColorArray = NULL;
 		VertexColorArray = (TerrainLayerData::RGBColor*)VertexShadowImage->GetPixels();
+
 		TerrainLayerData::RGBColor col = VertexColorArray[w + (VertexShadowImage->GetHeight() - h - 1) * VertexShadowImage->GetWidth()];
 		return NiColorA(col.r / 255.f, col.g / 255.f, col.b / 255.f);
 	}
@@ -299,4 +304,38 @@ NiColorA ShineIni::GetColor(int w, int h)
 			return NiColorA::WHITE;
 		}
 	}
+}
+void TerrainLayerData::SetColor(int w, int h, float Color) 
+{
+	NiPixelFormat format = *this->BlendTexture->GetPixelFormat();
+
+	NiPixelDataPtr data = BlendTexture->GetSourcePixelData();
+	int XPart = w;
+
+	int PreFullLines = BlendTexture->GetWidth() * h;
+	int YPartNormal = PreFullLines;
+	int PointOffsetNormal = XPart + YPartNormal; 
+
+	if (format.GetFormat() == NiPixelFormat::RGB24.GetFormat())
+	{
+		TerrainLayerData::RGBColor* VertexColorArray = NULL;
+		VertexColorArray = (TerrainLayerData::RGBColor*)data->GetPixels();
+
+		VertexColorArray[PointOffsetNormal] = TerrainLayerData::RGBColor(Color);
+	}
+	else
+	{
+		if (format.GetFormat() == NiPixelFormat::RGBA32.GetFormat())
+		{
+			TerrainLayerData::RGBAColor* VertexColorArrayA = NULL;
+			VertexColorArrayA = (TerrainLayerData::RGBAColor*)data->GetPixels();
+			VertexColorArrayA[PointOffsetNormal] = TerrainLayerData::RGBAColor(Color);
+		}
+		else
+		{
+			LogError("Not Supported NiPixelFormat for BlendTexture");
+			return;
+		}
+	}
+	data->MarkAsChanged();
 }

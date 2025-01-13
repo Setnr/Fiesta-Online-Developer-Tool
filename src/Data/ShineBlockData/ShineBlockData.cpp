@@ -60,7 +60,7 @@ bool ShineBlockData::Save(std::string Path)
 void ShineBlockData::CreateEmpty(int Size) 
 {
 	MapSize = Size;
-	SHBDSize = Size / 8;
+	SHBDSize = Size * 8;
 	Data.resize(MapSize * SHBDSize, 0x0);
 }
 bool ShineBlockData::IsWalkable(int w, int h)

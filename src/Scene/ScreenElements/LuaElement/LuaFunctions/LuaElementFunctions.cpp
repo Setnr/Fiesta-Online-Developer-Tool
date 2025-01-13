@@ -3,6 +3,7 @@
 #include <Scene/EditorScene/Modes/SHMDMode.h>
 #include <Scene/EditorScene/Modes/SHBDMode.h>
 #include <Scene/EditorScene/Modes/TerrainBrushMode.h>
+#include <Scene/EditorScene/Modes/TextureMode.h>
 #include <Scene/EditorScene/Modes/Brush/LuaBrush.h>
 
 int LogFromLua(lua_State* Script)
@@ -1380,20 +1381,75 @@ int CreateTexture(lua_State* Script)
 	}
 	return 0;
 }
+int RenderLayers(lua_State* Script) 
+{
 
+	if (lua_isinteger(Script, 1))
+	{
+		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(TextureMode, mode))
+		{
+			TextureModePtr ptr = NiSmartPointerCast(TextureMode, mode);
+			ptr->DrawLayers();
+		}
+	}
+	return 0;
+}
+int SaveLayer(lua_State* Script)
+{
+
+	if (lua_isinteger(Script, 1))
+	{
+		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(TextureMode, mode))
+		{
+			TextureModePtr ptr = NiSmartPointerCast(TextureMode, mode);
+			ptr->SaveSelectedLayer();
+		}
+	}
+	return 0;
+}
+int TextureColorPick(lua_State* Script) 
+{
+	if (lua_isnumber(Script, 1) && lua_isstring(Script, 2))
+	{
+		float number = lua_tonumber(Script, 1);
+		auto name = lua_tostring(Script, 2);
+
+		float n [] = {number,number,number};
+
+
+		bool changed = ImGui::ColorEdit3(name, n);
+		lua_pushboolean(Script, changed);
+		lua_pushnumber(Script, n[0]);
+		return 2;
+	}
+	return 0;
+}
+int SetTextureColor(lua_State* Script)
+{ 
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script,2) && lua_isinteger(Script, 3) && lua_isnumber(Script,4))
+	{
+		TerrainLayerData* layer = (TerrainLayerData*)lua_tointeger(Script, 1);
+		int w = lua_tointeger(Script, 2);
+		int h = lua_tointeger(Script, 3);
+		float Color = lua_tonumber(Script, 4);
+		layer->SetColor(w, h, Color);
+	}
+	return 0;
+}
 int RecreateHTD(lua_State* Script) 
 {
 	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2) 
-		&& lua_isinteger(Script, 3) && lua_isnumber(Script, 4))
+		&& lua_isnumber(Script, 3))
 	{
 		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
 		if (NiIsKindOf(LuaBrush, brush))
 		{
 			IngameWorldPtr world = (IngameWorld*)lua_tointeger(Script, 2);
-			int MapSize = lua_tointeger(Script, 3);
-			int Height = lua_tonumber(Script, 4);
+			int Height = lua_tonumber(Script, 3);
 			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
-			luabrush->RecreateHTD(world, MapSize, Height);
+			luabrush->RecreateHTD(world, Height);
 		}
 	}
 	return 0;
@@ -1550,5 +1606,9 @@ void SetFunctions(lua_State* Script)
 	lua_register(Script, "RandomInt", RandomInt);
 	lua_register(Script, "CreateTexture", CreateTexture);
 	lua_register(Script, "RecreateHTD", RecreateHTD);
+	lua_register(Script, "RenderLayers", RenderLayers);
+	lua_register(Script, "TextureColorPick", TextureColorPick);
+	lua_register(Script, "SetTextureColor", SetTextureColor);
+	lua_register(Script, "SaveLayer", SaveLayer);
 	
 }
