@@ -139,7 +139,7 @@ function algorithm(MiddleW,MiddleH, z, SizeW, SizeH ,BrushSize,WorldPtr, BrushPt
     for w = MiddleW - BrushSize, MiddleW + BrushSize , 1 do
         if w >= 0 and w < SizeW then
             for h = MiddleH - BrushSize, MiddleH + BrushSize , 1 do
-                if h >= 0 and h <= SizeH then
+                if h >= 0 and h < SizeH then
                     if (((w - MiddleW) * (w - MiddleW) + (h - MiddleH) * (h - MiddleH) <= BrushSize * BrushSize)) then
                         noise = (GetNoiseValue(BrushPtr,w ,h ) + 1.0) / 2.0
                         

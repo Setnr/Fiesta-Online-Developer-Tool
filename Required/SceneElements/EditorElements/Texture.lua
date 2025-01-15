@@ -9,9 +9,6 @@ function render(ElementPtr)
     local EditModePtr, EditModeName = GetCurrentEditMode(ScenePtr)
 
     if EditModeName == "Texture" then
-        if Button("Save Selected Layer") then
-            SaveLayer(EditModePtr)
-        end
         local BrushSize = GetBrushSize(EditModePtr)
         local changed, BrushSize = DragInt(BrushSize,"Brush Size",1.0,0,100)
         if changed then

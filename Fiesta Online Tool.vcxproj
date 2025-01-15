@@ -94,6 +94,7 @@
     <ClInclude Include="src\Data\NiCustom\NiBoundingBox.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\EditMode.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\SHMDMode.h" />
+    <ClInclude Include="src\Scene\ScreenElements\LoadObject\LoadDiffuseFile.h" />
     <ClInclude Include="src\Scene\ScreenElements\LoadObject\ReplaceObjects.h" />
     <ClInclude Include="src\Scene\ScreenElements\LuaElement\LuaElement.h" />
     <ClInclude Include="src\Scene\ScreenElements\LuaElement\LuaFunctions\LuaElementFunctions.h" />

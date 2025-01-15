@@ -263,20 +263,23 @@ void ShineIni::CreateEmpty(MapInfo* Info, int MapSize)
 	QuadsWide = 64;
 	QuadsHigh = 64;
 	auto data = std::make_shared<TerrainLayerData>();
-	data->Name = "01 ground";
-	data->DiffuseFileName = ".\\resmap\\fieldTexture\\grass_01.dds";
-	data->BlendFileName = ".\\resmap\\fieldtexture\\L1_A.BMP";
-	data->StartPos_X = 0.f;
-	data->StartPos_Y = 0.f;
-	data->Width = static_cast<float>(MapSize + 1);
-	data->Height = static_cast<float>(MapSize + 1);
-	data->UVScaleDiffuse = 5.f;
-	data->UVScaleBlend = 1.f;
-	LayerList.push_back(data);
-	data->CreateTexture();
+	CreateNewLayer(Info);
 
+
+	auto pixldata = LayerList[0]->BlendTexture->GetSourcePixelData();
+	auto pixl = pixldata->GetPixels();
+	for (size_t i = 0; i < pixldata->GetSizeInBytes(); i++)
+	{
+		pixl[i] = 0xFF;
+	}
+	pixldata->MarkAsChanged();
 	std::string VertexShadowPath = PgUtil::PathFromClientFolder(GetVertexColor());
 	VertexShadowImage = NiNew NiPixelData(HeightMap_width, HeightMap_height, NiPixelFormat::RGB24);
+	auto pixels = VertexShadowImage->GetPixels();
+	for (size_t i = 0; i < VertexShadowImage->GetSizeInBytes(); i++)
+	{
+		pixels[i] = 0xFF;
+	}
 }
 NiColorA ShineIni::GetColor(int w, int h) 
 {
@@ -305,14 +308,14 @@ NiColorA ShineIni::GetColor(int w, int h)
 		}
 	}
 }
-void TerrainLayerData::SetColor(int w, int h, float Color) 
+void TerrainLayerData::SetColor(int w, int h, float Color)
 {
 	NiPixelFormat format = *this->BlendTexture->GetPixelFormat();
 
 	NiPixelDataPtr data = BlendTexture->GetSourcePixelData();
-	int XPart = w;
+	int XPart = w ;
 
-	int PreFullLines = BlendTexture->GetWidth() * h;
+	int PreFullLines = BlendTexture->GetWidth() * h ;
 	int YPartNormal = PreFullLines;
 	int PointOffsetNormal = XPart + YPartNormal; 
 
@@ -338,4 +341,47 @@ void TerrainLayerData::SetColor(int w, int h, float Color)
 		}
 	}
 	data->MarkAsChanged();
+}
+void ShineIni::AddLayer(std::shared_ptr<TerrainLayerData> Layer) 
+{
+	LayerList.push_back(Layer);
+}
+void ShineIni::DeleteLayer(std::shared_ptr<TerrainLayerData> Layer) 
+{
+	auto l = std::find(LayerList.begin(), LayerList.end(), Layer);
+	LayerList.erase(l);
+}
+std::shared_ptr<TerrainLayerData> ShineIni::CreateNewLayer(MapInfo* Info) 
+{
+	std::shared_ptr<TerrainLayerData> layer = std::make_shared<TerrainLayerData>();
+	layer->Width = 257;
+	layer->Height = 257;
+	layer->StartPos_X = 0.f;
+	layer->StartPos_Y = 0.f;
+	layer->UVScaleBlend = 1.f;
+	layer->UVScaleDiffuse = 5.f;
+	layer->Name = "New Layer";
+	layer->DiffuseFileName = ".\\resmap\\fieldtexture\\\grass_01.dds";
+	layer->BlendFileName = PgUtil::GetMapFolderPath(Info->KingdomMap, Info->MapName) + "Name.bmp";
+	layer->LoadDiffuseFile();
+
+	NiTexture::FormatPrefs BlendPref;
+	BlendPref.m_ePixelLayout = NiTexture::FormatPrefs::PixelLayout::TRUE_COLOR_32;
+	BlendPref.m_eMipMapped = NiTexture::FormatPrefs::MipFlag::YES;
+	BlendPref.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
+
+	NiPixelDataPtr pixldata = NiNew NiPixelData(layer->Width, layer->Height, NiPixelFormat::RGBA32);
+	unsigned char* pixl = pixldata->GetPixels();
+	for (size_t i = 0; i < pixldata->GetSizeInBytes(); i++)
+		pixl[i] = 0x0;
+	layer->BlendTexture = NiSourceTexture::Create(pixldata, BlendPref);
+	layer->BlendTexture->SetStatic(false);
+	AddLayer(layer);
+	return layer;
+}
+
+void TerrainLayerData::SaveBlendFile(MapInfo* Info) 
+{
+	BlendFileName = PgUtil::GetMapFolderPath(Info->KingdomMap, Info->MapName) + Name +".bmp";
+	PgUtil::SaveTexture(PgUtil::PathFromClientFolder(BlendFileName), BlendTexture);
 }

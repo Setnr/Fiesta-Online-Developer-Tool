@@ -35,7 +35,7 @@ function algorithm(MiddleW,MiddleH, z, SizeW, SizeH ,BrushSize,WorldPtr)
             if w >= 0 and w < SizeW then
                 for h = MiddleH - BrushSize, MiddleH + BrushSize , 1 do
                     if h - BrushData["KernelSize"] / 2 > 0 then
-                        if h >= 0 and h <= SizeH then
+                        if h >= 0 and h < SizeH then
                             if (((w - MiddleW) * (w - MiddleW) + (h - MiddleH) * (h - MiddleH) <= BrushSize * BrushSize)) then
                                 local Sum  = 0
                                 for i = StartI, EndI , 1 do

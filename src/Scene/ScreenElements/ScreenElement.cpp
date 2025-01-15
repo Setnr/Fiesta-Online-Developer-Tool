@@ -4,10 +4,12 @@
 #include <Scene/ScreenElements/LoadObject/AddSingleObject.h>
 #include <Scene/ScreenElements/LoadObject/AddMultipleObject.h>
 #include <Scene/ScreenElements/LoadObject/ReplaceObjects.h>
+#include <Scene/ScreenElements/LoadObject/LoadDiffuseFile.h>
 
 NiImplementRootRTTI(ScreenElement);
 
 NiImplementRTTI(LuaElement, ScreenElement);
 NiImplementRTTI(AddMultipleObject, ScreenElement);
 NiImplementRTTI(AddSingleObject, ScreenElement);
-NiImplementRTTI(ReplaceObjects, ScreenElement); 
+NiImplementRTTI(ReplaceObjects, ScreenElement);
+NiImplementRTTI(LoadDiffuseFile, ScreenElement);

@@ -13,6 +13,13 @@ public:
 	EditorScenePtr GetScene() { return _Scene; }
 	void AddFlag(int flag) { flags |= flag; }
 	std::string GetFileName() { return _FileName; }
+	void SetPointer(long long ptr, const char* Func)
+	{
+		lua_getglobal(Script, Func);
+		lua_pushinteger(Script, ptr);
+		if (lua_pcallk(Script, 1, 0, 0, 0, 0))
+			LogLua(_FileName, lua_tostring(Script, -1));
+	}
 private:
 	EditorScenePtr _Scene;
 

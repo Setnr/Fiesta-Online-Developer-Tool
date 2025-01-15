@@ -15,6 +15,9 @@ class TextureMode : public TerrainBrushMode
 	}
 	~TextureMode()
 	{
+		_CurrentLayer = nullptr;
+		_Data = NULL;
+		_ScreenElement = NULL;
 	}
 
 	virtual void ProcessInput();
@@ -26,4 +29,5 @@ private:
 
 	std::shared_ptr<TerrainLayerData> _CurrentLayer;
 	NiPixelDataPtr _Data;
+	NiScreenElementsPtr _ScreenElement;
 };

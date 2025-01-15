@@ -12,23 +12,24 @@ public:
 		RGBAColor(unsigned char val) { r = val; g = val; b = val; a = val; }
 		RGBAColor(float col)
 		{
-			r = col * 255;
+			r = col * 0xFF;
 			g = r;
 			b = r;
-			a = 0xFF;
+			a = r;
 		}
 		unsigned char r, g, b, a;
 	};
 	struct RGBColor {
 		RGBColor(float col) 
 		{
-			r = col * 255;
+			r = col * 0xFF;
 			g = r;
 			b = r;
 		}
 		unsigned char r, g, b;
 	};
 	TerrainLayerData() = default;
+	void SaveBlendFile(MapInfo* Info);
 	std::string Name;
 	std::string DiffuseFileName;
 	std::string BlendFileName;
@@ -77,9 +78,12 @@ public:
 	}
 	float GetOneBlockWidht() { return OneBlock_width; }
 	float GetOneBlockHeight() { return OneBlock_height; }
-	std::vector<std::shared_ptr<TerrainLayerData>> GetLayers() { return LayerList; }
+	std::vector<std::shared_ptr<TerrainLayerData>>& GetLayers() { return LayerList; }
 	void CreateEmpty(MapInfo* Info, int MapSize);
 	NiColorA GetColor(int w, int h);
+	void AddLayer(std::shared_ptr<TerrainLayerData> Layer);
+	void DeleteLayer(std::shared_ptr<TerrainLayerData> Layer);
+	std::shared_ptr<TerrainLayerData> CreateNewLayer(MapInfo* Info);
 private:
 	std::string FileType;
 	std::string HeightFileName;

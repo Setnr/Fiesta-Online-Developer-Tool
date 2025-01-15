@@ -151,11 +151,11 @@ IngameWorld::IngameWorld(MapInfo* Info, int MapSize) : _MapInfo(Info)
 
 	SetFogColor(_SHMD->GetFogColor(), false);
 	SetFogDepth(_SHMD->GetFogDepth(), false);
-	SetGlobalLight(_SHMD->GetGlobalLight());
-	SetGlobalLightNode(_SHMD->GetGlobalLightNode());
-	SetFarFrustum(_SHMD->GetFarFrustum());
-	SetDirectionalLightAmbientColor(_SHMD->GetDirectionalLightAmbientColor());
-	SetDirectionalLightDiffuseColor(_SHMD->GetDirectionalLightDiffuseColor());
+	SetGlobalLight(_SHMD->GetGlobalLight(), false);
+	SetGlobalLightNode(_SHMD->GetGlobalLightNode(), false);
+	SetFarFrustum(_SHMD->GetFarFrustum(), false);
+	SetDirectionalLightAmbientColor(_SHMD->GetDirectionalLightAmbientColor(),false);
+	SetDirectionalLightDiffuseColor(_SHMD->GetDirectionalLightDiffuseColor(), false);
 
 	m_spWorldScene->Update(0.f);
 	m_spWorldScene->UpdateProperties();
@@ -444,11 +444,16 @@ void IngameWorld::ShowSHMDElements(bool Show)
 	if (Show) 
 	{
 		m_spGroundScene->AttachChild(m_spGroundObject);
+		m_spGroundScene->AttachChild(m_spWaterScene);
+		m_spGroundScene->AttachChild(m_spLightArea);
 	}
 	else
 	{
 		m_spGroundScene->DetachChild(m_spGroundObject);
+		m_spGroundScene->DetachChild(m_spWaterScene);
+		m_spGroundScene->DetachChild(m_spLightArea);
 	}
+	m_spGroundScene->Update(0.f);
 }
 void IngameWorld::ReplaceObjects(std::vector<NiPickablePtr> OldNodes, std::vector<NiPickablePtr> NewNodes, bool Backup)
 {
@@ -473,11 +478,13 @@ void IngameWorld::ShowTerrain(bool show)
 		CreateTerrainLayer(layerlist.at(0));
 		
 	}
+
 	m_spGroundTerrain->Update(0.f);
 	m_spGroundTerrain->UpdateProperties();
 	m_spGroundTerrain->UpdateEffects();
 	m_spGroundTerrain->Update(0.f);
 	_ShowTerrain = show;
+
 }
 void IngameWorld::SetHTD(int w, int h, float level) 
 {

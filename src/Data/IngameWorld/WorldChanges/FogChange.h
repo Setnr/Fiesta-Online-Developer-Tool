@@ -507,3 +507,87 @@ protected:
 	std::shared_ptr<TerrainLayerData> _Layer;
 	NiPixelDataPtr _From, _To;
 };
+
+
+NiSmartPointer(LayerDiffuseChange);
+class LayerDiffuseChange : public WorldChange
+{
+public:
+	NiDeclareRTTI;
+	LayerDiffuseChange(IngameWorldPtr World, std::shared_ptr<TerrainLayerData> Layer, std::string From, std::string To)
+	{
+		_World = World;
+		_Layer = Layer;
+		_From = From;
+		_To = To;
+	}
+	virtual void Undo()
+	{
+		_Layer->DiffuseFileName = _From;
+		_Layer->LoadDiffuseFile();
+		_World->ShowTerrain(_World->GetShowTerrain());
+	};
+	virtual void Redo()
+	{
+		_Layer->DiffuseFileName = _To;
+		_Layer->LoadDiffuseFile();
+		_World->ShowTerrain(_World->GetShowTerrain());
+	};
+	bool ExtraCheck(WorldChangePtr NewObject) { return true; }
+protected:
+	IngameWorldPtr _World;
+	std::shared_ptr<TerrainLayerData> _Layer;
+	std::string _From, _To;
+};
+
+NiSmartPointer(LayerAdd);
+class LayerAdd : public WorldChange
+{
+public:
+	NiDeclareRTTI;
+	LayerAdd(IngameWorldPtr World, std::shared_ptr<TerrainLayerData> Layer)
+	{
+		_World = World;
+		_Layer = Layer;
+	}
+	virtual void Undo()
+	{
+		_World->GetShineIni()->DeleteLayer(_Layer);
+		_World->ShowTerrain(_World->GetShowTerrain());
+	};
+	virtual void Redo()
+	{
+		_World->GetShineIni()->AddLayer(_Layer);
+		_World->ShowTerrain(_World->GetShowTerrain());
+	};
+	bool ExtraCheck(WorldChangePtr NewObject) { return true; }
+protected:
+	IngameWorldPtr _World;
+	std::shared_ptr<TerrainLayerData> _Layer;
+};
+
+NiSmartPointer(LayerDelete);
+class LayerDelete : public WorldChange
+{
+public:
+	NiDeclareRTTI;
+	LayerDelete(IngameWorldPtr World, std::shared_ptr<TerrainLayerData> Layer)
+	{
+		_World = World;
+		_Layer = Layer;
+	}
+	virtual void Undo()
+	{
+		_World->GetShineIni()->AddLayer(_Layer);
+		_World->ShowTerrain(_World->GetShowTerrain());
+	};
+	virtual void Redo()
+	{
+		_World->GetShineIni()->DeleteLayer(_Layer);
+		_World->ShowTerrain(_World->GetShowTerrain());
+	};
+	bool ExtraCheck(WorldChangePtr NewObject) { return true; }
+protected:
+	IngameWorldPtr _World;
+	std::shared_ptr<TerrainLayerData> _Layer;
+};

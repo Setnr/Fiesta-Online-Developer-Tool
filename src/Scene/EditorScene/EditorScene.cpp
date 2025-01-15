@@ -166,9 +166,9 @@ void EditorScene::ProcessInput()
 	{
 		if (ImGui::IsKeyDown((ImGuiKey)VK_CONTROL)) 
 		{
-			if(ImGui::IsKeyPressed((ImGuiKey)0x5A))//Ctrl + Z
+			if(ImGui::IsKeyReleased((ImGuiKey)0x5A))//Ctrl + Z
 				kWorld->Undo();
-			if (ImGui::IsKeyPressed((ImGuiKey)0x59))
+			if (ImGui::IsKeyReleased((ImGuiKey)0x59))
 				kWorld->Redo();
 		}
 		if (ImGui::IsKeyReleased((ImGuiKey)VK_TAB))

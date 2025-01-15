@@ -151,6 +151,14 @@ public:
 		*_HTD = data;
 	}
 	bool GetShowTerrain() { return _ShowTerrain; }
+	MapInfo* GetMapInfo() { return _MapInfo; }
+	void UpdateTerrain() {
+
+		m_spGroundTerrain->Update(0.f);
+		m_spGroundTerrain->UpdateProperties();
+		m_spGroundTerrain->UpdateEffects();
+		m_spGroundTerrain->Update(0.f);
+	}
 private:
 
 	ShineBlockDataPtr _SHBD;

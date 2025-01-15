@@ -1345,7 +1345,7 @@ int HasNoise(lua_State* Script)
 	return 1;
 }
 int RenderNoise(lua_State* Script)
-{
+{ 
 	bool hasnoise = false;
 	if (lua_isinteger(Script, 1))
 	{
@@ -1415,16 +1415,18 @@ int TextureColorPick(lua_State* Script)
 	{
 		float number = lua_tonumber(Script, 1);
 		auto name = lua_tostring(Script, 2);
+		int BrushColor = number * 255;
+		ImGui::ColorButton("##ColButton", ImVec4(number, number, number, number));
+		ImGui::SameLine();
+		bool changed = ImGui::DragInt("Color", &BrushColor, 1.f, 0, 255);
+		if (changed)
+			number = static_cast<float>(BrushColor) / 255.f;
 
-		float n [] = {number,number,number};
-
-
-		bool changed = ImGui::ColorEdit3(name, n);
 		lua_pushboolean(Script, changed);
-		lua_pushnumber(Script, n[0]);
+		lua_pushnumber(Script, number);
 		return 2;
 	}
-	return 0;
+	return 0; 
 }
 int SetTextureColor(lua_State* Script)
 { 
@@ -1437,7 +1439,8 @@ int SetTextureColor(lua_State* Script)
 		layer->SetColor(w, h, Color);
 	}
 	return 0;
-}
+} 
+
 int RecreateHTD(lua_State* Script) 
 {
 	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2) 
@@ -1451,6 +1454,16 @@ int RecreateHTD(lua_State* Script)
 			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, brush);
 			luabrush->RecreateHTD(world, Height);
 		}
+	}
+	return 0;
+}
+
+int ReloadProperties(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) )
+	{
+		IngameWorldPtr brush = (IngameWorld*)lua_tointeger(Script, 1);
+		brush->UpdateTerrain();
 	}
 	return 0;
 }
@@ -1610,5 +1623,6 @@ void SetFunctions(lua_State* Script)
 	lua_register(Script, "TextureColorPick", TextureColorPick);
 	lua_register(Script, "SetTextureColor", SetTextureColor);
 	lua_register(Script, "SaveLayer", SaveLayer);
+	lua_register(Script, "ReloadProperties", ReloadProperties);
 	
-}
+} 
