@@ -301,6 +301,7 @@ NiPickablePtr IngameWorld::PickObject()
 			return NULL;
 		}
 	}
+	return NULL;
 }
 void IngameWorld::UpdatePos(std::vector<NiPickablePtr> Node, NiPoint3 PosChange, bool Backup)
 {
