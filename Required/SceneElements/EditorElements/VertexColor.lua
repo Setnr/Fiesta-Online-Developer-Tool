@@ -7,7 +7,6 @@ function render(ElementPtr)
     local ret = true
     local ScenePtr = GetCurrentScenePtr(ElementPtr)
     local EditModePtr, EditModeName = GetCurrentEditMode(ScenePtr)
-
     if EditModeName == "VertexColor" then
         local BrushSize = GetBrushSize(EditModePtr)
         local changed, BrushSize = DragInt(BrushSize,"Brush Size",1.0,0,100)
@@ -22,6 +21,9 @@ function render(ElementPtr)
                 SnapMove = true
             end 
             SetShowSHMDElements(EditModePtr,SnapMove)
+        end
+        if Button("Save VertexColor") then
+            SaveVertexColor(EditModePtr)
         end
         RenderBrushes(EditModePtr)
     end

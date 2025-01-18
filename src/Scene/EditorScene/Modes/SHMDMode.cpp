@@ -23,6 +23,12 @@ void SHMDMode::UpdateScale(float Scale)
 
 void SHMDMode::ProcessInput() 
 {
+	if (ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x53))
+	{
+		kWorld->SaveSHMD();
+	}
+	if (ImGuizmo::IsOver())
+		return;
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) 
 	{
 		SelectObject(kWorld->PickObject(), ImGui::IsKeyDown((ImGuiKey)VK_CONTROL));

@@ -20,6 +20,7 @@ class VertexMode : public TerrainBrushMode
 	virtual void ProcessInput();
 
 	virtual std::string GetEditModeName() { return "VertexColor"; }
+	void SaveVertex();
 
 private:
 	NiPixelDataPtr _Data;

@@ -226,7 +226,7 @@ void IngameWorld::SetGlobalLight(NiColor kColor, bool Backup)
 		AttachStack(NiNew ChangeGlobalLightColor(this, _SHMD->GetGlobalLight(), kColor));
 	m_spAmbientLight->SetAmbientColor(kColor);
 	_SHMD->SetGlobalLight(kColor);
-}
+} 
 NiPoint3 IngameWorld::GetWorldPoint() 
 {
 	NiPoint3 kOrigin, kDir;
@@ -786,4 +786,8 @@ void IngameWorld::CalculateRay(NiPoint3& StartPoint, NiPoint3& SunVector, std::v
 		x = static_cast<int>(ActivePoint.x * invGridSize);
 		y = static_cast<int>(ActivePoint.y * invGridSize);
 	}
+}
+void IngameWorld::SaveVertex() 
+{
+	PgUtil::SaveTexture(PgUtil::PathFromClientFolder(_INI->GetVertexColor()), _INI->GetVertexImage());
 }

@@ -4,6 +4,7 @@
 #include <Scene/EditorScene/Modes/SHBDMode.h>
 #include <Scene/EditorScene/Modes/TerrainBrushMode.h>
 #include <Scene/EditorScene/Modes/TextureMode.h>
+#include <Scene/EditorScene/Modes/VertexMode.h>
 #include <Scene/EditorScene/Modes/Brush/LuaBrush.h>
 
 int LogFromLua(lua_State* Script)
@@ -1570,6 +1571,19 @@ int CreateShadow(lua_State* Script)
 	}
 	return 0;
 }
+int SaveVertex(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1))
+	{
+		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(VertexMode, mode) )
+		{
+			VertexModePtr ptr = NiSmartPointerCast(VertexMode, mode);
+			ptr->SaveVertex();
+		}
+	}
+	return 0;
+}
 void SetFunctions(lua_State* Script)
 {
 	lua_pushcclosure(Script, LogFromLua, 0);
@@ -1734,4 +1748,5 @@ void SetFunctions(lua_State* Script)
 	lua_register(Script, "SetSoftVertexColor", SetSoftVertexColor);
 	lua_register(Script, "GetVertexColor", GetVertexColor);
 	lua_register(Script, "CreateShadow", CreateShadow);
+	lua_register(Script, "SaveVertex", SaveVertex);
 } 

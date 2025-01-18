@@ -22,7 +22,7 @@ function render(BrushPtr)
         CreateShadow(BrushData.world, BrushData.red, BrushData.green, BrushData.blue, BrushData.red2, BrushData.green2, BrushData.blue2)
         
     end
-    if CheckBox("Live Render On Left Click",BrushData.LiveRender) then
+    if CheckBox("Live Render While Left Click",BrushData.LiveRender) then
         if BrushData.LiveRender == true then
             BrushData.LiveRender = false
         else

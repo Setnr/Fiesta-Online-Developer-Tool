@@ -165,7 +165,7 @@ public:
 	}
 	void CreateShadows(NiColorA Color, NiColorA SunLight);
 	void CalculateRay(NiPoint3& StartPoint, NiPoint3& SunVector, std::vector<bool>& Shadowed, float minh);
-	
+	void SaveVertex();
 private:
 
 	void SetVertexColorInternal(int ShapeID, int InternalBlockX, int InternalBlockY, NiColorA Color);

@@ -35,6 +35,11 @@ void TextureMode::ProcessInput()
 			kWorld->AttachStack(NiSmartPointerCast(WorldChange, Change));
 		}
 	}
+
+	if (ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x53))
+	{
+		SaveSelectedLayer();
+	}
 }
 void TextureMode::Update(float fTime)
 {
@@ -136,20 +141,24 @@ void TextureMode::DrawLayers()
 	else 
 	{
 		bool s;
-		ImGui::BeginChild("BrushChildL", ImVec2(100, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-		for (auto brush : _Brushes)
+		if(ImGui::BeginChild("BrushChildL", ImVec2(100, 0), false, ImGuiWindowFlags_HorizontalScrollbar))
 		{
-			if (ImGui::Selectable(brush->GetBrushName().c_str(), &s))
+			for (auto brush : _Brushes)
 			{
-				_CurrentBrush = brush;
+				if (ImGui::Selectable(brush->GetBrushName().c_str(), &s))
+				{
+					_CurrentBrush = brush;
+				}
 			}
+			ImGui::EndChild();
 		}
-		ImGui::EndChild();
 		ImGui::SameLine();
-		ImGui::BeginChild("BrushChildR", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-		if (_CurrentBrush)
-			_CurrentBrush->Draw();
-		ImGui::EndChild();
+		if (ImGui::BeginChild("BrushChildR", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar)) {
+			if (_CurrentBrush)
+				_CurrentBrush->Draw();
+			ImGui::EndChild();
+		}
+		
 	}
 	ImGui::EndChild();
 	auto WindowPos = ImGui::GetWindowPos();

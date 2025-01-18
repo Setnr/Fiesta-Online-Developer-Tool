@@ -48,4 +48,5 @@ private:
 	EditModePtr _EditMode;
 
 	std::vector<ScreenElementPtr> ScreenElements;
+	bool FreezeTime = false;
 };

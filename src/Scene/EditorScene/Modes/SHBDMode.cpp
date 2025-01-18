@@ -33,6 +33,10 @@ void SHBDMode::ProcessInput()
 {
 	TerrainMode::ProcessInput();
 
+	if (ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x53))
+	{
+		kWorld->SaveSHBD();
+	}
 	ImGuiIO& io = ImGui::GetIO();
 	float DeltaTime = FiestaOnlineTool::GetDeltaTime();
 	if (io.MouseWheel != 0.0f)

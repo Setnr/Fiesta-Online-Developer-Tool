@@ -22,4 +22,9 @@ void HTDGMode::ProcessInput()
 		kWorld->AttachStack(NiSmartPointerCast(WorldChange, Change));
 		_Update = false;
 	}
+
+	if (ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x53))
+	{
+		kWorld->SaveHTD();
+	}
 }

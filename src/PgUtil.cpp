@@ -83,6 +83,13 @@ std::string PgUtil::GetMapFolderPath(char KingdomMap, std::string MapName)
     BasePath += "\\" + MapName + "\\";
     return BasePath;
 }
+
+void PgUtil::SaveTexture(std::string Path, NiPixelDataPtr PixelData)
+{
+    NiSourceTexturePtr texture = NiSourceTexture::Create(PixelData);
+    SaveTexture(Path, texture);
+}
+
 void PgUtil::SaveTexture(std::string Path, NiSourceTexturePtr Texture)
 {
     try {

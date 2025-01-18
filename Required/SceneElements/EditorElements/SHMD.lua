@@ -3,6 +3,10 @@ function prepare(ElementPtr)
     MakeNoCollapse(ElementPtr)
 end
 
+Data = {
+    FreezeWorld = false
+}
+
 function render(ElementPtr)
     local ret = true
     local WorldPtr = GetIngameWorld(ElementPtr)

@@ -81,6 +81,13 @@ void EditorScene::CreateMenuBar()
 		{
 			kWorld->SaveIni();
 		}
+		if (ImGui::MenuItem("Save All"))
+		{
+			kWorld->SaveHTD();
+			kWorld->SaveSHBD();
+			kWorld->SaveSHMD();
+			kWorld->SaveIni();
+		}
 		ImGui::EndMenu();
 	}
 	if (ImGui::BeginMenu("View")) 
@@ -128,6 +135,7 @@ void EditorScene::CreateMenuBar()
 		}
 		ImGui::EndCombo();
 	}
+	ImGui::Checkbox("Freeze Time", &FreezeTime);
 
 	ImGui::SameLine(ImGui::GetWindowWidth() - 30);
 	ImGui::Text("(?)");
@@ -138,6 +146,8 @@ void EditorScene::CreateMenuBar()
 }
 void EditorScene::Update(float fTime) 
 {
+	if (FreezeTime)
+		fTime = 0.f;
 	if (NewWorldLoaded)
 	{
 		kWorld = NewWorldLoaded;

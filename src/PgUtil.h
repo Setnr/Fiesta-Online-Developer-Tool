@@ -26,4 +26,5 @@ public:
 	static NiScreenElements* CreateScreenElement(NiSourceTexturePtr texture);
 	static void MakePositiveVector(NiPoint3& Vector);
 	static void FixColor(NiColorA& Color);
+	static void SaveTexture(std::string Path, NiPixelDataPtr PixelData);
 };

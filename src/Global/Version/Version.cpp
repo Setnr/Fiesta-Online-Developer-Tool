@@ -14,7 +14,7 @@ std::string parseLatestVersion(const std::string& jsonResponse)
 
 std::string GetLatestVersion()
 {
-    HINTERNET hSession = WinHttpOpen(L"A WinHTTP Example Program/1.0",
+    HINTERNET hSession = WinHttpOpen(L"FiestaDeveloperTools VersionRequest",
         WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
         WINHTTP_NO_PROXY_NAME,
         WINHTTP_NO_PROXY_BYPASS, 0);
