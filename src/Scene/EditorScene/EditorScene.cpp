@@ -81,12 +81,17 @@ void EditorScene::CreateMenuBar()
 		{
 			kWorld->SaveIni();
 		}
+		if (ImGui::MenuItem("Save Vertex"))
+		{
+			kWorld->SaveVertex();
+		}
 		if (ImGui::MenuItem("Save All"))
 		{
 			kWorld->SaveHTD();
 			kWorld->SaveSHBD();
 			kWorld->SaveSHMD();
 			kWorld->SaveIni();
+			kWorld->SaveVertex();
 		}
 		ImGui::EndMenu();
 	}
@@ -192,6 +197,8 @@ void EditorScene::ProcessInput()
 		if (_EditMode)
 			_EditMode->ProcessInput();
 	}
+	if (ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x4F))
+		ScreenElements.push_back(NiNew MapLoadElement(this));
 }	
 void EditorScene::UpdateEditMode() 
 {

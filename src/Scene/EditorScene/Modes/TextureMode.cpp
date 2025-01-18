@@ -55,6 +55,7 @@ void TextureMode::DrawLayers()
 {
 
 	static char buffer[25];
+	static char Blendbuffer[25];
 	ImGui::BeginChild("BrushChildLayers", ImVec2(200, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 	auto _Ini = kWorld->GetShineIni();
 	if (ImGui::Button("Recreate Terrain"))
@@ -73,7 +74,6 @@ void TextureMode::DrawLayers()
 	if (ImGui::Button("Add New Layer"))
 	{
 		UpdateCurrentLayer(_Ini->CreateNewLayer(kWorld->GetMapInfo()));
-
 		kWorld->AttachStack(NiNew LayerAdd(kWorld, _CurrentLayer));
 		kWorld->ShowTerrain(kWorld->GetShowTerrain());
 	}
@@ -127,6 +127,16 @@ void TextureMode::DrawLayers()
 		{
 			auto element = NiNew LoadDiffuseFile(_CurrentLayer, kWorld,this);
 			ScreenElements.push_back(element);
+		}
+
+		auto mapinfo = kWorld->GetMapInfo();
+		auto MapPath = PgUtil::GetMapFolderPath(mapinfo->KingdomMap, mapinfo->MapFolderName);
+		auto Name = _CurrentLayer->BlendFileName.substr(MapPath.length());
+		Name = Name.substr(0, Name.length() - 4);
+		strcpy_s(Blendbuffer, sizeof(Blendbuffer), Name.c_str());
+		if (ImGui::InputText("BlendFileName", Blendbuffer, sizeof(Blendbuffer)))
+		{
+			_CurrentLayer->BlendFileName = MapPath + Blendbuffer + ".bmp";
 		}
 		ImGui::DragFloat("StartPos_X", &_CurrentLayer->StartPos_X);
 		ImGui::DragFloat("StartPos_Y", &_CurrentLayer->StartPos_Y);
