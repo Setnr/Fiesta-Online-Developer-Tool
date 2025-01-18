@@ -19,7 +19,7 @@ void NiFastNoiseLite::CreateTexture(int Size)
 			unsigned int Color = (Value << TexturePixelFormat->GetShift(NiPixelFormat::COMP_RED)) & TexturePixelFormat->GetMask(NiPixelFormat::COMP_RED);
 			Color |= (Value << TexturePixelFormat->GetShift(NiPixelFormat::COMP_GREEN)) & TexturePixelFormat->GetMask(NiPixelFormat::COMP_GREEN);
 			Color |= (Value << TexturePixelFormat->GetShift(NiPixelFormat::COMP_BLUE)) & TexturePixelFormat->GetMask(NiPixelFormat::COMP_BLUE);
-			Color |= (Value << TexturePixelFormat->GetShift(NiPixelFormat::COMP_ALPHA)) & TexturePixelFormat->GetMask(NiPixelFormat::COMP_ALPHA);
+			Color |= (0xFF << TexturePixelFormat->GetShift(NiPixelFormat::COMP_ALPHA)) & TexturePixelFormat->GetMask(NiPixelFormat::COMP_ALPHA);
 			*pixeloffset = Color;
 			pixeloffset++;
 		}

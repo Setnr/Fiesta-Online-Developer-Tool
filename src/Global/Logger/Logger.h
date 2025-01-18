@@ -52,5 +52,10 @@ constexpr std::string GetFunctionNameWithClass(const char* s)
 							std::ostringstream oss;\
 							oss << info << " " << std::round(std::chrono::duration<double, std::milli>(diff).count()) << "ms";\
 							LogInfo(oss.str());
-#define LogLua(File,msg)  Logger::_Logger.Log(ImColor(1.0f,0.8f,0.0f),Msg(File +".lua\n" + msg))
+#define LuaMsg(info) if(std::string(info).find(".lua:") >= std::string(info).size())\
+						LogWarning(info);\
+					else\
+						LogWarning(std::string(info).replace(std::string(info).find(".lua:"), sizeof(".lua:") - 1, ".lua\nLine:"))
+
+#define LogLua(File,msg)  LuaMsg(msg)
 

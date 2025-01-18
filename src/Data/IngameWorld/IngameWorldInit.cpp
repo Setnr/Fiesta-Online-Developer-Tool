@@ -209,9 +209,9 @@ void IngameWorld::CreateTerrainLayer(std::shared_ptr<TerrainLayerData> CurrentLa
 	};
 	std::vector<PointUsed> PointUsage(_INI->GetMapWidth()* _INI->GetMapHeight());
 
-	for (int BlockX = 0; BlockX < (_INI->GetMapWidth() - 1) / _INI->GetQuadsHigh(); BlockX++) //19
+	for (int BlockX = 0; BlockX < (_INI->GetMapWidth() - 1) / _INI->GetQuadsWide(); BlockX++) //19
 	{
-		for (int BlockY = 0; BlockY < (_INI->GetMapHeight() - 1) / _INI->GetQuadsWide(); BlockY++) //19
+		for (int BlockY = 0; BlockY < (_INI->GetMapHeight() - 1) / _INI->GetQuadsHigh(); BlockY++) //19
 		{
 			std::vector<NiPoint3> VerticesList;
 			std::vector<NiPoint3> NormalList;

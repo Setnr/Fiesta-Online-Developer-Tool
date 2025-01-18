@@ -59,6 +59,7 @@
     <ClInclude Include="src\Scene\EditorScene\Modes\TerrainBrushMode.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\TerrainMode.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\TextureMode.h" />
+    <ClInclude Include="src\Scene\EditorScene\Modes\VertexMode.h" />
     <ClInclude Include="src\Scene\ScreenElements\LoadObject\AddMultipleObject.h" />
     <ClInclude Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.h" />
     <ClInclude Include="Includes\lua\lapi.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="src\Scene\EditorScene\Modes\TerrainBrushMode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\TerrainMode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\TextureMode.cpp" />
+    <ClCompile Include="src\Scene\EditorScene\Modes\VertexMode.cpp" />
     <ClCompile Include="src\Scene\ScreenElements\LoadObject\AddSingleObject.cpp" />
     <ClCompile Include="src\Scene\ScreenElements\LuaElement\LuaElement.cpp" />
     <ClCompile Include="src\Scene\ScreenElements\LuaElement\LuaFunctions\LuaElementFunctions.cpp" />
@@ -524,12 +526,14 @@ copy ".\Includes\Gamebryo 2.3\DLL\ShaderLibraryDX923VC80D.dll" ".\Build\$(Config
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
-mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\VertexBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -656,12 +660,14 @@ copy ".\Includes\Gamebryo 2.3\DLL\NSFParserLibDX923VC80S.dll" ".\Build\$(Configu
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
-mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\VertexBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|Win32'">
@@ -689,12 +695,14 @@ copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(Pr
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
-mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\VertexBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -728,12 +736,14 @@ copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(Pr
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
-mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\VertexBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -790,12 +800,14 @@ copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(Pr
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
-mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\VertexBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ShippingLib|x64'">
@@ -820,12 +832,14 @@ copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(Pr
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements"
 mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes"
-mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes"
+mkdir "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes"
 copy "$(ProjectDir)Required\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\*"
 copy "$(ProjectDir)Required\SceneElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\*"
 copy "$(ProjectDir)Required\SceneElements\EditorElements\HTDGBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\HTDGBrushes\*"
-copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"</Command>
+copy "$(ProjectDir)Required\SceneElements\EditorElements\TextureBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\TextureBrushes\*"
+copy "$(ProjectDir)Required\SceneElements\EditorElements\VertexBrushes\*" "$(ProjectDir)$(OutDir)FiestaOnlineTool\SceneElements\EditorElements\VertexBrushes\*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

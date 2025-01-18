@@ -53,7 +53,7 @@ void TerrainBrushMode::DrawBrushes()
 		if (ImGui::Selectable(brush->GetBrushName().c_str(),&s))
 		{
 			_CurrentBrush = brush;   
-		}
+		}  
 	}
 	ImGui::EndChild();
 	ImGui::SameLine();

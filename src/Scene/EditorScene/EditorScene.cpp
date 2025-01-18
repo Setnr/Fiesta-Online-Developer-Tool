@@ -14,6 +14,7 @@
 #include "EditorScene/Modes/SHBDMode.h"
 #include "EditorScene/Modes/HTDGMode.h"
 #include "EditorScene/Modes/TextureMode.h"
+#include "EditorScene/Modes/VertexMode.h"
 #include <NiDX9Renderer.h>
 NiImplementRTTI(EditorScene, FiestaScene);
 
@@ -120,6 +121,11 @@ void EditorScene::CreateMenuBar()
 			_EditMode = NULL;
 			_EditMode = NiNew TextureMode(kWorld, this);
 		}
+		if (ImGui::Selectable("VertexColor", NiIsKindOf(VertexMode, _EditMode)))
+		{
+			_EditMode = NULL;
+			_EditMode = NiNew VertexMode(kWorld, this);
+		}
 		ImGui::EndCombo();
 	}
 
@@ -192,10 +198,10 @@ void EditorScene::UpdateEditMode()
 	{
 		_EditMode = NiNew TextureMode(kWorld, this);
 	}
-	/*else if (NiIsKindOf(TextureMode, _EditMode))
+	else if (NiIsKindOf(TextureMode, _EditMode))
 	{
-		_EditMode = NiNew VertexColorMode(kWorld, this);
-	}*/
+		_EditMode = NiNew VertexMode(kWorld, this);
+	}
 	else
 		_EditMode = NiNew SHMDMode(kWorld, this);
 }

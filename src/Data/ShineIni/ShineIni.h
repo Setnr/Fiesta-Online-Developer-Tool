@@ -17,6 +17,13 @@ public:
 			b = r;
 			a = r;
 		}
+		RGBAColor(NiColorA col)
+		{
+			r = col.r * 255.f;
+			g = col.g * 255.f;
+			b = col.b * 255.f;
+			a = col.a * 255.f;
+		}
 		unsigned char r, g, b, a;
 	};
 	struct RGBColor {
@@ -25,6 +32,12 @@ public:
 			r = col * 0xFF;
 			g = r;
 			b = r;
+		}
+		RGBColor(NiColorA col) 
+		{
+			r = col.r * 255.f;
+			g = col.g * 255.f;
+			b = col.b * 255.f;
 		}
 		unsigned char r, g, b;
 	};
@@ -50,6 +63,12 @@ public:
 	bool Load(std::ifstream& File);
 
 	void SetColor(int w, int h, float Color);
+	float GetColor(int w, int h);
+	void MarkAsChanged() 
+	{
+		NiPixelDataPtr data = BlendTexture->GetSourcePixelData();
+		data->MarkAsChanged();
+	}
 };
 
 NiSmartPointer(ShineIni);
@@ -81,9 +100,12 @@ public:
 	std::vector<std::shared_ptr<TerrainLayerData>>& GetLayers() { return LayerList; }
 	void CreateEmpty(MapInfo* Info, int MapSize);
 	NiColorA GetColor(int w, int h);
+	void SetColor(int w, int h, NiColorA Color);
 	void AddLayer(std::shared_ptr<TerrainLayerData> Layer);
 	void DeleteLayer(std::shared_ptr<TerrainLayerData> Layer);
 	std::shared_ptr<TerrainLayerData> CreateNewLayer(MapInfo* Info);
+	NiPixelDataPtr GetVertexImage() { return VertexShadowImage; }
+	void SetVertexImage(NiPixelDataPtr Image) { VertexShadowImage = Image; }
 private:
 	std::string FileType;
 	std::string HeightFileName;

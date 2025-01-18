@@ -42,6 +42,10 @@ void TerrainMode::ProcessInput()
 			SetBrushSize(_BrushSize); //We need to set it here to resize the Visual Identifier
 		}
 	}
+	if (ImGui::IsKeyPressed((ImGuiKey)VK_F1, false))
+	{
+		SetShowElements(!GetShowElements());
+	}
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 	{
 		_Update = true;

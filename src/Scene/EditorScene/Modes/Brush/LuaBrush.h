@@ -43,6 +43,16 @@ class LuaBrush : public Brush
 		lua_pushinteger(Script, ptr);
 		if (lua_pcallk(Script, 1, 0, 0, 0, 0))
 			LogLua(_FileName, lua_tostring(Script, -1));
+
+	}
+	void SetColor(NiColorA Col) 
+	{
+		lua_getglobal(Script, "SetColor");
+		lua_pushnumber(Script, Col.r);
+		lua_pushnumber(Script, Col.g);
+		lua_pushnumber(Script, Col.b);
+		if (lua_pcallk(Script, 3, 0, 0, 0, 0))
+			LogLua(_FileName, lua_tostring(Script, -1));
 	}
 
 private:

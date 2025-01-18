@@ -3,6 +3,8 @@ function prepare(ElementPtr)
     MakeNoCollapse(ElementPtr)
 end
 
+
+
 function render(ElementPtr)
     local ret = true
     local ScenePtr = GetCurrentScenePtr(ElementPtr)

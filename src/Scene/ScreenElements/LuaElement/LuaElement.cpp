@@ -41,6 +41,7 @@ bool LuaElement::Draw()
 			LogLua(_FileName, lua_tostring(Script, -1));
 		if (lua_isboolean(Script, -1))
 			ret = lua_toboolean(Script, -1);
+		lua_pop(Script, 1);
 	}
 	ImGui::End();
 

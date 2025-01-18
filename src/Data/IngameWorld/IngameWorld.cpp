@@ -50,7 +50,7 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 		_SHMD->CreateEmpty();
 		_INI->CreateEmpty(_MapInfo,MapSize);
 		_HTD = NiNew HeightTerrainData;
-		_HTD->ResizeHTD(MapSize);
+		_HTD->ResizeHTD(MapSize, MapSize);
 		CreateAndAttachTerrain();
 	}
 	else
@@ -131,7 +131,7 @@ IngameWorld::IngameWorld(MapInfo* Info, int MapSize) : _MapInfo(Info)
 	_SHMD->CreateEmpty();
 	_INI->CreateEmpty(_MapInfo, MapSize);
 	_HTD = NiNew HeightTerrainData;
-	_HTD->ResizeHTD(MapSize);
+	_HTD->ResizeHTD(MapSize, MapSize);
 	CreateAndAttachTerrain();
 
 	for (auto obj : _SHMD->GetSkyList())
@@ -599,4 +599,191 @@ float IngameWorld::GetHTD(int w, int h)
 	auto htdlevel = _HTD->GetHTD(w, h);
 	auto htdglevel = _HTD->GetHTDG(w, h); 
 	return htdlevel + htdglevel;
+}
+
+void IngameWorld::SetVertexColor(int w, int h, NiColorA Color)
+{
+	if (w < 0 || h < 0 || w >= _INI->GetMapWidth() || h >= _INI->GetMapHeight())
+		return;
+	_INI->SetColor(w, h, Color);
+	std::vector<std::shared_ptr<TerrainLayerData>>& layers = _INI->GetLayers();
+	for (int layerid = 0; layerid < layers.size(); layerid++)
+	{
+		auto QuadsHigh = _INI->GetQuadsHigh();
+		auto QuadsWide = _INI->GetQuadsWide();
+
+		auto BlockX = w / QuadsWide;
+		auto InternalBlockX = w % QuadsWide;
+		auto BlockXMax = (_INI->GetMapWidth() - 1) / _INI->GetQuadsWide();
+
+		auto BlockY = h / QuadsHigh;
+		auto InternalBlockY = h % QuadsHigh;
+		auto BlockYMax = (_INI->GetMapHeight() - 1) / _INI->GetQuadsHigh();
+
+		auto ShapeID = BlockY + BlockX * BlockYMax + layerid * BlockYMax * BlockXMax;
+		if (ShapeID > m_spGroundTerrain->GetChildCount() || ShapeID < 0) 
+		{
+			return;
+		}
+		if (BlockY > 0 && InternalBlockY == 0)
+		{
+			SetVertexColorInternal(ShapeID - 1, InternalBlockX, _INI->GetQuadsHigh(), Color);
+		}
+		
+		SetVertexColorInternal(ShapeID, InternalBlockX, InternalBlockY, Color);
+	}
+}
+
+void IngameWorld::SetVertexColorInternal(int ShapeID, int InternalBlockX, int InternalBlockY, NiColorA Color)
+{
+	auto obj = m_spGroundTerrain->GetAt(ShapeID);
+	if (NiIsKindOf(NiTriShape, obj))
+	{
+		NiTriShapePtr shape = NiSmartPointerCast(NiTriShape, obj);
+		NiGeometryDataPtr data = shape->GetModelData();
+		NiColorA* ColorArray = data->GetColors();
+
+		if (InternalBlockY <= 1)
+		{
+			if (InternalBlockX == 0 && InternalBlockY == 0)
+			{
+				ColorArray[0] = Color;
+				ColorArray[1] = Color;
+				ColorArray[2] = Color;
+				ColorArray[3] = Color;
+			}
+			if (InternalBlockX > 0)
+			{
+				ColorArray[3 + InternalBlockX * 2] = Color;
+				ColorArray[3 + InternalBlockX * 2 - 1] = Color;
+			}
+		}
+		else 
+		{
+			if (InternalBlockX == 0)
+			{
+				ColorArray[(_INI->GetQuadsWide() + 1) * InternalBlockY + InternalBlockX] = Color;
+			}
+			ColorArray[(_INI->GetQuadsWide() + 1) * InternalBlockY + InternalBlockX+1] = Color;
+
+		}
+
+		data->MarkAsChanged(NiGeometryData::COLOR_MASK);
+	}
+}
+void IngameWorld::CreateShadows(NiColorA Color, NiColorA SunLight)
+{
+	if (!HasHTD())
+		return;
+	NiPoint3 MiddlePoint = NiPoint3(_INI->GetMapWidth() * _INI->GetOneBlockWidht() / 2,
+		_INI->GetMapHeight() * _INI->GetOneBlockHeight() / 2, 
+		_HTD->GetMiddle()) + NiPoint3(250.f,0.f,0.f);
+	NiPoint3 SunVector = MiddlePoint - GetCamera()->GetTranslate();
+	SunVector.Unitize();
+	SunVector *= 25.f;
+
+	std::vector<bool> Shadowed(_INI->GetMapWidth() * _INI->GetMapHeight(),false);
+	std::vector<NiPoint3> Normals(_INI->GetMapWidth() * _INI->GetMapHeight(), NiPoint3::ZERO);
+	const float strength = 8.0f;
+	const float dZ = 1.0 / strength;
+
+	float MinH = std::numeric_limits<float>::max();
+
+	for (int w = 0; w < _INI->GetMapWidth(); w++)
+	{
+		for (int h = 0; h < _INI->GetMapHeight(); h++)
+		{
+			if (GetHTD(w, h) < MinH)
+				MinH = GetHTD(w, h);
+			float tl = GetHTD(w - 1, h - 1); // top left
+			float  l = GetHTD(w - 1, h);   // left
+			float bl = GetHTD(w - 1, h + 1); // bottom left
+			float  t = GetHTD(w, h - 1);   // top
+			float  b = GetHTD(w, h + 1);   // bottom
+			float tr = GetHTD(w + 1, h - 1); // top right
+			float  r = GetHTD(w + 1, h);   // right
+			float br = GetHTD(w + 1, h + 1); // bottom right
+
+			// sobel filter
+			const float dX = (tr + 2.0 * r + br) - (tl + 2.0 * l + bl);
+			const float dY = (bl + 2.0 * b + br) - (tl + 2.0 * t + tr);
+
+			NiPoint3 vec(dX, dY, dZ);
+			vec.Unitize();
+			vec.x += 1.f;
+			vec.y += 1.f;
+			vec.z += 1.f;
+			vec = vec / 2;
+			Normals[w + h * _INI->GetMapWidth()] = vec;
+
+		}
+	}
+	int RaysSent = 0;
+
+	int wStart = (SunVector.x < 0.0f) ? _INI->GetMapWidth() - 1 : 0;
+	int wEnd = (SunVector.x < 0.0f) ? -1 : _INI->GetMapWidth();
+	int wStep = (SunVector.x < 0.0f) ? -1 : 1;
+
+	int hStart = (SunVector.y < 0.0f) ? _INI->GetMapHeight() - 1 : 0;
+	int hEnd = (SunVector.y < 0.0f) ? -1 : _INI->GetMapHeight();
+	int hStep = (SunVector.y < 0.0f) ? -1 : 1;
+
+	for (int w = wStart; w != wEnd; w += wStep)
+	{
+		for (int h = hStart; h != hEnd; h += hStep)
+		{
+			if (!Shadowed[w + h * _INI->GetMapWidth()])
+			{
+				NiPoint3 CurPoint(w * 50.f + 25.f, h * 50.f + 25.f, GetHTD(w, h)); //We Start at the middle of the Point to make shit smoother
+				CalculateRay(CurPoint, SunVector, Shadowed, MinH);
+				RaysSent++;
+			}
+		}
+	}
+	PgUtil::MakePositiveVector(SunVector);
+
+	for (int w = 0; w < _INI->GetMapWidth(); w++)
+	{
+		for (int h = 0; h < _INI->GetMapHeight(); h++)
+		{
+			int OffSet = w + h * _INI->GetMapWidth();
+			auto FinalColor = Color * (Normals[OffSet].z + 1) / 2; //AmbientLight
+			if (!Shadowed[OffSet])
+			{
+				FinalColor = FinalColor + SunLight * Normals[OffSet].Dot(SunVector);
+			}
+			FinalColor.a = 1.f;
+			PgUtil::FixColor(FinalColor);
+			SetVertexColor(w, h, FinalColor); //Add SunLight if Not Shadowed
+
+		}
+	}
+}
+void IngameWorld::CalculateRay(NiPoint3& StartPoint, NiPoint3& SunVector, std::vector<bool>& Shadowed, float minh) 
+{
+	NiPoint3 ActivePoint = StartPoint;
+	if (SunVector.x == 0.0f && SunVector.y == 0.0f)
+		return;
+	const float invGridSize = 1.0f / 50.f;
+	int x = static_cast<int>(StartPoint.x * invGridSize);
+	int y = static_cast<int>(StartPoint.y * invGridSize);
+	float MinH = minh * 25.f;
+	int prevx = x;
+	int prevy = y;
+
+	while (true)
+	{
+		if (x != prevx || y != prevy)
+		{
+			if (x >= _INI->GetMapWidth() || x < 0 || y < 0 || y >= _INI->GetMapHeight() || GetHTD(x,y) > ActivePoint.z || ActivePoint.z < MinH)
+				return;
+
+			Shadowed[x + y *_INI->GetMapWidth()] = true;
+			prevx = x;
+			prevy = y;
+		}
+		ActivePoint += SunVector;
+		x = static_cast<int>(ActivePoint.x * invGridSize);
+		y = static_cast<int>(ActivePoint.y * invGridSize);
+	}
 }

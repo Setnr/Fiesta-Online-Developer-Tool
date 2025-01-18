@@ -281,8 +281,34 @@ void ShineIni::CreateEmpty(MapInfo* Info, int MapSize)
 		pixels[i] = 0xFF;
 	}
 }
+void ShineIni::SetColor(int w, int h, NiColorA Color) 
+{
+	NiPixelFormat format = VertexShadowImage->GetPixelFormat();
+	if (format == NiPixelFormat::RGB24)
+	{
+		TerrainLayerData::RGBColor* VertexColorArray = NULL;
+		VertexColorArray = (TerrainLayerData::RGBColor*)VertexShadowImage->GetPixels();
+
+		VertexColorArray[w + (VertexShadowImage->GetHeight() - h - 1) * VertexShadowImage->GetWidth()] = TerrainLayerData::RGBColor(Color);
+	}
+	else
+	{
+		if (format == NiPixelFormat::RGBA32)
+		{
+			TerrainLayerData::RGBAColor* VertexColorArrayA = NULL;
+			VertexColorArrayA = (TerrainLayerData::RGBAColor*)VertexShadowImage->GetPixels();
+			VertexColorArrayA[w + (VertexShadowImage->GetHeight() - h - 1) * VertexShadowImage->GetWidth()] = TerrainLayerData::RGBAColor(Color);;
+		}
+		else
+		{
+			LogError("Not Supported NiPixelFormat for VertexColorTexture");
+		}
+	}
+}
 NiColorA ShineIni::GetColor(int w, int h) 
 {
+	if (w < 0 || h < 0 || w >= VertexShadowImage->GetWidth() || h >= VertexShadowImage->GetHeight())
+		return NiColorA::WHITE;
 	NiPixelFormat format = VertexShadowImage->GetPixelFormat();
 	if (format == NiPixelFormat::RGB24)
 	{
@@ -310,7 +336,9 @@ NiColorA ShineIni::GetColor(int w, int h)
 }
 void TerrainLayerData::SetColor(int w, int h, float Color)
 {
-	NiPixelFormat format = *this->BlendTexture->GetPixelFormat();
+	if (w < 0 || h < 0 || w >= BlendTexture->GetWidth() || h >= BlendTexture->GetHeight())
+		return;
+	const NiPixelFormat* format = BlendTexture->GetPixelFormat();
 
 	NiPixelDataPtr data = BlendTexture->GetSourcePixelData();
 	int XPart = w ;
@@ -319,12 +347,41 @@ void TerrainLayerData::SetColor(int w, int h, float Color)
 	int YPartNormal = PreFullLines;
 	int PointOffsetNormal = XPart + YPartNormal; 
 
+	auto VertexColorArray = data->GetPixels();
+
+	unsigned char* pixlptr = data->operator()(w, h);
+	if (!pixlptr)
+		return;
+	format->GetMask(NiPixelFormat::Component::COMP_RED);
+	for (int i = 0; i < format->GetBitsPerPixel() / 8; i++)
+	{
+		pixlptr[i] = static_cast<unsigned char>(Color * 255.f);
+	}
+
+}
+
+float TerrainLayerData::GetColor(int w, int h)
+{
+	if (w < 0 || h < 0 || w >= BlendTexture->GetWidth() || h >= BlendTexture->GetHeight())
+		return 0.f;
+	NiPixelFormat format = *this->BlendTexture->GetPixelFormat();
+
+	NiPixelDataPtr data = BlendTexture->GetSourcePixelData();
+	int XPart = w;
+
+	int PreFullLines = BlendTexture->GetWidth() * h;
+	int YPartNormal = PreFullLines;
+	int PointOffsetNormal = XPart + YPartNormal;
+
+	float Color = 0.f;
+
 	if (format.GetFormat() == NiPixelFormat::RGB24.GetFormat())
 	{
 		TerrainLayerData::RGBColor* VertexColorArray = NULL;
 		VertexColorArray = (TerrainLayerData::RGBColor*)data->GetPixels();
 
-		VertexColorArray[PointOffsetNormal] = TerrainLayerData::RGBColor(Color);
+		auto col = VertexColorArray[PointOffsetNormal];
+		Color = static_cast<float>(col.r) / 255.f;
 	}
 	else
 	{
@@ -332,15 +389,16 @@ void TerrainLayerData::SetColor(int w, int h, float Color)
 		{
 			TerrainLayerData::RGBAColor* VertexColorArrayA = NULL;
 			VertexColorArrayA = (TerrainLayerData::RGBAColor*)data->GetPixels();
-			VertexColorArrayA[PointOffsetNormal] = TerrainLayerData::RGBAColor(Color);
+			auto col = VertexColorArrayA[PointOffsetNormal];
+			Color = static_cast<float>(col.r) / 255.f;
 		}
 		else
 		{
 			LogError("Not Supported NiPixelFormat for BlendTexture");
-			return;
+			return 0.f;
 		}
 	}
-	data->MarkAsChanged();
+	return Color;
 }
 void ShineIni::AddLayer(std::shared_ptr<TerrainLayerData> Layer) 
 {

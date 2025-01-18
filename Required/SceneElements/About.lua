@@ -40,7 +40,7 @@ function render(ElementPtr)
             Text("Move Camera with WASD");
             Text("Rotate Camera with Right Click");
             Text("Move Up/Down with Q/E");
-            Text("Scroll to resize Brush");
+            Text("Scrollt + alt to Resize Brush")
             Text("F1 to Show/Hide SHMD-Objects");
             EndTabWindow()
         end
@@ -48,7 +48,7 @@ function render(ElementPtr)
             Text("Move Camera with WASD");
             Text("Rotate Camera with Right Click");
             Text("Move Up/Down with Q/E");
-            Text("Scroll to resize Brush");
+            Text("Scrollt + alt to Resize Brush")
             Text("F1 to Show/Hide SHMD-Objects");
             EndTabWindow()
         end
@@ -56,7 +56,7 @@ function render(ElementPtr)
             Text("Move Camera with WASD");
             Text("Rotate Camera with Right Click");
             Text("Move Up/Down with Q/E");
-            Text("Scroll to resize Brush");
+            Text("Scrollt + alt to Resize Brush")
             Text("Copy the Color of the Current Hovered Vertex ctrl + c");
             Text("F1 to Show/Hide SHMD-Objects");
             EndTabWindow()

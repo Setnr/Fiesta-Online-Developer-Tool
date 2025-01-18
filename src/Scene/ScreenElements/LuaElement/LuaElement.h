@@ -20,6 +20,7 @@ public:
 		if (lua_pcallk(Script, 1, 0, 0, 0, 0))
 			LogLua(_FileName, lua_tostring(Script, -1));
 	}
+
 private:
 	EditorScenePtr _Scene;
 

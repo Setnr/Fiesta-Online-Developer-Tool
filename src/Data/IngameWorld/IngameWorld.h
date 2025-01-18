@@ -159,8 +159,16 @@ public:
 		m_spGroundTerrain->UpdateEffects();
 		m_spGroundTerrain->Update(0.f);
 	}
+	void SetVertexColor(int w, int h, NiColorA Color);
+	NiColorA GetVertexColor(int w, int h) {
+		return _INI->GetColor(w, h);
+	}
+	void CreateShadows(NiColorA Color, NiColorA SunLight);
+	void CalculateRay(NiPoint3& StartPoint, NiPoint3& SunVector, std::vector<bool>& Shadowed, float minh);
+	
 private:
 
+	void SetVertexColorInternal(int ShapeID, int InternalBlockX, int InternalBlockY, NiColorA Color);
 	ShineBlockDataPtr _SHBD;
 	ShineMapDataPtr _SHMD;
 	ShineIniPtr _INI;

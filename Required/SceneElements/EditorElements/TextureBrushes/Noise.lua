@@ -42,7 +42,6 @@ DomainWarpType = {
 }
 
 BrushData = { 
-    Height = 10.0,
     Seed = 195201418,
     Frequency = 0.01,
     NoiseType = NoiseType.Perlin.Name,
@@ -89,7 +88,6 @@ function render(BrushPtr)
         end
     end
 
-    changed, BrushData.Height = DragFloat(BrushData["Height"],"Brush Height",0.01,-5000,5000)
     BrushData.Seed = ShowEntry(BrushPtr, BrushData.Seed,"Seed", 1.0, math.mininteger, math.maxinteger,SetNoiseSeed,DragInt)
     BrushData.Frequency = ShowEntry(BrushPtr, BrushData.Frequency,"Frequency", 0.01,-2.0, 2.0,SetNoiseFrequency,DragFloat)
     BrushData.NoiseType = ShowTable("NoiseType",NoiseType,BrushData.NoiseType, SetNoiseType,BrushPtr)
@@ -127,7 +125,7 @@ end
 function ShowEntry(BrushPtr, value,name, step,min,max, SetFunc,DragFunc)
     local c, v = DragFunc(value,name,step,min, max)
     if c then
-        SetFunc(BrushPtr, value)
+        SetFunc(BrushPtr, v)
         if HasNoise(BrushPtr) then
             CreateTexture(BrushPtr, 350)
         end
@@ -142,12 +140,12 @@ function algorithm(MiddleW,MiddleH, z, SizeW, SizeH ,BrushSize,WorldPtr, BrushPt
                 if h >= 0 and h < SizeH then
                     if (((w - MiddleW) * (w - MiddleW) + (h - MiddleH) * (h - MiddleH) <= BrushSize * BrushSize)) then
                         noise = (GetNoiseValue(BrushPtr,w ,h ) + 1.0) / 2.0
-                        
                         SetTextureColor(BrushData.layer,w,h,noise)
                     end
                 end
             end
         end
     end
+    MarkAsChanged(BrushData.layer)
 end
 

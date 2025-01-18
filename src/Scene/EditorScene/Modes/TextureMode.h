@@ -19,15 +19,19 @@ class TextureMode : public TerrainBrushMode
 		_Data = NULL;
 		_ScreenElement = NULL;
 	}
-
+	virtual void Update(float fTime);
 	virtual void ProcessInput();
 	void DrawLayers();
 	virtual std::string GetEditModeName() { return "Texture"; }
-	void SaveSelectedLayer();
+	void SaveSelectedLayer(); 
+	void UpdateCurrentLayer(std::shared_ptr < TerrainLayerData> layer);
+
 
 private:
 
+	
 	std::shared_ptr<TerrainLayerData> _CurrentLayer;
 	NiPixelDataPtr _Data;
 	NiScreenElementsPtr _ScreenElement;
+	NiScreenElementsPtr _TexturePreview;
 };

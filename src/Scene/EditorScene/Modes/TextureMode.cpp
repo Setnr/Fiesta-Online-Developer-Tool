@@ -18,19 +18,34 @@ void TextureMode::ProcessInput()
 	TerrainBrushMode::ProcessInput();
 	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 	{
-		_Data = NiNew NiPixelData(*_CurrentLayer->BlendTexture->GetSourcePixelData());
-		_Update = true;
+		if(_CurrentLayer)
+		{
+			_Data = NiNew NiPixelData(*_CurrentLayer->BlendTexture->GetSourcePixelData());
+			_Update = true;
+		}
 		
 	}
 	if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
 	{
-		NiPixelDataPtr NewData = NiNew NiPixelData(*_CurrentLayer->BlendTexture->GetSourcePixelData());
-		_Update = false;
-		TextureChangePtr Change = NiNew TextureChange(_CurrentLayer, _Data, NewData);
-		kWorld->AttachStack(NiSmartPointerCast(WorldChange, Change));
+		if (_CurrentLayer)
+		{
+			NiPixelDataPtr NewData = NiNew NiPixelData(*_CurrentLayer->BlendTexture->GetSourcePixelData());
+			_Update = false;
+			TextureChangePtr Change = NiNew TextureChange(_CurrentLayer, _Data, NewData);
+			kWorld->AttachStack(NiSmartPointerCast(WorldChange, Change));
+		}
 	}
 }
-
+void TextureMode::Update(float fTime)
+{
+	if (_CurrentBrush && NiIsKindOf(LuaBrush, _CurrentBrush) && _CurrentLayer)
+	{
+		LuaBrushPtr ptr = NiSmartPointerCast(LuaBrush, _CurrentBrush);
+		ptr->SetPointer((long long)_CurrentLayer.get(), "SetLayer");
+	}
+	
+	TerrainBrushMode::Update(fTime);
+}
 void TextureMode::DrawLayers() 
 {
 
@@ -52,9 +67,7 @@ void TextureMode::DrawLayers()
 	}
 	if (ImGui::Button("Add New Layer"))
 	{
-		_CurrentLayer = _Ini->CreateNewLayer(kWorld->GetMapInfo());
-		_ScreenElement = PgUtil::CreateScreenElement(_CurrentLayer->BlendTexture->GetWidth(), _CurrentLayer->BlendTexture->GetHeight(), _CurrentLayer->BlendTexture);
-		_CurrentLayer->BlendTexture->SetStatic(false);
+		UpdateCurrentLayer(_Ini->CreateNewLayer(kWorld->GetMapInfo()));
 
 		kWorld->AttachStack(NiNew LayerAdd(kWorld, _CurrentLayer));
 		kWorld->ShowTerrain(kWorld->GetShowTerrain());
@@ -74,6 +87,8 @@ void TextureMode::DrawLayers()
 				LayerList[i] = LayerList[i - 1];
 				LayerList[i - 1] = layer;
 			}
+			kWorld->AttachStack(NiNew LayerAdd(kWorld, _CurrentLayer));
+			kWorld->ShowTerrain(kWorld->GetShowTerrain());
 		}
 		ImGui::SameLine();
 		if (ImGui::ArrowButton((layer->Name + "Down").c_str(), ImGuiDir_Down))
@@ -83,18 +98,13 @@ void TextureMode::DrawLayers()
 				LayerList[i] = LayerList[i + 1];
 				LayerList[i + 1] = layer;
 			}
+			kWorld->AttachStack(NiNew LayerAdd(kWorld, _CurrentLayer));
+			kWorld->ShowTerrain(kWorld->GetShowTerrain());
 		}
 		ImGui::SameLine();
 		if (ImGui::Selectable(layer->Name.c_str(), layer == _CurrentLayer))
 		{
-			_CurrentLayer = layer;
-			if (NiIsKindOf(LuaBrush, _CurrentBrush) && _CurrentLayer)
-			{
-				LuaBrushPtr ptr = NiSmartPointerCast(LuaBrush, _CurrentBrush);
-				ptr->SetPointer((long long)_CurrentLayer.get(), "SetLayer");
-			}
-			_ScreenElement = PgUtil::CreateScreenElement(_CurrentLayer->BlendTexture->GetWidth(), _CurrentLayer->BlendTexture->GetHeight(), _CurrentLayer->BlendTexture);
-			layer->BlendTexture->SetStatic(false);
+			UpdateCurrentLayer(layer);
 		}
 		
 	}
@@ -110,7 +120,7 @@ void TextureMode::DrawLayers()
 		msg += _CurrentLayer->DiffuseFileName;
 		if (ImGui::Selectable(msg.c_str(), false))
 		{
-			auto element = NiNew LoadDiffuseFile(_CurrentLayer, kWorld);
+			auto element = NiNew LoadDiffuseFile(_CurrentLayer, kWorld,this);
 			ScreenElements.push_back(element);
 		}
 		ImGui::DragFloat("StartPos_X", &_CurrentLayer->StartPos_X);
@@ -132,11 +142,6 @@ void TextureMode::DrawLayers()
 			if (ImGui::Selectable(brush->GetBrushName().c_str(), &s))
 			{
 				_CurrentBrush = brush;
-				if (NiIsKindOf(LuaBrush, _CurrentBrush) && _CurrentLayer)
-				{
-					LuaBrushPtr ptr = NiSmartPointerCast(LuaBrush, _CurrentBrush);
-					ptr->SetPointer((long long)_CurrentLayer.get(), "SetLayer");
-				}
 			}
 		}
 		ImGui::EndChild();
@@ -152,26 +157,51 @@ void TextureMode::DrawLayers()
 
 	auto& io = ImGui::GetIO();
 
-	if (!_ScreenElement)
-		return;
-	unsigned int Width = _CurrentLayer->BlendTexture->GetWidth();
-	unsigned int Height = _CurrentLayer->BlendTexture->GetHeight();
+	if (_ScreenElement)
+	{
+		unsigned int Width = _CurrentLayer->BlendTexture->GetWidth();
+		unsigned int Height = _CurrentLayer->BlendTexture->GetHeight();
 
-	float fLeft = (WindowPos.x +Size.x- Width) / io.DisplaySize.x;
-	float fTop = (WindowPos.y - Height) / io.DisplaySize.y;
+		float fLeft = (WindowPos.x + Size.x - Width) / io.DisplaySize.x;
+		float fTop = (WindowPos.y - Height) / io.DisplaySize.y;
 
-	float fBottom = fTop + (Height / io.DisplaySize.y);
-	float fRight = fLeft + (Width / io.DisplaySize.x);
+		float fBottom = fTop + (Height / io.DisplaySize.y);
+		float fRight = fLeft + (Width / io.DisplaySize.x);
 
-	_ScreenElement->SetVertex(0, 0, NiPoint2(fLeft, fBottom));
-	_ScreenElement->SetVertex(0, 1, NiPoint2(fRight, fBottom));
-	_ScreenElement->SetVertex(0, 2, NiPoint2(fRight, fTop));
-	_ScreenElement->SetVertex(0, 3, NiPoint2(fLeft, fTop));
-	_ScreenElement->UpdateBound();
+		_ScreenElement->SetVertex(0, 0, NiPoint2(fLeft, fBottom));
+		_ScreenElement->SetVertex(0, 1, NiPoint2(fRight, fBottom));
+		_ScreenElement->SetVertex(0, 2, NiPoint2(fRight, fTop));
+		_ScreenElement->SetVertex(0, 3, NiPoint2(fLeft, fTop));
+		_ScreenElement->UpdateBound();
+	}
+	if (_TexturePreview) 
+	{
+		unsigned int Width = 127;
+		unsigned int Height = 127;
+
+		float fLeft = (WindowPos.x - Width) / io.DisplaySize.x;
+		float fTop = (WindowPos.y + Size.y - Height) / io.DisplaySize.y;
+
+		float fBottom = fTop + (Height / io.DisplaySize.y);
+		float fRight = fLeft + (Width / io.DisplaySize.x);
+
+		_TexturePreview->SetVertex(0, 0, NiPoint2(fLeft, fBottom));
+		_TexturePreview->SetVertex(0, 1, NiPoint2(fRight, fBottom));
+		_TexturePreview->SetVertex(0, 2, NiPoint2(fRight, fTop));
+		_TexturePreview->SetVertex(0, 3, NiPoint2(fLeft, fTop));
+		_TexturePreview->UpdateBound();
+
+	}
+
 
 	auto renderer = FiestaOnlineTool::GetRenderer();
 	if (renderer)
-		_ScreenElement->Draw(renderer);
+	{
+		if(_ScreenElement)
+			_ScreenElement->Draw(renderer);
+		if (_TexturePreview)
+			_TexturePreview->Draw(renderer);
+	}
 }
 
 void TextureMode::SaveSelectedLayer() 
@@ -179,4 +209,12 @@ void TextureMode::SaveSelectedLayer()
 	if (!_CurrentLayer)
 		return;
 	PgUtil::SaveTexture(PgUtil::PathFromClientFolder(_CurrentLayer->BlendFileName), _CurrentLayer->BlendTexture);
+}
+
+void TextureMode::UpdateCurrentLayer(std::shared_ptr < TerrainLayerData> layer) 
+{
+	_CurrentLayer = layer;
+	_ScreenElement = PgUtil::CreateScreenElement(_CurrentLayer->BlendTexture);
+	_TexturePreview = PgUtil::CreateScreenElement(127,127,_CurrentLayer->BaseTexture);
+	layer->BlendTexture->SetStatic(false);
 }

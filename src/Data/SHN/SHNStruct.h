@@ -1208,6 +1208,7 @@ struct WorldMapAvatarInfo : SHNRow {
 #define ShowNumber(Col,Variable) ImGui::TableSetColumnIndex(Col);ImGui::Text(std::to_string(Variable).c_str())
 #define ShowText(Col,Variable) ImGui::TableSetColumnIndex(Col);ImGui::Text(Variable)
 #if SHN2k16
+#pragma pack(push,1)
 struct MapInfo : SHNRow
 {
 
@@ -1239,4 +1240,5 @@ struct MapInfo : SHNRow
 		ImGui::TableSetColumnIndex(10);
 	}
 };
+#pragma pack(pop)
 #endif

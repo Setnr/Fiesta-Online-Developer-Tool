@@ -138,7 +138,7 @@ end
 function ShowEntry(BrushPtr, value,name, step,min,max, SetFunc,DragFunc)
     local c, v = DragFunc(value,name,step,min, max)
     if c then
-        SetFunc(BrushPtr, value)
+        SetFunc(BrushPtr, v)
         if HasNoise(BrushPtr) then
             CreateTexture(BrushPtr, 350)
         end

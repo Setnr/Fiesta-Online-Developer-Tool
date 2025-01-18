@@ -23,4 +23,7 @@ public:
 	static void LookAndMoveAtWorldPoint(NiCameraPtr Camera, NiPoint3 Point);
 	static NiCamera* CreateNewCamera();
 	static NiScreenElements* CreateScreenElement(float width, float height, NiSourceTexturePtr texture);
+	static NiScreenElements* CreateScreenElement(NiSourceTexturePtr texture);
+	static void MakePositiveVector(NiPoint3& Vector);
+	static void FixColor(NiColorA& Color);
 };

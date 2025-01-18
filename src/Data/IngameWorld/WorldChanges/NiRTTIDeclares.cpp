@@ -14,6 +14,7 @@ NiImplementRTTI(TextureChange, WorldChange);
 NiImplementRTTI(LayerDiffuseChange, WorldChange);
 NiImplementRTTI(LayerAdd, WorldChange);
 NiImplementRTTI(LayerDelete, WorldChange);
+NiImplementRTTI(VertexColorChange, WorldChange);
 
 NiImplementRTTI(FogChangeColor, ChangeNiColor);
 NiImplementRTTI(ChangeDirectionalAmbientLightColor, ChangeNiColor);

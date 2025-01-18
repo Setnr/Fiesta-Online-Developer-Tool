@@ -9,12 +9,12 @@ NiImplementRTTI(HTDGMode, TerrainBrushMode);
 void HTDGMode::ProcessInput() 
 {
 	TerrainBrushMode::ProcessInput();
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && kWorld->HasHTD())
 	{
 		_Data = *kWorld->GetHTD();
 		_Update = true;
 	}
-	if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+	if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && kWorld->HasHTD())
 	{
 		auto NewData = *kWorld->GetHTD();
 

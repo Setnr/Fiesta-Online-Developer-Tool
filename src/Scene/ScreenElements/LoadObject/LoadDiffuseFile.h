@@ -7,11 +7,12 @@
 #include "AddSingleObject.h"
 #include "FiestaOnlineTool.h"
 #include <Data/IngameWorld/WorldChanges/FogChange.h>
+#include <Scene/EditorScene/Modes/TextureMode.h>
 class LoadDiffuseFile : public ScreenElement
 {
 	NiDeclareRTTI;
 public:
-	LoadDiffuseFile(std::shared_ptr<TerrainLayerData> Layer, IngameWorldPtr World) : _FileBrowser(ImGuiFileBrowserFlags_NoTitleBar | ImGuiFileBrowserFlags_CloseOnEsc | ImGuiFileBrowserFlags_NoModal)
+	LoadDiffuseFile(std::shared_ptr<TerrainLayerData> Layer, IngameWorldPtr World, TextureModePtr Mode) : _FileBrowser(ImGuiFileBrowserFlags_NoTitleBar | ImGuiFileBrowserFlags_CloseOnEsc | ImGuiFileBrowserFlags_NoModal)
 	{
 		_Layer = Layer;
 		_World = World;
@@ -19,6 +20,7 @@ public:
 		_FileBrowser.Open();
 		_FileBrowser.SetPwd(AddSingleObject::GetInitPath());
 		_FileBrowser.SetTypeFilters({ ".bmp", ".dds"});
+		_Mode = Mode;
 		
 	}
 	virtual bool Draw()
@@ -45,12 +47,13 @@ public:
 		{
 			auto ClientPath = PgUtil::PathFromClientFolder("");
 			std::string OldFile = _Layer->DiffuseFileName;
-			_Layer->DiffuseFileName = "./" + CurPath.substr(ClientPath.length());
+			_Layer->DiffuseFileName = "." + CurPath.substr(ClientPath.length());
 			_Layer->LoadDiffuseFile();
 			AddSingleObject::SetInitPath(_FileBrowser.GetPwd().string());
 
-			_World->AttachStack(NiNew LayerDiffuseChange(_World, _Layer, OldFile,_Layer->DiffuseFileName));
+			_World->AttachStack(NiNew LayerDiffuseChange(_World, _Layer, OldFile,_Layer->DiffuseFileName, _Mode));
 			_World->ShowTerrain(_World->GetShowTerrain());
+			_Mode->UpdateCurrentLayer(_Layer);
 			return false;
 		}
 		if(_ScreenElement)
@@ -89,5 +92,6 @@ private:
 	std::shared_ptr<TerrainLayerData> _Layer;
 	NiScreenElementsPtr _ScreenElement;
 	NiSourceTexturePtr _Texture;
+	TextureModePtr _Mode;
 };
 

@@ -2,6 +2,7 @@
 #include <NiRTTI.h>
 #include "WorldChanges.h"
 #include <Data/IngameWorld/IngameWorld.h>
+#include <Scene/EditorScene/Modes/TextureMode.h>
 NiSmartPointer(ChangeNiColor);
 class ChangeNiColor : public WorldChange
 {
@@ -514,30 +515,34 @@ class LayerDiffuseChange : public WorldChange
 {
 public:
 	NiDeclareRTTI;
-	LayerDiffuseChange(IngameWorldPtr World, std::shared_ptr<TerrainLayerData> Layer, std::string From, std::string To)
+	LayerDiffuseChange(IngameWorldPtr World, std::shared_ptr<TerrainLayerData> Layer, std::string From, std::string To, TextureModePtr Mode)
 	{
 		_World = World;
 		_Layer = Layer;
 		_From = From;
 		_To = To;
+		_Mode = Mode;
 	}
 	virtual void Undo()
 	{
 		_Layer->DiffuseFileName = _From;
 		_Layer->LoadDiffuseFile();
 		_World->ShowTerrain(_World->GetShowTerrain());
+		_Mode->UpdateCurrentLayer(_Layer);
 	};
 	virtual void Redo()
 	{
 		_Layer->DiffuseFileName = _To;
 		_Layer->LoadDiffuseFile();
 		_World->ShowTerrain(_World->GetShowTerrain());
+		_Mode->UpdateCurrentLayer(_Layer);
 	};
 	bool ExtraCheck(WorldChangePtr NewObject) { return true; }
 protected:
 	IngameWorldPtr _World;
 	std::shared_ptr<TerrainLayerData> _Layer;
 	std::string _From, _To;
+	TextureModePtr _Mode;
 };
 
 NiSmartPointer(LayerAdd);
@@ -590,4 +595,31 @@ public:
 protected:
 	IngameWorldPtr _World;
 	std::shared_ptr<TerrainLayerData> _Layer;
+};
+
+NiSmartPointer(VertexColorChange);
+class VertexColorChange : public WorldChange
+{
+public:
+	NiDeclareRTTI;
+	VertexColorChange(IngameWorldPtr World, NiPixelDataPtr From, NiPixelDataPtr To)
+	{
+		kWorld = World;
+		_From = From;
+		_To = To;
+	}
+	virtual void Undo()
+	{
+		kWorld->GetShineIni()->SetVertexImage(_From);
+		kWorld->ShowTerrain(kWorld->GetShowTerrain());
+	};
+	virtual void Redo()
+	{
+		kWorld->GetShineIni()->SetVertexImage(_To);
+		kWorld->ShowTerrain(kWorld->GetShowTerrain());
+	};
+	bool ExtraCheck(WorldChangePtr NewObject) { return true; }
+protected:
+	IngameWorldPtr kWorld;
+	NiPixelDataPtr _From, _To;
 };

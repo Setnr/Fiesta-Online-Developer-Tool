@@ -16,7 +16,7 @@ int LogFromLua(lua_State* Script)
 	//}
 	if (lua_isstring(Script, 1))
 	{
-		LogLua("",lua_tostring(Script, 1));
+		LogWarning(lua_tostring(Script, 1));
 	}
 	return 0;
 }
@@ -227,7 +227,7 @@ int MakeNoCollapse(lua_State* Script)
 	return 0;
 }
 int DragFloat(lua_State* Script)
-{
+{  
 	if (lua_isnumber(Script, 1) && lua_isstring(Script, 2)
 		&& lua_isnumber(Script, 3) && lua_isnumber(Script, 4) && lua_isnumber(Script, 5))
 	{
@@ -240,7 +240,7 @@ int DragFloat(lua_State* Script)
 		bool changed = ImGui::DragFloat(name, &number, Speed, Min, Max);
 		lua_pushboolean(Script, changed);
 		lua_pushnumber(Script, number);
-		return 2;
+		return 2; 
 	}
 	return 0;
 }
@@ -809,7 +809,7 @@ int CheckBox(lua_State* Script)
 		auto changed = ImGui::Checkbox(name, &active);
 		lua_pushboolean(Script, changed);
 		return 1;
-	}
+	} 
 	return 0;
 }
 int GetSnapMoveStep(lua_State* Script)
@@ -997,7 +997,7 @@ int SetHTD(lua_State* Script)
 	return 0; 
 }
 int GetHTD(lua_State* Script)
-{
+{  
 	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2)
 		&& lua_isinteger(Script, 3))
 	{
@@ -1006,7 +1006,7 @@ int GetHTD(lua_State* Script)
 		int h = lua_tointeger(Script, 3);
 		lua_pushnumber(Script,world->GetHTD(w, h));
 		return 1;
-	}
+	}     
 	return 0; 
 }
 int GetCurrentClientTime(lua_State* Script) 
@@ -1045,7 +1045,7 @@ int SetNoiseSeed(lua_State* Script)
 	return 0;
 }
 int SetNoiseFrequency(lua_State* Script)
-{
+{  
 	if (lua_isinteger(Script, 1) && lua_isnumber(Script, 2))
 	{
 		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
@@ -1055,10 +1055,11 @@ int SetNoiseFrequency(lua_State* Script)
 			NiFastNoiseLitePtr noise = luabrush->GetNoise();
 			if (noise)
 			{
-				noise->SetFrequency(lua_tonumber(Script, 2));
+				lua_Number n = lua_tonumber(Script, 2);
+				noise->SetFrequency(static_cast<float>(n));
 			}
 		}
-	}
+	} 
 	return 0;
 }
 int SetNoiseType(lua_State* Script)
@@ -1081,7 +1082,7 @@ int SetNoiseType(lua_State* Script)
 int SetFractalType(lua_State* Script)
 {
 	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2))
-	{
+	{ 
 		BrushPtr brush = (Brush*)lua_tointeger(Script, 1);
 		if (NiIsKindOf(LuaBrush, brush))
 		{
@@ -1091,8 +1092,8 @@ int SetFractalType(lua_State* Script)
 			{
 				noise->SetFractalType((FastNoiseLite::FractalType)lua_tointeger(Script, 2));
 			}
-		}
-	}
+		} 
+	} 
 	return 0;
 }
 int SetNoiseOctaves(lua_State* Script)
@@ -1318,7 +1319,7 @@ int Combo(lua_State* Script)
 	lua_pushboolean(Script, changed);
 	lua_pushstring(Script, "");
 	lua_pushinteger(Script, 0);
-	return 3;
+	return 3; 
 }
 int RandomInt(lua_State* Script) 
 {
@@ -1467,7 +1468,108 @@ int ReloadProperties(lua_State* Script)
 	}
 	return 0;
 }
+int GetTextureColor(lua_State* Script)
+{    
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2) && lua_isinteger(Script, 3) )
+	{
+		TerrainLayerData* layer = (TerrainLayerData*)lua_tointeger(Script, 1);
+		int w = lua_tointeger(Script, 2);
+		int h = lua_tointeger(Script, 3);
+		float Color = layer->GetColor(w, h);
+		lua_pushnumber(Script, Color);
+		return 1;
+		 
+	}
+	return 0;
+}
+int MarkAsChanged(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) )
+	{
+		TerrainLayerData* layer = (TerrainLayerData*)lua_tointeger(Script, 1);
+		layer->MarkAsChanged();
+	}
+	return 0;
+}
+int VertexColorPick(lua_State* Script)
+{ 
+	if (lua_isnumber(Script, 1) && lua_isnumber(Script, 2) 
+		&& lua_isnumber(Script, 3) && lua_isstring(Script, 4))
+	{
+		float Color[3];
+		for(int i = 0; i < 3; i++)
+			Color[i] = lua_tonumber(Script, i + 1);
+		bool c = ImGui::ColorPicker3(lua_tostring(Script, 4), Color);
+		lua_pushboolean(Script, c);
+		for (int i = 0; i < 3; i++)
+			lua_pushnumber(Script, Color[i]);
+		return 4;
+	}
+	return 0; 
+}
+int SetVertexColor(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2) && lua_isinteger(Script, 3)
+		&& lua_isnumber(Script,4) && lua_isnumber(Script, 5) && lua_isnumber(Script, 6))
+	{ 
+		IngameWorldPtr world = (IngameWorld*)lua_tointeger(Script, 1);
+		int w = lua_tointeger(Script, 2);
+		int h = lua_tointeger(Script, 3);
+		NiColorA Color(lua_tonumber(Script, 4), lua_tonumber(Script, 5), lua_tonumber(Script, 6), 1.0f);
+		world->SetVertexColor(w, h, Color);
 
+	}
+	return 0;
+}
+int SetSoftVertexColor(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2) && lua_isinteger(Script, 3)
+		&& lua_isnumber(Script, 4) && lua_isnumber(Script, 5) && lua_isnumber(Script, 6)
+		&& lua_isnumber(Script, 7))  
+	{
+		IngameWorldPtr world = (IngameWorld*)lua_tointeger(Script, 1);
+		int w = lua_tointeger(Script, 2);
+		int h = lua_tointeger(Script, 3);
+		NiColorA color(static_cast<float>(lua_tonumber(Script, 4)), lua_tonumber(Script, 5), lua_tonumber(Script, 6), lua_tonumber(Script, 7));
+		NiColorA VertexColor = world->GetVertexColor(w, h);
+		NiColorA col = color * ( color.a) + VertexColor * (1.f - color.a);
+		world->SetVertexColor(w, h, col);
+
+	}
+	return 0;
+}
+int GetVertexColor(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script, 2) && lua_isinteger(Script, 3))
+	{
+		IngameWorldPtr world = (IngameWorld*)lua_tointeger(Script, 1);
+		int w = lua_tointeger(Script, 2);
+		int h = lua_tointeger(Script, 3);
+		
+		auto Color = world->GetVertexColor(w, h);
+		lua_pushnumber(Script, Color.r);
+		lua_pushnumber(Script, Color.g);
+		lua_pushnumber(Script, Color.b);
+		return 3;
+
+	}
+	return 0;    
+}
+int CreateShadow(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isnumber(Script, 2) && lua_isnumber(Script, 3) && lua_isnumber(Script, 4)
+		&& lua_isnumber(Script, 5) && lua_isnumber(Script, 6) && lua_isnumber(Script, 7))
+	{
+		IngameWorldPtr world = (IngameWorld*)lua_tointeger(Script, 1);
+		
+		NiColorA color(lua_tonumber(Script, 2), lua_tonumber(Script, 3), lua_tonumber(Script, 4), 1.f);
+		NiColorA color2(lua_tonumber(Script, 5), lua_tonumber(Script, 6), lua_tonumber(Script, 7), 1.f);
+		world->CreateShadows(color,color2);
+		
+
+	}
+	return 0;
+}
 void SetFunctions(lua_State* Script)
 {
 	lua_pushcclosure(Script, LogFromLua, 0);
@@ -1622,7 +1724,14 @@ void SetFunctions(lua_State* Script)
 	lua_register(Script, "RenderLayers", RenderLayers);
 	lua_register(Script, "TextureColorPick", TextureColorPick);
 	lua_register(Script, "SetTextureColor", SetTextureColor);
+	lua_register(Script, "GetTextureColor", GetTextureColor);
 	lua_register(Script, "SaveLayer", SaveLayer);
 	lua_register(Script, "ReloadProperties", ReloadProperties);
-	
+	lua_register(Script, "MarkAsChanged", MarkAsChanged);
+
+	lua_register(Script, "VertexColorPick", VertexColorPick);
+	lua_register(Script, "SetVertexColor", SetVertexColor);
+	lua_register(Script, "SetSoftVertexColor", SetSoftVertexColor);
+	lua_register(Script, "GetVertexColor", GetVertexColor);
+	lua_register(Script, "CreateShadow", CreateShadow);
 } 

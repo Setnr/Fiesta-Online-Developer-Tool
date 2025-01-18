@@ -11,6 +11,7 @@ LuaBrush::LuaBrush(std::string FileName) : _FileName(FileName)
 	if (luaL_loadfilex(Script, FileName.c_str(), 0))
 	{
 		LogLua(_FileName, lua_tostring(Script, -1));
+		
 	}
 	else 
 	{
@@ -55,15 +56,15 @@ void LuaBrush::RunAlgorithm(int middelw, int middleh,float z, int SizeW, int Siz
 
 void LuaBrush::RecreateHTD(IngameWorldPtr world, float MapHeight)
 {
-	if (!_Noise)
+	if (!_Noise || !world->HasHTD())
 		return;
 	HeightTerrainData _OldData = *world->GetHTD(); 
 	HeightTerrainDataPtr data = world->GetHTD();
 	auto ini = world->GetShineIni();
-	data->ResizeHTD(ini->GetMapHeight() * ini->GetMapWidth());
-	for (int w = 0; w <= ini->GetMapWidth(); w++)
+	data->ResizeHTD(ini->GetMapHeight()-1 , ini->GetMapWidth()-1);
+	for (int w = 0; w < ini->GetMapWidth(); w++)
 	{
-		for (int h = 0; h <= ini->GetMapHeight(); h++)
+		for (int h = 0; h < ini->GetMapHeight(); h++)
 		{
 			data->SetHTD(w, h, _Noise->GetNoise((float)w, (float)h) * MapHeight);
 		}

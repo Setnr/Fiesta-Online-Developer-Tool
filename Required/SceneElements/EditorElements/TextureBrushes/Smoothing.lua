@@ -1,47 +1,35 @@
 BrushName = "Smoothing"
-
-BrushData = { 
+BrushData = {
+    layer = nil,
     KernelSize = 3,
     Cycles = 1,
     UpdateTime = 0.05,
-    LastUpdateTime = 0.0,
-    WholeMap = false
+    LastUpdateTime = 0.0
 }
-function Init(BrushPtr , world)
+
+function Init(BrushPtr, world) 
+end
+
+function SetLayer(LayerPtr)
+    BrushData.layer = LayerPtr
     
 end
 
 function render(BrushPtr)
-    if CheckBox("Update Whole Map (Can cause lag!)",BrushData.WholeMap) then
-            if BrushData.WholeMap then
-                BrushData.WholeMap = false
-            else
-                BrushData.WholeMap = true
-            end
-    end
-    local changed, value = DragInt(BrushData["KernelSize"],"KernelSize",2,3,21)
+    local chhanged, value = DragInt(BrushData["KernelSize"],"KernelSize",2,3,21)
     BrushData["KernelSize"] = value
-    hanged, value = DragInt(BrushData["Cycles"],"Cycles",1,1,20)
+    changed, value = DragInt(BrushData["Cycles"],"Cycles",1,1,20)
     BrushData["Cycles"] = value
     changed, value = DragFloat(BrushData["UpdateTime"],"UpdateTime",0.001,0,1)
     BrushData["UpdateTime"] = value
 end
 
 function algorithm(MiddleW,MiddleH, z, SizeW, SizeH ,BrushSize,WorldPtr)
-
     CurTime = GetCurrentTime()
     if BrushData["UpdateTime"] + BrushData["LastUpdateTime"] > CurTime then
         return
     end
     BrushData["LastUpdateTime"] = CurTime
-    if BrushData.WholeMap then
-        if SizeW > SizeH then
-            BrushSize = math.floor(SizeW / 2 + 2)
-        else 
-            BrushSize = math.floor(SizeH / 2 + 2) 
-        end
-    end
-
     local KernelValue = 1 / (BrushData["KernelSize"] * BrushData["KernelSize"])
     local StartI = math.floor(-1 * (BrushData["KernelSize"] / 2)) + 1
 	local EndI =  math.floor(BrushData["KernelSize"] / 2)
@@ -58,10 +46,10 @@ function algorithm(MiddleW,MiddleH, z, SizeW, SizeH ,BrushSize,WorldPtr)
                                 local Sum  = 0
                                 for i = StartI, EndI , 1 do
                                     for j = StartJ, EndJ , 1 do
-                                        Sum = Sum + GetHTD(WorldPtr , w - i , h - j) * KernelValue
+                                        Sum = Sum + GetTextureColor(BrushData.layer , w - i , h - j) * KernelValue
                                     end
                                 end
-                                SetHTD(WorldPtr,w,h,Sum)
+                                SetTextureColor(BrushData.layer, w, h, Sum)
                             end
                         end
                     end
@@ -69,6 +57,10 @@ function algorithm(MiddleW,MiddleH, z, SizeW, SizeH ,BrushSize,WorldPtr)
             end
         end
     end
+    MarkAsChanged(BrushData.layer)
 end
+
+
+
 
 
