@@ -1,6 +1,6 @@
 BrushName = "Height"
 BrushData = {
-    Height = 100
+    Height = 1
 }
 function Init(BrushPtr, world) end
 

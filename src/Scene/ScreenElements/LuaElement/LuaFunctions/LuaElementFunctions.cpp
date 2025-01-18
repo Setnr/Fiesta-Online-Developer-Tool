@@ -15,12 +15,12 @@ int LogFromLua(lua_State* Script)
 	//	LogError("WindowName-Variable missing");
 	//	return 0;
 	//}
-	if (lua_isstring(Script, 1))
+	if (lua_isstring(Script, 1)) 
 	{
 		LogWarning(lua_tostring(Script, 1));
 	}
-	return 0;
-}
+	return 0;  
+} 
 int ImGuiText(lua_State* Script)
 {
 	if (lua_isstring(Script, 1))
@@ -1580,6 +1580,22 @@ int SaveVertex(lua_State* Script)
 		{
 			VertexModePtr ptr = NiSmartPointerCast(VertexMode, mode);
 			ptr->SaveVertex();
+		} 
+	}  
+	return 0;  
+}
+
+int GetPointDistFromShineIni(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) )
+	{
+		IngameWorldPtr world = (IngameWorld*)lua_tointeger(Script, 1);
+
+		auto ini = world->GetShineIni();
+		if (ini)
+		{
+			lua_pushnumber(Script, ini->GetOneBlockWidht());
+			return 1;
 		}
 	}
 	return 0;
@@ -1749,4 +1765,5 @@ void SetFunctions(lua_State* Script)
 	lua_register(Script, "GetVertexColor", GetVertexColor);
 	lua_register(Script, "CreateShadow", CreateShadow);
 	lua_register(Script, "SaveVertex", SaveVertex);
+	lua_register(Script, "GetPointDistFromShineIni", GetPointDistFromShineIni);
 } 
