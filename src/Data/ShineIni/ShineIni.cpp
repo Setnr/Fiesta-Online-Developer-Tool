@@ -242,7 +242,7 @@ bool ShineIni::Save(std::string Path)
 		IniFile << "	#UVScaleBlend\t:" << layer->UVScaleBlend << "f" << std::endl;
 		IniFile << "}" << std::endl;
 
-		PgUtil::SaveTexture(PgUtil::PathFromClientFolder(layer->BlendFileName), layer->BlendTexture);
+		PgUtil::SaveTexture(PgUtil::PathFromClientFolder(layer->BlendFileName), layer->BlendTexture,true);
 	}
 	IniFile << "#END_FILE" << std::endl << "//Made With Fiesta Developer Tools by Set" << std::endl;
 
@@ -274,7 +274,7 @@ void ShineIni::CreateEmpty(MapInfo* Info, int MapSize)
 	}
 	pixldata->MarkAsChanged();
 	std::string VertexShadowPath = PgUtil::PathFromClientFolder(GetVertexColor());
-	VertexShadowImage = NiNew NiPixelData(HeightMap_width, HeightMap_height, NiPixelFormat::RGB24);
+	VertexShadowImage = NiNew NiPixelData(HeightMap_width, HeightMap_height, NiPixelFormat::RGBA32);
 	auto pixels = VertexShadowImage->GetPixels();
 	for (size_t i = 0; i < VertexShadowImage->GetSizeInBytes(); i++)
 	{
@@ -283,6 +283,12 @@ void ShineIni::CreateEmpty(MapInfo* Info, int MapSize)
 }
 void ShineIni::SetColor(int w, int h, NiColorA Color) 
 {
+
+	if (!VertexShadowImage)
+	{
+		LogError("No VertexColors loaded!");
+		return;
+	}
 	NiPixelFormat format = VertexShadowImage->GetPixelFormat();
 	if (format == NiPixelFormat::RGB24)
 	{
@@ -307,6 +313,11 @@ void ShineIni::SetColor(int w, int h, NiColorA Color)
 }
 NiColorA ShineIni::GetColor(int w, int h) 
 {
+	if (!VertexShadowImage)
+	{
+		LogError("No VertexColors loaded!");
+		return NiColorA::WHITE;
+	}
 	if (w < 0 || h < 0 || w >= VertexShadowImage->GetWidth() || h >= VertexShadowImage->GetHeight())
 		return NiColorA::WHITE;
 	NiPixelFormat format = VertexShadowImage->GetPixelFormat();
@@ -352,7 +363,6 @@ void TerrainLayerData::SetColor(int w, int h, float Color)
 	unsigned char* pixlptr = data->operator()(w, h);
 	if (!pixlptr)
 		return;
-	format->GetMask(NiPixelFormat::Component::COMP_RED);
 	for (int i = 0; i < format->GetBitsPerPixel() / 8; i++)
 	{
 		pixlptr[i] = static_cast<unsigned char>(Color * 255.f);
@@ -441,5 +451,5 @@ std::shared_ptr<TerrainLayerData> ShineIni::CreateNewLayer(MapInfo* Info)
 void TerrainLayerData::SaveBlendFile(MapInfo* Info) 
 {
 	BlendFileName = PgUtil::GetMapFolderPath(Info->KingdomMap, Info->MapName) + Name +".bmp";
-	PgUtil::SaveTexture(PgUtil::PathFromClientFolder(BlendFileName), BlendTexture);
+	PgUtil::SaveTexture(PgUtil::PathFromClientFolder(BlendFileName), BlendTexture,true);
 }

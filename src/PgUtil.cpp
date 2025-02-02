@@ -84,28 +84,30 @@ std::string PgUtil::GetMapFolderPath(char KingdomMap, std::string MapName)
     return BasePath;
 }
 
-void PgUtil::SaveTexture(std::string Path, NiPixelDataPtr PixelData)
+void PgUtil::SaveTexture(std::string Path, NiPixelDataPtr PixelData, bool flipped)
 {
-    NiSourceTexturePtr texture = NiSourceTexture::Create(PixelData);
-    SaveTexture(Path, texture);
-}
 
-void PgUtil::SaveTexture(std::string Path, NiSourceTexturePtr Texture)
-{
     try {
         BMP bmp;
-        bmp.SetSize(Texture->GetWidth(), Texture->GetHeight());
-        RGBApixel* PixelData = (RGBApixel*)Texture->GetSourcePixelData()->GetPixels();
-        for (int w = 0; w < Texture->GetWidth(); w++)
+        bmp.SetSize(PixelData->GetWidth(), PixelData->GetHeight());
+        RGBApixel* PixelDataArray = (RGBApixel*)PixelData->GetPixels();
+        for (int w = 0; w < PixelData->GetWidth(); w++)
         {
-            for (int h = Texture->GetHeight() - 1; h >= 0; h--)
+            for (int h = PixelData->GetHeight() - 1; h >= 0; h--)
             {
-                int XPart = w;
-
-                int PreFullLines = Texture->GetWidth() * h;
-                int YPartNormal = PreFullLines;
-                int PointOffsetNormal = XPart + YPartNormal;
-                bmp.SetPixel(w, Texture->GetHeight() - h - 1, PixelData[PointOffsetNormal]);
+                RGBApixel a = *(RGBApixel*)PixelData->operator()(w,h);
+                RGBApixel fixed;
+                fixed.Red = a.Blue;
+                fixed.Green = a.Green;
+                fixed.Blue = a.Red;
+                if (PixelData->GetPixelFormat().GetBitsPerPixel() == 32)
+                    fixed.Alpha = a.Alpha;
+                else
+                    fixed.Alpha = 0xFF;
+                int realh = h;
+                if (flipped)
+                    realh = PixelData->GetHeight() - h - 1;
+                bmp.SetPixel(w, realh , fixed);
             }
         }
         bmp.WriteToFile(Path.c_str());
@@ -119,6 +121,12 @@ void PgUtil::SaveTexture(std::string Path, NiSourceTexturePtr Texture)
     {
         LogError("Failed to safe: " + Path);
     }
+}
+
+void PgUtil::SaveTexture(std::string Path, NiSourceTexturePtr Texture, bool flipped)
+{
+    SaveTexture(Path, Texture->GetSourcePixelData(), flipped);
+    return;
 }
 bool PgUtil::LoadNodeNifFile(const char* File, NiNodePtr* spNode, NiTexturePalette* /*Currently Unused */)
 {

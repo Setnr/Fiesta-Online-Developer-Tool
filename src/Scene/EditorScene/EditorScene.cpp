@@ -54,6 +54,8 @@ void EditorScene::LoadNewMap(MapInfo* info)
 void EditorScene::CreateNewMap(MapInfo* info, int MapSize) 
 {
 	auto start = std::chrono::steady_clock::now();
+
+	memcpy_s(info->MapFolderName, sizeof(info->MapFolderName), info->MapName, sizeof(info->MapName));
 	NewWorldLoaded = NiNew IngameWorld(info,MapSize);
 	LogTime(std::string("Loaded ") + info->MapName, start);
 }

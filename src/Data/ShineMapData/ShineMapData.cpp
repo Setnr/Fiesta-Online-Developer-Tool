@@ -280,7 +280,12 @@ void ShineMapData::ExtractCollision(NiNodePtr obj)
 	{
 		obj->DetachChild(rem);
 		if (NiIsKindOf(NiNode, rem))
-			CollisionObjectList.push_back((NiNodePtr)(NiNode*)&*rem);
+		{
+			if(rem->GetName().Contains("#CD"))
+				CollisionObjectList.push_back((NiNodePtr)(NiNode*)&*rem);
+			else
+				CameraCollisionObjectList.push_back((NiNodePtr)(NiNode*)&*rem);
+		}
 	}
 }
 bool ShineMapData::Save(MapInfo* Info) 

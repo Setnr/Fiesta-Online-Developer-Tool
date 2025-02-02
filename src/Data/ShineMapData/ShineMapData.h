@@ -86,6 +86,7 @@ private:
 	std::vector<NiNodePtr> WaterList;
 	std::vector<NiNodePtr> GlobalGroundObjectList;
 	std::vector<NiNodePtr> CollisionObjectList;
+	std::vector<NiNodePtr> CameraCollisionObjectList;
 	NiNodePtr GlobalLightNif;
 	NiColor GlobalLight;
 	NiFog Fog;

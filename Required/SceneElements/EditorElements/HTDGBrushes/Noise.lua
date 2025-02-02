@@ -42,9 +42,9 @@ DomainWarpType = {
 }
 
 BrushData = { 
-    Height = 10.0,
+    Height = 0.1,
     Seed = 195201418,
-    Frequency = 0.01,
+    Frequency = 0.05,
     NoiseType = NoiseType.Perlin.Name,
     FractalType = FractalType.None.Name,
     Octaves = 3,

@@ -17,7 +17,7 @@ public:
 	static std::string ClientFolderPath;
 	static char CatchCamera(NiAVObject* pkObject, NiCameraPtr* pkCamera);
 	static std::string GetMapFolderPath(char KingdomMap, std::string MapName);
-	static void SaveTexture(std::string Path, NiSourceTexturePtr Texture);
+	static void SaveTexture(std::string Path, NiSourceTexturePtr Texture, bool flipped = false);
 	static bool LoadNodeNifFile(const char* File, NiNodePtr* spNode, NiTexturePalette* /*Currently Unused */);
 	static NiNodePtr LoadNifFile(const char* File, NiTexturePalette* = NULL/*Currently Unused */, bool IsPickable = false);
 	static void LookAndMoveAtWorldPoint(NiCameraPtr Camera, NiPoint3 Point);
@@ -26,5 +26,5 @@ public:
 	static NiScreenElements* CreateScreenElement(NiSourceTexturePtr texture);
 	static void MakePositiveVector(NiPoint3& Vector);
 	static void FixColor(NiColorA& Color);
-	static void SaveTexture(std::string Path, NiPixelDataPtr PixelData);
+	static void SaveTexture(std::string Path, NiPixelDataPtr PixelData, bool flipped = false);
 };

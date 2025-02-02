@@ -88,11 +88,11 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 
 	SetFogColor(_SHMD->GetFogColor(),false);
 	SetFogDepth(_SHMD->GetFogDepth(),false);
-	SetGlobalLight(_SHMD->GetGlobalLight());
-	SetGlobalLightNode(_SHMD->GetGlobalLightNode());
-	SetFarFrustum(_SHMD->GetFarFrustum());
-	SetDirectionalLightAmbientColor(_SHMD->GetDirectionalLightAmbientColor());
-	SetDirectionalLightDiffuseColor(_SHMD->GetDirectionalLightDiffuseColor());
+	SetGlobalLight(_SHMD->GetGlobalLight(), false);
+	SetGlobalLightNode(_SHMD->GetGlobalLightNode(), false);
+	SetFarFrustum(_SHMD->GetFarFrustum(), false);
+	SetDirectionalLightAmbientColor(_SHMD->GetDirectionalLightAmbientColor(), false);
+	SetDirectionalLightDiffuseColor(_SHMD->GetDirectionalLightDiffuseColor(), false);
 
 	m_spWorldScene->Update(0.f);
 	m_spWorldScene->UpdateProperties();
@@ -103,7 +103,6 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 
 IngameWorld::IngameWorld(MapInfo* Info, int MapSize) : _MapInfo(Info)
 {
-
 	if (!InitScene())
 		return;
 	if (!InitCamera())
@@ -489,6 +488,7 @@ void IngameWorld::ShowTerrain(bool show)
 }
 void IngameWorld::SetHTD(int w, int h, float level) 
 {
+	
 	if (w >= _INI->GetMapWidth() || h >= _INI->GetMapHeight() || w < 0 || h < 0)
 		return;
 	auto htdlevel = _HTD->GetHTD(w, h);
@@ -497,6 +497,13 @@ void IngameWorld::SetHTD(int w, int h, float level)
 
 	int XBlocks = (_INI->GetMapWidth() - 1) / _INI->GetQuadsWide();
 	int YBlocks = (_INI->GetMapHeight() - 1) / _INI->GetQuadsHigh();
+
+	if (_INI->GetLayers().size() * XBlocks * YBlocks != m_spGroundTerrain->GetChildCount())
+	{
+		LogError("Count Missmatchter for Layers and Terrain-Childs");
+		LogError("This can be caused if you have have offsets for textures like Adelia!!");
+		return;
+	}
 
 	int SubLayerW = w / _INI->GetQuadsWide();
 	int SubLayerH = h / _INI->GetQuadsHigh();
@@ -516,17 +523,20 @@ void IngameWorld::SetHTD(int w, int h, float level)
 			int h;
 		};
 		std::vector<POS> LayerList;
-		if (SubW == 0 && SubLayerW >= 1)
+		for (int i = 0; i < _INI->GetLayers().size(); i++)
 		{
-			LayerList.push_back({ Layer->GetAt(SubLayerH + (SubLayerW - 1) * YBlocks), _INI->GetQuadsWide(), SubH });
+			if (SubW == 0 && SubLayerW >= 1)
+			{
+				LayerList.push_back({ Layer->GetAt(SubLayerH + (SubLayerW - 1) * YBlocks + i * YBlocks * XBlocks), _INI->GetQuadsWide(), SubH });
+			}
+			if (SubH == 0 && SubLayerH >= 1)
+			{
+				LayerList.push_back({ Layer->GetAt(SubLayerH + SubLayerW * YBlocks - 1 + i * YBlocks * XBlocks), SubW, _INI->GetQuadsHigh() });
+			}
+			if (SubW == 0 && SubLayerW >= 1 && SubH == 0 && SubLayerH >= 1)
+				LayerList.push_back({ Layer->GetAt(SubLayerH + (SubLayerW - 1) * YBlocks - 1 + i * YBlocks * XBlocks), _INI->GetQuadsWide(), _INI->GetQuadsHigh() });
+			LayerList.push_back({ Layer->GetAt(SubLayerH + SubLayerW * YBlocks + i * YBlocks * XBlocks), SubW, SubH });
 		}
-		if (SubH == 0 && SubLayerH >= 1)
-		{
-			LayerList.push_back({ Layer->GetAt(SubLayerH + SubLayerW * YBlocks - 1), SubW, _INI->GetQuadsHigh() });
-		}
-		if (SubW == 0 && SubLayerW >= 1 && SubH == 0 && SubLayerH >= 1)
-			LayerList.push_back({ Layer->GetAt(SubLayerH + (SubLayerW - 1) * YBlocks - 1), _INI->GetQuadsWide(), _INI->GetQuadsHigh() });
-		LayerList.push_back({ Layer->GetAt(SubLayerH + SubLayerW * YBlocks), SubW, SubH });
 		for (auto _Layer : LayerList)
 		{
 			if (!_Layer.obj)
@@ -591,6 +601,7 @@ void IngameWorld::SetHTD(int w, int h, float level)
 			}
 		}
 	}
+	
 		
 
 	
@@ -757,6 +768,24 @@ void IngameWorld::CreateShadows(NiColorA Color, NiColorA SunLight)
 			PgUtil::FixColor(FinalColor);
 			SetVertexColor(w, h, FinalColor); //Add SunLight if Not Shadowed
 
+		}
+	}
+	for(int cycle = 0; cycle < 3; cycle++)
+	{
+		for (int w = 0; w < _INI->GetMapWidth(); w++)
+		{
+			for (int h = 0; h < _INI->GetMapHeight(); h++)
+			{
+				NiColorA Color = NiColorA::BLACK;
+				for (int i = -2; i <= 2; i++)
+				{
+					for (int j = -2; j <= 2; j++)
+					{
+						Color = Color + GetVertexColor(w - i, h - j) * 1 / (5 * 5);
+					}
+				}
+				SetVertexColor(w, h, Color);
+			}
 		}
 	}
 }

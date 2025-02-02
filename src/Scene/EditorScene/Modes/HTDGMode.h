@@ -9,7 +9,7 @@ class HTDGMode : public TerrainBrushMode
 	NiDeclareRTTI;
 	HTDGMode(IngameWorldPtr World, EditorScenePtr Scene) : TerrainBrushMode(World, (FiestaScenePtr)&*Scene)
 	{
-		kWorld->ShowTerrain(false);
+		kWorld->ShowTerrain(true);
 		ScreenElements.push_back(NiNew LuaElement(Scene, "EditorELements/HTDG.lua"));
 		LoadBrushes("HTDGBrushes");
 	} 

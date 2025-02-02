@@ -1572,7 +1572,7 @@ int CreateShadow(lua_State* Script)
 	return 0;
 }
 int SaveVertex(lua_State* Script)
-{
+{ 
 	if (lua_isinteger(Script, 1))
 	{
 		EditModePtr mode = (EditMode*)lua_tointeger(Script, 1);
@@ -1586,7 +1586,7 @@ int SaveVertex(lua_State* Script)
 }
 
 int GetPointDistFromShineIni(lua_State* Script)
-{
+{ 
 	if (lua_isinteger(Script, 1) )
 	{
 		IngameWorldPtr world = (IngameWorld*)lua_tointeger(Script, 1);

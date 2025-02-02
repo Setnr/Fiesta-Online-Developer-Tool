@@ -227,7 +227,7 @@ void TextureMode::SaveSelectedLayer()
 {
 	if (!_CurrentLayer)
 		return;
-	PgUtil::SaveTexture(PgUtil::PathFromClientFolder(_CurrentLayer->BlendFileName), _CurrentLayer->BlendTexture);
+	PgUtil::SaveTexture(PgUtil::PathFromClientFolder(_CurrentLayer->BlendFileName), _CurrentLayer->BlendTexture,true);
 }
 
 void TextureMode::UpdateCurrentLayer(std::shared_ptr < TerrainLayerData> layer) 

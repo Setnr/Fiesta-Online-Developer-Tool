@@ -12,7 +12,7 @@ bool MapLoadElement::Draw()
 		if (ImGui::Begin("MapInfo"))
 		{
 			if (ImGui::CollapsingHeader("Create a New Map")) {
-				ImGui::InputText("MapName", EmptyData.Name, sizeof(EmptyData.MapName));
+				ImGui::InputText("MapName", EmptyData.MapName, sizeof(EmptyData.MapName));
 				ImGui::SameLine();
 				if (ImGui::Button("New Map"))
 				{

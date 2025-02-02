@@ -23,7 +23,7 @@ function render(ElementPtr)
             SetShowSHMDElements(EditModePtr,SnapMove)
         end
         if Button("Save VertexColor") then
-            SaveVertexColor(EditModePtr)
+            SaveVertex(EditModePtr)
         end
         RenderBrushes(EditModePtr)
     end
