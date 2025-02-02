@@ -412,4 +412,5 @@ Interface/Dlls.rar
 /Build
 /enc_temp_folder
 !/Includes/DirectX9/Lib/x86
+!/Includes/DirectX9/Lib/x64
 *.bak
