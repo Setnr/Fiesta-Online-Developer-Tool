@@ -9,6 +9,7 @@
 
 std::string PgUtil::ClientFolderPath = "";
 std::string PgUtil::ApplicationPath = "";
+std::string PgUtil::ServerFolderPath = "";
 
 std::string PgUtil::PathFromApplicationFolder(std::string File) 
 {
@@ -36,6 +37,22 @@ std::string PgUtil::PathFromClientFolder(std::string File)
             return ClientFolderPath + "\\" + File;
     }
     return ClientFolderPath;
+}
+std::string PgUtil::PathFromServerFolder(std::string File)
+{
+    if (!File.empty())
+    {
+        if (File.at(0) == '.')
+        {
+            if (File.at(1) == '\\')
+                return ServerFolderPath + File.substr(1);
+            else
+                return ServerFolderPath + "\\" + File.substr(1);
+        }
+        else
+            return ServerFolderPath + "\\" + File;
+    }
+    return ServerFolderPath;
 }
 char PgUtil::CatchCamera(NiAVObject* pkObject, NiCameraPtr* pkCamera)
 {
@@ -143,25 +160,6 @@ bool PgUtil::LoadNodeNifFile(const char* File, NiNodePtr* spNode, NiTexturePalet
 
     return true;
 
-}
-NiNodePtr PgUtil::LoadNifFile(const char* File, NiTexturePalette*/*Currently Unused */, bool IsPickable)
-{
-    NiNode* Node;
-    if (IsPickable)
-        Node = NiNew NiPickable;
-    else
-        Node = NiNew NiNode;
-    NiStream kStream;
-    bool bLoaded = kStream.Load(File);
-    NIASSERT(bLoaded);
-    for (unsigned int ct = 0; ct < kStream.GetObjectCount(); ct++)
-    {
-        NiObject* obj = kStream.GetObjectAt(ct);
-        if (obj->IsKindOf(&NiNode::ms_RTTI) || obj->IsKindOf(&NiGeometry::ms_RTTI))
-            Node->AttachChild((NiAVObject*)obj, 0);
-    }
-
-    return Node;
 }
 void PgUtil::LookAndMoveAtWorldPoint(NiCameraPtr Camera, NiPoint3 Point)
 {

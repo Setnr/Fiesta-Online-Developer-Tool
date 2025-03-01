@@ -19,7 +19,7 @@ public:
 	std::vector<NiNodePtr>& GetSkyList() { return SkyList; }
 	std::vector<NiNodePtr>& GetWaterList() { return WaterList; }
 	std::vector<NiNodePtr>& GetGlobalGroundObjectList() { return GlobalGroundObjectList; }
-	std::vector<NiNodePtr>& GetCollisionObjectListList() { return CollisionObjectList; }
+	std::vector<NiAVObjectPtr>& GetCollisionObjectListList() { return CollisionObjectList; }
 	std::set<NiNodePtr>& GetGroundObjectListList() { return GroundObjectList; }
 	void SetFogColor(NiColor kColor) { Fog.Color = kColor; }
 	NiColor GetFogColor() { return Fog.Color; }
@@ -85,8 +85,8 @@ private:
 	std::vector<NiNodePtr> SkyList;
 	std::vector<NiNodePtr> WaterList;
 	std::vector<NiNodePtr> GlobalGroundObjectList;
-	std::vector<NiNodePtr> CollisionObjectList;
-	std::vector<NiNodePtr> CameraCollisionObjectList;
+	std::vector<NiAVObjectPtr> CollisionObjectList;
+	std::vector<NiAVObjectPtr> CameraCollisionObjectList;
 	NiNodePtr GlobalLightNif;
 	NiColor GlobalLight;
 	NiFog Fog;

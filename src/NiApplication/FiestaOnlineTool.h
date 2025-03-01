@@ -11,6 +11,9 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_dx9.h"
 #include "ImGui/imgui_impl_win32.h"
+#include "Data/NPCData/NPCData.h"
+#include "SHN/MobLoader.h"
+
 
 class FiestaOnlineTool : public NiApplication
 {
@@ -23,6 +26,8 @@ public:
 
 	virtual void Terminate()
 	{
+		NPCData::Clear();
+		MobLoader::Clear();
 		ImGuiIO& io = ImGui::GetIO();
 		ImGui::SaveIniSettingsToDisk(io.IniFilename);
 		if(_Scene)

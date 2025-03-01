@@ -38,7 +38,7 @@ bool FiestaScene::SetupScene()
 }
 void FiestaScene::UpdateCamera(float fTime)
 {
-	if (!EnableKeyStrokes)https://github.com/
+	if (!EnableKeyStrokes)
 		return;
 	ImGuiIO& io = ImGui::GetIO();
 	static POINT CursorPos;
@@ -93,7 +93,7 @@ void FiestaScene::UpdateCamera(float fTime)
 	}
 	float DeltaTime =  FiestaOnlineTool::GetDeltaTime();
 
-	if (!ImGui::IsKeyDown((ImGuiKey)VK_CONTROL))
+	if (!ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && !ImGui::IsAnyItemActive())
 	{
 		bool W_Key = ImGui::IsKeyDown((ImGuiKey)0x57);
 		bool S_Key = ImGui::IsKeyDown((ImGuiKey)0x53);
@@ -162,13 +162,13 @@ void FiestaScene::DrawImGui()
 	ImGui::End();
 
 	ImGui::SetNextWindowPos(ImVec2(0, io.DisplaySize.y - 150));
-	ImGui::SetNextWindowSize(ImVec2(500, 150));
+	ImGui::SetNextWindowSize(ImVec2(1000, 150));
 	ImGui::Begin("Logger", NULL, flags);
 	Logger::Draw();
 	if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
 		ImGui::SetScrollHereY(1.0f);
 	ImGui::End();
-
+	Logger::DrawError();
 	if (ImGui::BeginMainMenuBar())
 	{
 		this->CreateMenuBar();

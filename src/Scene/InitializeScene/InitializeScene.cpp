@@ -10,46 +10,68 @@ NiImplementRTTI(InitializeScene, FiestaScene);
 
 void InitializeScene::DrawImGui() 
 {
-	if (!fileDialog.IsOpened())
-		fileDialog.Open();
-
 	FiestaScene::DrawImGui();
 	ImGuiIO& io = ImGui::GetIO();
-
-	fileDialog.SetWindowPos(io.DisplaySize.x, io.DisplaySize.y);
-	fileDialog.Display();
-	if (fileDialog.HasSelected()) 
+	if (!Init)
 	{
-		std::string File = fileDialog.GetSelected().string();
-		if (File.find(".exe") != std::string::npos || File.find(".bin") != std::string::npos)
+		Init = true;
+		ClientFolderPath.Display();
+	}
+	if (ClientFolderPath.IsOpened())
+	{
+		ClientFolderPath.SetWindowPos(io.DisplaySize.x, io.DisplaySize.y);
+		ClientFolderPath.Display();
+		if (ClientFolderPath.HasSelected())
 		{
-			NiMessageBox::DisplayMessage("Please Select the Folder!", "Info");
-			fileDialog.ClearSelected();
-			return;
-		}
-		PgUtil::ClientFolderPath = File;
-		Settings::SaveSettings();
-		fileDialog.ClearSelected();
-		NiMessageBox::DisplayMessage("Updated Settings\n Restart Tool now!", "Info");
-
-		if (std::filesystem::exists(PgUtil::PathFromApplicationFolder(".\\FiestaOnlineTool\\AlphaTextureBlender.NSF")))
-		{
-			NiMessageBox::DisplayMessage("AlphaTextureBlender.NSF will be replaced in your client", "Shader Info");
-			if (std::filesystem::exists(PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF.bak")))
-				std::filesystem::remove(PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF.bak"));
-
-			if (std::filesystem::exists(PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF")))
+			std::string File = ClientFolderPath.GetSelected().string();
+			if (File.find(".exe") != std::string::npos || File.find(".bin") != std::string::npos)
 			{
-				std::filesystem::copy(
-					PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF"),
-					PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF.bak"));
-				std::filesystem::remove(PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF"));
+				NiMessageBox::DisplayMessage("Please Select the Folder!", "Info");
+				ClientFolderPath.ClearSelected();
+				return;
 			}
-			std::filesystem::copy(
-				PgUtil::PathFromApplicationFolder(".\\FiestaOnlineTool\\AlphaTextureBlender.NSF"),
-				PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF"));
+			PgUtil::ClientFolderPath = File;
+			ClientFolderPath.ClearSelected();
+
+			if (std::filesystem::exists(PgUtil::PathFromApplicationFolder(".\\FiestaOnlineTool\\AlphaTextureBlender.NSF")))
+			{
+				NiMessageBox::DisplayMessage("AlphaTextureBlender.NSF will be replaced in your client", "Shader Info");
+				if (std::filesystem::exists(PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF.bak")))
+					std::filesystem::remove(PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF.bak"));
+
+				if (std::filesystem::exists(PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF")))
+				{
+					std::filesystem::copy(
+						PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF"),
+						PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF.bak"));
+					std::filesystem::remove(PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF"));
+				}
+				std::filesystem::copy(
+					PgUtil::PathFromApplicationFolder(".\\FiestaOnlineTool\\AlphaTextureBlender.NSF"),
+					PgUtil::PathFromClientFolder(".\\shader\\AlphaTextureBlender.NSF"));
+			}
+			ServerFolderPath.Open();
+			ServerFolderPath.Display();
+		}
+	}
+	if (ServerFolderPath.IsOpened()) 
+	{
+		ServerFolderPath.SetWindowPos(io.DisplaySize.x, io.DisplaySize.y);
+		ServerFolderPath.Display();
+		if (ServerFolderPath.HasSelected())
+		{
+			std::string File = ServerFolderPath.GetSelected().string();
+			if (!File.contains("9Data")) 
+			{
+				NiMessageBox::DisplayMessage("Please Select the 9Data Folder!", "Info");
+				ClientFolderPath.ClearSelected();
+				return;
+			}
+			PgUtil::ServerFolderPath = File;
+			Settings::SaveSettings();
+			NiMessageBox::DisplayMessage("Updated Settings\n Restart Tool now!", "Info");
+			ServerFolderPath.Close();
 		}
 
-		return;
 	}
 }

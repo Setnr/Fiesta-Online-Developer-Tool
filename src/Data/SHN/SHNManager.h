@@ -253,7 +253,7 @@ namespace SHN
 	public:
 		static void Load()
 		{
-			std::map<SHNType, const char*> shnlist{ {MapInfoType, "MapInfo"} };
+			std::map<SHNType, const char*> shnlist{ {MapInfoType, "MapInfo"}, {MobInfo,"MobInfo"},{MobViewInfo,"MobViewInfo"} };
 			for(auto shn :  shnlist)
 			{
 				auto reader = std::make_shared<CDataReader>(shn.second);

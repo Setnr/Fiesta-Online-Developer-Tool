@@ -15,7 +15,9 @@
 #include "EditorScene/Modes/HTDGMode.h"
 #include "EditorScene/Modes/TextureMode.h"
 #include "EditorScene/Modes/VertexMode.h"
+#include "EditorScene/Modes/NPCEditMode.h"
 #include <NiDX9Renderer.h>
+#include <NPCData/NPCData.h>
 NiImplementRTTI(EditorScene, FiestaScene);
 
 EditorScene::EditorScene() 
@@ -87,6 +89,10 @@ void EditorScene::CreateMenuBar()
 		{
 			kWorld->SaveVertex();
 		}
+		if (ImGui::MenuItem("Save NPC.txt"))
+		{
+			NPCData::SaveNPCs();
+		}
 		if (ImGui::MenuItem("Save All"))
 		{
 			kWorld->SaveHTD();
@@ -94,6 +100,7 @@ void EditorScene::CreateMenuBar()
 			kWorld->SaveSHMD();
 			kWorld->SaveIni();
 			kWorld->SaveVertex();
+			NPCData::SaveNPCs();
 		}
 		ImGui::EndMenu();
 	}
@@ -139,6 +146,11 @@ void EditorScene::CreateMenuBar()
 		{
 			_EditMode = NULL;
 			_EditMode = NiNew VertexMode(kWorld, this);
+		}
+		if (ImGui::Selectable("NPC", NiIsKindOf(VertexMode, _EditMode)))
+		{
+			_EditMode = NULL;
+			_EditMode = NiNew NPCEditMode(kWorld, this);
 		}
 		ImGui::EndCombo();
 	}
@@ -220,6 +232,10 @@ void EditorScene::UpdateEditMode()
 	else if (NiIsKindOf(TextureMode, _EditMode))
 	{
 		_EditMode = NiNew VertexMode(kWorld, this);
+	}
+	else if (NiIsKindOf(VertexMode, _EditMode))
+	{
+		_EditMode = NiNew NPCEditMode(kWorld, this);
 	}
 	else
 		_EditMode = NiNew SHMDMode(kWorld, this);

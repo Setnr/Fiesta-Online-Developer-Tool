@@ -11,7 +11,7 @@ void TextureMode::ProcessInput()
 {
 	auto _Ini = kWorld->GetShineIni();
 	auto layerlist = _Ini->GetLayers();
-	if (layerlist.size() < 0 || _CurrentLayer == layerlist[0])
+	if (layerlist.size() < 1 || _CurrentLayer == layerlist[0])
 	{
 		return;
 	}
@@ -144,7 +144,7 @@ void TextureMode::DrawLayers()
 		ImGui::DragFloat("UVScaleBlend", &_CurrentLayer->UVScaleBlend);
 	}
 	auto layerlist = _Ini->GetLayers();
-	if (layerlist.size() < 0 || _CurrentLayer == layerlist[0])
+	if (layerlist.size() < 1 || _CurrentLayer == layerlist[0])
 	{
 		ImGui::Text("Ground Layer is not intended to be changed because of the size missmatch\n and the fact that the game need a all white base layer!");
 	}

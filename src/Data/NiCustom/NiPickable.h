@@ -10,12 +10,13 @@ public:
 	void DisableSorting() {
 		this->SetSortObject(false);
 	}
-	void SetSHMDPath(std::string Path) { SHMDPath = Path; }
-	std::string GetSHMDPath() { return SHMDPath; }
+	void SetFilePathOrName(std::string Path) { FilePathOrName = Path; }
+	std::string GetSHMDPath() { return FilePathOrName; }
 	NiNodePtr ToNiNode();
 	void ShowBoundingBox();
 	void HideBoundingBox();
+	bool BoundingBoxIsVisible() { return BoundingBox != NULL; }
 private:
-	std::string SHMDPath;
+	std::string FilePathOrName;
 	NiNodePtr BoundingBox;
 };

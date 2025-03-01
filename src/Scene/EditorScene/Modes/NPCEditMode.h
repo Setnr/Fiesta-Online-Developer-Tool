@@ -2,31 +2,29 @@
 #include "EditMode.h"
 #include <Scene/ScreenElements/LuaElement/LuaElement.h>
 #include "ImGui/ImGuizmo.h"
-#include "Data/NiCustom/NiSHMDPickable.h"
+#include "Data/NiCustom/ShineObjectNode.h"
 
-NiSmartPointer(SHMDMode);
-class SHMDMode : public EditMode
+
+NiSmartPointer(NPCEditMode);
+class NPCEditMode : public EditMode
 {
 	NiDeclareRTTI;
-	SHMDMode(IngameWorldPtr World, EditorScenePtr Scene) : EditMode(World, (FiestaScenePtr)&*Scene)
+public:
+	NPCEditMode(IngameWorldPtr World, EditorScenePtr Scene) : EditMode(World, (FiestaScenePtr)&* Scene)
 	{
-		ScreenElements.push_back(NiNew LuaElement(Scene, "EditorELements/SHMD.lua"));
-		ScreenElements.push_back(NiNew LuaElement(Scene, "EditorELements/SHMDObject.lua"));
-	}
-	~SHMDMode() 
+		ScreenElements.push_back(NiNew LuaElement(Scene, "EditorELements/NPCEditMode.lua"));
+	} 
+	~NPCEditMode() 
 	{
-		for (auto ptr : SelectedObjects) {
-			ptr->HideBoundingBox();
-		}
-		SelectedObjects.clear();
+		ClearSelectedObjects();
 	}
 	virtual void Draw();
 	virtual void Update(float fTime);
 	virtual void ProcessInput();
-	virtual std::string GetEditModeName() { return "SHMD"; }
-	void SelectObject(NiPickablePtr Obj, bool append = false) 
+	virtual std::string GetEditModeName() { return "NPC"; }
+	void SelectObject(NiPickablePtr Obj, bool append = false)
 	{
-		if (!Obj || !NiIsKindOf(NiSHMDPickable, Obj))
+		if (!Obj || !NiIsKindOf(ShineObjectNode, Obj))
 			return;
 		auto it = std::find(SelectedObjects.begin(), SelectedObjects.end(), Obj);
 		if (it != SelectedObjects.end())
@@ -43,7 +41,7 @@ class SHMDMode : public EditMode
 		Obj->ShowBoundingBox();
 		SelectedObjects.push_back(Obj);
 	}
-	void ClearSelectedObjects() 
+	void ClearSelectedObjects()
 	{
 		if (!SelectedObjects.empty())
 		{
@@ -58,17 +56,14 @@ class SHMDMode : public EditMode
 	void SetOperationMode(ImGuizmo::OPERATION Mode) { OperationMode = Mode; }
 	std::vector<NiPickablePtr> GetSelectedNodes() { return SelectedObjects; }
 	NiPoint3 GetSnapSize() { return SnapSize; }
-	void SetSnapSize(float Size){ SnapSize = NiPoint3(Size, Size, Size); }
+	void SetSnapSize(float Size) { SnapSize = NiPoint3(Size, Size, Size); }
 	void SetSnapeMovement(bool Snap) { SnapMovement = Snap; }
 	bool GetSnapMovement() { return SnapMovement; }
-	void CreateAddElement(std::string type);
-	void UpdateScale(float Scale);
 private:
-	ImGuizmo::OPERATION OperationMode = ImGuizmo::OPERATION::TRANSLATE;
+	ImGuizmo::OPERATION OperationMode = ImGuizmo::OPERATION::TRANSLATE_X | ImGuizmo::OPERATION::TRANSLATE_Y;
 	void DrawGizmo();
 	bool SnapMovement = false;
 	NiPoint3 SnapSize = NiPoint3(2.5f, 2.5f, 2.5f);
 	std::vector<NiPickablePtr> SelectedObjects;
 	NiPickablePtr CopyObject = NULL;
-	
 };

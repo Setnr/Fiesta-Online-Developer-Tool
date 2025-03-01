@@ -7,15 +7,23 @@ class Logger
 {
 private:
 
-	std::vector<std::pair<ImColor, std::string>> InfoList;
+	std::vector<std::tuple<ImColor, std::string, float>> InfoList;
 	std::mutex InfoListLock;
+
+	std::mutex ErrorListLock;
+	std::vector<std::tuple<ImColor, std::string, float>> ErrorList;
+
 public:
 	static Logger _Logger;
 	Logger();
 	void Log(ImColor col, std::string msg);
 
+	void ErrorLog(ImColor col, std::string msg);
+
 	static void Draw();
+	static void DrawError();
 	void DrawInternal();
+	void DrawErrorInternal();
 };
 
 #include <format>
@@ -45,7 +53,7 @@ constexpr std::string GetFunctionNameWithClass(const char* s)
 #define LogDebug(info) 
 #endif
 
-#define LogError(info) Logger::_Logger.Log(ImColor(1.0f,0.0f,0.0f),Msg(info))
+#define LogError(info) Logger::_Logger.ErrorLog(ImColor(1.0f,0.0f,0.0f),Msg(info))
 #define LogWarning(info) Logger::_Logger.Log(ImColor(1.0f,0.8f,0.0f),Msg(info))
 #define LogInfo(info) Logger::_Logger.Log(ImColor(.333f,0.776f,0.952f),Msg(info))
 #define LogTime(info, start) auto diff = std::chrono::steady_clock::now() - start; \

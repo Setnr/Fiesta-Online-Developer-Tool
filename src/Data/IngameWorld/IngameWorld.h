@@ -9,6 +9,7 @@
 #include <Data/IngameWorld/WorldChanges/WorldChanges.h>
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
+#include "NiCustom/ShineObjectNode.h"
 NiSmartPointer(IngameWorld);
 
 class IngameWorld : public NiRefObject
@@ -166,6 +167,10 @@ public:
 	void CreateShadows(NiColorA Color, NiColorA SunLight);
 	void CalculateRay(NiPoint3& StartPoint, NiPoint3& SunVector, std::vector<bool>& Shadowed, float minh);
 	void SaveVertex();
+	void LoadNPCS();
+	void AddShineObject(ShineObjectNodePtr obj, bool Backup = true);
+	bool UpdateZCoord(NiPoint3& Pos);
+	NiPickablePtr CreateNewNPC();
 private:
 
 	void SetVertexColorInternal(int ShapeID, int InternalBlockX, int InternalBlockY, NiColorA Color);

@@ -1240,5 +1240,173 @@ struct MapInfo : SHNRow
 		ImGui::TableSetColumnIndex(10);
 	}
 };
+enum WeaponTypeEnum : int
+{
+	WT_NONE = 0x0,
+	WT_SWORD = 0x1,
+	WT_BOW = 0x2,
+	WT_STAFF = 0x3,
+	WT_AXE = 0x4,
+	WT_MACE = 0x5,
+	WT_SPIKE = 0x6,
+	WT_FIST = 0x7,
+	WT_BODY = 0x8,
+	WT_STONE = 0x9,
+	WT_CROSSBOW = 0xA,
+	WT_WAND = 0xB,
+	WT_SPEAR = 0xC,
+	WT_HAMMER = 0xD,
+	WT_SPECIAL = 0xE,
+	WT_PRODUCTIONTOOL = 0xF,
+	WT_INVINCIBLEHAMMER = 0x10,
+	WT_DSWORD = 0x11,
+	WT_CLAW = 0x12,
+	WT_BLADE = 0x13,
+	WT_RANGE_PY = 0x14,
+	WT_TSWORD = 0x15,
+	MAX_WEAPONTYPEENUM = 0x16,
+};
+enum ArmorTypeEnum : int
+{
+	AT_NONE = 0x0,
+	AT_CLOTH = 0x1,
+	AT_LEATHER = 0x2,
+	AT_SCALE = 0x3,
+	AT_PLATE = 0x4,
+	AT_BONE = 0x5,
+	AT_HARDSKIN = 0x6,
+	AT_WEAKSKIN = 0x7,
+	AT_BARTSKIN = 0x8,
+	AT_GELSKIN = 0x9,
+	AT_FURSKIN = 0xA,
+	AT_SPECIAL = 0xB,
+	MAX_ARMORTYPEENUM = 0xC,
+};
+enum MobGradeType : int
+{
+	MGT_NORMAL = 0x0,
+	MGT_CHIEF = 0x1,
+	MGT_BOSS = 0x2,
+	MGT_HERO = 0x3,
+	MGT_ELITE = 0x4,
+	MGT_NONE = 0x5,
+	MAX_MOBGRADETYPE = 0x6,
+};
+enum MobType : int
+{
+	MT_HUMAN = 0x0,
+	MT_MAGICLIFE = 0x1,
+	MT_SPIRIT = 0x2,
+	MT_BEAST = 0x3,
+	MT_ELEMENTAL = 0x4,
+	MT_UNDEAD = 0x5,
+	MT_NPC = 0x6,
+	MT_OBJECT = 0x7,
+	MT_MINE = 0x8,
+	MT_HERB = 0x9,
+	MT_WOOD = 0xA,
+	MT_NONAME = 0xB,
+	MT_NOTARGET = 0xC,
+	MT_NOTARGET2 = 0xD,
+	MT_GLDITEM = 0xE,
+	MT_FLAG = 0xF,
+	MT_DEVIL = 0x10,
+	MT_META = 0x11,
+	MT_NODAMAGE = 0x12,
+	MT_NODAMAGE2 = 0x13,
+	MT_NONAMEGATE = 0x14,
+	MT_BOX_HERB = 0x15,
+	MT_BOX_MINE = 0x16,
+	MT_GB_DICE = 0x17,
+	MT_NODAMAGE3 = 0x18,
+	MT_FRIEND = 0x19,
+	MT_GB_SLOTMACHINE = 0x1A,
+	MT_FRIENDDMGABSORB = 0x1B,
+	MT_DEVILDOM = 0x1C,
+	MT_NOTARGET3 = 0x1D,
+	MT_META2 = 0x1E,
+	MT_DWARF = 0x1F,
+	MT_MACHINE = 0x20,
+	MAX_MOBTYPE = 0x21,
+};
+struct MobInfo : SHNRow
+{
+	unsigned short ID;
+	char InxName[32];
+	char Name[32];
+	unsigned int Level;
+	unsigned int MaxHP;
+	unsigned int WalkSpeed;
+	unsigned int RunSpeed;
+	unsigned char IsNPC;
+	unsigned int Size;
+	WeaponTypeEnum WeaponType;
+	ArmorTypeEnum ArmorType;
+	MobGradeType GradeType;
+	MobType Type;
+	unsigned char IsPlayerSide;
+	unsigned int AbsoluteSize;
+};
+enum MobAttackType : int
+{
+	MAT_MELEE = 0x0,
+	MAT_RANGE = 0x1,
+	MAX_MOBATTACKTYPE = 0x2,
+};
+enum MiniMapIconType : int
+{
+	MMIT_NPCFuniture = 0x0,
+	MMIT_NPCGuild = 0x1,
+	MMIT_NPCHelp = 0x2,
+	MMIT_NPCItem = 0x3,
+	MMIT_NPCKingdom = 0x4,
+	MMIT_NPCLink = 0x5,
+	MMIT_NPCMine = 0x6,
+	MMIT_NPCQuest = 0x7,
+	MMIT_NPCSkill = 0x8,
+	MMIT_NPCSmith = 0x9,
+	MMIT_NPCSoulStone = 0xA,
+	MMIT_NPCStore = 0xB,
+	MMIT_NPCTempler = 0xC,
+	MMIT_NPCNormal = 0xD,
+	MMIT_NPCWTitle = 0xE,
+	MMIT_NPCHouseZone = 0xF,
+	MMIT_NPCRedFlag = 0x10,
+	MMIT_NPCBlueFlag = 0x11,
+	MMIT_NPCNormalFlag = 0x12,
+	MMIT_NPCBlueGate = 0x13,
+	MMIT_NPCRedGate = 0x14,
+	MMIT_NPCNormalGate = 0x15,
+	MMIT_NPCNone = 0x16,
+	MMIT_NPCLinkTown = 0x17,
+	MMIT_NPCIDGate = 0x18,
+	MMIT_MobChief = 0x19,
+	MMIT_MobDmg = 0x1A,
+	MMIT_MobNormal = 0x1B,
+	MMIT_MobNotDamaged = 0x1C,
+	MMIT_MobAlreadyDamaged = 0x1D,
+	MMIT_MobChrLocFlag = 0x1E,
+	MAX_MINIMAPICONTYPE = 0x1F,
+};
+struct MobViewInfo : SHNRow
+{
+	unsigned short ID;
+	char InxName[32];
+	char FileName[32];
+	char Texture[32];
+	MobAttackType AttackType;
+	char ShotEffect[32];
+	char MobPortrait[32];
+	unsigned int ChrMarkSize;
+	MiniMapIconType MiniMapIcon;
+	unsigned short NpcViewIndex;
+	unsigned short BoundingBox;
+	unsigned short EffectViewID;
+	unsigned short SpectralGlow;
+	char Group1[32];
+	char Group2[32];
+	char Group3[32];
+	char GroupS[32];
+};
 #pragma pack(pop)
 #endif

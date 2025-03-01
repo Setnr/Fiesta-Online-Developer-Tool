@@ -10,12 +10,17 @@ class InitializeScene : public FiestaScene
 {
 	NiDeclareRTTI;
 public:
-	InitializeScene() : fileDialog(ImGuiFileBrowserFlags_SelectDirectory | ImGuiFileBrowserFlags_NoModal) 
+	InitializeScene() : 
+		ClientFolderPath(ImGuiFileBrowserFlags_SelectDirectory | ImGuiFileBrowserFlags_NoModal) ,
+		ServerFolderPath(ImGuiFileBrowserFlags_SelectDirectory | ImGuiFileBrowserFlags_NoModal)
 	{
-		fileDialog.SetTitle("Select Game-Client-Folder");
-		fileDialog.SetTypeFilters({ ".exe", ".bin" });
-		fileDialog.SetPwd(PgUtil::PathFromApplicationFolder(""));
-		fileDialog.Open();
+		ClientFolderPath.SetTitle("Select Game-Client-Folder");
+		ClientFolderPath.SetTypeFilters({ ".exe", ".bin" });
+		ClientFolderPath.SetPwd(PgUtil::PathFromApplicationFolder(""));
+		ClientFolderPath.Open();
+		ServerFolderPath.SetTitle("Select 9Data Folder");
+		ServerFolderPath.SetTypeFilters({});
+		ServerFolderPath.SetPwd(PgUtil::PathFromApplicationFolder(""));
 	};
 	virtual void Draw(NiRenderer* renderer) 
 	{
@@ -26,5 +31,7 @@ public:
 	virtual void DrawImGui();
 	virtual void UpdateCamera(float fTime){};
 private:
-	ImGui::FileBrowser fileDialog;
+	bool Init = false;
+	ImGui::FileBrowser ClientFolderPath;
+	ImGui::FileBrowser ServerFolderPath;
 };

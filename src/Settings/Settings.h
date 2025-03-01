@@ -31,6 +31,11 @@ public:
 			_ClientIsSetup = false;
 		else
 			_ClientIsSetup = true;
+		PgUtil::ServerFolderPath = reader.GetString("BaseInformation", "ServerPath", "");
+		if (PgUtil::ServerFolderPath == "" || !std::filesystem::exists(PgUtil::ServerFolderPath))
+			_ServerIsSetup = false;
+		else
+			_ServerIsSetup = true;
 		_Resolution.Width = reader.GetInteger("Window", "Width", 1600);
 		_Resolution.Height = reader.GetInteger("Window", "Height", 900);
 		_IsFullScreen = reader.GetBoolean("Window", "FullScreen", false);
@@ -59,6 +64,7 @@ public:
 
 		file << "[BaseInformation]" << std::endl;
 		file << "ClientPath = " << PgUtil::ClientFolderPath << std::endl;
+		file << "ServerPath = " << PgUtil::ServerFolderPath << std::endl;
 
 		file << "SaveInterval = " << _SaveInternal << std::endl << std::endl;
 
@@ -69,9 +75,11 @@ public:
 	static Resolution GetResolution() { return _Resolution; }
 	static void SetResolution(int Height, int Width) { _Resolution.Height = Height; _Resolution.Width = Width; }
 	static bool IsClientSetup() { return _ClientIsSetup; }
+	static bool IsServerSetup() { return _ServerIsSetup; }
 private:
 	static bool _IsFullScreen;
 	static bool _ClientIsSetup;
+	static bool _ServerIsSetup;
 	static Resolution _Resolution;
 	static float _SaveInternal;
 };

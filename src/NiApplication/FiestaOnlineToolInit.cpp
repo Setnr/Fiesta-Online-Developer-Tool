@@ -51,6 +51,8 @@ bool FiestaOnlineTool::Initialize()
     if(!Settings::Load())
         NiMessageBox("Failed to Load Settings!\nContinue with DefaultSettings", "Settings Error");
 
+    NPCData::Init();
+
     AddSingleObject::SetInitPath(PgUtil::PathFromClientFolder(""));
 
     std::thread SHNThread(StartSHNLoadingThread);
@@ -184,7 +186,7 @@ bool FiestaOnlineTool::CreateRenderer()
 
 void FiestaOnlineTool::LoadInitialScene()
 {
-    if (!Settings::IsClientSetup())
+    if (!Settings::IsClientSetup() || !Settings::IsServerSetup())
     {
         _Scene = NiNew InitializeScene;
         return;

@@ -5,6 +5,9 @@
 #include "WorldChanges/FogChange.h"
 #include <NiPick.h>
 #include <FiestaOnlineTool.h>
+#include "Data/NPCData/NPCData.h"
+#include "Data/SHN/Mobloader.h"
+#include "NiCustom/ShineNPCNode.h"
 
 #pragma region Gizmo-Calc
 glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
@@ -94,11 +97,18 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 	SetDirectionalLightAmbientColor(_SHMD->GetDirectionalLightAmbientColor(), false);
 	SetDirectionalLightDiffuseColor(_SHMD->GetDirectionalLightDiffuseColor(), false);
 
+	m_spGroundCollidee->Update(0.f);
+	m_spGroundCollidee->UpdateProperties();
+	m_spGroundCollidee->UpdateEffects();
+	m_spGroundCollidee->Update(0.f);
+
 	m_spWorldScene->Update(0.f);
 	m_spWorldScene->UpdateProperties();
 	m_spWorldScene->UpdateEffects();
 	m_spWorldScene->Update(0.f);
 	PgUtil::LookAndMoveAtWorldPoint(m_spCamera, NiPoint3(_MapInfo->RegenX, _MapInfo->RegenY, 500));
+
+	LoadNPCS();
 }
 
 IngameWorld::IngameWorld(MapInfo* Info, int MapSize) : _MapInfo(Info)
@@ -156,11 +166,19 @@ IngameWorld::IngameWorld(MapInfo* Info, int MapSize) : _MapInfo(Info)
 	SetDirectionalLightAmbientColor(_SHMD->GetDirectionalLightAmbientColor(),false);
 	SetDirectionalLightDiffuseColor(_SHMD->GetDirectionalLightDiffuseColor(), false);
 
+	m_spGroundCollidee->Update(0.f);
+	m_spGroundCollidee->UpdateProperties();
+	m_spGroundCollidee->UpdateEffects();
+	m_spGroundCollidee->Update(0.f);
+
 	m_spWorldScene->Update(0.f);
 	m_spWorldScene->UpdateProperties();
 	m_spWorldScene->UpdateEffects();
 	m_spWorldScene->Update(0.f);
+
 	PgUtil::LookAndMoveAtWorldPoint(m_spCamera, NiPoint3(_MapInfo->RegenX, _MapInfo->RegenY, 500));
+
+	LoadNPCS();
 }
 void IngameWorld::SetFogColor(NiColor kColor, bool Backup) 
 {
@@ -306,10 +324,17 @@ void IngameWorld::UpdatePos(std::vector<NiPickablePtr> Node, NiPoint3 PosChange,
 {
 	if (Backup)
 		AttachStack(NiNew UpdateNodePos(this, Node, PosChange));
+
 	for (auto obj : Node)
 	{
-		NiPoint3 OldPos = obj->GetTranslate();
-		obj->SetTranslate(OldPos + PosChange);
+		NiPoint3 NewPos = obj->GetTranslate() + PosChange;
+		if (NiIsKindOf(ShineObjectNode, obj))
+		{
+			UpdateZCoord(NewPos);
+			ShineObjectNodePtr mob = NiSmartPointerCast(ShineObjectNode, obj);
+			mob->UpdatePos(NewPos);
+		}else
+			obj->SetTranslate(NewPos);
 	}
 }
 void IngameWorld::UpdateRotation(std::vector<NiPickablePtr> Node, glm::vec3 RotationChange, bool Backup)
@@ -344,7 +369,12 @@ void IngameWorld::UpdateRotation(std::vector<NiPickablePtr> Node, glm::vec3 Rota
 		NiMatrix3 m;
 		m.MakeRotation(angleAxis[0], angleAxis[1], angleAxis[2], angleAxis[3]);
 
-		obj->SetRotate(m);
+		if (NiIsKindOf(ShineObjectNode, obj))
+		{
+			ShineObjectNodePtr mob = NiSmartPointerCast(ShineObjectNode, obj);
+			mob->UpdateRotation(angleAxis[3] * angleAxis[0] * 180.0 / NI_PI );
+		}else
+			obj->SetRotate(m);
 	}
 }
 void IngameWorld::RemoveSky(NiNodePtr Node, bool Backup)
@@ -424,6 +454,17 @@ void IngameWorld::AddObject(std::vector<NiPickablePtr> objs, bool Backup)
 		m_spGroundObject->AttachChild(obj);
 		_SHMD->AddObject(NiSmartPointerCast(NiNode, obj));
 	}
+	m_spGroundObject->CompactChildArray();
+	m_spGroundObject->UpdateProperties();
+	m_spGroundObject->UpdateEffects();
+	m_spGroundObject->Update(0.f);
+}
+void IngameWorld::AddShineObject(ShineObjectNodePtr obj, bool Backup) 
+{
+	if (Backup) {
+		LogError("No ShineObject Backup added yet");
+	}
+	m_spGroundObject->AttachChild(obj);
 	m_spGroundObject->CompactChildArray();
 	m_spGroundObject->UpdateProperties();
 	m_spGroundObject->UpdateEffects();
@@ -820,4 +861,88 @@ void IngameWorld::CalculateRay(NiPoint3& StartPoint, NiPoint3& SunVector, std::v
 void IngameWorld::SaveVertex() 
 {
 	PgUtil::SaveTexture(PgUtil::PathFromClientFolder(_INI->GetVertexColor()), _INI->GetVertexImage());
+}
+
+void IngameWorld::LoadNPCS()
+{
+	std::vector<ShineNPCPtr> NPCS = NPCData::GetNPCsByMap(_MapInfo->MapName);
+	for (auto npc : NPCS)
+	{
+		ShineNPCNodePtr mob = NiNew ShineNPCNode(npc);
+		NiPoint3 pos = mob->GetPos();
+		UpdateZCoord(pos);
+		mob->UpdatePos(pos);
+		
+		mob->UpdateRotation(mob->GetRotation());
+		if (NiIsKindOf(ShineObjectNode, mob))
+			this->AddShineObject(NiSmartPointerCast(ShineObjectNode, mob), false);
+	}
+}
+bool IngameWorld::UpdateZCoord(NiPoint3& Pos) 
+{
+	NiPoint3 Org = Pos;
+	Org.z = -2500.;
+	float z = -2500;
+
+	NiPick _Pick;
+	_Pick.SetPickType(NiPick::FIND_ALL);
+	_Pick.SetSortType(NiPick::SORT);
+	_Pick.SetIntersectType(NiPick::TRIANGLE_INTERSECT);
+	_Pick.SetFrontOnly(false);
+	_Pick.SetObserveAppCullFlag(false);
+	if (HasHTD()) 
+	{
+		_Pick.SetTarget(m_spGroundTerrain);
+		if (_Pick.PickObjects(Org, NiPoint3(.0,.0,1.0), true))
+		{
+			NiPick::Results& results = _Pick.GetResults();
+			for (int i = 0; i < results.GetSize(); i++) 
+			{
+				NiPick::Record* record = results.GetAt(0);
+				if (!record)
+					continue;
+				if (z < record->GetIntersection().z) {
+					z = record->GetIntersection().z;
+				}
+			}
+		}
+		_Pick.ClearResultsArray();
+	}
+	_Pick.SetTarget(m_spGroundCollidee);
+	if (_Pick.PickObjects(Org, NiPoint3(.0, .0, 1.0), true))
+	{
+		NiPick::Results& results = _Pick.GetResults();
+		for (int i = 0; i < results.GetSize(); i++)
+		{
+			NiPick::Record* record = results.GetAt(i);
+			if (!record)
+				continue;
+			if (z < record->GetIntersection().z) {
+				z = record->GetIntersection().z;
+			}
+		}
+	}
+	_Pick.ClearResultsArray();
+	if (z != Pos.z)
+	{
+		Pos.z = z;
+		return true;
+	}
+	return false;
+}
+
+NiPickablePtr IngameWorld::CreateNewNPC()
+{
+	NiPoint3 pos = GetWorldPoint();
+	UpdateZCoord(pos);
+	ShineNPCPtr npc = NPCData::CreateNewNPC(this->_MapInfo, pos);
+	ShineNPCNodePtr mob = NiNew ShineNPCNode(npc);
+	mob->UpdatePos(pos);
+	mob->UpdateRotation(mob->GetRotation());
+	if (NiIsKindOf(ShineObjectNode, mob))
+		this->AddShineObject(NiSmartPointerCast(ShineObjectNode, mob), false);
+	if (NiIsKindOf(NiPickable, mob))
+		return NiSmartPointerCast(NiPickable, mob);
+	else
+		return nullptr;
 }

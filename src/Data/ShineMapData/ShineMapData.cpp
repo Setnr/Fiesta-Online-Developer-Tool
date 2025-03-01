@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <future>
 #include <map>
+#include <Data/NiCustom/NiSHMDPickable.h>
+#include <NiCollisionData.h>
 
 struct ObjectPosition
 {
@@ -101,9 +103,12 @@ bool ShineMapData::Load(MapInfo* Info)
 
 		NiNodePtr Node;
 		PgUtil::LoadNodeNifFile(FullFilePath.c_str(), &Node, NULL);
-		Node->SetName(FilePath.c_str());
-		ExtractCollision(Node);
-		GlobalGroundObjectList.push_back(Node);
+		if(Node)
+		{
+			Node->SetName(FilePath.c_str());
+			ExtractCollision(Node);
+			GlobalGroundObjectList.push_back(Node);
+		}
 	}
 
 	SHMD >> line;
@@ -115,7 +120,7 @@ bool ShineMapData::Load(MapInfo* Info)
 
 	if (std::filesystem::exists(GlobalLightPath))
 	{
-		GlobalLightNif = PgUtil::LoadNifFile(GlobalLightPath.c_str());
+		GlobalLightNif = PgUtil::LoadNifFile<NiNode>(GlobalLightPath.c_str());
 	}
 	SHMD >> r >> g >> b;
 	{
@@ -210,7 +215,7 @@ bool ShineMapData::Load(MapInfo* Info)
 					std::string Path = PgUtil::PathFromClientFolder(obj.first);
 					if (!MainObj)
 					{
-						MainObj = PgUtil::LoadNifFile(Path.c_str(), NULL, true);
+						MainObj = PgUtil::LoadNifFile<NiSHMDPickable>(Path.c_str(), NULL);
 						ExtractCollision(MainObj);
 
 					}
@@ -219,7 +224,7 @@ bool ShineMapData::Load(MapInfo* Info)
 
 					List.insert(ptr);
 
-					Obj->SetSHMDPath(obj.first);
+					Obj->SetFilePathOrName(obj.first);
 
 					Obj->SetDefaultCopyType(Obj->COPY_UNIQUE);
 					Obj->SetTranslate(pos->pos);
@@ -262,31 +267,50 @@ void ShineMapData::ExtractCollision(NiNodePtr obj)
 		NiAVObjectPtr child = obj->GetAt(i);
 		if (!child)
 			continue;
-		if (NiIsKindOf(NiGeometry, child))
+		auto Name = child->GetName();
+		if ((Name.Contains("#CD") || Name.Contains("#M")) && NiIsKindOf(NiAVObject,child))
 		{
-			auto Name = child->GetName();
-			if (Name.Contains("#CD") || Name.Contains("#M"))
+			Removes.push_back(child);
+		}
+		else
+		{
+			if (NiIsKindOf(NiNode, child))
 			{
-				Removes.push_back(child);
+				ExtractCollision(NiSmartPointerCast(NiNode, child));
+			}
+			if (NiIsKindOf(NiTriStrips, child)) 
+			{
+				/*auto colidee = child->GetCollisionObject();
+				if(colidee)
+				{
+					NiNode* node = NiNew NiNode;
+					node->AttachChild(NiSmartPointerCast(NiAVObject, child->Clone()));
+					CollisionObjectList.push_back(node);
+				}*/
 			}
 		}
-		else if (NiIsKindOf(NiNode, child))
-		{
-			NiNodePtr p = (NiNode*)(NiAVObject*)child;
-			ExtractCollision(p);
-		}
+		
 	}
 	for (auto rem : Removes)
 	{
-		obj->DetachChild(rem);
-		if (NiIsKindOf(NiNode, rem))
+		if (NiIsKindOf(NiAVObject, rem))
 		{
+			obj->DetachChild(rem);
+			obj->CompactChildArray();
+
 			if(rem->GetName().Contains("#CD"))
-				CollisionObjectList.push_back((NiNodePtr)(NiNode*)&*rem);
+				CollisionObjectList.push_back(NiSmartPointerCast(NiAVObject,rem));
 			else
-				CameraCollisionObjectList.push_back((NiNodePtr)(NiNode*)&*rem);
+				CameraCollisionObjectList.push_back(NiSmartPointerCast(NiAVObject, rem));
+
+			rem->UpdateProperties();
+			rem->UpdateEffects();
+			rem->Update(0.0f);
 		}
 	}
+	obj->UpdateProperties();
+	obj->UpdateEffects();
+	obj->Update(0.0f);
 }
 bool ShineMapData::Save(MapInfo* Info) 
 {

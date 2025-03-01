@@ -8,7 +8,7 @@ class TerrainMode : public EditMode
 	TerrainMode(IngameWorldPtr World, FiestaScenePtr Scene) : EditMode(World, Scene)
 	{
 		Camera = World->GetCamera();
-		MouseOrb = PgUtil::LoadNifFile(PgUtil::PathFromApplicationFolder(".\\FiestaOnlineTool\\HTDCircle.nif").c_str());
+		MouseOrb = PgUtil::LoadNifFile<NiNode>(PgUtil::PathFromApplicationFolder(".\\FiestaOnlineTool\\HTDCircle.nif").c_str());
 		NiWireframePropertyPtr ptr = NiNew NiWireframeProperty;
 		ptr->SetWireframe(true);
 		MouseOrb->AttachProperty(ptr);

@@ -4,6 +4,7 @@
 #include <ImGui/imfilebrowser.h>
 #include <Data/IngameWorld/IngameWorld.h>
 #include <NiDX9Renderer.h>
+#include "Data/NiCustom/NiSHMDPickable.h"
 class AddMultipleObject : public ScreenElement
 {
 	NiDeclareRTTI;
@@ -48,14 +49,14 @@ public:
 			CurPath = _FileBrowser.GetSelected().string();
 			if(CurPath.ends_with(".nif"))
 			{
-				NiNodePtr ptr = PgUtil::LoadNifFile(CurPath.c_str(), 0, true);
+				NiSHMDPickablePtr ptr = PgUtil::LoadNifFile<NiSHMDPickable>(CurPath.c_str(), 0);
 				if (NiIsKindOf(NiPickable, ptr))
 				{
 					_BaseNode->DetachChild(_Obj);
 
 					_Obj = NiSmartPointerCast(NiPickable, ptr);
 					auto len = PgUtil::PathFromClientFolder("").length() + 1;
-					_Obj->SetSHMDPath(CurPath.substr(len).c_str());
+					_Obj->SetFilePathOrName(CurPath.substr(len).c_str());
 
 					auto io = ImGui::GetIO();
 					NiPoint3 kOrigin, kDir;

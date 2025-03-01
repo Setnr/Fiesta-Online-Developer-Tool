@@ -2,6 +2,7 @@
 #include "Logger.h"
 #include <Scene/EditorScene/Modes/SHMDMode.h>
 #include <Scene/EditorScene/Modes/SHBDMode.h>
+#include <Scene/EditorScene/Modes/NPCEditMode.h>
 #include <Scene/EditorScene/Modes/TerrainBrushMode.h>
 #include <Scene/EditorScene/Modes/TextureMode.h>
 #include <Scene/EditorScene/Modes/VertexMode.h>
@@ -644,6 +645,13 @@ int HasSelectedObject(lua_State* Script)
 		if (NiIsKindOf(SHMDMode, _EditMode))
 		{
 			SHMDModePtr mode = NiSmartPointerCast(SHMDMode, _EditMode);
+			bool _HasSelected = mode->HasSelectedObject();
+			lua_pushboolean(Script, _HasSelected);
+			return 1;
+		}
+		if (NiIsKindOf(NPCEditMode, _EditMode))
+		{
+			NPCEditModePtr mode = NiSmartPointerCast(NPCEditMode, _EditMode);
 			bool _HasSelected = mode->HasSelectedObject();
 			lua_pushboolean(Script, _HasSelected);
 			return 1;
@@ -1584,6 +1592,28 @@ int SaveVertex(lua_State* Script)
 	}  
 	return 0;  
 }
+int BeginDisabled(lua_State* Script)
+{
+	ImGui::BeginDisabled();
+	return 0;
+}
+int EndDisabled(lua_State* Script)
+{
+	ImGui::EndDisabled();
+	return 0;
+}
+int DrawObjectMenu(lua_State* Script)
+{
+	if(lua_isinteger(Script, 1))
+	{
+		NiNodePtr node = (NiNode*)lua_tointeger(Script, 1);
+		if (NiIsKindOf(ShineObjectNode, node)) {
+			ShineObjectNodePtr obj = NiSmartPointerCast(ShineObjectNode, node);
+			obj->DrawObjectMenu();
+		}
+	}
+	return 0;
+}
 
 int GetPointDistFromShineIni(lua_State* Script)
 { 
@@ -1766,4 +1796,7 @@ void SetFunctions(lua_State* Script)
 	lua_register(Script, "CreateShadow", CreateShadow);
 	lua_register(Script, "SaveVertex", SaveVertex);
 	lua_register(Script, "GetPointDistFromShineIni", GetPointDistFromShineIni);
+	lua_register(Script, "BeginDisabled", BeginDisabled);
+	lua_register(Script, "EndDisabled", EndDisabled);
+	lua_register(Script, "DrawObjectMenu", DrawObjectMenu);
 } 

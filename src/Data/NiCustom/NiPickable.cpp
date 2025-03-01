@@ -1,16 +1,22 @@
-#include "NiPickable.h"
+#include "NiSHMDPickable.h"
 #include <NiCloningProcess.h>
 #include "NiBoundingBox.h"
 
 NiImplementRTTI(NiPickable, NiNode);
-NiImplementCreateClone(NiPickable);
-
+NiImplementCreateClone(NiPickable)
+NiImplementRTTI(NiSHMDPickable, NiPickable);
+NiImplementCreateClone(NiSHMDPickable);
+void NiSHMDPickable::CopyMembers(
+    NiSHMDPickable* pDest, NiCloningProcess& kCloning)
+{
+    NiPickable::CopyMembers(pDest, kCloning);
+}
 //---------------------------------------------------------------------------
 void NiPickable::CopyMembers(
     NiPickable* pDest, NiCloningProcess& kCloning)
 {
     NiNode::CopyMembers(pDest, kCloning);
-    pDest->SetSHMDPath(GetSHMDPath());
+    pDest->SetFilePathOrName(GetSHMDPath());
 }
 
 NiNodePtr NiPickable::ToNiNode()
