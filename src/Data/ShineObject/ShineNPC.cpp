@@ -4,6 +4,7 @@
 #include <NPCData/NPCData.h>
 
 NiImplementRTTI(ShineNPC, ShineMob);
+NiImplementRTTI(GateSpawn, ShineMob);
 NiImplementRootRTTI(NPCRole);
 NiImplementRTTI(JobManager, NPCRole);
 NiImplementRTTI(QuestNPC, NPCRole);
@@ -24,7 +25,7 @@ ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::s
 	++start;
 	for (auto& iter = start; iter != end; iter++)
 	{
-		if (*iter == "")
+		if (*iter == "" || iter->empty())
 			continue;
 		switch (DataID) 
 		{
@@ -96,7 +97,10 @@ ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::s
 			}
 			break;
 		case 7:
-			_Role->SetArgument(*iter);
+			if (!_Role)
+				LogError("Failed to Load NPC.txt");
+			else
+				_Role->SetArgument(*iter);
 			break;
 		default:
 			continue;
@@ -287,13 +291,14 @@ void ShineGate::Draw()
 	DrawSizeCheck();
 	if (ImGui::Button("Add new LinkData"))
 	{
-		_LinkData.push_back({ "Rou","Rou",0.0f,0.0f,0.0f,false });
+		_LinkData.push_back( NiNew LinkData);
 	}
 	int ID = 0;
 	if (!_LinkData.size())
 		return;
 	for (auto data = _LinkData.begin();data != _LinkData.end(); data++ ) 
 	{
+		LinkDataPtr LinkData = *data;
 		if(ImGui::TreeNode(std::to_string(ID).c_str()))
 		{
 			char argument[33];
@@ -303,19 +308,19 @@ void ShineGate::Draw()
 				_Argument = argument;
 			}
 			char buffer[33];
-			strcpy_s(buffer, data->MapClient.c_str());
+			strcpy_s(buffer, LinkData->MapClient.c_str());
 			if (ImGui::InputText("Map", buffer, sizeof(buffer)))
 			{
-				data->MapClient = buffer;
-				data->MapServer = buffer;
+				LinkData->MapClient = buffer;
+				LinkData->MapServer = buffer;
 			}
-			ImGui::DragFloat2("Coord", &data->x, 0.05);
-			ImGui::DragFloat("Rotation", &data->rot, 0.01f, 0.f, 360.f);
-			ImGui::Checkbox("Party", &data->Party);
+			ImGui::DragFloat2("Coord", &LinkData->x, 0.05);
+			ImGui::DragFloat("Rotation", &LinkData->rot, 0.01f, 0.f, 360.f);
+			ImGui::Checkbox("Party", &LinkData->Party);
 			if (NPCData::isCN) 
 			{
-				ImGui::DragInt("Level From", &data->from);
-				ImGui::DragInt("Level To", &data->to);
+				ImGui::DragInt("Level From", &LinkData->from);
+				ImGui::DragInt("Level To", &LinkData->to);
 			}
 
 			if (ImGui::Button("Delete"))
@@ -350,14 +355,15 @@ std::string ShineGate::GetArgumentString()
 	std::string msg = _Argument;
 	for (auto data = _LinkData.begin(); data != _LinkData.end(); data++)
 	{
-		const char* IsParty = (data->Party) ? "1" : "0";
-		msg += "\n#recordin\tLinkTable\t" + _Argument + "\t" + data->MapClient + "\t" +
-			data->MapServer + "\t" + std::to_string((int)data->x) + "\t" + std::to_string((int)data->y) +
+		LinkDataPtr LinkData = *data;
+		const char* IsParty = (LinkData->Party) ? "1" : "0";
+		msg += "\n#recordin\tLinkTable\t" + _Argument + "\t" + LinkData->MapClient + "\t" +
+			LinkData->MapServer + "\t" + std::to_string((int)LinkData->x) + "\t" + std::to_string((int)LinkData->y) +
 			"\t";
 		if (NPCData::isCN)
-			msg += std::to_string((int)data->from) + "\t" + std::to_string((int)data->to) + "\t";
+			msg += std::to_string((int)LinkData->from) + "\t" + std::to_string((int)LinkData->to) + "\t";
 
-		msg += std::to_string((int)data->rot) + "\t" + IsParty;
+		msg += std::to_string((int)LinkData->rot) + "\t" + IsParty;
 
 	}
 	return msg;
@@ -368,11 +374,12 @@ bool ShineGate::AppendGate(std::vector<std::string>::iterator& start, std::vecto
 	if (*start != "LinkTable")
 		return false;
 	int id = 0;
-	LinkData data;
+	LinkDataPtr data = NiNew LinkData;
 	
 	for (auto iter = start; iter != end; iter++)
 	{
-		if (*iter == "" || *iter == "LinkTable")
+		
+		if (*iter == "" || *iter == "LinkTable" || iter->empty())
 			continue;
 		if (!NPCData::isCN)
 		{
@@ -383,22 +390,22 @@ bool ShineGate::AppendGate(std::vector<std::string>::iterator& start, std::vecto
 					return false;
 				break;
 			case 1:
-				data.MapServer = *iter;
+				data->MapServer = *iter;
 				break;
 			case 2:
-				data.MapClient = *iter;
+				data->MapClient = *iter;
 				break;
 			case 3:
-				data.x = std::stof(*iter);
+				data->x = std::stof(*iter);
 				break;
 			case 4:
-				data.y = std::stof(*iter);
+				data->y = std::stof(*iter);
 				break;
 			case 5:
-				data.rot = std::stof(*iter);
+				data->rot = std::stof(*iter);
 				break;
 			case 6:
-				data.Party = std::stoi(*iter);
+				data->Party = std::stoi(*iter);
 				break;
 
 			}
@@ -412,28 +419,28 @@ bool ShineGate::AppendGate(std::vector<std::string>::iterator& start, std::vecto
 					return false;
 				break;
 			case 1:
-				data.MapServer = *iter;
+				data->MapServer = *iter;
 				break;
 			case 2:
-				data.MapClient = *iter;
+				data->MapClient = *iter;
 				break;
 			case 3:
-				data.x = std::stof(*iter);
+				data->x = std::stof(*iter);
 				break;
 			case 4:
-				data.y = std::stof(*iter);
+				data->y = std::stof(*iter);
 				break;
 			case 5:
-				data.rot = std::stof(*iter);
+				data->rot = std::stof(*iter);
 				break;
 			case 6:
-				data.from = std::stoi(*iter);
+				data->from = std::stoi(*iter);
 				break;
 			case 7:
-				data.to = std::stoi(*iter);
+				data->to = std::stoi(*iter);
 				break;
 			case 8:
-				data.Party = std::stoi(*iter);
+				data->Party = std::stoi(*iter);
 				break;
 
 			}
@@ -460,4 +467,19 @@ std::string NPCRole::toString()
 	std::stringstream os;
 	os << GetRoleString() << "\t" << GetArgumentString();
 	return os.str();
+}
+
+GateSpawn::GateSpawn(ShineGate::LinkDataPtr data)
+{
+	MobInfo* info = nullptr;
+	int id = 0;
+	while (info == nullptr) {
+		info = MobLoader::GetMobInfo(id);
+		id++;
+	}
+	_Data = data;
+	_Pos = NiPoint3(_Data->x, _Data->y, 0.f);
+	_Rotation = _Data->rot;
+	_MobInx = info->InxName;
+	_MapInx = data->MapClient;
 }

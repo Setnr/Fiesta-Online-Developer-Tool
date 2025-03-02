@@ -17,6 +17,7 @@ public:
 	~NPCEditMode() 
 	{
 		ClearSelectedObjects();
+		kWorld->GateSpawnPoints(false);
 	}
 	virtual void Draw();
 	virtual void Update(float fTime);

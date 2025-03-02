@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <regex>
 
+
 NPCDataPtr NPCData::Data = nullptr;
 bool NPCData::isCN = false;
 void NPCData::Init() 
@@ -92,7 +93,7 @@ void NPCData::Save()
 	npctxt << "#ColumnName\tMobName\tMap\tCoord-X\tCoord-Y\tDirect\tNPCMenu\tRole\tRoleArg0" << std::endl;
 	npctxt << std::endl;
 	npctxt << "#Table LinkTable" << std::endl;
-	if (NPCData::isCN)
+	if (!NPCData::isCN)
 	{
 		npctxt << "#ColumnType\tIndex\tSTRING[33]\tSTRING[33]\tDWRD\tDWRD\tWORD\tBYTE" << std::endl;
 		npctxt << "#ColumnName\targument\tMapServer\tMapClient\tCoord-Y\tCoord-Y\tDirect\tParty" << std::endl;
@@ -135,5 +136,23 @@ ShineNPCPtr NPCData::CreateNewNPC(MapInfo* Info, NiPoint3 Pos)
 	ShineNPC* npc = NiNew ShineNPC(Info, Pos);
 	Data->_NPCS.push_back(npc);
 	return npc;
+}
+
+std::vector<std::pair<std::string,ShineGate::LinkDataPtr>> NPCData::GetSpawnPointsByMap(std::string MapName)
+{
+	std::vector<std::pair<std::string, ShineGate::LinkDataPtr>> list;
+	for (auto data : Data->_NPCS) 
+	{
+		if (NiIsKindOf(ShineGate, data->GetRole())) 
+		{
+			ShineGatePtr gate = NiSmartPointerCast(ShineGate, data->GetRole());
+			for (auto link : gate->GetLinkData()) 
+			{
+				if (link->MapClient == MapName)
+					list.push_back({ gate->GetArgument(),link});
+			}
+		}
+	}
+	return list;
 }
 

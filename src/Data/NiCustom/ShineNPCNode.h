@@ -13,3 +13,14 @@ protected:
 	ShineNPCNode();
 	virtual void UpdateActor(NiActorManagerPtr NewActor);
 };
+
+NiSmartPointer(GateSpawnPoint);
+class GateSpawnPoint : public ShineMobNode 
+{
+	NiDeclareRTTI;
+public:
+	GateSpawnPoint(std::string Argument, ShineGate::LinkDataPtr LinkData);
+	virtual void DrawObjectMenu();
+private:
+	std::string _Argument;
+};

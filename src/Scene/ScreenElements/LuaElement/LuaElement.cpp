@@ -29,7 +29,7 @@ LuaElement::LuaElement(EditorScenePtr Scene, std::string FileName, ImVec2 Pos) :
 } 
 
 bool LuaElement::Draw()
-{
+{  
 	bool ret = true;
 	if (_Pos.x != -1 && _Pos.y != -1)
 		ImGui::SetNextWindowPos(_Pos);

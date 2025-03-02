@@ -4,7 +4,7 @@ function prepare(ElementPtr)
 end
 
 Data = {
-    
+    ShowNPCSpawn = false
 }
 
 function render(ElementPtr)
@@ -13,6 +13,11 @@ function render(ElementPtr)
     local ScenePtr = GetCurrentScenePtr(ElementPtr)
     local EditModePtr, EditModeName = GetCurrentEditMode(ScenePtr)
     if EditModeName == "NPC" then
+        local changed =  CheckBox("Show SpawnPoints", Data.ShowNPCSpawn)
+        if changed then
+            Data.ShowNPCSpawn = not Data.ShowNPCSpawn
+            ShowGateSpawns(WorldPtr,Data.ShowNPCSpawn)
+        end
         if HasSelectedObject(EditModePtr) then
             local CurEditMode = GetCurrentObjectMode(EditModePtr)
             if RadioButton(CurEditMode, "Translate" , 1|2) then

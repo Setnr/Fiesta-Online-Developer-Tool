@@ -132,20 +132,20 @@ NiSmartPointer(ShineGate);
 class ShineGate : public NPCRole{
 	NiDeclareRTTI;
 public:
-	ShineGate(){};
-	bool AppendGate(std::vector<std::string>::iterator& start, std::vector<std::string>::iterator& end);
-	virtual bool SetArgument(std::string Argument) { _Argument = Argument;  return true; };
-	virtual void Draw();
-
-	virtual void DrawSizeCheck();
-	ShineGate(ShineGatePtr kCopy);
-	virtual std::string GetRoleString() { return "Gate"; };
-	virtual std::string GetArgumentString();
-	
-	
-protected:
-	struct LinkData
+	NiSmartPointer(LinkData);
+	class LinkData : public NiRefObject
 	{
+	public:
+		LinkData() {
+			MapServer = "Rou";
+			MapClient = "Rou";
+			x = 0.f;
+			y = 0.f;
+			rot = 0.f;
+			from = 1;
+			to = 150;
+			Party = false;
+		}
 		std::string MapServer;
 		std::string MapClient;
 		float x;
@@ -155,7 +155,20 @@ protected:
 		int to;
 		bool Party;
 	};
-	std::vector<LinkData> _LinkData;
+	ShineGate(){};
+	bool AppendGate(std::vector<std::string>::iterator& start, std::vector<std::string>::iterator& end);
+	virtual bool SetArgument(std::string Argument) { _Argument = Argument;  return true; };
+	std::string GetArgument() { return _Argument; }
+	virtual void Draw();
+
+	virtual void DrawSizeCheck();
+	ShineGate(ShineGatePtr kCopy);
+	virtual std::string GetRoleString() { return "Gate"; };
+	virtual std::string GetArgumentString();
+	std::vector<LinkDataPtr> GetLinkData() { return _LinkData; }
+	
+protected:
+	std::vector<LinkDataPtr> _LinkData;
 	std::string _Argument;
 };
 
@@ -187,7 +200,6 @@ public:
 };
 
 
-
 NiSmartPointer(ShineNPC);
 class ShineNPC : public ShineMob
 {
@@ -203,4 +215,25 @@ public:
 private:
 	bool _NPCMenu;
 	NPCRolePtr _Role; 
+};
+
+NiSmartPointer(GateSpawn);
+class GateSpawn : public ShineMob
+{
+	NiDeclareRTTI;
+public:
+	GateSpawn(ShineGate::LinkDataPtr data);
+	virtual void UpdatePos(NiPoint3 NewPos)
+	{
+		ShineMob::UpdatePos(NewPos);
+		_Data->x = NewPos.x;
+		_Data->y = NewPos.y;
+	}
+	virtual void UpdateRotation(float NewRotation)
+	{
+		ShineMob::UpdateRotation(NewRotation);
+		_Data->rot = NewRotation;
+	}
+private:
+	ShineGate::LinkDataPtr _Data;
 };

@@ -169,8 +169,10 @@ public:
 	void SaveVertex();
 	void LoadNPCS();
 	void AddShineObject(ShineObjectNodePtr obj, bool Backup = true);
+	void RemoveShineObject(ShineObjectNodePtr obj, bool Backup = true);
 	bool UpdateZCoord(NiPoint3& Pos);
 	NiPickablePtr CreateNewNPC();
+	void GateSpawnPoints(bool show);
 private:
 
 	void SetVertexColorInternal(int ShapeID, int InternalBlockX, int InternalBlockY, NiColorA Color);
@@ -191,9 +193,10 @@ private:
 	void CreateTerrainLayer(std::shared_ptr<TerrainLayerData> CurrentLayer);
 
 	bool _ShowTerrain = true;
-	 
 	std::deque<WorldChangePtr>UnDoStack;
 	std::deque<WorldChangePtr>ReDoStack;
+
+	std::vector<ShineObjectNodePtr> _GateSpawnPoints;
 
 #pragma region WorldStructureNodes
 	NiNodePtr m_spLightArea;

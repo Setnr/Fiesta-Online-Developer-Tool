@@ -14,11 +14,11 @@ public:
 	std::string GetMapInx() { return _MapInx; }
 	NiPoint3 GetPos() { return _Pos; }
 	float GetRotation() { return _Rotation; }
-	void UpdatePos(NiPoint3 NewPos) 
+	virtual void UpdatePos(NiPoint3 NewPos) 
 	{ 
 		_Pos = NewPos;
 	}
-	void UpdateRotation(float NewRotation) 
+	virtual void UpdateRotation(float NewRotation) 
 	{ 
 		_Rotation = NewRotation; 
 	}

@@ -2,6 +2,7 @@
 #include <Logger.h>
 
 NiImplementRTTI(ShineNPCNode, ShineMobNode);
+NiImplementRTTI(GateSpawnPoint, ShineMobNode);
 NiImplementCreateClone(ShineNPCNode);
 ShineNPCNode::ShineNPCNode(ShineNPCPtr BaseObject) 
 	: ShineMobNode(NiSmartPointerCast(ShineMob, BaseObject)) 
@@ -36,4 +37,18 @@ void ShineNPCNode::UpdateActor(NiActorManagerPtr NewActor)
 {
     ShineMobNode::UpdateActor(NewActor);
     _Actor->ActivateSequence(101000);
+}
+
+GateSpawnPoint::GateSpawnPoint(std::string Argument,ShineGate::LinkDataPtr LinkData)
+    : _Argument(Argument), ShineMobNode(NiSmartPointerCast(ShineMob, NiNew GateSpawn(LinkData)))
+{
+    if (_Actor)
+        _Actor->ActivateSequence(101000);
+}
+
+void GateSpawnPoint::DrawObjectMenu()
+{
+    ShineMobNode::DrawObjectMenu();
+
+    ImGui::Text("Argument %s", _Argument.c_str());
 }

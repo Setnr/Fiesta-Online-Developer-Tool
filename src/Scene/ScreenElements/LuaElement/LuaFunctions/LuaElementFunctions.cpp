@@ -810,7 +810,7 @@ int SetScale(lua_State* Script)
 	return 0;
 }
 int CheckBox(lua_State* Script)
-{
+{ 
 	if (lua_isstring(Script, 1) && lua_isboolean(Script, 2))
 	{
 		auto name = lua_tostring(Script, 1);
@@ -819,7 +819,7 @@ int CheckBox(lua_State* Script)
 		lua_pushboolean(Script, changed);
 		return 1;
 	} 
-	return 0;
+	return 0; 
 }
 int GetSnapMoveStep(lua_State* Script)
 {
@@ -1614,6 +1614,15 @@ int DrawObjectMenu(lua_State* Script)
 	}
 	return 0;
 }
+int ShowGateSpawns(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isboolean(Script,2))
+	{
+		IngameWorldPtr node = (IngameWorld*)lua_tointeger(Script, 1);
+		node->GateSpawnPoints(lua_toboolean(Script,2));
+	}
+	return 0;
+}
 
 int GetPointDistFromShineIni(lua_State* Script)
 { 
@@ -1799,4 +1808,5 @@ void SetFunctions(lua_State* Script)
 	lua_register(Script, "BeginDisabled", BeginDisabled);
 	lua_register(Script, "EndDisabled", EndDisabled);
 	lua_register(Script, "DrawObjectMenu", DrawObjectMenu);
+	lua_register(Script, "ShowGateSpawns", ShowGateSpawns);
 } 

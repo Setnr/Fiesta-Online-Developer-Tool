@@ -470,6 +470,17 @@ void IngameWorld::AddShineObject(ShineObjectNodePtr obj, bool Backup)
 	m_spGroundObject->UpdateEffects();
 	m_spGroundObject->Update(0.f);
 }
+void IngameWorld::RemoveShineObject(ShineObjectNodePtr obj, bool Backup)
+{
+	if (Backup) {
+		LogError("No ShineObject Backup added yet");
+	}
+	m_spGroundObject->DetachChild(obj);
+	m_spGroundObject->CompactChildArray();
+	m_spGroundObject->UpdateProperties();
+	m_spGroundObject->UpdateEffects();
+	m_spGroundObject->Update(0.f);
+}
 void IngameWorld::UpdateScale(std::vector<NiPickablePtr> Node, float Scale, bool Backup) 
 {
 	if (Backup)
@@ -945,4 +956,34 @@ NiPickablePtr IngameWorld::CreateNewNPC()
 		return NiSmartPointerCast(NiPickable, mob);
 	else
 		return nullptr;
+}
+
+void IngameWorld::GateSpawnPoints(bool show)
+{
+	if (show) 
+	{
+		std::vector<std::pair<std::string,ShineGate::LinkDataPtr>> spawnpoints = NPCData::GetSpawnPointsByMap(_MapInfo->MapName);
+		for (auto point : spawnpoints) 
+		{
+			GateSpawnPointPtr npc = NiNew GateSpawnPoint(point.first,point.second);
+			auto pos = npc->GetPos();
+			UpdateZCoord(pos);
+			npc->UpdatePos(pos);
+			npc->UpdateRotation(npc->GetRotation());
+			if (NiIsKindOf(ShineObjectNode, npc))
+			{
+				this->AddShineObject(NiSmartPointerCast(ShineObjectNode, npc), false);
+				_GateSpawnPoints.push_back(NiSmartPointerCast(ShineObjectNode, npc));
+			}
+		}
+	}
+	else 
+	{
+		for (auto obj : _GateSpawnPoints)
+		{
+			if (NiIsKindOf(ShineObjectNode, obj))
+				this->RemoveShineObject(NiSmartPointerCast(ShineObjectNode, obj), false);
+		}
+		_GateSpawnPoints.clear();
+	}
 }
