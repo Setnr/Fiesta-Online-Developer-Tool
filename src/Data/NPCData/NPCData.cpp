@@ -75,6 +75,8 @@ void NPCData::Load()
 void NPCData::Save()
 {
 	auto Path = PgUtil::PathFromServerFolder(".\\Shine\\World\\NPC.txt");
+	if (std::filesystem::exists(Path + ".bak"))
+		std::filesystem::remove(Path + ".bak");
 	if (std::filesystem::exists(Path))
 		std::filesystem::copy(Path, Path + ".bak");
 	std::ofstream npctxt(Path);
