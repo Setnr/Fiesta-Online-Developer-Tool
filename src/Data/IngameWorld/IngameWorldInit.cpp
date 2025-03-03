@@ -160,6 +160,9 @@ bool IngameWorld::InitLightFog()
 	m_spMapDirectionalLight->SetDiffuseColor(NiColor::WHITE);
 	m_spMapDirectionalLight->SetSpecularColor(NiColor::WHITE);
 	m_spMapDirectionalLight->SetSwitch(true);
+
+	m_spMapDirectionalLight->AttachAffectedNode(m_spAllGroundScene);
+	m_spAllGroundScene->AttachChild(m_spMapDirectionalLight);
 	return 1;
 }
 bool IngameWorld::LoadHTD()
