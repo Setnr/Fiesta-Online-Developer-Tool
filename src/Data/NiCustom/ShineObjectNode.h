@@ -31,6 +31,7 @@ public:
 		return _ShineObject->GetRotation();
 	}
 	virtual void DrawObjectMenu() {};
+	ShineObjectPtr GetShineObject() { return _ShineObject; }
 protected:
 	virtual void UpdateActor(NiActorManagerPtr NewActor);
 	ShineObjectPtr _ShineObject; 

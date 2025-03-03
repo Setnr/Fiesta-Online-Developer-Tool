@@ -25,7 +25,7 @@ ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::s
 	++start;
 	for (auto& iter = start; iter != end; iter++)
 	{
-		if (*iter == "" || iter->empty())
+		if (*iter == "" || iter->empty() || iter->contains(" "))
 			continue;
 		switch (DataID) 
 		{
@@ -357,7 +357,7 @@ std::string ShineGate::GetArgumentString()
 	{
 		LinkDataPtr LinkData = *data;
 		const char* IsParty = (LinkData->Party) ? "1" : "0";
-		msg += "\n#recordin\tLinkTable\t" + _Argument + "\t" + LinkData->MapClient + "\t" +
+		msg += "\n\t#recordin\tLinkTable\t" + _Argument + "\t" + LinkData->MapClient + "\t" +
 			LinkData->MapServer + "\t" + std::to_string((int)LinkData->x) + "\t" + std::to_string((int)LinkData->y) +
 			"\t";
 		if (NPCData::isCN)
@@ -379,7 +379,7 @@ bool ShineGate::AppendGate(std::vector<std::string>::iterator& start, std::vecto
 	for (auto iter = start; iter != end; iter++)
 	{
 		
-		if (*iter == "" || *iter == "LinkTable" || iter->empty())
+		if (*iter == "" || *iter == "LinkTable" || iter->empty() || iter->contains(" "))
 			continue;
 		if (!NPCData::isCN)
 		{

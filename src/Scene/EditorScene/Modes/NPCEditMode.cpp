@@ -1,6 +1,7 @@
 #include "NPCEditMode.h"
 #include <Scene/ScreenElements/LuaElement/LuaElement.h>
 #include <NPCData/NPCData.h>
+#include <Data/NiCustom/ShineNPCNode.h>
 
 NiImplementRTTI(NPCEditMode, EditMode);
 
@@ -104,7 +105,20 @@ void NPCEditMode::ProcessInput()
 		ClearSelectedObjects();
 	if (HasSelectedObject() && ImGui::IsKeyPressed((ImGuiKey)VK_DELETE))
 	{
-		kWorld->RemoveObject(SelectedObjects);
+		for (auto pickable : SelectedObjects) 
+		{
+			if (NiIsKindOf(ShineNPCNode, pickable)) 
+			{
+				ShineNPCNodePtr ptr = NiSmartPointerCast(ShineNPCNode, pickable);
+				kWorld->RemoveShineObject(NiSmartPointerCast(ShineObjectNode,ptr));
+				auto obj = ptr->GetShineObject();
+				if (NiIsKindOf(ShineNPC, obj)) 
+				{
+					ShineNPCPtr npc = NiSmartPointerCast(ShineNPC, obj);
+					NPCData::RemoveNPC(npc);
+				}
+			}
+		}
 		ClearSelectedObjects();
 	}
 	if (HasSelectedObject() && ImGui::IsKeyDown((ImGuiKey)VK_CONTROL) && ImGui::IsKeyPressed((ImGuiKey)0x41))

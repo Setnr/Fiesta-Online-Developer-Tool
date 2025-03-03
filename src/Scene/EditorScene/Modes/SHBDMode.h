@@ -35,7 +35,6 @@ class SHBDMode : public TerrainMode
 	}
 	~SHBDMode()
 	{
-
 		_SHBDNode = NULL;
 	}
 	virtual void Draw();

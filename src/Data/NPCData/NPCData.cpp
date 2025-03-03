@@ -1,4 +1,4 @@
-#include "NPCData.h"
+﻿#include "NPCData.h"
 #include "PgUtil.h"
 #include "Logger.h"
 
@@ -25,13 +25,13 @@ void NPCData::Load()
 	auto Path = PgUtil::PathFromServerFolder(".\\Shine\\World\\NPC.txt");
 	if (!std::filesystem::exists(Path)) 
 	{
-		NiMessageBox::DisplayMessage("Can�t find NPC.txt", "Error");
+		NiMessageBox::DisplayMessage("Can´t find NPC.txt", "Error");
 		exit(0);
 	}
 	std::ifstream npctxt(Path);
 	if (!npctxt.is_open())
 	{
-		LogError("Can�t open NPC.txt");
+		LogError("Can´t open NPC.txt");
 		return;
 	}
 	std::string line;
@@ -82,34 +82,34 @@ void NPCData::Save()
 	std::ofstream npctxt(Path);
 	if (!npctxt.is_open())
 	{
-		LogError("Can�t open NPC.txt");
+		LogError("Can´t open NPC.txt");
 		return;
 	}
-	npctxt << ";Updated with Fiesta DeveloperTools by SetNr12" << std::endl;;
-	npctxt << ";Shine NPC table(ShineNPC.txt)	" << std::endl;
-	npctxt << "#ignore \\o042" << std::endl;
-	npctxt << "#exchange\t#\t\\x20" << std::endl;
-	npctxt << "#delimiter\t\\x20" << std::endl;
-	npctxt << "#Table ShineNPC" << std::endl;
-	npctxt << "#ColumnType\tSTRING[33]\tSTRING[20]\tDWRD\tDWRD\tWORD\tBYTE\tINDEX\tINDEX" << std::endl;
-	npctxt << "#ColumnName\tMobName\tMap\tCoord-X\tCoord-Y\tDirect\tNPCMenu\tRole\tRoleArg0" << std::endl;
+	npctxt << "\t;Updated with Fiesta DeveloperTools by SetNr12" << std::endl;;
+	npctxt << "\t;Shine NPC table(ShineNPC.txt)	" << std::endl;
+	npctxt << "	#ignore	\\o042				; 인용부호 무시		" << std::endl;
+	npctxt << "	#exchange	#	\\x20			; # => space		" << std::endl;
+	npctxt << "	#delimiter	\\x20				; Space is delimiter	" << std::endl;
+	npctxt << "\t#Table ShineNPC" << std::endl;
+	npctxt << "\t#ColumnType\tSTRING[33]\tSTRING[20]\tDWRD\tDWRD\tWORD\tBYTE\tINDEX\tINDEX" << std::endl;
+	npctxt << "\t#ColumnName\tMobName\tMap\tCoord-X\tCoord-Y\tDirect\tNPCMenu\tRole\tRoleArg0" << std::endl;
 	npctxt << std::endl;
-	npctxt << "#Table LinkTable" << std::endl;
+	npctxt << "\t#Table LinkTable" << std::endl;
 	if (!NPCData::isCN)
 	{
-		npctxt << "#ColumnType\tIndex\tSTRING[33]\tSTRING[33]\tDWRD\tDWRD\tWORD\tBYTE" << std::endl;
-		npctxt << "#ColumnName\targument\tMapServer\tMapClient\tCoord-Y\tCoord-Y\tDirect\tParty" << std::endl;
+		npctxt << "\t#ColumnType\tIndex\tSTRING[33]\tSTRING[33]\tDWRD\tDWRD\tWORD\tBYTE" << std::endl;
+		npctxt << "\t#ColumnName\targument\tMapServer\tMapClient\tCoord-X\tCoord-Y\tDirect\tParty" << std::endl;
 	}
 	else {
-		npctxt << "#ColumnType\tIndex\tSTRING[33]\tSTRING[33]\tDWRD\tDWRD\tWORD\tWORD\tWORD\tBYTE" << std::endl;
-		npctxt << "#ColumnName\targument\tMapServer\tMapClient\tCoord-Y\tCoord-Y\tDirect\tLevelFrom\tLevelTo\tParty" << std::endl;
+		npctxt << "\t#ColumnType\tIndex\tString[33]\tString[33]\tDWRD\tDWRD\tWORD\tWORD\tWORD\tBYTE" << std::endl;
+		npctxt << "\t#ColumnName\targument\tMapServer\tMapClient\tCoord-X\tCoord-Y\tDirect\tLevelFrom\tLevelTo\tParty" << std::endl;
 	}
 	npctxt << std::endl;
 	for (auto npc : _NPCS) 
 	{
-		npctxt << npc->toString() << std::endl;
+		npctxt << "\t"<< npc->toString() << std::endl;
 	}
-	npctxt << "#End" << std::endl;
+	npctxt << "\t#End" << std::endl;
 }
 void NPCData::SaveNPCs()
 {
@@ -156,5 +156,12 @@ std::vector<std::pair<std::string,ShineGate::LinkDataPtr>> NPCData::GetSpawnPoin
 		}
 	}
 	return list;
+}
+
+void NPCData::RemoveNPC(ShineNPCPtr npc)
+{
+	auto it = std::find(Data->_NPCS.begin(), Data->_NPCS.end(), npc);
+	if (it != Data->_NPCS.end())
+		Data->_NPCS.erase(it);
 }
 
