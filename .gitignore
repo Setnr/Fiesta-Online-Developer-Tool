@@ -413,4 +413,5 @@ Interface/Dlls.rar
 /enc_temp_folder
 !/Includes/DirectX9/Lib/x86
 !/Includes/DirectX9/Lib/x64
+!x64
 *.bak
