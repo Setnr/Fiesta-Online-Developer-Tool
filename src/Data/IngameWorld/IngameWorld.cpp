@@ -477,8 +477,17 @@ void IngameWorld::RemoveObject(std::vector<NiPickablePtr> objs, bool Backup)
 	for (auto obj : objs) 
 	{
 		m_spGroundObject->DetachChild(obj);
+		if (NiIsKindOf(NiSHMDPickable, obj)) {
+			NiSHMDPickablePtr ptr = NiSmartPointerCast(NiSHMDPickable, obj);
+			m_spGroundCollidee->DetachChild(ptr->GetCollision());
+		}
 		_SHMD->RemoveObject(NiSmartPointerCast(NiNode, obj));
 	}
+	m_spGroundCollidee->CompactChildArray();
+	m_spGroundCollidee->UpdateProperties();
+	m_spGroundCollidee->UpdateEffects();
+	m_spGroundCollidee->Update(0.f);
+
 	m_spGroundObject->CompactChildArray();
 	m_spGroundObject->UpdateProperties();
 	m_spGroundObject->UpdateEffects();
@@ -491,8 +500,20 @@ void IngameWorld::AddObject(std::vector<NiPickablePtr> objs, bool Backup)
 	for (auto obj : objs)
 	{
 		m_spGroundObject->AttachChild(obj);
+		if (NiIsKindOf(NiSHMDPickable, obj)) {
+			NiSHMDPickablePtr ptr = NiSmartPointerCast(NiSHMDPickable, obj);
+			ptr->UpdateCollisionTranslate(obj->GetTranslate());
+			ptr->UpdateCollisionRotate(obj->GetRotate());
+			m_spGroundCollidee->AttachChild(ptr->GetCollision());
+		}
 		_SHMD->AddObject(NiSmartPointerCast(NiNode, obj));
 	}
+
+	m_spGroundCollidee->CompactChildArray();
+	m_spGroundCollidee->UpdateProperties();
+	m_spGroundCollidee->UpdateEffects();
+	m_spGroundCollidee->Update(0.f);
+
 	m_spGroundObject->CompactChildArray();
 	m_spGroundObject->UpdateProperties();
 	m_spGroundObject->UpdateEffects();

@@ -49,6 +49,7 @@ public:
 			if (CurPath.ends_with(".nif"))
 			{
 				NiSHMDPickablePtr ptr = PgUtil::LoadNifFile<NiSHMDPickable>(CurPath.c_str(), 0);
+				ptr->ExtractCollision();
 				if (NiIsKindOf(NiPickable, ptr))
 				{
 					_BaseNode->DetachChild(_Obj);
