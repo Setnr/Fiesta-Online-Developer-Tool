@@ -15,6 +15,11 @@ NiSmartPointer(IngameWorld);
 class IngameWorld : public NiRefObject
 {
 public:
+	enum WorldIntersectType {
+		HTD, 
+		GroundCollision,
+		GroundScene
+	};
 	IngameWorld(MapInfo* Info);
 	IngameWorld(MapInfo* Info, int MapSize);
 	NiNodePtr GetWorldNode() { return m_spWorldScene; }
@@ -114,13 +119,15 @@ public:
 	float GetFOV() { return m_fCameraFOV; }
 	ShineBlockDataPtr GetSHBD() { return _SHBD; }
 	ShineIniPtr GetShineIni() { return _INI; }
-	NiPoint3 GetWorldPoint();
+	NiPoint3 GetWorldPoint(WorldIntersectType point = WorldIntersectType::GroundScene);
 	void ReplaceObjects(std::vector<NiPickablePtr> OldNodes, std::vector<NiPickablePtr> NewNodes, bool Backup = true);
 	void ShowSHMDElements(bool Show);
 	void UpdateSHBDData(std::vector<char> newData) 
 	{
 		_SHBD->UpdateSHBDData(newData);
 	}
+	void UpdateCollide() { m_spGroundCollidee->Update(0.0); }
+	NiNodePtr GetCollide() { return m_spGroundCollidee; }
 	void AttachStack(WorldChangePtr change)
 	{
 		if (UnDoStack.size() == 0)

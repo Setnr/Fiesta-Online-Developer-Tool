@@ -158,11 +158,13 @@ bool IngameWorld::InitLightFog()
 	m_spMapDirectionalLight = NiNew NiDirectionalLight;
 	m_spMapDirectionalLight->SetAmbientColor(NiColor(.75, .75, .75));
 	m_spMapDirectionalLight->SetDiffuseColor(NiColor::WHITE);
-	m_spMapDirectionalLight->SetSpecularColor(NiColor::WHITE);
-	m_spMapDirectionalLight->SetSwitch(true);
+	m_spMapDirectionalLight->SetSpecularColor(NiColor::BLACK);
+	m_spMapDirectionalLight->SetSwitch(false); //This one kinda sucks xD
+	m_spMapDirectionalLight->SetDimmer(1.0f);
 
 	m_spMapDirectionalLight->AttachAffectedNode(m_spAllGroundScene);
 	m_spAllGroundScene->AttachChild(m_spMapDirectionalLight);
+	m_spAllGroundScene->UpdateEffects();
 	return 1;
 }
 bool IngameWorld::LoadHTD()

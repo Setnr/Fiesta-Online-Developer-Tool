@@ -184,6 +184,7 @@ void EditorScene::Update(float fTime)
 	FiestaScene::Update(fTime);
 	if (kWorld)
 	{
+		kWorld->UpdateCollide();
 		for (auto sky : kWorld->GetSkyNodeList())
 		{
 			NiPoint3 translate(Camera->GetTranslate());

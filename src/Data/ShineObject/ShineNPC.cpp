@@ -2,6 +2,9 @@
 #include "Logger.h"
 #include <SHN/MobLoader.h>
 #include <NPCData/NPCData.h>
+#include <string>
+#include <algorithm>
+#include <iostream>
 
 NiImplementRTTI(ShineNPC, ShineMob);
 NiImplementRTTI(GateSpawn, ShineMob);
@@ -25,8 +28,13 @@ ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::s
 	++start;
 	for (auto& iter = start; iter != end; iter++)
 	{
-		if (*iter == "" || iter->empty() || iter->contains(" "))
+		if (*iter == "" || iter->empty())
 			continue;
+		if (iter->contains(" "))
+		{
+			std::string& str = *iter;
+			str.erase(std::remove_if(str.begin(), str.end(), isspace), str.end());
+		}
 		switch (DataID) 
 		{
 		case 0:

@@ -42,14 +42,30 @@ void SHMDMode::ProcessInput()
 		if (ImGui::IsKeyPressed((ImGuiKey)0x44)) //d
 			SnapMovement = !SnapMovement;
 		if (HasSelectedObject() && ImGui::IsKeyPressed((ImGuiKey)0x43))
+		{
 			CopyObject = SelectedObjects.back();
+		}
 		if (CopyObject && ImGui::IsKeyPressed((ImGuiKey)0x56))
 		{
-			auto pos = kWorld->GetWorldPoint();
+			auto pos = kWorld->GetWorldPoint(IntersectType);
 			CopyObject->HideBoundingBox();
 			NiPickablePtr NewObject = (NiPickable*)CopyObject->Clone();
 			NewObject->SetTranslate(pos);
 			kWorld->AddObject({ NewObject });
+			if (ImGui::IsKeyDown((ImGuiKey)VK_SHIFT))
+			{
+				auto matrix = NewObject->GetRotate();
+				float x, y, z;
+				matrix.ToEulerAnglesXYZ(x, y, z);
+				z = 360.f * (rand() / float(RAND_MAX));
+				matrix.FromEulerAnglesXYZ(x, y, z);
+				NewObject->SetRotate(matrix);
+			}
+			if (ImGui::IsKeyDown((ImGuiKey)VK_SPACE )) 
+			{
+				float ran = (rand() / float(RAND_MAX)); 
+				NewObject->SetScale(NewObject->GetScale() * ran * 2.f);
+			}
 			SelectObject(NewObject);
 		}
 	}
@@ -190,4 +206,15 @@ void SHMDMode::CreateAddElement(std::string name)
 		}
 		ScreenElements.push_back(NiNew AddSingleObject(kWorld, AddFunc,NiPoint3::ZERO));
 	}
+}
+
+void SHMDMode::SaveSelectedPickableNif() 
+{
+	NiPickablePtr CurObj = SelectedObjects.back();
+	
+	auto node = kWorld->GetCollide(); CurObj->ToNiNode();
+
+	NiStream s;
+	s.InsertObject(node);
+	s.Save(PgUtil::PathFromClientFolder("resmap/field/Rou/test.nif").c_str());
 }

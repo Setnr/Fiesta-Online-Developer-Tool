@@ -103,7 +103,7 @@ public:
 	void SetColor(int w, int h, NiColorA Color);
 	void AddLayer(std::shared_ptr<TerrainLayerData> Layer);
 	void DeleteLayer(std::shared_ptr<TerrainLayerData> Layer);
-	std::shared_ptr<TerrainLayerData> CreateNewLayer(MapInfo* Info);
+	std::shared_ptr<TerrainLayerData> CreateNewLayer(MapInfo* Info, int size);
 	NiPixelDataPtr GetVertexImage() { return VertexShadowImage; }
 	void SetVertexImage(NiPixelDataPtr Image) { VertexShadowImage = Image; }
 private:

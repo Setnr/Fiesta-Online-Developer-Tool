@@ -8,6 +8,7 @@
 #include "Data/NPCData/NPCData.h"
 #include "Data/SHN/Mobloader.h"
 #include "NiCustom/ShineNPCNode.h"
+#include "NiCustom/NiSHMDPickable.h"
 
 #pragma region Gizmo-Calc
 glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
@@ -84,7 +85,16 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 		m_spGroundObject->AttachChild(obj);
 
 	for (auto obj : _SHMD->GetGroundObjectListList())
+	{
 		m_spGroundObject->AttachChild(obj);
+		if (NiIsKindOf(NiSHMDPickable, obj))
+		{
+			NiSHMDPickablePtr ptr = NiSmartPointerCast(NiSHMDPickable, obj);
+			ptr->UpdateCollisionTranslate(obj->GetTranslate());
+			ptr->UpdateCollisionRotate(obj->GetRotate());
+			m_spGroundCollidee->AttachChild(ptr->GetCollision());
+		}
+	}
 
 	for (auto obj : _SHMD->GetCollisionObjectListList())
 		m_spGroundCollidee->AttachChild(obj);
@@ -97,12 +107,10 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 	SetDirectionalLightAmbientColor(_SHMD->GetDirectionalLightAmbientColor(), false);
 	SetDirectionalLightDiffuseColor(_SHMD->GetDirectionalLightDiffuseColor(), false);
 
-	m_spGroundCollidee->Update(0.f);
 	m_spGroundCollidee->UpdateProperties();
 	m_spGroundCollidee->UpdateEffects();
 	m_spGroundCollidee->Update(0.f);
 
-	m_spWorldScene->Update(0.f);
 	m_spWorldScene->UpdateProperties();
 	m_spWorldScene->UpdateEffects();
 	m_spWorldScene->Update(0.f);
@@ -153,7 +161,16 @@ IngameWorld::IngameWorld(MapInfo* Info, int MapSize) : _MapInfo(Info)
 		m_spGroundObject->AttachChild(obj);
 
 	for (auto obj : _SHMD->GetGroundObjectListList())
+	{
 		m_spGroundObject->AttachChild(obj);
+		if (NiIsKindOf(NiSHMDPickable, obj))
+		{
+			NiSHMDPickablePtr ptr = NiSmartPointerCast(NiSHMDPickable, obj);
+			ptr->UpdateCollisionTranslate(obj->GetTranslate());
+			ptr->UpdateCollisionRotate(obj->GetRotate());
+			m_spGroundCollidee->AttachChild(ptr->GetCollision());
+		}
+	}
 
 	for (auto obj : _SHMD->GetCollisionObjectListList())
 		m_spGroundCollidee->AttachChild(obj);
@@ -166,12 +183,10 @@ IngameWorld::IngameWorld(MapInfo* Info, int MapSize) : _MapInfo(Info)
 	SetDirectionalLightAmbientColor(_SHMD->GetDirectionalLightAmbientColor(),false);
 	SetDirectionalLightDiffuseColor(_SHMD->GetDirectionalLightDiffuseColor(), false);
 
-	m_spGroundCollidee->Update(0.f);
 	m_spGroundCollidee->UpdateProperties();
 	m_spGroundCollidee->UpdateEffects();
 	m_spGroundCollidee->Update(0.f);
 
-	m_spWorldScene->Update(0.f);
 	m_spWorldScene->UpdateProperties();
 	m_spWorldScene->UpdateEffects();
 	m_spWorldScene->Update(0.f);
@@ -244,7 +259,7 @@ void IngameWorld::SetGlobalLight(NiColor kColor, bool Backup)
 	m_spAmbientLight->SetAmbientColor(kColor);
 	_SHMD->SetGlobalLight(kColor);
 } 
-NiPoint3 IngameWorld::GetWorldPoint() 
+NiPoint3 IngameWorld::GetWorldPoint(WorldIntersectType point) 
 {
 	NiPoint3 kOrigin, kDir;
 	auto Point = FiestaOnlineTool::CurrentMousePosition();
@@ -257,7 +272,20 @@ NiPoint3 IngameWorld::GetWorldPoint()
 		_Pick.SetFrontOnly(true);
 		_Pick.SetReturnNormal(true);
 		_Pick.SetObserveAppCullFlag(true);
-		_Pick.SetTarget(m_spGroundScene);
+		switch (point) 
+		{
+			break;
+		case GroundCollision:
+				_Pick.SetTarget(m_spGroundCollidee);
+			break;
+		case HTD:
+			_Pick.SetTarget(m_spGroundTerrain);
+			break;
+		case GroundScene:
+		default:
+			_Pick.SetTarget(m_spGroundScene); 
+			break;
+		}
 		if (_Pick.PickObjects(kOrigin, kDir, true))
 		{
 			NiPick::Results& results = _Pick.GetResults();
@@ -333,8 +361,14 @@ void IngameWorld::UpdatePos(std::vector<NiPickablePtr> Node, NiPoint3 PosChange,
 			UpdateZCoord(NewPos);
 			ShineObjectNodePtr mob = NiSmartPointerCast(ShineObjectNode, obj);
 			mob->UpdatePos(NewPos);
-		}else
+		}
+		else
 			obj->SetTranslate(NewPos);
+		if (NiIsKindOf(NiSHMDPickable, obj))
+		{
+			NiSHMDPickablePtr ptr = NiSmartPointerCast(NiSHMDPickable, obj);
+			ptr->UpdateCollisionTranslate(NewPos);
+		}
 	}
 }
 void IngameWorld::UpdateRotation(std::vector<NiPickablePtr> Node, glm::vec3 RotationChange, bool Backup)
@@ -375,6 +409,11 @@ void IngameWorld::UpdateRotation(std::vector<NiPickablePtr> Node, glm::vec3 Rota
 			mob->UpdateRotation(angleAxis[3] * angleAxis[0] * 180.0 / NI_PI );
 		}else
 			obj->SetRotate(m);
+		if (NiIsKindOf(NiSHMDPickable, obj))
+		{
+			NiSHMDPickablePtr ptr = NiSmartPointerCast(NiSHMDPickable, obj);
+			ptr->UpdateCollisionRotate(m);
+		}
 	}
 }
 void IngameWorld::RemoveSky(NiNodePtr Node, bool Backup)

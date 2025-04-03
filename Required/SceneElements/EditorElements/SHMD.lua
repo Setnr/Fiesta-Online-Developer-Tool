@@ -4,11 +4,23 @@ function prepare(ElementPtr)
 end
 
 Data = {
-    FreezeWorld = false
+    FreezeWorld = false,
+    IntersectType = "GroundScene"
+}
+IntersectType =
+{
+    {Name = "HTD", ID = 0},
+    {Name = "GroundCollision", ID = 1},
+    {Name = "GroundScene", ID = 2}
 }
 
 function render(ElementPtr)
     local ret = true
+    local c,v,n = Combo("IntersectType", Data.IntersectType,IntersectType)
+    if c then
+        SetIntersect(ElementPtr,n)
+        Data.IntersectType = v
+    end
     local WorldPtr = GetIngameWorld(ElementPtr)
 
     SHMDList(WorldPtr,GetSkyNode,RemoveSky,"Sky Node")
@@ -23,6 +35,7 @@ function render(ElementPtr)
     DrawDragFloat(WorldPtr,GetFrustum,SetFrustum,"Frustum",1,0,5000)
     DrawColorEdit(WorldPtr, GetAmbientLightColor, SetAmbientLightColor,"AmbientLight Color")
     DrawColorEdit(WorldPtr, GetDiffuseLightColor, SetDiffuseLightColor,"DiffuseLight Color")
+
 end
 
 function SHMDList(WorldPtr, GetFunc, RemoveFunc, Name)

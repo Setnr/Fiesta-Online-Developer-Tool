@@ -23,7 +23,7 @@ function render(ElementPtr)
             local Node = GetSelectedNode(EditModePtr) -- If multiple selected this only returns the last selected
             local x,y,z = GetTranslate(Node)
             local pitch,yaw,roll = GetRotate(Node)
-            local changed, x,y,z = DragFloat3("Position",x,y,z,0.0001,0.00000,5)
+            local changed, x,y,z = DragFloat3("Position",x,y,z,0.0001)
             if changed then 
                 SetTranslate(Node, x,y,z)
             end
@@ -51,6 +51,9 @@ function render(ElementPtr)
                 if changed then
                     SetSnapMoveStep(EditModePtr,SnapMoveStep)
                 end
+            end
+            if Button("Save Nif") then
+                SaveNIF(EditModePtr)
             end
         end
     end

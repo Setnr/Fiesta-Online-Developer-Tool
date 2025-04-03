@@ -63,6 +63,9 @@ class SHMDMode : public EditMode
 	bool GetSnapMovement() { return SnapMovement; }
 	void CreateAddElement(std::string type);
 	void UpdateScale(float Scale);
+	void SaveSelectedPickableNif();
+	void UpdatePoint(IngameWorld::WorldIntersectType newPoint) { IntersectType = newPoint; }
+	IngameWorld::WorldIntersectType GetWorldIntersectType() { return IntersectType; }
 private:
 	ImGuizmo::OPERATION OperationMode = ImGuizmo::OPERATION::TRANSLATE;
 	void DrawGizmo();
@@ -70,5 +73,6 @@ private:
 	NiPoint3 SnapSize = NiPoint3(2.5f, 2.5f, 2.5f);
 	std::vector<NiPickablePtr> SelectedObjects;
 	NiPickablePtr CopyObject = NULL;
+	IngameWorld::WorldIntersectType IntersectType = IngameWorld::WorldIntersectType::GroundScene;
 	
 };

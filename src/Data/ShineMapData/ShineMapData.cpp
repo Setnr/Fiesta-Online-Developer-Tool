@@ -207,7 +207,7 @@ bool ShineMapData::Load(MapInfo* Info)
 	{
 		auto future = std::async(std::launch::async, [this, obj]
 			{
-				NiNodePtr MainObj;
+				NiSHMDPickablePtr MainObj;
 				NiPickablePtr Obj;
 				std::set<NiNodePtr> List;
 				for (auto pos = obj.second.begin(); pos < obj.second.end(); pos++)
@@ -216,7 +216,8 @@ bool ShineMapData::Load(MapInfo* Info)
 					if (!MainObj)
 					{
 						MainObj = PgUtil::LoadNifFile<NiSHMDPickable>(Path.c_str(), NULL);
-						ExtractCollision(MainObj);
+						MainObj->SetFilePathOrName(obj.first);
+						MainObj->ExtractCollision();
 
 					}
 					Obj = (NiPickable*)MainObj->Clone();
@@ -262,6 +263,7 @@ bool ShineMapData::Load(MapInfo* Info)
 void ShineMapData::ExtractCollision(NiNodePtr obj)
 {
 	std::vector<NiAVObjectPtr> Removes;
+	obj->CompactChildArray();
 	for (int i = 0; i < obj->GetChildCount(); i++)
 	{
 		NiAVObjectPtr child = obj->GetAt(i);

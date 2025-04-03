@@ -263,7 +263,7 @@ void ShineIni::CreateEmpty(MapInfo* Info, int MapSize)
 	QuadsWide = 64;
 	QuadsHigh = 64;
 	auto data = std::make_shared<TerrainLayerData>();
-	CreateNewLayer(Info);
+	CreateNewLayer(Info, MapSize);
 
 
 	auto pixldata = LayerList[0]->BlendTexture->GetSourcePixelData();
@@ -273,7 +273,7 @@ void ShineIni::CreateEmpty(MapInfo* Info, int MapSize)
 		pixl[i] = 0xFF;
 	}
 	pixldata->MarkAsChanged();
-	std::string VertexShadowPath = PgUtil::PathFromClientFolder(GetVertexColor());
+	//std::string VertexShadowPath = PgUtil::PathFromClientFolder(GetVertexColor());
 	VertexShadowImage = NiNew NiPixelData(HeightMap_width, HeightMap_height, NiPixelFormat::RGBA32);
 	auto pixels = VertexShadowImage->GetPixels();
 	for (size_t i = 0; i < VertexShadowImage->GetSizeInBytes(); i++)
@@ -327,7 +327,7 @@ NiColorA ShineIni::GetColor(int w, int h)
 		VertexColorArray = (TerrainLayerData::RGBColor*)VertexShadowImage->GetPixels();
 
 		TerrainLayerData::RGBColor col = VertexColorArray[w + (VertexShadowImage->GetHeight() - h - 1) * VertexShadowImage->GetWidth()];
-		return NiColorA(col.r / 255.f, col.g / 255.f, col.b / 255.f);
+		return NiColorA(col.r / 255.f, col.g / 255.f, col.b / 255.f, 1.0f);
 	}
 	else
 	{
@@ -336,7 +336,7 @@ NiColorA ShineIni::GetColor(int w, int h)
 			TerrainLayerData::RGBAColor* VertexColorArrayA = NULL;
 			VertexColorArrayA = (TerrainLayerData::RGBAColor*)VertexShadowImage->GetPixels();
 			TerrainLayerData::RGBAColor col = VertexColorArrayA[w + (VertexShadowImage->GetHeight() - h - 1) * VertexShadowImage->GetWidth()];
-			return NiColorA(col.r / 255.f, col.g / 255.f, col.b / 255.f);
+			return NiColorA(col.r / 255.f, col.g / 255.f, col.b / 255.f,1.0f);
 		}
 		else
 		{
@@ -419,11 +419,11 @@ void ShineIni::DeleteLayer(std::shared_ptr<TerrainLayerData> Layer)
 	auto l = std::find(LayerList.begin(), LayerList.end(), Layer);
 	LayerList.erase(l);
 }
-std::shared_ptr<TerrainLayerData> ShineIni::CreateNewLayer(MapInfo* Info) 
+std::shared_ptr<TerrainLayerData> ShineIni::CreateNewLayer(MapInfo* Info, int size) 
 {
 	std::shared_ptr<TerrainLayerData> layer = std::make_shared<TerrainLayerData>();
-	layer->Width = 257;
-	layer->Height = 257;
+	layer->Width = size;
+	layer->Height = size;
 	layer->StartPos_X = 0.f;
 	layer->StartPos_Y = 0.f;
 	layer->UVScaleBlend = 1.f;

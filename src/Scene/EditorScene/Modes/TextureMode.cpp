@@ -73,7 +73,7 @@ void TextureMode::DrawLayers()
 	}
 	if (ImGui::Button("Add New Layer"))
 	{
-		UpdateCurrentLayer(_Ini->CreateNewLayer(kWorld->GetMapInfo()));
+		UpdateCurrentLayer(_Ini->CreateNewLayer(kWorld->GetMapInfo(), _Ini->GetMapWidth()));
 		kWorld->AttachStack(NiNew LayerAdd(kWorld, _CurrentLayer));
 		kWorld->ShowTerrain(kWorld->GetShowTerrain());
 	}

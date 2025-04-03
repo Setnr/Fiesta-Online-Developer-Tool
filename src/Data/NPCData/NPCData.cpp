@@ -40,7 +40,7 @@ void NPCData::Load()
 	{
 		if (line.starts_with(";"))
 			continue;
-		if (line.contains("LevelFrom") || line.contains("LevelTo")) 
+		if (line.contains("LevelFrom") && line.contains("LevelTo")) 
 		{
 			isCN = true;
 		}

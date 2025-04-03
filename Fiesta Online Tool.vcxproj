@@ -195,6 +195,7 @@
     <ClCompile Include="src\Data\IngameWorld\WorldChanges\WorldChanges.cpp" />
     <ClCompile Include="src\Data\NiCustom\NiFastNoiseLite.cpp" />
     <ClCompile Include="src\Data\NiCustom\NiFastNoiseLite.h" />
+    <ClCompile Include="src\Data\NiCustom\NiSHMDPickable.cpp" />
     <ClCompile Include="src\Data\NiCustom\ShineMobNode.cpp" />
     <ClCompile Include="src\Data\NiCustom\ShineNPCNode.cpp" />
     <ClCompile Include="src\Data\NiCustom\ShineObjectNode.cpp" />

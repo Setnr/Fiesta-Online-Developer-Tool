@@ -9,6 +9,7 @@ NiImplementCreateClone(NiSHMDPickable);
 void NiSHMDPickable::CopyMembers(
     NiSHMDPickable* pDest, NiCloningProcess& kCloning)
 {
+    pDest->Collision = (NiNode*)this->Collision->Clone();
     NiPickable::CopyMembers(pDest, kCloning);
 }
 //---------------------------------------------------------------------------

@@ -201,6 +201,25 @@ int GetIngameWorld(lua_State* Script)
 				return 1;
 			}
 		}
+	} 
+	return 0; 
+}
+int SetIntersect(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1) && lua_isinteger(Script,2))
+	{
+		LuaElementPtr element = (LuaElement*)lua_tointeger(Script, 1);
+		auto scene = element->GetScene();
+		if (scene)
+		{
+			auto mode = scene->GetCurrentEditMode();
+			if (NiIsKindOf(SHMDMode, mode)) 
+			{
+				SHMDModePtr shmdmode = NiSmartPointerCast(SHMDMode, mode);
+				IngameWorld::WorldIntersectType id = (IngameWorld::WorldIntersectType)lua_tointeger(Script, 2);
+				shmdmode->UpdatePoint(id);
+			}
+		}
 	}
 	return 0;
 }
@@ -737,8 +756,7 @@ int DragFloat3(lua_State* Script)
 {
 	if (lua_isstring(Script, 1) && lua_isnumber(Script, 2)
 		&& lua_isnumber(Script, 3) && lua_isnumber(Script, 4)
-		&& lua_isnumber(Script, 5) && lua_isnumber(Script, 6)
-		&& lua_isnumber(Script, 7))
+		&& lua_isnumber(Script, 5))
 	{
 		auto Name = lua_tostring(Script, 1);
 		NiPoint3 Data;
@@ -746,8 +764,12 @@ int DragFloat3(lua_State* Script)
 		Data.y = lua_tonumber(Script, 3);
 		Data.z = lua_tonumber(Script, 4);
 		float Speed = lua_tonumber(Script, 5);
-		float Min = lua_tonumber(Script, 6);
-		float Max = lua_tonumber(Script, 7);
+		float Min = 0.0;
+		float Max =1024.f*50.f*2.f; //Max SUpport for 2048x2048 maps
+		if(lua_isnumber(Script, 6))
+			Min = lua_tonumber(Script, 6);
+		if(lua_isnumber(Script, 7))
+			Max = lua_tonumber(Script, 7);
 		bool changed = ImGui::DragFloat3(Name, (float*)&Data, Speed, Min, Max);
 		lua_pushboolean(Script, changed);
 		lua_pushnumber(Script, Data.x);
@@ -1285,7 +1307,7 @@ int Combo(lua_State* Script)
 	int id = 0;
 	bool changed = false;
 	if (lua_isstring(Script, 1) && lua_tostring(Script,2))
-	{
+	{ 
 		auto Name = lua_tostring(Script, 1);
 		std::string CurValue = lua_tostring(Script, 2);
 		if(lua_istable(Script, 3))
@@ -1317,7 +1339,7 @@ int Combo(lua_State* Script)
 					}
 					lua_pop(Script, 1); // Entferne den Wert (Tabelle) vom Stack, behalte den Schlüssel
 				}
-				ImGui::EndCombo();
+				ImGui::EndCombo(); 
 			}
 		}
 		lua_pushboolean(Script, changed);
@@ -1639,6 +1661,16 @@ int GetPointDistFromShineIni(lua_State* Script)
 	}
 	return 0;
 }
+int SaveNIF(lua_State* Script)
+{
+	if (lua_isinteger(Script, 1))
+	{
+		SHMDModePtr _EditMode = (SHMDMode*)lua_tointeger(Script, 1);
+		_EditMode->SaveSelectedPickableNif();
+	}
+	return 0;
+}
+
 void SetFunctions(lua_State* Script)
 {
 	lua_pushcclosure(Script, LogFromLua, 0);
@@ -1809,4 +1841,6 @@ void SetFunctions(lua_State* Script)
 	lua_register(Script, "EndDisabled", EndDisabled);
 	lua_register(Script, "DrawObjectMenu", DrawObjectMenu);
 	lua_register(Script, "ShowGateSpawns", ShowGateSpawns);
-} 
+	lua_register(Script, "SaveNIF", SaveNIF);
+	lua_register(Script, "SetIntersect", SetIntersect);
+}  
