@@ -55,5 +55,6 @@ protected:
 
 	bool EnableKeyStrokes = false;
 	std::atomic<bool> CanSwitch = false;
+	bool ShowImGui = true;
 
 };

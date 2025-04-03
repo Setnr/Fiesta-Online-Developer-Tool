@@ -31,6 +31,9 @@ EditorScene::~EditorScene()
 }
 void EditorScene::DrawImGui()
 {
+	if (!ShowImGui)
+		return;
+
 	FiestaScene::DrawImGui();
 
 	ImGuiIO& io = ImGui::GetIO();
