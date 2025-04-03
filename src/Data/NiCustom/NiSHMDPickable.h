@@ -13,6 +13,7 @@ public:
 	NiNodePtr GetCollision() { return Collision; }
 	void UpdateCollisionTranslate(const NiPoint3& point);
 	void UpdateCollisionRotate(const NiMatrix3& point);
+	void SetCollisionScale(float Scale);
 	NiNodePtr ToNiNode();
 private:
 	NiNodePtr Collision;

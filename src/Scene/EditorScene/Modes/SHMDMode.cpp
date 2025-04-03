@@ -212,9 +212,10 @@ void SHMDMode::SaveSelectedPickableNif()
 {
 	NiPickablePtr CurObj = SelectedObjects.back();
 	
-	auto node = kWorld->GetCollide(); CurObj->ToNiNode();
+	auto node = kWorld->GetTerrainNode(); CurObj->ToNiNode();
 
 	NiStream s;
-	s.InsertObject(node);
+	s.InsertObject(kWorld->GetTerrainNode());
+	s.InsertObject(kWorld->GetCollide());
 	s.Save(PgUtil::PathFromClientFolder("resmap/field/Rou/test.nif").c_str());
 }

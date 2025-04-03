@@ -19,7 +19,7 @@ void NiSHMDPickable::ExtractCollision()
 		if (!child)
 			continue;
 		auto Name = child->GetName();
-		if ((Name.Contains("#CD") || Name.Contains("#M")) && (NiIsKindOf(NiAVObject, child) || NiIsKindOf(NiTriStrips, child)))
+		if ((Name.Contains("#CD") || Name.Contains("#M")) && NiIsKindOf(NiAVObject, child))
 		{
 			Removes.push_back(child);
 		}
@@ -61,7 +61,7 @@ void NiSHMDPickable::ExtractChildCollision(NiNodePtr childParent)
 		if (!child)
 			continue;
 		auto Name = child->GetName();
-		if ((Name.Contains("#CD") || Name.Contains("#M")) && (NiIsKindOf(NiAVObject, child) || NiIsKindOf(NiTriStrips, child)))
+		if ((Name.Contains("#CD") || Name.Contains("#M")) && NiIsKindOf(NiAVObject, child))
 		{
 			Removes.push_back(child);
 		}
@@ -95,6 +95,11 @@ void NiSHMDPickable::UpdateCollisionTranslate(const NiPoint3& point)
 void NiSHMDPickable::UpdateCollisionRotate(const NiMatrix3& point)
 {
 	Collision->SetRotate(point);
+}
+
+void NiSHMDPickable::SetCollisionScale(float Scale)
+{
+	Collision->SetScale(Scale);
 }
 
 NiNodePtr NiSHMDPickable::ToNiNode()

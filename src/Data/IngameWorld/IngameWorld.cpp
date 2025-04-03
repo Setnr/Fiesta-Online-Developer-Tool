@@ -92,6 +92,7 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 			NiSHMDPickablePtr ptr = NiSmartPointerCast(NiSHMDPickable, obj);
 			ptr->UpdateCollisionTranslate(obj->GetTranslate());
 			ptr->UpdateCollisionRotate(obj->GetRotate());
+			ptr->SetCollisionScale(obj->GetScale());
 			m_spGroundCollidee->AttachChild(ptr->GetCollision());
 		}
 	}
@@ -168,6 +169,7 @@ IngameWorld::IngameWorld(MapInfo* Info, int MapSize) : _MapInfo(Info)
 			NiSHMDPickablePtr ptr = NiSmartPointerCast(NiSHMDPickable, obj);
 			ptr->UpdateCollisionTranslate(obj->GetTranslate());
 			ptr->UpdateCollisionRotate(obj->GetRotate());
+			ptr->SetCollisionScale(obj->GetScale());
 			m_spGroundCollidee->AttachChild(ptr->GetCollision());
 		}
 	}
@@ -504,6 +506,7 @@ void IngameWorld::AddObject(std::vector<NiPickablePtr> objs, bool Backup)
 			NiSHMDPickablePtr ptr = NiSmartPointerCast(NiSHMDPickable, obj);
 			ptr->UpdateCollisionTranslate(obj->GetTranslate());
 			ptr->UpdateCollisionRotate(obj->GetRotate());
+			ptr->SetCollisionScale(obj->GetScale());
 			m_spGroundCollidee->AttachChild(ptr->GetCollision());
 		}
 		_SHMD->AddObject(NiSmartPointerCast(NiNode, obj));
@@ -549,6 +552,10 @@ void IngameWorld::UpdateScale(std::vector<NiPickablePtr> Node, float Scale, bool
 	{
 		float OldScale = obj->GetScale();
 		obj->SetScale(OldScale - Scale);
+		if (NiIsKindOf(NiSHMDPickable, obj)) {
+			NiSHMDPickablePtr ptr = NiSmartPointerCast(NiSHMDPickable, obj);
+			ptr->SetCollisionScale(OldScale - Scale);
+		}
 	}
 }
 void IngameWorld::ShowSHMDElements(bool Show) 
