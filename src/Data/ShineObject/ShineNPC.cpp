@@ -28,13 +28,14 @@ ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::s
 	++start;
 	for (auto& iter = start; iter != end; iter++)
 	{
-		if (*iter == "" || iter->empty())
-			continue;
 		if (iter->contains(" "))
 		{
 			std::string& str = *iter;
 			str.erase(std::remove_if(str.begin(), str.end(), isspace), str.end());
 		}
+		if (*iter == "" || iter->empty())
+			continue;
+		
 		switch (DataID) 
 		{
 		case 0:
@@ -42,6 +43,7 @@ ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::s
 			break;
 		case 1:
 			this->_MapInx = *iter;
+
 			break;
 		case 2:
 			this->_Pos.x = std::stod(*iter);

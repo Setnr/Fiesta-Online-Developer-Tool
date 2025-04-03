@@ -31,7 +31,7 @@ void NPCData::Load()
 	std::ifstream npctxt(Path);
 	if (!npctxt.is_open())
 	{
-		LogError("Can´t open NPC.txt");
+		NiMessageBox::DisplayMessage("Failed to open NPC.txt", "Error");
 		return;
 	}
 	std::string line;
