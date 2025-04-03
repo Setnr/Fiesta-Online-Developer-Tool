@@ -21,7 +21,7 @@ NiImplementRTTI(IDGate, ShineGate);
 NiImplementRTTI(ModeIDGate, ShineGate);
 NiImplementRTTI(RandomGate, ShineGate);
 
-auto RoleList = "JobManager\0QuestNPC\0StoreManager\0ClientMenu\0Guard\0Merchant\0NPCMenu\0ShineGate\0IDGate\0ModeGate\0RandomGate";
+auto RoleList = "JobManager\0QuestNPC\0StoreManager\0ClientMenu\0Guard\0Merchant\0NPCMenu\0ShineGate\0IDGate\0ModeGate\0RandomGate\0\0";
 ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::string>::iterator& end)
 {
 	int DataID = 0;
