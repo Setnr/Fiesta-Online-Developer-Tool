@@ -137,7 +137,7 @@ void FiestaScene::UpdateCamera(float fTime)
 	if (ImGui::IsKeyReleased((ImGuiKey)VK_F11))
 	{
 		FiestaOnlineTool::EnableCursor();
-		ShowImGui = true;
+		ShowImGui = true; 
 	}
 	Camera->Update(0.0f);
 }
