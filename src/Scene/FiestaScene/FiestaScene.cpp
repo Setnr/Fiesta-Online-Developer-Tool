@@ -132,9 +132,13 @@ void FiestaScene::UpdateCamera(float fTime)
 		FiestaOnlineTool::GetRenderer()->SaveScreenShot(
 			PgUtil::PathFromClientFolder("Screenshot.png").c_str(),
 			NiRenderer::EScreenshotFormat::FORMAT_PNG);
+		FiestaOnlineTool::DisableCursor();
 	}
 	if (ImGui::IsKeyReleased((ImGuiKey)VK_F11))
+	{
+		FiestaOnlineTool::EnableCursor();
 		ShowImGui = true;
+	}
 	Camera->Update(0.0f);
 }
 void FiestaScene::StartImGuiFrame()

@@ -31,7 +31,7 @@ EditorScene::~EditorScene()
 }
 void EditorScene::DrawImGui()
 {
-	if (!ShowImGui)
+	if (!ShowImGui) 
 		return;
 
 	FiestaScene::DrawImGui();
