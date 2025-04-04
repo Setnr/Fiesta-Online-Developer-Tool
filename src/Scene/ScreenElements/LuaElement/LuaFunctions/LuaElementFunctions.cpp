@@ -15,7 +15,7 @@ int LogFromLua(lua_State* Script)
 	//{
 	//	LogError("WindowName-Variable missing");
 	//	return 0;
-	//}
+	//} 
 	if (lua_isstring(Script, 1)) 
 	{
 		LogWarning(lua_tostring(Script, 1));
