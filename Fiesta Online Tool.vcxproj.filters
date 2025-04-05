@@ -381,6 +381,7 @@
     <ClCompile Include="src\Data\NiCustom\ShineNPCNode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\NPCEditMode.cpp" />
     <ClCompile Include="src\Data\NiCustom\NiSHMDPickable.cpp" />
+    <ClCompile Include="src\Data\ShineObject\ShinePlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Includes\ImGui\imgui.ini">

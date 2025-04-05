@@ -36,6 +36,7 @@ bool HeightTerrainData::Load(std::string Path, int Width, int Height)
 
 	if (!std::filesystem::exists(Path))
 	{
+		HTDG.resize(HTD.size(),0.0);
 		return true;
 	}
 	std::ifstream HTDGFile;

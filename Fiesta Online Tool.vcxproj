@@ -203,6 +203,7 @@
     <ClCompile Include="src\Data\ShineObject\ShineMob.cpp" />
     <ClCompile Include="src\Data\ShineObject\ShineNPC.cpp" />
     <ClCompile Include="src\Data\ShineObject\ShineObject.cpp" />
+    <ClCompile Include="src\Data\ShineObject\ShinePlayer.cpp" />
     <ClCompile Include="src\Data\SHN\MobLoader.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\Brush\Brush.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\Brush\LuaBrush.cpp" />
