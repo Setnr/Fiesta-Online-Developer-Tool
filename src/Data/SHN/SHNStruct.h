@@ -1420,7 +1420,21 @@ enum BaseCharClass : unsigned __int32
 	CC_SENTINEL = 0x7,
 	MAX_BASECHARCLASS = 0x8,
 };
-
+struct NPCViewLoopDummy : SHNRow 
+{
+	
+	unsigned __int16 TypeIndex;
+	BaseCharClass Class;
+	unsigned __int16 Gender;
+	unsigned __int8 FaceShape;
+	unsigned __int8 HairType;
+	unsigned __int8 HairColor;
+	unsigned int BaseActionCode;
+	unsigned int PeriodActionCode;
+	unsigned int ActionDelayTime;
+	unsigned __int8 bUseEventAction;
+	char Equ_Dummy[32 * 19];
+};
 struct NPCViewInfo : SHNRow
 {
 	unsigned __int16 TypeIndex;

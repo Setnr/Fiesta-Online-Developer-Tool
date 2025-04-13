@@ -8,6 +8,50 @@
 #include <NiBoneLODController.h>
 #include <set>
 
+NiSmartPointer(NiCustomSkinData);
+class NiCustomSkinData : public NiSkinData 
+{
+public:
+    void UpdateRootTransform(NiTransform transform) 
+    {
+        m_kRootParentToSkin = transform;
+    }
+};
+NiSmartPointer(CustomNiBoneLODController);
+class CustomNiBoneLODController : public NiBoneLODController 
+{
+public:
+    void UpdateSkin(NiTriBasedGeom* pkOldSkin, NiTriBasedGeom* pkNewSkin) 
+    {
+        unsigned int ui;
+
+        for (ui = 0; ui < m_kSkinArray.GetSize(); ui++)
+        {
+            SkinInfoSet* pkSet = m_kSkinArray.GetAt(ui);
+            if (pkSet)
+            {
+                for (unsigned int uj = 0; uj < pkSet->GetSize(); uj++)
+                {
+                    SkinInfo* pkInfo = pkSet->GetAt(uj);
+                    if (pkInfo->m_pkSkinGeom == pkOldSkin)
+                    {
+                        pkInfo->m_pkSkinGeom = pkNewSkin;
+                        pkInfo->m_spSkinInst = pkNewSkin->GetSkinInstance();
+                    }
+                }
+            }
+        }
+
+        for (ui = 0; ui < m_kSkinSet.GetSize(); ui++)
+        {
+            if (m_kSkinSet.GetAt(ui) == pkOldSkin)
+            {
+                m_kSkinSet.ReplaceAt(ui, pkNewSkin);
+            }
+        }
+    }
+};
+
 class NS_TourScene 
 {
 public:
@@ -57,7 +101,7 @@ public:
 class FindBoneNode : public NS_TourScene
 {
 public:
-    FindBoneNode(NiNode** ppNode, int nArry, const char* szName) 
+    FindBoneNode(NiNodePtr* ppNode, int nArry, const char* szName) 
     {
         m_nCurLevel = -1;
         m_szName = szName;
@@ -65,7 +109,7 @@ public:
         for (int i = 0; i < nArry; i++)
         {
             if (ppNode[i])
-                m_setLinkNode.insert(ppNode[i]);
+                m_setLinkNode.insert(NiSmartPointerCast(NiAVObject,ppNode[i]));
         }
     }
     TS_RESULT ProcessData(NiAVObject* obj, void* _data_) override
@@ -82,7 +126,7 @@ public:
     }
     const char* m_szName;
     NiAVObject* m_pkBone;
-    std::set<NiAVObject*> m_setLinkNode;
+    std::set<NiAVObjectPtr> m_setLinkNode;
 };
 
 CharShape::CharShape(NiAVObject* node)
@@ -171,65 +215,32 @@ void CharShape::SetEquipment(NPCViewInfo* npcviewinfo)
     _Gender = npcviewinfo->Gender;
     _Class = npcviewinfo->Class;
 
-    std::string s = npcviewinfo->Equ_RightHand;
-    if (s!= "-") 
+    NPCViewLoopDummy* LoopDummy = (NPCViewLoopDummy*)npcviewinfo;
+    std::vector<LinkIndex> LinkIndex = {
+        LINK_RIGHTHAND ,
+        LINK_LEFTHAND,
+        LINK_CHEST,
+        LINK_NUM,
+        LINK_NUM
+    };
+    for(int i = 0; i < LinkIndex.size(); i++)
     {
-        auto itemview = SHN::SHNManager::GetViewInfoByInx(s);
-        switch (itemview->EquipType) 
+        std::string s = &LoopDummy->Equ_Dummy[i * 32];
+        if (s != "-")
         {
-        case EquipTypeEnum::ICON:
-            break;
-        case EquipTypeEnum::SET:
-            CreateSetEquipment(itemview);
-            break;
-        case EquipTypeEnum::LINK:
-            CreateLinkEquipment(LinkIndex::LINK_RIGHTHAND ,itemview);
-            break;
+            auto itemview = SHN::SHNManager::GetViewInfoByInx(s);
+            switch (itemview->EquipType)
+            {
+            case EquipTypeEnum::ICON:
+                break;
+            case EquipTypeEnum::SET:
+                CreateSetEquipment(itemview);
+                break;
+            case EquipTypeEnum::LINK:
+                CreateLinkEquipment(LinkIndex[i], itemview);
+                break;
+            }
         }
-    } 
-    s = npcviewinfo->Equ_LeftHand;
-    if (s != "-")
-    {
-        auto itemview = SHN::SHNManager::GetViewInfoByInx(s);
-        switch (itemview->EquipType)
-        {
-        case EquipTypeEnum::ICON:
-            break;
-        case EquipTypeEnum::SET:
-            CreateSetEquipment(itemview);
-            break;
-        case EquipTypeEnum::LINK:
-            CreateLinkEquipment(LinkIndex::LINK_LEFTHAND, itemview);
-            break;
-        }
-    }
-    s = npcviewinfo->Equ_Body;
-    if (s != "-")
-    {
-        auto itemview = SHN::SHNManager::GetViewInfoByInx(s);
-        switch (itemview->EquipType)
-        {
-        case EquipTypeEnum::ICON:
-            break;
-        case EquipTypeEnum::SET:
-            CreateSetEquipment(itemview);
-            break;
-        case EquipTypeEnum::LINK:
-            CreateLinkEquipment(LinkIndex::LINK_CHEST, itemview);
-            break;
-        }
-    }
-    if (NiIsKindOf(NiPickable, m_pkRootNode))
-    {
-        NiPickablePtr pickable = NiSmartPointerCast(NiPickable, m_pkRootNode);
-        NiStream s;
-        s.InsertObject(pickable->ToNiNode());
-        s.Save("E:\\VM\\Gamebryo\\Nebula v2 Rewind\\ResChar\\Joker-f\\test.nif");
-    }
-    else {
-        NiStream s;
-        s.InsertObject(m_pkRootNode);
-        s.Save("E:\\VM\\Gamebryo\\Nebula v2 Rewind\\ResChar\\Joker-f\\test.nif");
     }
 }
 void CharShape::CreateSetEquipment(ItemViewInfo* info)
@@ -248,19 +259,32 @@ void CharShape::CreateSetEquipment(ItemViewInfo* info)
     CharSet set(SetNode);
     set.Init();
     ItemInfo* _ItemInfo = SHN::SHNManager::GetItemInfoByID(info->ID);
+    
     switch (_ItemInfo->Equip) 
     {
     case ITEMEQUIP_BODY:
+    {
         SetBody(SetNode, &set);
-        break;
-    case ITEMEQUIP_LEG:
-        SetLeg(SetNode);
-        break;
-    case ITEMEQUIP_SHOES:
-        SetShoes(SetNode);
+        NiTexturingPropertyPtr tex = NiSmartPointerCast(NiTexturingProperty, m_apkLodGeom[0]->GetProperty(NiProperty::TEXTURING));
+        tex->SetBaseTexture(NiSourceTexture::Create(PgUtil::PathFromClientFolder("reschar\\" + classname + "-" + gender + "\\" + info->TextureFile + ".dds").c_str()));
         break;
     }
-
+    case ITEMEQUIP_LEG:
+    {
+        SetLeg(SetNode, &set);
+        NiTexturingPropertyPtr tex = NiSmartPointerCast(NiTexturingProperty, m_apkLodGeom[3]->GetProperty(NiProperty::TEXTURING));
+        tex->SetBaseTexture(NiSourceTexture::Create(PgUtil::PathFromClientFolder("reschar\\" + classname + "-" + gender + "\\" + info->TextureFile + ".dds").c_str()));
+        break;
+    }
+    case ITEMEQUIP_SHOES:
+    {
+        SetShoes(SetNode, &set);
+        NiTexturingPropertyPtr tex = NiSmartPointerCast(NiTexturingProperty, m_apkLodGeom[6]->GetProperty(NiProperty::TEXTURING));
+        tex->SetBaseTexture(NiSourceTexture::Create(PgUtil::PathFromClientFolder("reschar\\" + classname + "-" + gender + "\\" + info->TextureFile + ".dds").c_str()));
+        break;
+    }
+    }
+   
     m_pkRootNode->UpdateProperties();
     m_pkRootNode->UpdateEffects();
     m_pkRootNode->Update(0.0f);
@@ -286,7 +310,7 @@ void CharShape::SetBody(NiNodePtr SetNode, CharSet* pkSet)
 {
     std::vector<const char*> LodLevels = { "LOD0","LOD1","LOD2" };
     int v2 = 0;
-    NiGeometry** v3; // ebx
+    NiGeometryPtr* v3; // ebx
     NiGeometryPtr v4;
     NiGeometryPtr v5;
     v3 = m_apkLodGeom;
@@ -297,7 +321,7 @@ void CharShape::SetBody(NiNodePtr SetNode, CharSet* pkSet)
         v5 = 0;
         if (v2 < pkSet->m_nSetGeoCnt)
             v5 = pkSet->m_pkBodyGeom[v2];
-        if (!ChangeGeom(v3, v5, v2))
+        if (!ChangeGeom(&m_apkLodGeom[v2], v5, v2))
             break;
         v2++;
         v3++;
@@ -307,34 +331,57 @@ void CharShape::SetBody(NiNodePtr SetNode, CharSet* pkSet)
             return;
         }
     }
-
-
-    NiNodePtr BIPNode = NiSmartPointerCast(NiNode, m_pkRootNode->GetObjectByName("Bip01"));
-    NiBoneLODController* controller = (NiBoneLODController*)NiGetController(NiBoneLODController, BIPNode);
-
 }
-void CharShape::SetLeg(NiNodePtr SetNode)
+void CharShape::SetLeg(NiNodePtr SetNode, CharSet* pkSet)
 {
     std::vector<const char*> LodLevels = { "LOD0","LOD1","LOD2" };
-    for (int i = 0; i < LodLevels.size(); i++)
+    int v2 = 0;
+    NiGeometryPtr* v3; // ebx
+    NiGeometryPtr v4;
+    NiGeometryPtr v5;
+    v3 = &m_apkLodGeom[3];
+
+    while (1)
     {
-        auto newnode = NiSmartPointerCast(NiNode, SetNode->GetObjectByName(LodLevels[i])->GetObjectByName("Leg"));
-        auto parent = m_apkLodGeom[i + 3]->GetParent();
-        parent->DetachChild(m_apkLodGeom[i + 3]);
-        parent->AttachChild(newnode);
-        PgUtil::CatchGeomentry(newnode, &m_apkLodGeom[i + 3]);
+        v4 = *v3;
+        v5 = 0;
+        if (v2 < pkSet->m_nSetGeoCnt)
+            v5 = pkSet->m_pkLegGeom[v2];
+        if (!ChangeGeom(&m_apkLodGeom[v2 + 3], v5, v2))
+            break;
+        v2++;
+        v3++;
+        if (v2 >= 3)
+        {
+            m_apkGeom[3] = m_apkLodGeom[3];
+            return;
+        }
     }
 }
-void CharShape::SetShoes(NiNodePtr SetNode)
+void CharShape::SetShoes(NiNodePtr SetNode, CharSet* pkSet)
 {
     std::vector<const char*> LodLevels = { "LOD0","LOD1","LOD2" };
-    for (int i = 0; i < LodLevels.size(); i++)
+    int v2 = 0;
+    NiGeometryPtr* v3; // ebx
+    NiGeometryPtr v4;
+    NiGeometryPtr v5;
+    v3 = &m_apkLodGeom[6];
+
+    while (1)
     {
-        auto newnode = NiSmartPointerCast(NiNode, SetNode->GetObjectByName(LodLevels[i])->GetObjectByName("Shoes"));
-        auto parent = m_apkLodGeom[i + 6]->GetParent();
-        parent->DetachChild(m_apkLodGeom[i + 6]);
-        parent->AttachChild(newnode);
-        PgUtil::CatchGeomentry(newnode, &m_apkLodGeom[i + 6]);
+        v4 = *v3;
+        v5 = 0;
+        if (v2 < pkSet->m_nSetGeoCnt)
+            v5 = pkSet->m_pkShoesGeom[v2];
+        if (!ChangeGeom(&m_apkLodGeom[v2 + 6], v5, v2))
+            break;
+        v2++;
+        v3++;
+        if (v2 >= 3)
+        {
+            m_apkGeom[4] = m_apkLodGeom[6];
+            return;
+        }
     }
 }
 bool CharShape::SetLodGeometry(int nLodLeve, const char* LodName)
@@ -358,95 +405,124 @@ bool CharShape::SetLodGeometry(int nLodLeve, const char* LodName)
     return true;
     
 }
-char CharShape::ChangeGeom(NiGeometry** pkCurGeom, NiGeometry* pkChgGeom, int nLodLevel)
+char CharShape::ChangeGeom(NiGeometryPtr* pkCurGeom, NiGeometryPtr pkChgGeom, int nLodLevel)
 {
-    NiGeometry* pkChgNodeBL;
+    NiGeometryPtr pkChgNodeBL;
     if (!m_pkRootNode || !*pkCurGeom || !pkChgGeom)
         return false;
     NiObjectNET::SetDefaultCopyType(NiObjectNET::COPY_EXACT);
+
+    NiGeometryPtr UnchangedGeometry = pkChgGeom;
+    NiNodePtr NewNode = (NiNode*)pkChgGeom->GetParent()->Clone();
+    PgUtil::CatchGeomentry(NewNode, &pkChgGeom);
+    NiGeometryPtr OldGeometry = *pkCurGeom;
+    pkChgGeom->SetTranslate(OldGeometry->GetTranslate());
+    pkChgGeom->SetRotate(OldGeometry->GetRotate());
     pkChgNodeBL = pkChgGeom;
-    NiAVObject* v5 = (NiAVObject*) pkChgGeom->GetParent()->Clone();
-    PgUtil::CatchGeomentry(v5, &pkChgGeom);
-    pkChgGeom->SetTranslate((*pkCurGeom)->GetTranslate());
-    pkChgGeom->SetRotate((*pkCurGeom)->GetRotate());
     if (nLodLevel >= 0)
-        ChangeBoneLODController(nLodLevel, *pkCurGeom, pkChgNodeBL, pkChgGeom);
-    NiSkinPartition* partition = pkChgGeom->GetSkinInstance()->GetSkinPartition();
-    NiAVObject** objarray = NiAlloc(NiAVObject*, (*pkCurGeom)->GetSkinInstance()->GetSkinData()->GetBoneCount());
-    NiSkinInstance* skin = NiNew NiSkinInstance(pkChgGeom->GetSkinInstance()->GetSkinData(), (*pkCurGeom)->GetSkinInstance()->GetRootParent(), objarray);
+        ChangeBoneLODController(nLodLevel, OldGeometry, pkChgNodeBL, UnchangedGeometry);
+    NiSkinInstancePtr NewSkinInstance = pkChgGeom->GetSkinInstance();
+    NiSkinDataPtr NewSkinData = NewSkinInstance->GetSkinData();
+    int NewBoneCount = NewSkinData->GetBoneCount();
+    NiNodePtr OldRootParent = NiSmartPointerCast(NiNode,OldGeometry->GetSkinInstance()->GetRootParent());
+    NiAVObject** objarray = NiAlloc(NiAVObject*, NewBoneCount);
+    NiSkinInstance* skin = NiNew NiSkinInstance(NewSkinData, OldRootParent, objarray);
+    skin->SetSkinPartition(pkChgGeom->GetSkinInstance()->GetSkinPartition());
     pkChgGeom->SetSkinInstance(skin);
-    skin->SetSkinPartition(partition);;
+    
+    OldGeometry->SetSkinInstance(skin);
 
-    NiAVObject* const* bones = pkChgGeom->GetSkinInstance()->GetBones();
-
-    int BoneSetCt = 0;
-    int OldBoneCt = (*pkCurGeom)->GetSkinInstance()->GetSkinData()->GetBoneCount();
-    int NewBoneCt = pkChgGeom->GetSkinInstance()->GetSkinData()->GetBoneCount();
-    for (int i = 0; i < NewBoneCt; i++)
+    NiAVObject* const* NewBoneList = NewSkinInstance->GetBones();
+    for (int i = 0; i < NewBoneCount; i++) 
     {
-        NiNode* bone = NULL;
-        auto name = bones[i]->GetName();
+        auto name = NewBoneList[i]->GetName();
         FindBoneNode tour(LinkNodes, 27, name);
-        tour.TourScene<NiNode>((NiNode*)(*pkCurGeom)->GetSkinInstance()->GetRootParent(), 0);
+        tour.TourScene<NiNode>(OldRootParent, 0);
         if (tour.m_pkBone)
         {
             skin->SetBone(i, tour.m_pkBone);
-            BoneSetCt++;
         }
     }
-    auto curname = (*pkCurGeom)->GetName();
-    (*pkCurGeom)->SetName("Dead Mesh");
-    auto parent = (*pkCurGeom)->GetParent()->GetParent();
-    parent->DetachChild((*pkCurGeom)->GetParent());
-    parent->AttachChild(v5);
-    *pkCurGeom = pkChgGeom;
-    pkChgGeom->UpdateProperties();
-    pkChgGeom->UpdateEffects();
-    pkChgGeom->Update(0.0f);
+    NiNodePtr OldNode = NiSmartPointerCast(NiNode,OldGeometry->GetParent());
+    NiNodePtr Parent = NiSmartPointerCast(NiNode, OldNode->GetParent());
+    pkChgGeom->SetTranslate(OldGeometry->GetTranslate());
+    pkChgGeom->SetRotate(OldGeometry->GetRotate());
+    
+    Parent->DetachChild(OldNode);
+    Parent->AttachChild(NewNode);
+    NewNode->SetTranslate(OldNode->GetTranslate());
+    NewNode->SetWorldTranslate(OldNode->GetTranslate());
+    NewNode->SetWorldBound(OldNode->GetWorldBound());
+    NewNode->SetScale(OldNode->GetScale());
+
     return true;
 }
 
-void CharShape::ChangeBoneLODController(int _nLodLevel, NiGeometry* _pkDestGeom, NiGeometry* _pkSrcGeom, NiGeometry* _pkNewGeom)
+void CharShape::ChangeBoneLODController(int _nLodLevel, NiGeometryPtr& _pkDestGeom, NiGeometryPtr& _pkSrcGeom, NiGeometryPtr& _pkNewGeom)
 {
-    auto v5 = _pkDestGeom->GetSkinInstance();
-    auto v6 = _pkSrcGeom->GetSkinInstance();
-    auto v7 = (NiNode*)v5->GetRootParent();
-    auto v8 = (NiNode*)v6->GetRootParent();
-    auto v9 = PgUtil::FindBoneRootNodes(v7);
-    auto v10 = PgUtil::FindBoneRootNodes(v8);
-    auto v12 = NiGetController(NiBoneLODController, v9);
-    auto v13 = NiGetController(NiBoneLODController, v10);
-    NiBoneLODController::NiTriBasedGeomSet geomset;
-    NiBoneLODController::NiSkinInstanceSet skinset;
-    v13->GetSkinData(geomset, skinset);
-    int i;
-    for (i = 0; i < geomset.GetSize(); i++)
+    NiSkinInstancePtr OldSkinInstance = _pkDestGeom->GetSkinInstance();
+    NiSkinInstancePtr NewSkinInstance = _pkSrcGeom->GetSkinInstance();
+    NiNodePtr OldParentRoot = (NiNode*)OldSkinInstance->GetRootParent();
+    NiNodePtr NewParentRoot = (NiNode*)NewSkinInstance->GetRootParent();
+    NiNodePtr OldRootBone = PgUtil::FindBoneRootNodes(OldParentRoot);
+    NiNodePtr NewRootBone = PgUtil::FindBoneRootNodes(NewParentRoot);
+    CustomNiBoneLODControllerPtr OldLODController = NiGetController(CustomNiBoneLODController, OldRootBone);
+    CustomNiBoneLODControllerPtr NewLODController = NiGetController(CustomNiBoneLODController, NewRootBone);
+
+    NiBoneLODController::NiTriBasedGeomSet OldGeomSet;
+    NiBoneLODController::NiSkinInstanceSet OldSkinSet;
+    OldLODController->GetSkinData(OldGeomSet, OldSkinSet);
+
+
+    NiBoneLODController::NiTriBasedGeomSet NewGeomSet;
+    NiBoneLODController::NiSkinInstanceSet NewSkinSet;
+    NewLODController->GetSkinData(NewGeomSet, NewSkinSet);
+
+    NiTriBasedGeomPtr GeometryInOldLOD = NiSmartPointerCast(NiTriBasedGeom, _pkDestGeom);
+    if (!OldLODController->FindGeom(GeometryInOldLOD))
+    {   
+        LogError("OLDLODController doesnt have SrcGeometry");
+        return;
+    }
+
+    NiTriBasedGeomPtr GeometryInNewLOD = NiSmartPointerCast(NiTriBasedGeom, _pkNewGeom);
+    if (!NewLODController->FindGeom(GeometryInNewLOD))
     {
-        if (geomset.GetAt(i) == _pkSrcGeom)
+        LogError("NewLODController doesnt have SrcGeometry");
+        return;
+    }
+    int LODOffset;
+    for (LODOffset = 0; LODOffset < NewGeomSet.GetSize(); LODOffset++)
+    {
+        NiTriBasedGeom*& geom = NewGeomSet.GetAt(LODOffset);
+        if (GeometryInNewLOD == geom)
             break;
     }
-    int oldBoneCt = _pkSrcGeom->GetSkinInstance()->GetSkinData()->GetBoneCount();
-    NiAVObject** objarray = NiAlloc(NiAVObject*, oldBoneCt);
-    NiSkinInstance* skin = NiNew NiSkinInstance(skinset.GetAt(i)->GetSkinData(), v7, objarray);
-    auto skinpartition = _pkSrcGeom->GetSkinInstance()->GetSkinPartition();
-    skin->SetSkinPartition(skinpartition);
-    NiAVObject*const* bones = _pkSrcGeom->GetSkinInstance()->GetBones();
-    int newBoneCt = skin->GetSkinData()->GetBoneCount();
-    int BoneSetCt = 0;
-    for (i = 0; i < skin->GetSkinData()->GetBoneCount(); i++) 
+
+    NiSkinDataPtr NewSkinData = NewSkinSet.GetAt(LODOffset)->GetSkinData();
+    NiCustomSkinDataPtr Helper = NiSmartPointerCast(NiCustomSkinData, NewSkinData);
+    Helper->UpdateRootTransform(OldSkinInstance->GetSkinData()->GetRootParentToSkin());
+
+    int OldBoneCt = OldSkinInstance->GetSkinData()->GetBoneCount();
+    int NewBoneCt = NewSkinInstance->GetSkinData()->GetBoneCount();
+
+    NiAVObject** objarray = NiAlloc(NiAVObject*, NewBoneCt);
+    NiSkinInstance* skin = NiNew NiSkinInstance(NewSkinData, OldParentRoot, objarray);
+    skin->SetSkinPartition(NewSkinInstance->GetSkinPartition());
+    _pkSrcGeom->SetSkinInstance(skin);
+
+    NiAVObject* const* NewBoneList = NewSkinInstance->GetBones();
+    for (int i = 0; i < NewBoneCt; i++)
     {
-        auto name = bones[i]->GetName();
+        auto name = NewBoneList[i]->GetName();
         FindBoneNode tour(LinkNodes, 27, name);
-        tour.TourScene<NiNode>((NiNode*)v7, 0);
+        tour.TourScene<NiNode>((NiNode*)OldParentRoot, 0);
         if (tour.m_pkBone)
         {
             skin->SetBone(i, tour.m_pkBone);
-            BoneSetCt++;
         }
-
-       
     }
-    v12->ReplaceSkin((NiTriBasedGeom*)_pkDestGeom, (NiTriBasedGeom*)_pkNewGeom);
+    OldLODController->UpdateSkin(NiSmartPointerCast(NiTriBasedGeom,_pkDestGeom), NiSmartPointerCast(NiTriBasedGeom, _pkSrcGeom));
 }
 CharSet::CharSet(NiNodePtr Node)
 {

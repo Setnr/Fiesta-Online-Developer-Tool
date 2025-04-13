@@ -12,9 +12,9 @@ public:
 	bool SetNormalGeometry();
 	int m_nSetGeoCnt;
 	NiNodePtr m_spRootNode;
-	NiGeometry* m_pkBodyGeom[3];
-	NiGeometry* m_pkLegGeom[3];
-	NiGeometry* m_pkShoesGeom[3];
+	NiGeometryPtr m_pkBodyGeom[3];
+	NiGeometryPtr m_pkLegGeom[3];
+	NiGeometryPtr m_pkShoesGeom[3];
 };
 
 NiSmartPointer(CharShape);
@@ -89,11 +89,11 @@ public:
 	CharShape(NiAVObject* node);
 	void SetEquipment(NPCViewInfo* npcviewinfo);
 private:
-	NiNode* LinkNodes[27] = {nullptr};
+	NiNodePtr LinkNodes[27] = {nullptr};
 	NiNodePtr EyeShapeNode;
 	PROTO_EQUIPMENT Equip;
-	NiGeometry* m_apkLodGeom[9] = { nullptr };
-	NiGeometry* m_apkGeom[5] = { nullptr };
+	NiGeometryPtr m_apkLodGeom[9] = { nullptr };
+	NiGeometryPtr m_apkGeom[5] = { nullptr };
 	int m_nSetLodGeoCnt = 0;
 	bool _Gender;
 	BaseCharClass _Class;
@@ -103,9 +103,9 @@ private:
 	void CreateSetEquipment(ItemViewInfo* info);
 	void CreateLinkEquipment(LinkIndex slot, ItemViewInfo* info);
 	void SetBody(NiNodePtr SetNode, CharSet* pkSet);
-	void SetLeg(NiNodePtr SetNode);
-	void SetShoes(NiNodePtr SetNode);
+	void SetLeg(NiNodePtr SetNode, CharSet* pkSet);
+	void SetShoes(NiNodePtr SetNode, CharSet* pkSet);
 	bool SetLodGeometry(int nLodLeve, const char* LodName);
-	char ChangeGeom(NiGeometry** pkCurGeom, NiGeometry* pkChgGeom, int nLodLevel);
-	void ChangeBoneLODController(int _nLodLevel, NiGeometry* _pkDestGeom, NiGeometry* _pkSrcGeom, NiGeometry* _pkNewGeom);
+	char ChangeGeom(NiGeometryPtr* pkCurGeom, NiGeometryPtr pkChgGeom, int nLodLevel);
+	void ChangeBoneLODController(int _nLodLevel, NiGeometryPtr& _pkDestGeom, NiGeometryPtr& _pkSrcGeom, NiGeometryPtr& _pkNewGeom);
 };

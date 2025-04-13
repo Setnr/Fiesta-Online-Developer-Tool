@@ -82,7 +82,7 @@ public:
 		return "Fighter";
 	}
 
-	static bool CatchGeomentry(NiAVObject* obj, NiGeometry** geomentry) 
+	static bool CatchGeomentry(NiAVObject* obj, NiGeometryPtr* geomentry) 
 	{
 		if (NiIsKindOf(NiNode, obj)) 
 		{
@@ -97,7 +97,7 @@ public:
 		{
 			if (NiIsKindOf(NiGeometry, obj)) 
 			{
-				*geomentry = (NiGeometry*) obj;
+				*geomentry = NiSmartPointerCast(NiGeometry, obj);
 				return true;
 			}
 			
