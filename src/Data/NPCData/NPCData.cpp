@@ -6,14 +6,18 @@
 #include <fstream>
 #include <filesystem>
 #include <regex>
+#include <future>
 
 
 NPCDataPtr NPCData::Data = nullptr;
 bool NPCData::isCN = false;
 void NPCData::Init() 
 {
-	Data = NiNew NPCData;
-	Data->Load();
+	if(Data == NULL)
+	{
+		Data = NiNew NPCData;
+		Data->Load();
+	}
 }
 void NPCData::Clear()
 {
@@ -36,6 +40,10 @@ void NPCData::Load()
 	}
 	std::string line;
 	ShineNPCPtr LastNPC;
+
+	std::vector<std::string> CurrentLines;
+	std::vector<std::future<void>> futures;
+
 	while (getline(npctxt, line)) 
 	{
 		if (line.starts_with(";"))
@@ -46,31 +54,23 @@ void NPCData::Load()
 		}
 		if (line.contains("#recordin"))
 		{
-			std::regex del("\t");
-			std::vector<std::string> list = { std::sregex_token_iterator(line.begin(), line.end(), del, -1), std::sregex_token_iterator() };
-			std::vector<std::string>::iterator end = list.end();
-			for(auto iter = list.begin(); iter != end; iter++)
+			if (line.contains("LinkTable")) 
 			{
-				if (*iter == "")
-					continue;
-				if (*iter != "#recordin")
-				{
-					if (*iter == "ShineNPC")
-					{
-						LastNPC = NiNew ShineNPC(iter, end);
-						_NPCS.push_back(LastNPC);
-						break;
-					}
-					else if (*iter == "LinkTable")
-					{
-						LastNPC->AppendGate(iter, end);
-						break;
-					}
-				}
+				CurrentLines.push_back(line);
 			}
+			else 
+			{
+				if (!CurrentLines.empty()) 
+				{
+					futures.push_back(std::async(std::launch::async, &NPCData::ProcessNPCData , this, CurrentLines));
+				}
+				CurrentLines = { line };
+			}
+			
 		}
 	}
-
+	for (auto& fut : futures)
+		fut.get();
 }
 void NPCData::Save()
 {
@@ -114,6 +114,39 @@ void NPCData::Save()
 void NPCData::SaveNPCs()
 {
 	Data->Save();
+}
+void NPCData::ProcessNPCData(std::vector<std::string> lines)
+{
+	ShineNPCPtr NPC;
+	for(auto line : lines)
+	{
+		std::replace(line.begin(), line.end(), ' ', '\t');
+		std::regex del("\t");
+		std::vector<std::string> list = { std::sregex_token_iterator(line.begin(), line.end(), del, -1), std::sregex_token_iterator() };
+		std::vector<std::string>::iterator end = list.end();
+		for (auto iter = list.begin(); iter != end; iter++)
+		{
+			if (*iter == "")
+				continue;
+			if (*iter != "#recordin")
+			{
+				if (*iter == "ShineNPC")
+				{
+					NPC = NiNew ShineNPC(iter, end);
+					break;
+				}
+				else if (*iter == "LinkTable")
+				{
+					NPC->AppendGate(iter, end);
+					break;
+				}
+			}
+		}
+	}
+	if (!NPC)
+		return;
+	std::lock_guard<std::mutex> lock(NPCLock);
+	_NPCS.push_back(NPC);
 }
 std::vector<ShineNPCPtr>NPCData::GetNPCsByMap(std::string MapName) 
 {

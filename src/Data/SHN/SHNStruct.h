@@ -1408,5 +1408,379 @@ struct MobViewInfo : SHNRow
 	char Group3[32];
 	char GroupS[32];
 };
+enum BaseCharClass : unsigned __int32
+{
+	CC_FIGHT = 0x0,
+	CC_CLERIC = 0x1,
+	CC_ARCHER = 0x2,
+	CC_MAGE = 0x3,
+	CC_CHARCOPY = 0x4,
+	CC_MOBCOPY = 0x5,
+	CC_JOKER = 0x6,
+	CC_SENTINEL = 0x7,
+	MAX_BASECHARCLASS = 0x8,
+};
+
+struct NPCViewInfo : SHNRow
+{
+	unsigned __int16 TypeIndex;
+	BaseCharClass Class;
+	unsigned __int16 Gender;
+	unsigned __int8 FaceShape;
+	unsigned __int8 HairType;
+	unsigned __int8 HairColor;
+	unsigned int BaseActionCode;
+	unsigned int PeriodActionCode;
+	unsigned int ActionDelayTime;
+	unsigned __int8 bUseEventAction;
+	char Equ_RightHand[32];
+	char Equ_LeftHand[32];
+	char Equ_Body[32];
+	char Equ_Leg[32];
+	char Equ_Shoes[32];
+	char Equ_AccBody[32];
+	char Equ_AccLeg[32];
+	char Equ_AccShoes[32];
+	char Equ_AccMouth[32];
+	char Equ_AccHeadA[32];
+	char Equ_AccEye[32];
+	char Equ_AccHead[32];
+	char Equ_AccLeftHand[32];
+	char Equ_AccRightHand[32];
+	char Equ_AccBack[32];
+	char Equ_AccWeast[32];
+	char Equ_AccHip[32];
+	char Equ_MiniMon[32];
+	char Equ_MiniMon_R[32];
+};
+enum EquipTypeEnum : __int32
+{
+	ICON = 0x0,
+	LINK = 0x1,
+	SET = 0x2,
+	MAX_EQUIPTYPEENUM = 0x3,
+};
+enum IVEType : __int32
+{
+	IVET_ALLOFF = 0x0,
+	IVET_HAIROFF = 0x1,
+	IVET_BA3OFF = 0x2,
+	IVET_FA12OFF = 0x3,
+	IVET_FRONTOFF = 0x4,
+	IVET_DEFAULT = 0x5,
+	IVET_3PIECE_BOOTS = 0x6,
+	IVET_3PIECE_PANTS = 0x7,
+	IVET_2PIECE_PANTS = 0x8,
+	IVET_3PIECE_AMOR = 0x9,
+	IVET_1PIECE = 0xA,
+	MAX_IVETYPE = 0xB,
+};
+struct ItemViewInfo :SHNRow
+{
+	unsigned __int16 ID;
+	char InxName[32];
+	unsigned int IconIndex;
+	char IconFile[32];
+	unsigned int SubIconIndex;
+	char SubIconFile[32];
+	unsigned int PeriodIconIndex;
+	char PeriodIconFile[32];
+	unsigned int R;
+	unsigned int G;
+	unsigned int B;
+	unsigned int SUB_R;
+	unsigned int SUB_G;
+	unsigned int SUB_B;
+	EquipTypeEnum EquipType;
+	char LinkFile[32];
+	char TextureFile[32];
+	unsigned int MSetNo;
+	unsigned int FSetNo;
+	float GrnItemSize;
+	char GrnItemTex[32];
+	unsigned __int16 UpEffect;
+	char DropSnd[32];
+	char EquSnd[32];
+	char PutSnd[32];
+	IVEType IVET_Index;
+	char Descript[256];
+};
+enum ItemEquipEnum : __int32
+{
+	ITEMEQUIP_NONE = 0x0,
+	ITEMEQUIP_HAT = 0x1,
+	ITEMEQUIP_NOUSE03 = 0x2,
+	ITEMEQUIP_NOUSE01 = 0x3,
+	ITEMEQUIP_NOUSE02 = 0x4,
+	ITEMEQUIP_FACETATTOO = 0x5,
+	ITEMEQUIP_NECKLACE = 0x6,
+	ITEMEQUIP_BODY = 0x7,
+	ITEMEQUIP_BODYACC = 0x8,
+	ITEMEQUIP_BACK = 0x9,
+	ITEMEQUIP_LEFTHAND = 0xA,
+	ITEMEQUIP_LEFTHANDACC = 0xB,
+	ITEMEQUIP_RIGHTHAND = 0xC,
+	ITEMEQUIP_RIGHTHANDACC = 0xD,
+	ITEMEQUIP_BRACELET = 0xE,
+	ITEMEQUIP_LEFTRING = 0xF,
+	ITEMEQUIP_RIGHTRING = 0x10,
+	ITEMEQUIP_COSEFF = 0x11,
+	ITEMEQUIP_TAIL = 0x12,
+	ITEMEQUIP_LEG = 0x13,
+	ITEMEQUIP_LEGACC = 0x14,
+	ITEMEQUIP_SHOES = 0x15,
+	ITEMEQUIP_SHOESACC = 0x16,
+	ITEMEQUIP_EARRING = 0x17,
+	ITEMEQUIP_MOUTH = 0x18,
+	ITEMEQUIP_MINIMON = 0x19,
+	ITEMEQUIP_EYE = 0x1A,
+	ITEMEQUIP_HATACC = 0x1B,
+	ITEMEQUIP_MINIMON_R = 0x1C,
+	ITEMEQUIP_SHIELDACC = 0x1D,
+	MAX_ITEMEQUIPENUM = 0x1E,
+};
+enum ItemTypeEnum : __int32
+{
+	ITEMTYPE_EQU = 0x0,
+	ITEMTYPE_EXH = 0x1,
+	ITEMTYPE_ETC = 0x2,
+	ITEMTYPE_QUEST = 0x3,
+	ITEMTYPE_STARTQUEST = 0x4,
+	ITEMTYPE_VIP = 0x5,
+	ITEMTYPE_CONFIRM = 0x6,
+	MAX_ITEMTYPEENUM = 0x7,
+};
+enum ItemClassEnum : __int32
+{
+	ITEMCLASS_BYTELOT = 0x0,
+	ITEMCLASS_WORDLOT = 0x1,
+	ITEMCLASS_DWRDLOT = 0x2,
+	ITEMCLASS_QUESTITEM = 0x3,
+	ITEMCLASS_AMULET = 0x4,
+	ITEMCLASS_WEAPON = 0x5,
+	ITEMCLASS_ARMOR = 0x6,
+	ITEMCLASS_SHIELD = 0x7,
+	ITEMCLASS_BOOT = 0x8,
+	ITEMCLASS_FURNITURE = 0x9,
+	ITEMCLASS_DECORATION = 0xA,
+	ITEMCLASS_SKILLSCROLL = 0xB,
+	ITEMCLASS_RECALLSCROLL = 0xC,
+	ITEMCLASS_BINDITEM = 0xD,
+	ITEMCLASS_UPSOURCE = 0xE,
+	ITEMCLASS_ITEMCHEST = 0xF,
+	ITEMCLASS_WTLICENCE = 0x10,
+	ITEMCLASS_KQ = 0x11,
+	ITEMCLASS_HOUSESKIN = 0x12,
+	ITEMCLASS_UPRED = 0x13,
+	ITEMCLASS_UPBLUE = 0x14,
+	ITEMCLASS_KQSTEP = 0x15,
+	ITEMCLASS_FEED = 0x16,
+	ITEMCLASS_RIDING = 0x17,
+	ITEMCLASS_AMOUNT = 0x18,
+	ITEMCLASS_UPGOLD = 0x19,
+	ITEMCLASS_COSWEAPON = 0x1A,
+	ITEMCLASS_ACTIONITEM = 0x1B,
+	ITEMCLASS_GBCOIN = 0x1C,
+	ITEMCLASS_CAPSULE = 0x1D,
+	ITEMCLASS_CLOSEDCARD = 0x1E,
+	ITEMCLASS_OPENCARD = 0x1F,
+	ITEMCLASS_MONEY = 0x20,
+	ITEMCLASS_NOEFFECT = 0x21,
+	ITEMCLASS_ENCHANT = 0x22,
+	ITEMCLASS_ACTIVESKILL = 0x23,
+	ITEMCLASS_PUP = 0x24,
+	ITEMCLASS_COSSHIELD = 0x25,
+	ITEMCLASS_BRACELET = 0x26,
+	MAX_ITEMCLASSENUM = 0x27,
+};
+enum AuctionGroup : __int32
+{
+	AG_ALL = 0x0,
+	AG_M_WEAPON = 0x1,
+	AG_M_ARMOR = 0x2,
+	AG_M_ACCESSORY = 0x3,
+	AG_M_PRODUCE = 0x4,
+	AG_M_ENCHANT = 0x5,
+	AG_M_RAW = 0x6,
+	AG_M_ETC = 0x7,
+	AG_S_ONEHANDSWORD = 0x8,
+	AG_S_TWOHANDSWORD = 0x9,
+	AG_S_AXE = 0xA,
+	AG_S_MACE = 0xB,
+	AG_S_HAMMER = 0xC,
+	AG_S_BOW = 0xD,
+	AG_S_CBOW = 0xE,
+	AG_S_STAFF = 0xF,
+	AG_S_WAND = 0x10,
+	AG_S_CLAW = 0x11,
+	AG_S_DSWORD = 0x12,
+	AG_S_FIGHTER = 0x13,
+	AG_S_CLERIC = 0x14,
+	AG_S_ARCHER = 0x15,
+	AG_S_MAGE = 0x16,
+	AG_S_JOKER = 0x17,
+	AG_S_NECK = 0x18,
+	AG_S_EARRING = 0x19,
+	AG_S_RING = 0x1A,
+	AG_S_SCROLL = 0x1B,
+	AG_S_POTION = 0x1C,
+	AG_S_STONE = 0x1D,
+	AG_S_FOOD = 0x1E,
+	AG_S_ENCHANT = 0x1F,
+	AG_S_PRODRAW = 0x20,
+	AG_S_FARM = 0x21,
+	AG_S_MOVER = 0x22,
+	AG_S_MINIHOUSE = 0x23,
+	AG_S_COSTUME = 0x24,
+	AG_S_ABILLITY = 0x25,
+	AG_S_EMOTION = 0x26,
+	AG_S_ETC = 0x27,
+	AG_S_BLADE = 0x28,
+	AG_S_SENTINEL = 0x29,
+	AG_S_BRACELET = 0x2A,
+	MAX_AUCTIONGROUP = 0x2B,
+};
+enum GradeType : __int32
+{
+	GT_NORMAL = 0x0,
+	GT_NAMED = 0x1,
+	GT_RARE = 0x2,
+	GT_UNIQUE = 0x3,
+	GT_CHARGE = 0x4,
+	GT_SET = 0x5,
+	GT_LEGENDARY = 0x6,
+	GT_MYTHIC = 0x7,
+	MAX_GRADETYPE = 0x8,
+};
+enum UseClassType : __int32
+{
+	UCT_NONE = 0x0,
+	UCT_ALL = 0x1,
+	UCT_FIGHTER_ALL = 0x2,
+	UCT_CLEVERFIGHTER_AND_OVER = 0x3,
+	UCT_WARRIOR_AND_OVER = 0x4,
+	UCT_WARRIOR_OVER = 0x5,
+	UCT_GLADIATOR_ONLY = 0x6,
+	UCT_KNIGHT_ONLY = 0x7,
+	UCT_CLERIC_ALL = 0x8,
+	UCT_HIGHCLERIC_AND_OVER = 0x9,
+	UCT_PALADIN_AND_OVER = 0xA,
+	UCT_GUARDIAN_ONLY = 0xB,
+	UCT_HOLYKNIGHT_ONLY = 0xC,
+	UCT_PALADIN_OVER = 0xD,
+	UCT_ARCHER_ALL = 0xE,
+	UCT_HAWKARCHER_AND_OVER = 0xF,
+	UCT_SCOUT_AND_OVER = 0x10,
+	UCT_RANGER_ONLY = 0x11,
+	UCT_SHARPSHOOTER_ONLY = 0x12,
+	UCT_SCOUT_OVER = 0x13,
+	UCT_MAGE_ALL = 0x14,
+	UCT_WIZMAGE_AND_OVER = 0x15,
+	UCT_ENCHANTER_AND_OVER = 0x16,
+	UCT_WIZARD_ONLY = 0x17,
+	UCT_WARLOCK_ONLY = 0x18,
+	UCT_ENCHANTER_OVER = 0x19,
+	UCT_SENTINEL_EXCLUDE = 0x1A,
+	UCT_JOKER_ALL = 0x1B,
+	UCT_CHASER_AND_OVER = 0x1C,
+	UCT_CRUEL_AND_OVER = 0x1D,
+	UCT_ASSASSIN_ONLY = 0x1E,
+	UCT_CLOSER_ONLY = 0x1F,
+	UCT_CRUEL_OVER = 0x20,
+	UCT_SENTINEL_ALL = 0x21,
+	UCT_SAVIOR_ONLY = 0x22,
+	UCT_DEEPER_SKILL = 0x23,
+	UCT_SHIELD = 0x24,
+	UCT_CLASS_CHANGE = 0x25,
+	UCT_SHIELD_NOT_GLA = 0x26,
+	MAX_USECLASSTYPE = 0x27,
+};
+enum E_BelongType : __int32
+{
+	BT_COMMON = 0x0,
+	BT_NO_SELL = 0x1,
+	BT_NO_DROP = 0x2,
+	BT_NO_SELL_DROP = 0x3,
+	BT_ACC = 0x4,
+	BT_CHR = 0x5,
+	BT_ONLY_DEL = 0x6,
+	BT_NO_DEL = 0x7,
+	BT_PUTON_ACC = 0x8,
+	BT_PUTON_CHR = 0x9,
+	BT_NO_STORAGE = 0xA,
+	MAX_E_BELONGTYPE = 0xB,
+};
+enum ItemFuncEnum : __int32
+{
+	ITEMFUNC_NONE = 0x0,
+	ITEMFUNC_ENDUREKIT_WC = 0x1,
+	ITEMFUNC_ENDUREKIT_F = 0x2,
+	ITEMFUNC_JUSTREVIVAL = 0x3,
+	ITEMFUNC_CHANGE_NAME = 0x4,
+	ITEMFUNC_CHANGE_RELATION = 0x5,
+	ITEMFUNC_PUTON_CLEAR = 0x6,
+	MAX_ITEMFUNCENUM = 0x7,
+};
+
+struct ItemInfo :SHNRow
+{
+	unsigned __int16 ID;
+	char InxName[32];
+	char Name[64];
+	ItemTypeEnum Type;
+	ItemClassEnum Class;
+	unsigned int MaxLot;
+	ItemEquipEnum Equip;
+	AuctionGroup ItemAuctionGroup;
+	GradeType ItemGradeType;
+	unsigned __int8 TwoHand;
+	unsigned int AtkSpeed;
+	unsigned int DemandLv;
+	unsigned int Grade;
+	unsigned int MinWC;
+	unsigned int MaxWC;
+	unsigned int AC;
+	unsigned int MinMA;
+	unsigned int MaxMA;
+	unsigned int MR;
+	unsigned int TH;
+	unsigned int TB;
+	unsigned int WCRate;
+	unsigned int MARate;
+	unsigned int ACRate;
+	unsigned int MRRate;
+	unsigned int CriRate;
+	unsigned int CriMinWc;
+	unsigned int CriMaxWc;
+	unsigned int CriMinMa;
+	unsigned int CriMaxMa;
+	unsigned int CrlTB;
+	UseClassType UseClass;
+	unsigned int BuyPrice;
+	unsigned int SellPrice;
+	unsigned __int8 BuyDemandLv;
+	unsigned int BuyFame;
+	unsigned int BuyGToken;
+	unsigned int BuyGBCoin;
+	WeaponTypeEnum WeaponType;
+	ArmorTypeEnum ArmorType;
+	unsigned __int8 UpLimit;
+	unsigned __int16 BasicUpInx;
+	unsigned __int16 UpSucRatio;
+	unsigned __int16 UpLuckRatio;
+	unsigned __int8 UpResource;
+	unsigned __int16 AddUpInx;
+	unsigned int ShieldAC;
+	unsigned int HitRatePlus;
+	unsigned int EvaRatePlus;
+	unsigned int MACriPlus;
+	unsigned int CriDamPlus;
+	unsigned int MagCriDamPlus;
+	E_BelongType BT_Inx;
+	char TitleName[32];
+	char ItemUseSkill[32];
+	char SetItemIndex[32];
+	ItemFuncEnum ItemFunc;
+};
 #pragma pack(pop)
 #endif

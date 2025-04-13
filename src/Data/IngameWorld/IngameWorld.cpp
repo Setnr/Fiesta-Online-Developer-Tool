@@ -7,8 +7,8 @@
 #include <FiestaOnlineTool.h>
 #include "Data/NPCData/NPCData.h"
 #include "Data/SHN/Mobloader.h"
-#include "NiCustom/ShineNPCNode.h"
 #include "NiCustom/NiSHMDPickable.h"
+#include <future>
 
 #pragma region Gizmo-Calc
 glm::vec4 ConvertQuatToAngleAxis(glm::quat q)
@@ -59,21 +59,31 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 	}
 	else
 	{
-		if (!_SHBD->Load(_MapInfo))
+		auto _SHBDFuture = std::async(std::launch::async, [this]()
+			{
+				return _SHBD->Load(_MapInfo);
+			});
+		auto _SHMDFuture = std::async(std::launch::async, [this]()
+			{
+				return  _SHMD->Load(_MapInfo);
+			});
+		auto _INIHTDFuture = std::async(std::launch::async, [this](){
+			std::string Path = PgUtil::PathFromClientFolder(PgUtil::GetMapFolderPath(_MapInfo->KingdomMap, _MapInfo->MapFolderName) + _MapInfo->MapFolderName + ".ini");
+			if (std::filesystem::exists(Path))
+				if (!_INI->Load(Path))
+					return false;
+			if (_INI->GetHTDPath() != "")
+				if (LoadHTD())
+					CreateAndAttachTerrain();
+			return true;
+		});
+		if (!_SHBDFuture.get())
 			LogError("Failed to Load SHBD for " + _MapInfo->MapName);
-		if (!_SHMD->Load(_MapInfo))
+		if (!_SHMDFuture.get())
 			LogError("Failed to Load SHMD for " + _MapInfo->MapName);
-
-		std::string Path = PgUtil::PathFromClientFolder(PgUtil::GetMapFolderPath(_MapInfo->KingdomMap, _MapInfo->MapFolderName) + _MapInfo->MapFolderName + ".ini");
-		if (std::filesystem::exists(Path))
-			if (!_INI->Load(Path))
-				LogError("Failed to Load INI for " + _MapInfo->MapName);
-		if (_INI->GetHTDPath() != "")
-			if (LoadHTD())
-				CreateAndAttachTerrain();
+		if (!_INIHTDFuture.get())
+			LogError("Failed to Load INI or HTD for " + _MapInfo->MapName);
 	}
-
-	
 
 	for (auto obj : _SHMD->GetSkyList())
 		m_spSkyScene->AttachChild(obj);
@@ -100,6 +110,15 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 	for (auto obj : _SHMD->GetCollisionObjectListList())
 		m_spGroundCollidee->AttachChild(obj);
 
+	m_spGroundCollidee->UpdateProperties();
+	m_spGroundCollidee->UpdateEffects();
+	m_spGroundCollidee->Update(0.f);
+
+	auto NPCFuture = std::async(std::launch::async, [this]()
+		{
+			return LoadNPCS();
+		});
+
 	SetFogColor(_SHMD->GetFogColor(),false);
 	SetFogDepth(_SHMD->GetFogDepth(),false);
 	SetGlobalLight(_SHMD->GetGlobalLight(), false);
@@ -108,16 +127,15 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 	SetDirectionalLightAmbientColor(_SHMD->GetDirectionalLightAmbientColor(), false);
 	SetDirectionalLightDiffuseColor(_SHMD->GetDirectionalLightDiffuseColor(), false);
 
-	m_spGroundCollidee->UpdateProperties();
-	m_spGroundCollidee->UpdateEffects();
-	m_spGroundCollidee->Update(0.f);
+	auto NPCS = NPCFuture.get();
+	for (auto npc : NPCS)
+		this->AddShineObject(npc, false);
 
 	m_spWorldScene->UpdateProperties();
 	m_spWorldScene->UpdateEffects();
 	m_spWorldScene->Update(0.f);
-	PgUtil::LookAndMoveAtWorldPoint(m_spCamera, NiPoint3(_MapInfo->RegenX, _MapInfo->RegenY, 500));
 
-	LoadNPCS();
+	PgUtil::LookAndMoveAtWorldPoint(m_spCamera, NiPoint3(_MapInfo->RegenX, _MapInfo->RegenY, 500));
 }
 
 IngameWorld::IngameWorld(MapInfo* Info, int MapSize) : _MapInfo(Info)
@@ -358,10 +376,10 @@ void IngameWorld::UpdatePos(std::vector<NiPickablePtr> Node, NiPoint3 PosChange,
 	for (auto obj : Node)
 	{
 		NiPoint3 NewPos = obj->GetTranslate() + PosChange;
-		if (NiIsKindOf(ShineObjectNode, obj))
+		if (NiIsKindOf(ShineObject, obj))
 		{
 			UpdateZCoord(NewPos);
-			ShineObjectNodePtr mob = NiSmartPointerCast(ShineObjectNode, obj);
+			ShineObjectPtr mob = NiSmartPointerCast(ShineObject, obj);
 			mob->UpdatePos(NewPos);
 		}
 		else
@@ -405,9 +423,9 @@ void IngameWorld::UpdateRotation(std::vector<NiPickablePtr> Node, glm::vec3 Rota
 		NiMatrix3 m;
 		m.MakeRotation(angleAxis[0], angleAxis[1], angleAxis[2], angleAxis[3]);
 
-		if (NiIsKindOf(ShineObjectNode, obj))
+		if (NiIsKindOf(ShineObject, obj))
 		{
-			ShineObjectNodePtr mob = NiSmartPointerCast(ShineObjectNode, obj);
+			ShineObjectPtr mob = NiSmartPointerCast(ShineObject, obj);
 			mob->UpdateRotation(angleAxis[3] * angleAxis[0] * 180.0 / NI_PI );
 		}else
 			obj->SetRotate(m);
@@ -522,18 +540,22 @@ void IngameWorld::AddObject(std::vector<NiPickablePtr> objs, bool Backup)
 	m_spGroundObject->UpdateEffects();
 	m_spGroundObject->Update(0.f);
 }
-void IngameWorld::AddShineObject(ShineObjectNodePtr obj, bool Backup) 
+void IngameWorld::AddShineObject(ShineObjectPtr obj, bool Update)
 {
-	if (Backup) {
-		LogError("No ShineObject Backup added yet");
-	}
+	if (!obj->HasActor())
+		obj->LoadActor();
+
 	m_spGroundObject->AttachChild(obj);
-	m_spGroundObject->CompactChildArray();
-	m_spGroundObject->UpdateProperties();
-	m_spGroundObject->UpdateEffects();
-	m_spGroundObject->Update(0.f);
+
+	if(Update)
+	{
+		m_spGroundObject->CompactChildArray();
+		m_spGroundObject->UpdateProperties();
+		m_spGroundObject->UpdateEffects();
+		m_spGroundObject->Update(0.f);
+	}
 }
-void IngameWorld::RemoveShineObject(ShineObjectNodePtr obj, bool Backup)
+void IngameWorld::RemoveShineObject(ShineObjectPtr obj, bool Backup)
 {
 	if (Backup) {
 		LogError("No ShineObject Backup added yet");
@@ -731,7 +753,6 @@ float IngameWorld::GetHTD(int w, int h)
 	auto htdglevel = _HTD->GetHTDG(w, h); 
 	return htdlevel + htdglevel;
 }
-
 void IngameWorld::SetVertexColor(int w, int h, NiColorA Color)
 {
 	if (w < 0 || h < 0 || w >= _INI->GetMapWidth() || h >= _INI->GetMapHeight())
@@ -764,7 +785,6 @@ void IngameWorld::SetVertexColor(int w, int h, NiColorA Color)
 		SetVertexColorInternal(ShapeID, InternalBlockX, InternalBlockY, Color);
 	}
 }
-
 void IngameWorld::SetVertexColorInternal(int ShapeID, int InternalBlockX, int InternalBlockY, NiColorA Color)
 {
 	auto obj = m_spGroundTerrain->GetAt(ShapeID);
@@ -940,21 +960,31 @@ void IngameWorld::SaveVertex()
 {
 	PgUtil::SaveTexture(PgUtil::PathFromClientFolder(_INI->GetVertexColor()), _INI->GetVertexImage());
 }
-
-void IngameWorld::LoadNPCS()
+std::vector<ShineObjectPtr> IngameWorld::LoadNPCS()
 {
 	std::vector<ShineNPCPtr> NPCS = NPCData::GetNPCsByMap(_MapInfo->MapName);
+	std::vector<std::future<ShineNPCPtr>> asyncTasks;
 	for (auto npc : NPCS)
 	{
-		ShineNPCNodePtr mob = NiNew ShineNPCNode(npc);
-		NiPoint3 pos = mob->GetPos();
-		UpdateZCoord(pos);
-		mob->UpdatePos(pos);
-		
-		mob->UpdateRotation(mob->GetRotation());
-		if (NiIsKindOf(ShineObjectNode, mob))
-			this->AddShineObject(NiSmartPointerCast(ShineObjectNode, mob), false);
+		asyncTasks.emplace_back(std::async(std::launch::async, [this,npc]() {
+			if (!npc->HasActor())
+				npc->LoadActor();
+
+			NiPoint3 pos = npc->GetPos();
+			UpdateZCoord(pos);
+			npc->UpdatePos(pos);
+
+			npc->UpdateRotation(npc->GetRotation());
+
+			return npc;
+			}));
 	}
+	std::vector< ShineObjectPtr> obj;
+	for (auto& task : asyncTasks)
+	{
+		obj.push_back(NiSmartPointerCast(ShineObject, task.get()));
+	}
+	return obj;
 }
 bool IngameWorld::UpdateZCoord(NiPoint3& Pos) 
 {
@@ -1008,23 +1038,20 @@ bool IngameWorld::UpdateZCoord(NiPoint3& Pos)
 	}
 	return false;
 }
-
 NiPickablePtr IngameWorld::CreateNewNPC()
 {
 	NiPoint3 pos = GetWorldPoint();
 	UpdateZCoord(pos);
-	ShineNPCPtr npc = NPCData::CreateNewNPC(this->_MapInfo, pos);
-	ShineNPCNodePtr mob = NiNew ShineNPCNode(npc);
+	ShineNPCPtr mob = NPCData::CreateNewNPC(this->_MapInfo, pos);
 	mob->UpdatePos(pos);
 	mob->UpdateRotation(mob->GetRotation());
-	if (NiIsKindOf(ShineObjectNode, mob))
-		this->AddShineObject(NiSmartPointerCast(ShineObjectNode, mob), false);
+	if (NiIsKindOf(ShineObject, mob))
+		this->AddShineObject(NiSmartPointerCast(ShineObject, mob));
 	if (NiIsKindOf(NiPickable, mob))
 		return NiSmartPointerCast(NiPickable, mob);
 	else
 		return nullptr;
 }
-
 void IngameWorld::GateSpawnPoints(bool show)
 {
 	if (show) 
@@ -1032,15 +1059,16 @@ void IngameWorld::GateSpawnPoints(bool show)
 		std::vector<std::pair<std::string,ShineGate::LinkDataPtr>> spawnpoints = NPCData::GetSpawnPointsByMap(_MapInfo->MapName);
 		for (auto point : spawnpoints) 
 		{
-			GateSpawnPointPtr npc = NiNew GateSpawnPoint(point.first,point.second);
+			GateSpawnPtr npc = NiNew GateSpawn(point.second,point.first);
 			auto pos = npc->GetPos();
 			UpdateZCoord(pos);
 			npc->UpdatePos(pos);
 			npc->UpdateRotation(npc->GetRotation());
-			if (NiIsKindOf(ShineObjectNode, npc))
+			if (NiIsKindOf(ShineObject, npc))
 			{
-				this->AddShineObject(NiSmartPointerCast(ShineObjectNode, npc), false);
-				_GateSpawnPoints.push_back(NiSmartPointerCast(ShineObjectNode, npc));
+				this->AddShineObject(NiSmartPointerCast(ShineObject, npc));
+
+				_GateSpawnPoints.push_back(NiSmartPointerCast(ShineObject, npc));
 			}
 		}
 	}
@@ -1048,8 +1076,8 @@ void IngameWorld::GateSpawnPoints(bool show)
 	{
 		for (auto obj : _GateSpawnPoints)
 		{
-			if (NiIsKindOf(ShineObjectNode, obj))
-				this->RemoveShineObject(NiSmartPointerCast(ShineObjectNode, obj), false);
+			if (NiIsKindOf(ShineObject, obj))
+				this->RemoveShineObject(NiSmartPointerCast(ShineObject, obj), false);
 		}
 		_GateSpawnPoints.clear();
 	}

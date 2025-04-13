@@ -126,8 +126,6 @@ private:
 	}_SellType;
 };
 
-
-
 NiSmartPointer(ShineGate);
 class ShineGate : public NPCRole{
 	NiDeclareRTTI;
@@ -212,6 +210,7 @@ public:
 	void DrawRole();
 	NPCRolePtr GetRole() { return _Role; }
 	std::string toString();
+	virtual void DrawObjectMenu() override;
 private:
 	bool _NPCMenu;
 	NPCRolePtr _Role; 
@@ -222,7 +221,7 @@ class GateSpawn : public ShineMob
 {
 	NiDeclareRTTI;
 public:
-	GateSpawn(ShineGate::LinkDataPtr data);
+	GateSpawn(ShineGate::LinkDataPtr data, std::string Argument);
 	virtual void UpdatePos(NiPoint3 NewPos)
 	{
 		ShineMob::UpdatePos(NewPos);
@@ -234,6 +233,8 @@ public:
 		ShineMob::UpdateRotation(NewRotation);
 		_Data->rot = NewRotation;
 	}
+	virtual void DrawObjectMenu() override;
 private:
 	ShineGate::LinkDataPtr _Data;
+	std::string _Argument;
 };

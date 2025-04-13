@@ -22,6 +22,7 @@ NiImplementRTTI(EditorScene, FiestaScene);
 
 EditorScene::EditorScene() 
 {
+	NPCData::Init();
 	ScreenElements.push_back(NiNew MapLoadElement(this));
 }
 EditorScene::~EditorScene() 

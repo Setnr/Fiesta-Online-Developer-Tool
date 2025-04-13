@@ -1629,8 +1629,8 @@ int DrawObjectMenu(lua_State* Script)
 	if(lua_isinteger(Script, 1))
 	{
 		NiNodePtr node = (NiNode*)lua_tointeger(Script, 1);
-		if (NiIsKindOf(ShineObjectNode, node)) {
-			ShineObjectNodePtr obj = NiSmartPointerCast(ShineObjectNode, node);
+		if (NiIsKindOf(ShineObject, node)) {
+			ShineObjectPtr obj = NiSmartPointerCast(ShineObject, node);
 			obj->DrawObjectMenu();
 		}
 	}

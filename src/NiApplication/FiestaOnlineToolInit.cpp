@@ -19,6 +19,7 @@
 
 #include <detours/detours.h>
 #include "Data/NiCustom/NiBoundingBox.h"
+#include <future>
 NiCursorPtr FiestaOnlineTool::cursor;
 POINT FiestaOnlineTool::MousePos;
 NiNodePtr FiestaOnlineTool::BoundingBox;
@@ -51,15 +52,10 @@ bool FiestaOnlineTool::Initialize()
     if(!Settings::Load())
         NiMessageBox("Failed to Load Settings!\nContinue with DefaultSettings", "Settings Error");
 
-    NPCData::Init();
-
     AddSingleObject::SetInitPath(PgUtil::PathFromClientFolder(""));
 
-    std::thread SHNThread(StartSHNLoadingThread);
-    SHNThread.detach();
-
-    std::thread VersionCheck(StartVersionCheckThread);
-    VersionCheck.detach();
+    auto SHN = std::async(std::launch::async, StartSHNLoadingThread);
+    auto VersionCheck = std::async(std::launch::async, StartVersionCheckThread);
 
 	NiApplication::Initialize();
 
@@ -106,6 +102,9 @@ bool FiestaOnlineTool::Initialize()
     ImGui_ImplDX9_Init(ptr->GetD3DDevice());
 
     BoundingBox = NiBoundingBox::LoadBaseNode();
+
+    SHN.get();
+    VersionCheck.get();
 
     return true;
 }  

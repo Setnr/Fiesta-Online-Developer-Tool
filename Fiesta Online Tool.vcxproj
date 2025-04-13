@@ -53,11 +53,9 @@
   <ItemGroup>
     <ClInclude Include="Includes\FastNoiseLite\FastNoiseLite.h" />
     <ClInclude Include="src\Data\NiCustom\NiSHMDPickable.h" />
-    <ClInclude Include="src\Data\NiCustom\ShineMobNode.h" />
-    <ClInclude Include="src\Data\NiCustom\ShineNPCNode.h" />
-    <ClInclude Include="src\Data\NiCustom\ShineObjectNode.h" />
     <ClInclude Include="src\Data\NPCData\NPC.h" />
     <ClInclude Include="src\Data\NPCData\NPCData.h" />
+    <ClInclude Include="src\Data\ShineObject\CharShape.h" />
     <ClInclude Include="src\Data\ShineObject\ShineMob.h" />
     <ClInclude Include="src\Data\ShineObject\ShineNPC.h" />
     <ClInclude Include="src\Data\ShineObject\ShineObject.h" />
@@ -196,10 +194,8 @@
     <ClCompile Include="src\Data\NiCustom\NiFastNoiseLite.cpp" />
     <ClCompile Include="src\Data\NiCustom\NiFastNoiseLite.h" />
     <ClCompile Include="src\Data\NiCustom\NiSHMDPickable.cpp" />
-    <ClCompile Include="src\Data\NiCustom\ShineMobNode.cpp" />
-    <ClCompile Include="src\Data\NiCustom\ShineNPCNode.cpp" />
-    <ClCompile Include="src\Data\NiCustom\ShineObjectNode.cpp" />
     <ClCompile Include="src\Data\NPCData\NPCData.cpp" />
+    <ClCompile Include="src\Data\ShineObject\CharShape.cpp" />
     <ClCompile Include="src\Data\ShineObject\ShineMob.cpp" />
     <ClCompile Include="src\Data\ShineObject\ShineNPC.cpp" />
     <ClCompile Include="src\Data\ShineObject\ShineObject.cpp" />

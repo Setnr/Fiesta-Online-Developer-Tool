@@ -2,7 +2,7 @@
 #include "EditMode.h"
 #include <Scene/ScreenElements/LuaElement/LuaElement.h>
 #include "ImGui/ImGuizmo.h"
-#include "Data/NiCustom/ShineObjectNode.h"
+#include "ShineObject/ShineObject.h"
 
 
 NiSmartPointer(NPCEditMode);
@@ -25,7 +25,7 @@ public:
 	virtual std::string GetEditModeName() { return "NPC"; }
 	void SelectObject(NiPickablePtr Obj, bool append = false)
 	{
-		if (!Obj || !NiIsKindOf(ShineObjectNode, Obj))
+		if (!Obj || !NiIsKindOf(ShineObject, Obj))
 			return;
 		auto it = std::find(SelectedObjects.begin(), SelectedObjects.end(), Obj);
 		if (it != SelectedObjects.end())

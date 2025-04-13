@@ -22,7 +22,7 @@ NiImplementRTTI(ModeIDGate, ShineGate);
 NiImplementRTTI(RandomGate, ShineGate);
 
 auto RoleList = "JobManager\0QuestNPC\0StoreManager\0ClientMenu\0Guard\0Merchant\0NPCMenu\0ShineGate\0IDGate\0ModeGate\0RandomGate\0\0";
-ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::string>::iterator& end)
+ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::string>::iterator& end) : ShineMob()
 {
 	int DataID = 0;
 	++start;
@@ -120,11 +120,9 @@ ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::s
 	}
 }
 
-ShineNPC::ShineNPC(MapInfo* Info, NiPoint3 Pos)
+ShineNPC::ShineNPC(MapInfo* Info, NiPoint3 Pos) : ShineMob()
 {
 	this->_MapInx = Info->MapName;
-	this->UpdatePos(Pos);
-	this->UpdateRotation(0.0f);
 	_Role = NiNew Guard;
 	unsigned short id = 0;
 	MobInfo* info = nullptr;
@@ -133,8 +131,13 @@ ShineNPC::ShineNPC(MapInfo* Info, NiPoint3 Pos)
 		info = MobLoader::GetMobInfo(id);
 		id++;
 	}
+	_MobInx = info->Name;
 
-	_MobInx = info->InxName;
+
+	this->UpdatePos(Pos);
+	this->UpdateRotation(0.0f);
+
+	LoadActor();
 }
 void ShineNPC::AppendGate(std::vector<std::string>::iterator& start, std::vector<std::string>::iterator& end)
 {
@@ -472,6 +475,14 @@ std::string ShineNPC::toString()
 		<< "\t" << IsParty << "\t" << GetRole()->toString();
 	return os.str();
 }
+void ShineNPC::DrawObjectMenu()
+{
+	ShineMob::DrawObjectMenu();
+
+	ImGui::Checkbox("Has Menu", HasMenu());
+	DrawRole();
+}
+
 std::string NPCRole::toString()
 {
 	std::stringstream os;
@@ -479,7 +490,7 @@ std::string NPCRole::toString()
 	return os.str();
 }
 
-GateSpawn::GateSpawn(ShineGate::LinkDataPtr data)
+GateSpawn::GateSpawn(ShineGate::LinkDataPtr data, std::string Argument) :_Argument(Argument)
 {
 	MobInfo* info = nullptr;
 	int id = 0;
@@ -487,9 +498,29 @@ GateSpawn::GateSpawn(ShineGate::LinkDataPtr data)
 		info = MobLoader::GetMobInfo(id);
 		id++;
 	}
+	_Actor = MobLoader::GetNodeByName(info->InxName);
+	if (!_Actor)
+	{
+		LogError("Cant create Mob for Bot");
+		return;
+	}
+	this->AttachChild(_Actor->GetNIFRoot(), 0);
+
+	this->CompactChildArray();
+	this->UpdateProperties();
+	this->UpdateEffects();
+	this->Update(0.0f);
+
 	_Data = data;
 	_Pos = NiPoint3(_Data->x, _Data->y, 0.f);
 	_Rotation = _Data->rot;
 	_MobInx = info->InxName;
 	_MapInx = data->MapClient;
+}
+
+void GateSpawn::DrawObjectMenu()
+{
+	ShineMob::DrawObjectMenu();
+
+	ImGui::Text("Argument %s", _Argument.c_str());
 }

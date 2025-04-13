@@ -3,11 +3,13 @@
 
 #include <windows.h>
 
-#include <NiNode.h>
+#include <NiMain.h>
 #include <NiCamera.h>
 #include <NiSourceTexture.h>
 #include <NiScreenElements.h>
+#include <NiActorManager.h>
 #include "Logger.h"
+#include "SHN/SHNStruct.h"
 
 class PgUtil 
 {
@@ -50,4 +52,84 @@ public:
 	static void MakePositiveVector(NiPoint3& Vector);
 	static void FixColor(NiColorA& Color);
 	static void SaveTexture(std::string Path, NiPixelDataPtr PixelData, bool flipped = false);
+	static NiActorManager* CreatePlayerNPC(unsigned short NPCViewIndex);
+	static bool AttachItem(NiAVObjectPtr ptr, const char* slot,  const char* item, bool gender, BaseCharClass baseclass);
+	static std::string GetBaseClassName(BaseCharClass baseclass)
+	{
+		switch (baseclass)
+		{
+		default:
+		case BaseCharClass::CC_FIGHT:
+			return "Fighter";
+			break;
+
+		case BaseCharClass::CC_CLERIC:
+			return "Cleric";
+			break;
+		case BaseCharClass::CC_ARCHER:
+			return "Archer";
+			break;
+		case BaseCharClass::CC_MAGE:
+			return "Mage";
+			break;
+		case BaseCharClass::CC_JOKER:
+			return "Joker";
+			break;
+		case BaseCharClass::CC_SENTINEL:
+			return "Sentinel";
+			break;
+		}
+		return "Fighter";
+	}
+
+	static bool CatchGeomentry(NiAVObject* obj, NiGeometry** geomentry) 
+	{
+		if (NiIsKindOf(NiNode, obj)) 
+		{
+			NiNode* node = NiSmartPointerCast(NiNode, obj);
+			for (int i = 0; i < node->GetChildCount(); i++) 
+			{
+				if (CatchGeomentry(node->GetAt(i), geomentry))
+					return true;
+			}
+		}
+		else 
+		{
+			if (NiIsKindOf(NiGeometry, obj)) 
+			{
+				*geomentry = (NiGeometry*) obj;
+				return true;
+			}
+			
+		}
+		return false;
+	}
+	static NiNode* FindBoneRootNodes(NiNode* node) 
+	{
+		if (node->GetExtraDataSize()) 
+		{
+			for (int i = 0; i < node->GetExtraDataSize(); i++) 
+			{
+				auto data = node->GetExtraDataAt(i);
+				if (NiIsKindOf(NiStringExtraData, data)) 
+				{
+					NiStringExtraDataPtr stringdata = NiSmartPointerCast(NiStringExtraData, data);
+					if (stringdata->GetValue().Contains("NiBoneLOD#BoneRoot"))
+						return node;
+				}
+			}
+		}
+		for (int i = 0; i < node->GetChildCount(); i++) 
+		{
+			auto child = node->GetAt(i);
+			if (NiIsKindOf(NiNode, child))
+			{
+				auto result = FindBoneRootNodes((NiNode*)child);
+				if (result)
+					return result;
+			}
+		}
+		return nullptr;
+	}
+
 };

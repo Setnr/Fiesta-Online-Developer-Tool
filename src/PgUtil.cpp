@@ -6,6 +6,8 @@
 #include <NiTexturingProperty.h>
 #include <NiVertexColorProperty.h>
 #include <algorithm>
+#include "SHN/SHNManager.h"
+#include <SHN/MobLoader.h>
 
 std::string PgUtil::ClientFolderPath = "";
 std::string PgUtil::ApplicationPath = "";
@@ -138,6 +140,111 @@ void PgUtil::SaveTexture(std::string Path, NiPixelDataPtr PixelData, bool flippe
     {
         LogError("Failed to safe: " + Path);
     }
+}
+
+NiActorManager* PgUtil::CreatePlayerNPC(unsigned short NPCViewIndex)
+{
+    NiActorManager* Actor = NULL;
+    std::shared_ptr<SHN::CDataReader> reader;
+    if (!SHN::SHNManager::GetSHN(SHN::SHNType::NPCViewInfo, reader)) 
+    {
+        LogError("NPCViewInfo wasnt able to be recieved");
+        return NULL;
+    }
+    NPCViewInfo* info = nullptr;
+    for (int i = 0; i < reader->GetRows(); i++)
+    {
+        info = (NPCViewInfo*)reader->GetRow(i);
+        if (info->TypeIndex == NPCViewIndex)
+            break;
+        info = nullptr;
+    }
+    if (info == nullptr)
+        return NULL;
+    std::string Gender = "f";
+    std::string Class = PgUtil::GetBaseClassName(info->Class);
+    
+    if (info->Gender)
+        Gender = "m";
+    std::string Combine = Class + "-" + Gender; 
+
+    NiActorManager* actor = MobLoader::GetPlayerKFM(Combine);
+    return actor;
+}
+
+bool PgUtil::AttachItem(NiAVObjectPtr MainNode, const char* slot, const char* item, bool gender, BaseCharClass baseclass)
+{
+    std::string w = item;
+    if (w == "-")
+        return true;
+    
+    NiAVObjectPtr MainSlot = MainNode->GetObjectByName(slot);
+    if (NiIsKindOf(NiNode, MainSlot))
+    {
+        NiNodePtr ptr = NiSmartPointerCast(NiNode, MainSlot);
+        std::shared_ptr<SHN::CDataReader> reader;
+        if (!SHN::SHNManager::GetSHN(SHN::ItemViewInfo, reader))
+        {
+            LogError("No ItemViewInfo loaded");
+            return false;
+        }
+        std::string itemstr = item;
+        ItemViewInfo* info = SHN::SHNManager::GetViewInfoByInx(item);
+        if (!info)
+        {
+            LogError(item + " not found in ItemViewInfo");
+            return false;
+        }
+
+        switch (info->EquipType)
+        {
+        case EquipTypeEnum::ICON:
+            return true;
+            break;
+        case EquipTypeEnum::LINK:
+        {
+            auto node = PgUtil::LoadNifFile<NiNode>(PgUtil::PathFromClientFolder("resitem\\" + std::string(info->LinkFile) + ".nif").c_str());
+            if (!node)
+            {
+                LogError("Coudn´t attach " + item + " to slot " + slot + " Item Nif failed to load");
+                return false;
+            }
+            ptr->AttachChild(node);
+        
+            return true;
+            break;
+        }
+        case EquipTypeEnum::SET:
+            /*const char* setname = "reschar\\%s-%s\\set%03d.nif";
+            char buffer[256] = { 0x0 };
+            if(gender)
+                sprintf(buffer, setname,PgUtil::GetBaseClassName(baseclass).c_str(), "m", info->MSetNo);
+            else
+                sprintf(buffer, setname, PgUtil::GetBaseClassName(baseclass).c_str(), "f", info->MSetNo);
+            auto node = PgUtil::LoadNifFile<NiNode>(PgUtil::PathFromClientFolder(buffer).c_str());
+            NiAVObjectPtr ReplaceSlot = node->GetObjectByName(slot);
+            if(ReplaceSlot)
+            {
+                NiNodePtr Main = MainSlot->GetParent();
+                Main->DetachChild(MainSlot);
+                Main->AttachChild(ReplaceSlot);
+                Main->CompactChildArray();
+            }
+            else
+                ReplaceSlot = MainSlot;
+            if (NiIsKindOf(NiNode, ReplaceSlot)) 
+            {
+                NiNodePtr replacenode = NiSmartPointerCast(NiNode, ReplaceSlot);
+                
+            }*/
+            return true;
+        }
+
+
+
+    }
+    LogError("Coudn´t attach " + item + " to slot " + slot + " Wrong Node Type");
+    return false;
 }
 
 void PgUtil::SaveTexture(std::string Path, NiSourceTexturePtr Texture, bool flipped)

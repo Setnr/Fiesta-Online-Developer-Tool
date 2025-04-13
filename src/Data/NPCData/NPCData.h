@@ -20,6 +20,9 @@ public:
 
 	static bool isCN;
 private:
+	void ProcessNPCData(std::vector<std::string> lines);
 	static NPCDataPtr Data;
+	std::mutex NPCLock;
 	std::vector<ShineNPCPtr> _NPCS;
+
 };

@@ -9,7 +9,7 @@
 #include <Data/IngameWorld/WorldChanges/WorldChanges.h>
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
-#include "NiCustom/ShineObjectNode.h"
+#include "ShineObject/ShineObject.h"
 NiSmartPointer(IngameWorld);
 
 class IngameWorld : public NiRefObject
@@ -174,9 +174,9 @@ public:
 	void CreateShadows(NiColorA Color, NiColorA SunLight);
 	void CalculateRay(NiPoint3& StartPoint, NiPoint3& SunVector, std::vector<bool>& Shadowed, float minh);
 	void SaveVertex();
-	void LoadNPCS();
-	void AddShineObject(ShineObjectNodePtr obj, bool Backup = true);
-	void RemoveShineObject(ShineObjectNodePtr obj, bool Backup = true);
+	std::vector<ShineObjectPtr> LoadNPCS();
+	void AddShineObject(ShineObjectPtr obj, bool Update = true);
+	void RemoveShineObject(ShineObjectPtr obj, bool Backup = true);
 	bool UpdateZCoord(NiPoint3& Pos);
 	NiPickablePtr CreateNewNPC();
 	void GateSpawnPoints(bool show);
@@ -203,7 +203,7 @@ private:
 	std::deque<WorldChangePtr>UnDoStack;
 	std::deque<WorldChangePtr>ReDoStack;
 
-	std::vector<ShineObjectNodePtr> _GateSpawnPoints;
+	std::vector<ShineObjectPtr> _GateSpawnPoints;
 
 #pragma region WorldStructureNodes
 	NiNodePtr m_spLightArea;

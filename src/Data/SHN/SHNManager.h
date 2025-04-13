@@ -91,11 +91,11 @@ namespace SHN
 	};
 	class CDataReader
 	{
+	public:
 		struct SHNRow
 		{
 			unsigned short ColLen;
 		};
-	public:
 		CDataReader(std::string FileName)
 		{
 			_FileName = FileName;
@@ -114,39 +114,45 @@ namespace SHN
 			}
 			InputStream.seekg(0, std::ios::beg);
 			auto size = std::filesystem::file_size(Path);
-			std::vector<char> FullData(size);
-			InputStream.read(FullData.data(), size);
+			SHNData.resize(size);
+			InputStream.read(SHNData.data(), size);
 			auto CryptedSize = size - 0x24;
-			memcpy_s(&Header, sizeof(HEAD), FullData.data(), sizeof(HEAD));
+			memcpy_s(&Header, sizeof(HEAD), SHNData.data(), sizeof(HEAD));
 			if (Header.nDataMode == CDataReader::HEAD::DATA_MODE_ENCRYPTION) {
-				Encription((FullData.data() + 0x24), CryptedSize);
+				Encription((SHNData.data() + 0x24), CryptedSize);
 			}
-			memcpy_s(&Header, sizeof(HEAD), FullData.data(), sizeof(HEAD));
+			memcpy_s(&Header, sizeof(HEAD), SHNData.data(), sizeof(HEAD));
 			auto SHNDataSize = size - 52 - (Header.nNumOfField * sizeof(HEAD::FIELD));
-			SHNData = FullData;
-			SHNStart = SHNData.data() + (size - SHNDataSize);
+			SHNStart = (SHNRow*)&SHNData.data()[size - SHNDataSize];
 			MD5Hash = md5(SHNData.data(), Header.nFileSize);
 
 			SelectedRow.resize(Header.nNumOfRecord);
 		}
 		unsigned int GetRows() { return this->Header.nNumOfRecord; }
-		void* GetRow(unsigned int row)
+		void* GetRow(unsigned int row, SHNRow* prevRow = nullptr)
 		{
-			SHNRow* srow = (SHNRow*)SHNStart;
+			SHNRow* srow;
+			if (prevRow)
+			{
+				srow = prevRow;
+				row = 1;
+			}
+			else
+				srow = SHNStart;
 
 			for (int j = 0; j < row; j++)
 			{
-				srow = (SHNRow*)(((size_t)srow) + srow->ColLen);
+				srow = (SHNRow*)(((uintptr_t)srow) + srow->ColLen);
 			}
 			return (void*)srow;
 		}
 		unsigned short GetRowLen(unsigned int row)
 		{
-			SHNRow* srow = (SHNRow*)SHNStart;
+			SHNRow* srow = SHNStart;
 
 			for (int j = 0; j < row; j++)
 			{
-				srow = (SHNRow*)((size_t)srow + srow->ColLen);
+				srow = (SHNRow*)((uintptr_t)srow + srow->ColLen);
 			}
 			return srow->ColLen;
 		}
@@ -224,27 +230,23 @@ namespace SHN
 		};
 		HEAD Header;
 		std::vector<char> SHNData;
-		char* SHNStart;
+		SHNRow* SHNStart;
 		std::string MD5Hash;
 		std::string _FileName;
 
 		std::vector<char> SelectedRow;;
-		char* Encription(char* buf, const int32_t len)
+		char* Encription(char* pBF, const int32_t nSize)
 		{
-			auto num = (uint8_t)len;
+			int32_t cnSize = nSize;
+			int32_t nSizeMin = nSize - 1;
 
-			for (auto i = len - 1; i >= 0; i--)
+			for (auto Key_3 = nSize; nSizeMin >= 0; Key_3 = cnSize)
 			{
-				buf[i] = (uint8_t)(buf[i] ^ num);
-				auto num3 = (uint8_t)(i);
-				num3 = (uint8_t)(num3 & 0xF);
-				num3 = (uint8_t)(num3 + 85);
-				num3 = (uint8_t)(num3 ^ (uint8_t)((uint8_t)i * 11));
-				num3 = (uint8_t)(num3 ^ num);
-				num3 = (uint8_t)(num3 ^ 0xAA);
-				num = num3;
+				pBF[nSizeMin] ^= cnSize;
+				cnSize = Key_3 ^ ((nSizeMin & 0xF) + 85) ^ 11 * nSizeMin ^ 0xAA;
+				--nSizeMin;
 			}
-			return buf;
+			return pBF;
 		}
 	};
 
@@ -253,11 +255,47 @@ namespace SHN
 	public:
 		static void Load()
 		{
-			std::map<SHNType, const char*> shnlist{ {MapInfoType, "MapInfo"}, {MobInfo,"MobInfo"},{MobViewInfo,"MobViewInfo"} };
+			std::map<SHNType, const char*> shnlist{ {MapInfoType, "MapInfo"}, 
+				{MobInfo,"MobInfo"},
+				{MobViewInfo,"MobViewInfo"},
+				{NPCViewInfo,"NPCViewInfo"},
+				{ItemViewInfo,"ItemViewInfo"},
+				{ItemInfo, "ItemInfo"}
+			};
 			for(auto shn :  shnlist)
 			{
 				auto reader = std::make_shared<CDataReader>(shn.second);
 				SHNList.insert({ shn.first,reader });
+			}
+			{
+				std::shared_ptr<CDataReader> reader;
+				if (!GetSHN(SHNType::ItemViewInfo, reader))
+				{
+					LogError("ItemViewInfo wasnt loaded properly");
+					return;
+				}
+				struct ItemViewInfo* info = nullptr;
+				for (int i = 0; i < reader->GetRows(); i++)
+				{
+					info = (struct ItemViewInfo*)reader->GetRow(i, (SHN::CDataReader::SHNRow*)info);
+					IDItemsView.insert({ info->ID, info });
+					InxItemsView.insert({ info->InxName, info });
+				}
+			}
+			{
+				std::shared_ptr<CDataReader> reader;
+				if (!GetSHN(SHNType::ItemInfo, reader))
+				{
+					LogError("ItemInfo wasnt loaded properly");
+					return;
+				}
+				struct ItemInfo* info = nullptr;
+				for (int i = 0; i < reader->GetRows(); i++)
+				{
+					info = (struct ItemInfo*)reader->GetRow(i, (SHN::CDataReader::SHNRow*)info);
+					IDItems.insert({ info->ID, info });
+					InxItems.insert({ info->InxName, info });
+				}
 			}
 		}
 		static bool GetSHN(SHN::SHNType type, std::shared_ptr<CDataReader>& reader)
@@ -271,8 +309,39 @@ namespace SHN
 			return false;
 			
 		}
+		static struct ItemViewInfo* GetViewInfoByID(unsigned short ID) 
+		{
+			auto it = IDItemsView.find(ID);
+			if (it == IDItemsView.end())
+				return nullptr;
+			return it->second;
+		}
+		static struct ItemViewInfo* GetViewInfoByInx(std::string Inx)
+		{
+			auto it = InxItemsView.find(Inx);
+			if (it == InxItemsView.end())
+				return nullptr;
+			return it->second;
+		}static struct ItemInfo* GetItemInfoByID(unsigned short ID)
+		{
+			auto it = IDItems.find(ID);
+			if (it == IDItems.end())
+				return nullptr;
+			return it->second;
+		}
+		static struct ItemInfo* GetItemInfoByInx(std::string Inx)
+		{
+			auto it = InxItems.find(Inx);
+			if (it == InxItems.end())
+				return nullptr;
+			return it->second;
+		}
 	private:
 		static std::map<SHNType, std::shared_ptr<CDataReader>> SHNList;
+		static std::map<unsigned short, struct ItemViewInfo*> IDItemsView;
+		static std::map<std::string, struct ItemViewInfo*> InxItemsView;
+		static std::map<unsigned short, struct ItemInfo*> IDItems;
+		static std::map<std::string, struct ItemInfo*> InxItems;
 	};
 
 	

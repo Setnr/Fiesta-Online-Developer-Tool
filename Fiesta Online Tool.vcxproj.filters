@@ -237,12 +237,10 @@
     <ClInclude Include="src\Data\ShineObject\ShineMob.h" />
     <ClInclude Include="src\Data\ShineObject\ShinePlayer.h" />
     <ClInclude Include="src\Data\ShineObject\ShineNPC.h" />
-    <ClInclude Include="src\Data\NiCustom\ShineObjectNode.h" />
-    <ClInclude Include="src\Data\NiCustom\ShineMobNode.h" />
     <ClInclude Include="src\Data\SHN\MobLoader.h" />
-    <ClInclude Include="src\Data\NiCustom\ShineNPCNode.h" />
     <ClInclude Include="src\Data\NiCustom\NiSHMDPickable.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\NPCEditMode.h" />
+    <ClInclude Include="src\Data\ShineObject\CharShape.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NiApplication\FiestaOnlineTool.cpp">
@@ -375,13 +373,11 @@
     <ClCompile Include="src\Data\ShineObject\ShineNPC.cpp" />
     <ClCompile Include="src\Data\ShineObject\ShineObject.cpp" />
     <ClCompile Include="src\Data\ShineObject\ShineMob.cpp" />
-    <ClCompile Include="src\Data\NiCustom\ShineObjectNode.cpp" />
-    <ClCompile Include="src\Data\NiCustom\ShineMobNode.cpp" />
     <ClCompile Include="src\Data\SHN\MobLoader.cpp" />
-    <ClCompile Include="src\Data\NiCustom\ShineNPCNode.cpp" />
     <ClCompile Include="src\Scene\EditorScene\Modes\NPCEditMode.cpp" />
     <ClCompile Include="src\Data\NiCustom\NiSHMDPickable.cpp" />
     <ClCompile Include="src\Data\ShineObject\ShinePlayer.cpp" />
+    <ClCompile Include="src\Data\ShineObject\CharShape.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Includes\ImGui\imgui.ini">
