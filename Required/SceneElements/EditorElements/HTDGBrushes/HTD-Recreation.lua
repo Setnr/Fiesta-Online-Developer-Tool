@@ -146,6 +146,6 @@ function ShowEntry(BrushPtr, value,name, step,min,max, SetFunc,DragFunc)
     return v
 end
 
-function algorithm(MiddleW,MiddleH, z, SizeW, SizeH ,BrushSize,WorldPtr, BrushPtr)
+function algorithm(MiddleW,MiddleH, z,zAtClick, SizeW, SizeH ,BrushSize,WorldPtr)
 end
 

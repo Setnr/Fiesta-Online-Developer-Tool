@@ -63,5 +63,6 @@ protected:
 	NiNodePtr MouseOrb;
 	NiCameraPtr Camera;
 	NiPoint3 MouseIntersect;
+	NiPoint3 MouseIntersectAtClick;
 
 };

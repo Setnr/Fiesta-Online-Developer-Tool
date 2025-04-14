@@ -14,7 +14,7 @@ int LogFromLua(lua_State* Script)
 	//if (!lua_isstring(Script, 2))
 	//{
 	//	LogError("WindowName-Variable missing");
-	//	return 0;
+	//	return 0; 
 	//} 
 	if (lua_isstring(Script, 1)) 
 	{
@@ -1672,7 +1672,7 @@ int SaveNIF(lua_State* Script)
 }
 
 void SetFunctions(lua_State* Script)
-{
+{ 
 	lua_pushcclosure(Script, LogFromLua, 0);
 	lua_setglobal(Script, "Log");
 

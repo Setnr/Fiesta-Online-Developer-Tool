@@ -786,12 +786,6 @@ void CharShape::SetSubItem(LinkIndex enumIndex, std::string szNifName, std::stri
         break;
     }
     }
-    NiGeometryPtr geometry;
-    if (PgUtil::CatchGeomentry(AttachedNode, &geometry)) {
-        NiTexturingPropertyPtr ptr = NiSmartPointerCast(NiTexturingProperty,geometry->GetProperty(NiProperty::TEXTURING));
-        //if (ptr)
-         //   ptr->SetBaseTexture(Texture);
-    }
 
     ResetTexture _ResTex;
     _ResTex.TourScene<NiNode>(AttachedNode, (void*)Texture);

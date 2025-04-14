@@ -19,12 +19,12 @@ class LuaBrush : public Brush
 		}
 	}
 	virtual void Draw();
-	virtual void RunAlgorithm(int middelw, int middleh,float z, int SizeW, int SizeH, int BrushSize,IngameWorldPtr World);
+	virtual void RunAlgorithm(int middelw, int middleh,float z, int SizeW, int SizeH, int BrushSize,IngameWorldPtr World, float ZAtClick);
 	std::string GetBrushName() 
 	{
 		return _BrushName;
 	}
-	void CreateNoise(int seed) 
+	void CreateNoise(int seed)  
 	{
 		_Noise = NiNew NiFastNoiseLite(seed);
 	}

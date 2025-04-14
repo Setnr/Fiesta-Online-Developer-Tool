@@ -22,7 +22,7 @@ void TerrainBrushMode::Update(float fTime)
 		if(NiIsKindOf(LuaBrush,_CurrentBrush))
 		{
 			LuaBrushPtr luabrush = NiSmartPointerCast(LuaBrush, _CurrentBrush);
-			luabrush->RunAlgorithm(middelw, middelh,z, SizeW, SizeH, GetBrushSize(), kWorld);
+			luabrush->RunAlgorithm(middelw, middelh,z, SizeW, SizeH, GetBrushSize(), kWorld, MouseIntersectAtClick.z);
 		}
 	}
 } 
