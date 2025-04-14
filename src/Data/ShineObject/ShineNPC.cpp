@@ -118,6 +118,7 @@ ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::s
 
 		DataID++;
 	}
+
 }
 
 ShineNPC::ShineNPC(MapInfo* Info, NiPoint3 Pos) : ShineMob()

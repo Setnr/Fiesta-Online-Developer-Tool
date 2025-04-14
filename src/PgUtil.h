@@ -10,6 +10,8 @@
 #include <NiActorManager.h>
 #include "Logger.h"
 #include "SHN/SHNStruct.h"
+#include <NiProperty.h>
+#include <NiSourceTexture.h>
 
 class PgUtil 
 {
@@ -130,6 +132,38 @@ public:
 			}
 		}
 		return nullptr;
+	}
+	static std::string GetGenderString(bool Gender) 
+	{
+		if (Gender)
+			return "m";
+		return "f";
+	}
+	static std::pair<NiNodePtr, NiSourceTexturePtr> LoadSubItem(std::string FileName, BaseCharClass ClassID, bool Gender, std::string TextureName)
+	{
+		std::string NifPath = "reschar\\" + GetBaseClassName(ClassID) + "-" + GetGenderString(Gender) + "\\";
+		std::string TexturePath = NifPath + TextureName + ".dds";
+		NifPath = NifPath + FileName + ".nif";
+		
+		NiNodePtr node = PgUtil::LoadNifFile<NiNode>(PgUtil::PathFromClientFolder(NifPath).c_str());
+		NiSourceTexturePtr tex = NiSourceTexture::Create(PgUtil::PathFromClientFolder(TexturePath).c_str());
+
+		return { node,tex };
+
+
+	}
+	static NiSourceTexturePtr LoadTextureWithPixelData(std::string Path) 
+	{
+		NiImageConverterPtr conv = NiImageConverter::GetImageConverter();
+
+		NiPixelDataPtr ReadImage = conv->ReadImageFile(Path.c_str(), 0);
+
+		NiTexture::FormatPrefs BlendPref;
+		BlendPref.m_ePixelLayout = NiTexture::FormatPrefs::PixelLayout::TRUE_COLOR_32;
+		BlendPref.m_eMipMapped = NiTexture::FormatPrefs::MipFlag::YES;
+		BlendPref.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
+
+		return NiSourceTexture::Create(ReadImage, BlendPref);
 	}
 
 };

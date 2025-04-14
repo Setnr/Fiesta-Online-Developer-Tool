@@ -1796,5 +1796,61 @@ struct ItemInfo :SHNRow
 	char SetItemIndex[32];
 	ItemFuncEnum ItemFunc;
 };
+enum StateType : __int32
+{
+	Normal = 0x0,
+	Skill = 0x1,
+	Scroll = 0x2,
+	Potion = 0x3,
+	Debuff = 0x4,
+	MAX_STATETYPE = 0x5,
+};
+struct AbnormalStateViewInfo : SHNRow
+{
+	enum EffPosEnum : __int32
+	{
+		None = 0x0,
+		Ground = 0x1,
+		Chest = 0x2,
+		HairLink = 0x3,
+		OP_Ground = 0x4,
+		OP_Chest = 0x5,
+		Back = 0x6,
+		TopLink = 0x7,
+		OP_TopLink = 0x8,
+		MAX_EFFPOSENUM = 0x9,
+	};
+	unsigned __int16 ID;
+	char inxName[32];
+	unsigned int icon;
+	char iconFile[32];
+	char Descript[256];
+	unsigned __int8 R;
+	unsigned __int8 G;
+	unsigned __int8 B;
+	char AniIndex[32];
+	char effName[32];
+	EffPosEnum EffNamePos;
+	unsigned __int8 EffRefresh;
+	char LoopEffect[32];
+	EffPosEnum LoopEffPos;
+	char LastEffect[32];
+	EffPosEnum LastEffectPos;
+	char DOTEffect[32];
+	EffPosEnum DOTEffectPos;
+	char IconSort[16];
+	StateType TypeSort;
+	unsigned __int8 View;
+};
+typedef AbnormalStateViewInfo::EffPosEnum DummyTypeEnum;
+struct ItemViewDummy : SHNRow
+{
+	char InxName[32];
+	unsigned __int8 IsMale;
+	DummyTypeEnum DummyType;
+	char Nif[32];
+	char ArmorTexture[32];
+};
+
 #pragma pack(pop)
 #endif

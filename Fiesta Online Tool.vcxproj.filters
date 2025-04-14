@@ -241,6 +241,9 @@
     <ClInclude Include="src\Data\NiCustom\NiSHMDPickable.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\NPCEditMode.h" />
     <ClInclude Include="src\Data\ShineObject\CharShape.h" />
+    <ClInclude Include="src\Data\PROTOStructs.h" />
+    <ClInclude Include="src\Data\GenerallFiestaStructs.h" />
+    <ClInclude Include="src\Data\ShineObject\ActionInfoSet.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NiApplication\FiestaOnlineTool.cpp">

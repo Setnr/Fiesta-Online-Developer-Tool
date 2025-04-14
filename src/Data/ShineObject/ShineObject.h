@@ -5,7 +5,7 @@
 #include <string>
 #include "NiCustom/NiPickable.h"
 #include <NiActorManager.h>
-
+#include "ActionInfoSet.h"
 NiSmartPointer(ShineObject);
 class ShineObject : public NiPickable
 {
@@ -39,4 +39,5 @@ protected:
 	float _Rotation;
 	NiActorManagerPtr _Actor;
 	unsigned short _Handle;
+	ActionInfoSetPtr _ActionInfoSet = NULL;
 };

@@ -30,12 +30,12 @@ void ShineMob::LoadActor()
     _MobViewInfo = MobLoader::GetMobViewInfo(_MobInfo->ID);
 
     UpdateActor( MobLoader::GetNodeByName(_MobInx));
-
 }
 
 void ShineMob::UpdateActor(NiActorManagerPtr NewActor)
 {
     ShineObject::UpdateActor(NewActor);
+    unsigned int ActionCode = 0;
     if (_MobViewInfo->NpcViewIndex)
     {
         std::shared_ptr<SHN::CDataReader> reader;
@@ -52,13 +52,30 @@ void ShineMob::UpdateActor(NiActorManagerPtr NewActor)
                 break;
         }
         _NPCViewInfo = info;
+        _ActionInfoSet = ActionInfoSetManager::GetActionInfoSet(PgUtil::GetBaseClassName(_NPCViewInfo->Class) + "-" + PgUtil::GetGenderString(_NPCViewInfo->Gender));
         _Shape = NiNew CharShape(_Actor->GetNIFRoot());
         _Shape->SetEquipment(_NPCViewInfo);
-        if(_NPCViewInfo->BaseActionCode)
-            _Actor->ActivateSequence(_NPCViewInfo->BaseActionCode);
-        else
-            _Actor->ActivateSequence(101010);
+
+        auto _Info = _Shape->GetWeapon();
+        ActionCode = AnimationEventCodes::Code1::STAND +
+            AnimationEventCodes::Code2::NORMALSTAND +
+            AnimationEventCodes::GetWeaponAnimationType(_Info);
     }
     else
-        _Actor->ActivateSequence(101000);
+        _ActionInfoSet = ActionInfoSetManager::GetActionInfoSet(_MobViewInfo->FileName);
+    if (!ActionCode)
+    {
+        if (_MobInfo)
+            if (_MobInfo->IsNPC)
+                ActionCode = AnimationEventCodes::Code1::STAND +
+                    AnimationEventCodes::Code2::NORMALSTAND;
+            else
+                ActionCode = AnimationEventCodes::Code1::STAND +
+                    AnimationEventCodes::Code2::COMBATSTAND;
+        else
+            ActionCode = AnimationEventCodes::Code1::STAND +
+                AnimationEventCodes::Code2::COMBATSTAND;
+    }
+    _Actor->ActivateSequence(ActionCode);
+    
 }

@@ -85,12 +85,12 @@ public:
                 TS_RESULT data = ProcessData(child, _data_);
                 if (data == TERMINATE_TOUR)
                     return TERMINATE_TOUR;
+                if (NiIsKindOf(NiNode, child))
+                    if (!TourScene<T>(NiSmartPointerCast(NiNode, child), _data_))
+                        return TERMINATE_TOUR;
             }
-            if (NiIsKindOf(NiNode, child))
-                if (!TourScene<T>(NiSmartPointerCast(NiNode, child), _data_))
-                    return TERMINATE_TOUR;
-
         }
+
         m_nCurLevel--;
         return NEXT_TOUR;
     }
@@ -128,11 +128,101 @@ public:
     NiAVObject* m_pkBone;
     std::set<NiAVObjectPtr> m_setLinkNode;
 };
+class ResetTexture : public NS_TourScene
+{
+public:
 
+    TS_RESULT ProcessData(NiAVObject* obj, void* _data_) override
+    {
+        if (!obj)
+            return CONTINUE_TOUR;
+        if(obj->GetName().Equals("Scene Root"))
+            return CONTINUE_TOUR;
+        NiTexturingProperty* prop = NiSmartPointerCast(NiTexturingProperty,obj->GetProperty(NiProperty::TEXTURING));
+        if (prop)
+            prop->SetBaseTexture((NiTexture*)_data_);
+        return NEXT_TOUR;
+    }
+};
+class FindFaceNode : public NS_TourScene
+{
+public:
+
+    TS_RESULT ProcessData(NiAVObject* obj, void* _data_) override
+    {
+        if (!obj)
+            return CONTINUE_TOUR;
+        if (obj->GetName().Equals("#Face") && NiIsKindOf(NiNode, obj))
+        {
+            FaceNode = (NiNode*)obj;
+            return TERMINATE_TOUR;
+        }
+        else
+            return CONTINUE_TOUR;
+        
+    }
+    NiNode* FaceNode;
+};
+CharSet::CharSet(NiNodePtr Node)
+{
+    m_spRootNode = Node;
+}
+bool CharSet::Init()
+{
+    m_pkBodyGeom[0] = 0;
+    m_pkBodyGeom[1] = 0;
+    m_pkBodyGeom[2] = 0;
+    m_pkLegGeom[0] = 0;
+    m_pkLegGeom[1] = 0;
+    m_pkLegGeom[2] = 0;
+    m_pkShoesGeom[0] = 0;
+    m_pkShoesGeom[1] = 0;
+    m_pkShoesGeom[2] = 0;
+    return m_spRootNode && (SetLodGeometry(0, "LOD0")
+        && SetLodGeometry(1, "LOD1")
+        && SetLodGeometry(2, "LOD2")
+        || SetNormalGeometry());
+}
+bool CharSet::SetLodGeometry(int _nLodLevel, const char* _pLodNodeName)
+{
+    NiNode* LodNode = (NiNode*)m_spRootNode->GetObjectByName(_pLodNodeName);
+    if (!LodNode)
+        return false;
+    auto h = LodNode->GetObjectByName("Body");
+    if (!PgUtil::CatchGeomentry(h, &m_pkBodyGeom[_nLodLevel]))
+        return false;
+
+    h = LodNode->GetObjectByName("Leg");
+    if (!PgUtil::CatchGeomentry(h, &m_pkLegGeom[_nLodLevel]))
+        return false;
+    h = LodNode->GetObjectByName("Shoes");
+    if (!PgUtil::CatchGeomentry(h, &m_pkShoesGeom[_nLodLevel]))
+        return false;
+    m_nSetGeoCnt++;
+    return true;
+}
+bool CharSet::SetNormalGeometry()
+{
+
+    auto h = m_spRootNode->GetObjectByName("Body");
+    if (!PgUtil::CatchGeomentry(h, m_pkBodyGeom))
+        return false;
+
+    h = m_spRootNode->GetObjectByName("Leg");
+    if (!PgUtil::CatchGeomentry(h, m_pkLegGeom))
+        return false;
+    h = m_spRootNode->GetObjectByName("Shoes");
+    if (!PgUtil::CatchGeomentry(h, m_pkShoesGeom))
+        return false;
+    m_nSetGeoCnt++;
+    return true;
+}
 CharShape::CharShape(NiAVObject* node)
 {
     m_pkRootNode = NiSmartPointerCast(NiNode,node);
     
+    memset(&Equipment, 0, sizeof(Equipment));
+
     std::vector<const char*> ModelPartName = {
     "HatAcc",           // 0x00
     "HairLink",         // 0x01
@@ -206,10 +296,15 @@ CharShape::CharShape(NiAVObject* node)
             }
         }
     }
-
+    FindFaceNode FaceFinder;
+    FaceFinder.TourScene<NiNode>(m_pkRootNode, 0);
+    if (!FaceFinder.FaceNode)
+        LogError("Failed to Find Face Node");
+    m_pkBaseFaceShapeNode = FaceFinder.FaceNode;
+    if(!m_pkBaseFaceShapeNode)
+        LogError("Failed to Find Face Node");
     EyeShapeNode = NiSmartPointerCast(NiNode, node->GetObjectByName("EyeShape"));
 }
-
 void CharShape::SetEquipment(NPCViewInfo* npcviewinfo)
 {
     _Gender = npcviewinfo->Gender;
@@ -223,12 +318,17 @@ void CharShape::SetEquipment(NPCViewInfo* npcviewinfo)
         LINK_NUM,
         LINK_NUM
     };
+    std::vector<int> PROTO_EQUIPMENT_INDEX = {
+        2,4,3,5,6
+    };
     for(int i = 0; i < LinkIndex.size(); i++)
     {
         std::string s = &LoopDummy->Equ_Dummy[i * 32];
         if (s != "-")
         {
             auto itemview = SHN::SHNManager::GetViewInfoByInx(s);
+            unsigned __int16* EquPtr = (unsigned __int16*) &Equipment;
+            EquPtr[PROTO_EQUIPMENT_INDEX[i]] = itemview->ID;
             switch (itemview->EquipType)
             {
             case EquipTypeEnum::ICON:
@@ -242,6 +342,21 @@ void CharShape::SetEquipment(NPCViewInfo* npcviewinfo)
             }
         }
     }
+    m_byFaceShapeType = 0;
+    m_byFace = npcviewinfo->FaceShape;
+    UpdateFaceShape();
+    m_pkRootNode->UpdateProperties();
+    m_pkRootNode->UpdateEffects();
+    m_pkRootNode->Update(0.0f);
+
+}
+ItemInfo* CharShape::GetWeapon()
+{
+    if (Equipment.Equ_RightHand)
+        return SHN::SHNManager::GetItemInfoByID(Equipment.Equ_RightHand);
+    if (Equipment.Equ_LeftHand)
+        return SHN::SHNManager::GetItemInfoByID(Equipment.Equ_LeftHand);
+    return nullptr;
 }
 void CharShape::CreateSetEquipment(ItemViewInfo* info)
 {
@@ -259,35 +374,46 @@ void CharShape::CreateSetEquipment(ItemViewInfo* info)
     CharSet set(SetNode);
     set.Init();
     ItemInfo* _ItemInfo = SHN::SHNManager::GetItemInfoByID(info->ID);
-    
+    std::vector<ItemViewDummy*> dummylist = SHN::SHNManager::GetItemViewDummys(info->InxName);
+    std::string TexturePath = PgUtil::PathFromClientFolder("reschar\\" + classname + "-" + gender + "\\" + info->TextureFile + ".dds");
     switch (_ItemInfo->Equip) 
     {
     case ITEMEQUIP_BODY:
     {
-        SetBody(SetNode, &set);
+        SetBody(&set);
         NiTexturingPropertyPtr tex = NiSmartPointerCast(NiTexturingProperty, m_apkLodGeom[0]->GetProperty(NiProperty::TEXTURING));
-        tex->SetBaseTexture(NiSourceTexture::Create(PgUtil::PathFromClientFolder("reschar\\" + classname + "-" + gender + "\\" + info->TextureFile + ".dds").c_str()));
+        tex->SetBaseTexture(PgUtil::LoadTextureWithPixelData(TexturePath));
         break;
     }
     case ITEMEQUIP_LEG:
     {
-        SetLeg(SetNode, &set);
+        SetLeg(&set);
         NiTexturingPropertyPtr tex = NiSmartPointerCast(NiTexturingProperty, m_apkLodGeom[3]->GetProperty(NiProperty::TEXTURING));
-        tex->SetBaseTexture(NiSourceTexture::Create(PgUtil::PathFromClientFolder("reschar\\" + classname + "-" + gender + "\\" + info->TextureFile + ".dds").c_str()));
+        tex->SetBaseTexture(PgUtil::LoadTextureWithPixelData(TexturePath));
         break;
     }
     case ITEMEQUIP_SHOES:
     {
-        SetShoes(SetNode, &set);
+        SetShoes(&set);
         NiTexturingPropertyPtr tex = NiSmartPointerCast(NiTexturingProperty, m_apkLodGeom[6]->GetProperty(NiProperty::TEXTURING));
-        tex->SetBaseTexture(NiSourceTexture::Create(PgUtil::PathFromClientFolder("reschar\\" + classname + "-" + gender + "\\" + info->TextureFile + ".dds").c_str()));
+        tex->SetBaseTexture(PgUtil::LoadTextureWithPixelData(TexturePath));
         break;
     }
     }
+
+    auto Equip = _ItemInfo->Equip;
+    if (Equip == ITEMEQUIP_HAT) 
+    {
+        Equip = ITEMEQUIP_HATACC;
+    }
+    char NodeName[256];
+    sprintf(buffer, "_SubItem%02d", Equip);
+    for (auto Dummy : dummylist) 
+    {
+        if(Dummy->IsMale == _Gender)
+            SetSubItem(Equip, Dummy->DummyType, Dummy->Nif,Dummy->ArmorTexture, buffer);
+    }
    
-    m_pkRootNode->UpdateProperties();
-    m_pkRootNode->UpdateEffects();
-    m_pkRootNode->Update(0.0f);
 
     
 }
@@ -306,33 +432,27 @@ void CharShape::CreateLinkEquipment(LinkIndex slot, ItemViewInfo* info)
     LinkNodes[slot]->UpdateEffects();
     LinkNodes[slot]->Update(0.0f);
 }
-void CharShape::SetBody(NiNodePtr SetNode, CharSet* pkSet)
+void CharShape::SetBody(CharSet* pkSet)
 {
     std::vector<const char*> LodLevels = { "LOD0","LOD1","LOD2" };
-    int v2 = 0;
-    NiGeometryPtr* v3; // ebx
-    NiGeometryPtr v4;
+    int LodLevel = 0;
     NiGeometryPtr v5;
-    v3 = m_apkLodGeom;
-
     while (1) 
     {
-        v4 = *v3;
         v5 = 0;
-        if (v2 < pkSet->m_nSetGeoCnt)
-            v5 = pkSet->m_pkBodyGeom[v2];
-        if (!ChangeGeom(&m_apkLodGeom[v2], v5, v2))
+        if (LodLevel < pkSet->m_nSetGeoCnt)
+            v5 = pkSet->m_pkBodyGeom[LodLevel];
+        if (!ChangeGeom(&m_apkLodGeom[LodLevel], v5, LodLevel))
             break;
-        v2++;
-        v3++;
-        if (v2 >= 3)
+        LodLevel++;
+        if (LodLevel >= 3)
         {
             m_apkGeom[2] = m_apkLodGeom[0];
             return;
         }
     }
 }
-void CharShape::SetLeg(NiNodePtr SetNode, CharSet* pkSet)
+void CharShape::SetLeg(CharSet* pkSet)
 {
     std::vector<const char*> LodLevels = { "LOD0","LOD1","LOD2" };
     int v2 = 0;
@@ -358,7 +478,7 @@ void CharShape::SetLeg(NiNodePtr SetNode, CharSet* pkSet)
         }
     }
 }
-void CharShape::SetShoes(NiNodePtr SetNode, CharSet* pkSet)
+void CharShape::SetShoes(CharSet* pkSet)
 {
     std::vector<const char*> LodLevels = { "LOD0","LOD1","LOD2" };
     int v2 = 0;
@@ -447,7 +567,9 @@ char CharShape::ChangeGeom(NiGeometryPtr* pkCurGeom, NiGeometryPtr pkChgGeom, in
     NiNodePtr Parent = NiSmartPointerCast(NiNode, OldNode->GetParent());
     pkChgGeom->SetTranslate(OldGeometry->GetTranslate());
     pkChgGeom->SetRotate(OldGeometry->GetRotate());
-    
+
+    *pkCurGeom = pkChgGeom;
+
     Parent->DetachChild(OldNode);
     Parent->AttachChild(NewNode);
     NewNode->SetTranslate(OldNode->GetTranslate());
@@ -457,7 +579,6 @@ char CharShape::ChangeGeom(NiGeometryPtr* pkCurGeom, NiGeometryPtr pkChgGeom, in
 
     return true;
 }
-
 void CharShape::ChangeBoneLODController(int _nLodLevel, NiGeometryPtr& _pkDestGeom, NiGeometryPtr& _pkSrcGeom, NiGeometryPtr& _pkNewGeom)
 {
     NiSkinInstancePtr OldSkinInstance = _pkDestGeom->GetSkinInstance();
@@ -524,57 +645,176 @@ void CharShape::ChangeBoneLODController(int _nLodLevel, NiGeometryPtr& _pkDestGe
     }
     OldLODController->UpdateSkin(NiSmartPointerCast(NiTriBasedGeom,_pkDestGeom), NiSmartPointerCast(NiTriBasedGeom, _pkSrcGeom));
 }
-CharSet::CharSet(NiNodePtr Node)
+void CharShape::SetSubItem(ItemEquipEnum slot, DummyTypeEnum DummyType, std::string szNifName, std::string szSubItemTextureName, std::string szSubItemNode)
 {
-    m_spRootNode = Node;
-}
-bool CharSet::Init()
-{
-    m_pkBodyGeom[0] = 0;
-    m_pkBodyGeom[1] = 0;
-    m_pkBodyGeom[2] = 0;
-    m_pkLegGeom[0] = 0;
-    m_pkLegGeom[1] = 0;
-    m_pkLegGeom[2] = 0;
-    m_pkShoesGeom[0] = 0;
-    m_pkShoesGeom[1] = 0;
-    m_pkShoesGeom[2] = 0;
-    return m_spRootNode && (SetLodGeometry(0, "LOD0")
-        && SetLodGeometry(1, "LOD1")
-        && SetLodGeometry(2, "LOD2")
-        || SetNormalGeometry());
-}
-bool CharSet::SetLodGeometry(int _nLodLevel, const char* _pLodNodeName)
-{
-    NiNode* LodNode =(NiNode*) m_spRootNode->GetObjectByName(_pLodNodeName);
-    if (!LodNode)
-        return false;
-    auto h = LodNode->GetObjectByName("Body");
-    if (!PgUtil::CatchGeomentry(h, &m_pkBodyGeom[_nLodLevel]))
-        return false;
+    if (DummyType == DummyTypeEnum::None)
+        return;
 
-    h = LodNode->GetObjectByName("Leg");
-    if (!PgUtil::CatchGeomentry(h, &m_pkLegGeom[_nLodLevel]))
-        return false;
-    h = LodNode->GetObjectByName("Shoes");
-    if (!PgUtil::CatchGeomentry(h, &m_pkShoesGeom[_nLodLevel]))
-        return false;
-    m_nSetGeoCnt++;
-    return true;
+    switch (DummyType) 
+    {
+    case 1:
+        SetSubItem(LINK_HATACC, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+        break;
+    case 2:
+        SetSubItem(LINK_HAIR, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+        break;
+    case 3:
+        SetSubItem(LINK_FACE, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+        break;
+    case 4:
+        SetSubItem(LINK_EYE, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+        break;
+    case 5:
+        SetSubItem(LINK_MOUTH, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+        break;
+    case 6:
+        SetSubItem(LINK_CHEST, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+        break;
+    case 7:
+        SetSubItem(LINK_BACK, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+        break;
+    case 9:
+        SetSubItem(LINK_BELT, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+        break;
+    case 10:
+        SetSubItem(LINK_TAIL, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+        break;
+    case 11:
+        SetSubItem(LINK_LEFTSHOULDER, szNifName, szSubItemTextureName, szSubItemNode, Left);
+        SetSubItem(LINK_RIGHTSHOULDER, szNifName, szSubItemTextureName, szSubItemNode, Right);
+        break;
+    case 12:
+        SetSubItem(LINK_LEFTSHOULDER, szNifName, szSubItemTextureName, szSubItemNode, Left);
+        break;
+    case 13:
+        SetSubItem(LINK_RIGHTSHOULDER, szNifName, szSubItemTextureName, szSubItemNode, Right);
+        break;
+    case 14:
+        SetSubItem(LINK_LEFTUPPERARM, szNifName, szSubItemTextureName, szSubItemNode, Left);
+        SetSubItem(LINK_RIGHTUPPERARM, szNifName, szSubItemTextureName, szSubItemNode, Right);
+        break;
+    case 15:
+        SetSubItem(LINK_LEFTUPPERARM, szNifName, szSubItemTextureName, szSubItemNode, Left);
+        break;
+    case 16:
+        SetSubItem(LINK_RIGHTUPPERARM, szNifName, szSubItemTextureName, szSubItemNode, Right);
+        break;
+    case 17:
+        SetSubItem(LINK_RIGHTBRACELET, szNifName, szSubItemTextureName, szSubItemNode, Right);
+        SetSubItem(LINK_LEFTBRACELET, szNifName, szSubItemTextureName, szSubItemNode, Left);
+        break;
+    case 18:
+        SetSubItem(LINK_LEFTBRACELET, szNifName, szSubItemTextureName, szSubItemNode, Left);
+        break;
+    case 19:
+        SetSubItem(LINK_RIGHTBRACELET, szNifName, szSubItemTextureName, szSubItemNode, Right);
+        break;
+    case 20:
+        SetSubItem(LINK_LEFTTHIGH, szNifName, szSubItemTextureName, szSubItemNode, Left);
+        SetSubItem(LINK_RIGHTTHIGH, szNifName, szSubItemTextureName, szSubItemNode, Right);
+        break;
+    case 21:
+        SetSubItem(LINK_LEFTTHIGH, szNifName, szSubItemTextureName, szSubItemNode, Left);
+        break;
+    case 22:
+        SetSubItem(LINK_RIGHTTHIGH, szNifName, szSubItemTextureName, szSubItemNode, Right);
+        break;
+    case 23:
+        SetSubItem(LINK_LEFTCALF, szNifName, szSubItemTextureName, szSubItemNode, Left);
+        SetSubItem(LINK_RIGHTCALF, szNifName, szSubItemTextureName, szSubItemNode, Right);
+        break;
+    case 24:
+        SetSubItem(LINK_LEFTCALF, szNifName, szSubItemTextureName, szSubItemNode, Left);
+        break;
+    case 25:
+        SetSubItem(LINK_RIGHTCALF, szNifName, szSubItemTextureName, szSubItemNode, Right);
+        break;
+    case 26:
+        SetSubItem(LINK_LEFTSHOESACC, szNifName, szSubItemTextureName, szSubItemNode, Left);
+        SetSubItem(LINK_RIGHTSHOESACC, szNifName, szSubItemTextureName, szSubItemNode, Right);
+        break;
+    case 27:
+        SetSubItem(LINK_LEFTSHOESACC, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+        break;
+    case 28:
+        SetSubItem(LINK_RIGHTSHOESACC, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+        break;
+    case 29:
+        SetSubItem(LINK_WORLD_COS, szNifName, szSubItemTextureName, szSubItemNode, Origin);
+    }
 }
-bool CharSet::SetNormalGeometry()
+void CharShape::SetSubItem(LinkIndex enumIndex, std::string szNifName, std::string szSubItemTextureName, std::string szSubItemNode, AttachType eAttachType)
 {
+    auto LinkNode = LinkNodes[enumIndex];
+    if (!LinkNode)
+        return;
+    std::pair<NiNodePtr, NiSourceTexturePtr> pair = PgUtil::LoadSubItem(szNifName, _Class, _Gender, szSubItemTextureName);
+    NiNodePtr ObjectNode = pair.first;
+    NiSourceTexturePtr Texture = pair.second;
+    NiNodePtr AttachedNode = NULL;
+    switch (eAttachType) 
+    {
+    case Origin:
+        LinkNode->AttachChild(ObjectNode);
+        ObjectNode->SetName(szSubItemNode.c_str());
+        AttachedNode = ObjectNode;
+        break;
+    case Right:
+    {
+        NiAVObjectPtr RightNode = ObjectNode->GetObjectByName("Right");
+        RightNode->SetTranslate(NiPoint3::ZERO);
+        RightNode->SetRotate(0.f, 0.f, 0.f, 0.f);
+        RightNode->SetName(szSubItemNode.c_str());
+        if (NiIsKindOf(NiNode, RightNode))
+        {
+            LinkNode->AttachChild(RightNode);
+            AttachedNode = NiSmartPointerCast(NiNode,RightNode);
+        }
+        break;
+    }
+    case Left:
+    {
+        NiAVObjectPtr RightNode = ObjectNode->GetObjectByName("Left");
+        RightNode->SetTranslate(NiPoint3::ZERO);
+        RightNode->SetRotate(0.f, 0.f, 0.f, 0.f);
+        RightNode->SetName(szSubItemNode.c_str());
+        if (NiIsKindOf(NiNode, RightNode))
+        {
+            LinkNode->AttachChild(RightNode);
+            AttachedNode = NiSmartPointerCast(NiNode, RightNode);
+        }
+        break;
+    }
+    }
+    NiGeometryPtr geometry;
+    if (PgUtil::CatchGeomentry(AttachedNode, &geometry)) {
+        NiTexturingPropertyPtr ptr = NiSmartPointerCast(NiTexturingProperty,geometry->GetProperty(NiProperty::TEXTURING));
+        //if (ptr)
+         //   ptr->SetBaseTexture(Texture);
+    }
 
-    auto h = m_spRootNode->GetObjectByName("Body");
-    if (!PgUtil::CatchGeomentry(h, m_pkBodyGeom))
-        return false;
+    ResetTexture _ResTex;
+    _ResTex.TourScene<NiNode>(AttachedNode, (void*)Texture);
 
-    h = m_spRootNode->GetObjectByName("Leg");
-    if (!PgUtil::CatchGeomentry(h, m_pkLegGeom))
-        return false;
-    h = m_spRootNode->GetObjectByName("Shoes");
-    if (!PgUtil::CatchGeomentry(h, m_pkShoesGeom))
-        return false;
-    m_nSetGeoCnt++;
-    return true;
+    LinkNode->UpdateEffects();
+    LinkNode->UpdateProperties();
+    LinkNode->Update(0.0);
+}
+
+void CharShape::UpdateFaceShape()
+{
+    char buffer[512];
+    sprintf(buffer, "reschar\\%s-%s\\%s-%s-face%03d.dds", PgUtil::GetBaseClassName(_Class).c_str(), PgUtil::GetGenderString(_Gender).c_str(), PgUtil::GetBaseClassName(_Class).c_str(), PgUtil::GetGenderString(_Gender).c_str(), m_byFaceShapeType);
+
+    NiSourceTexturePtr tex = PgUtil::LoadTextureWithPixelData(PgUtil::PathFromClientFolder(buffer));
+    if (m_byFaceShapeType)
+    {
+        //Unk
+    }
+    else 
+    {
+        m_spFaceNode = m_pkBaseFaceShapeNode;
+        ResetTexture _ResTex;
+        _ResTex.TourScene<NiAVObject>(m_spFaceNode, (void*)tex);
+    }
 }

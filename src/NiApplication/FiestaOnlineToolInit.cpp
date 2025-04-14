@@ -195,8 +195,6 @@ void FiestaOnlineTool::LoadInitialScene()
     RunShaderParser();
     RegisterShaderLibraries();
 
-    std::thread SHNThread(StartSHNLoadingThread);
-    SHNThread.detach();
 }
 
 

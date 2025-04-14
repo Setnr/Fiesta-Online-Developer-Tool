@@ -87,7 +87,8 @@ namespace SHN
 		WeaponAttrib,
 		WeaponTitleData,
 		WorldMapAvatarInfo,
-		MAX
+		MAX,
+		ItemViewDummy
 	};
 	class CDataReader
 	{
@@ -260,7 +261,8 @@ namespace SHN
 				{MobViewInfo,"MobViewInfo"},
 				{NPCViewInfo,"NPCViewInfo"},
 				{ItemViewInfo,"ItemViewInfo"},
-				{ItemInfo, "ItemInfo"}
+				{ItemInfo, "ItemInfo"},
+				{ItemViewDummy, "ItemViewDummy"}
 			};
 			for(auto shn :  shnlist)
 			{
@@ -295,6 +297,26 @@ namespace SHN
 					info = (struct ItemInfo*)reader->GetRow(i, (SHN::CDataReader::SHNRow*)info);
 					IDItems.insert({ info->ID, info });
 					InxItems.insert({ info->InxName, info });
+				}
+			}
+			{
+				std::shared_ptr<CDataReader> reader;
+				if (!GetSHN(SHNType::ItemViewDummy, reader))
+				{
+					LogError("ItemInfo wasnt loaded properly");
+					return;
+				}
+				struct ItemViewDummy* info = nullptr;
+				for (int i = 0; i < reader->GetRows(); i++)
+				{
+					info = (struct ItemViewDummy*)reader->GetRow(i, (SHN::CDataReader::SHNRow*)info);
+					auto it = ItemViewDummyList.find(info->InxName);
+					if (it == ItemViewDummyList.end()) {
+						ItemViewDummyList.insert({ info->InxName, {info} });
+					}
+					else {
+						it->second.push_back(info);
+					}
 				}
 			}
 		}
@@ -336,12 +358,21 @@ namespace SHN
 				return nullptr;
 			return it->second;
 		}
+		static std::vector<struct ItemViewDummy*> GetItemViewDummys(std::string Inx) 
+		{
+			auto it = ItemViewDummyList.find(Inx);
+			if (it == ItemViewDummyList.end())
+				return {};
+			else
+				return it->second;
+		}
 	private:
 		static std::map<SHNType, std::shared_ptr<CDataReader>> SHNList;
 		static std::map<unsigned short, struct ItemViewInfo*> IDItemsView;
 		static std::map<std::string, struct ItemViewInfo*> InxItemsView;
 		static std::map<unsigned short, struct ItemInfo*> IDItems;
 		static std::map<std::string, struct ItemInfo*> InxItems;
+		static std::map < std::string, std::vector<struct ItemViewDummy*>> ItemViewDummyList;
 	};
 
 	

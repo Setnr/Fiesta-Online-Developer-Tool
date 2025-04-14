@@ -52,9 +52,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Includes\FastNoiseLite\FastNoiseLite.h" />
+    <ClInclude Include="src\Data\GenerallFiestaStructs.h" />
     <ClInclude Include="src\Data\NiCustom\NiSHMDPickable.h" />
     <ClInclude Include="src\Data\NPCData\NPC.h" />
     <ClInclude Include="src\Data\NPCData\NPCData.h" />
+    <ClInclude Include="src\Data\PROTOStructs.h" />
+    <ClInclude Include="src\Data\ShineObject\ActionInfoSet.h" />
     <ClInclude Include="src\Data\ShineObject\CharShape.h" />
     <ClInclude Include="src\Data\ShineObject\ShineMob.h" />
     <ClInclude Include="src\Data\ShineObject\ShineNPC.h" />
