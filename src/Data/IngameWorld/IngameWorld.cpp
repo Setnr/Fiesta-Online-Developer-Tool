@@ -545,14 +545,14 @@ void IngameWorld::AddShineObject(ShineObjectPtr obj, bool Update)
 	if (!obj->HasActor())
 		obj->LoadActor();
 
-	m_spGroundObject->AttachChild(obj);
+	m_spCharScene->AttachChild(obj);
 
 	if(Update)
 	{
-		m_spGroundObject->CompactChildArray();
-		m_spGroundObject->UpdateProperties();
-		m_spGroundObject->UpdateEffects();
-		m_spGroundObject->Update(0.f);
+		m_spCharScene->CompactChildArray();
+		m_spCharScene->UpdateProperties();
+		m_spCharScene->UpdateEffects();
+		m_spCharScene->Update(0.f);
 	}
 }
 void IngameWorld::RemoveShineObject(ShineObjectPtr obj, bool Backup)
@@ -560,11 +560,11 @@ void IngameWorld::RemoveShineObject(ShineObjectPtr obj, bool Backup)
 	if (Backup) {
 		LogError("No ShineObject Backup added yet");
 	}
-	m_spGroundObject->DetachChild(obj);
-	m_spGroundObject->CompactChildArray();
-	m_spGroundObject->UpdateProperties();
-	m_spGroundObject->UpdateEffects();
-	m_spGroundObject->Update(0.f);
+	m_spCharScene->DetachChild(obj);
+	m_spCharScene->CompactChildArray();
+	m_spCharScene->UpdateProperties();
+	m_spCharScene->UpdateEffects();
+	m_spCharScene->Update(0.f);
 }
 void IngameWorld::UpdateScale(std::vector<NiPickablePtr> Node, float Scale, bool Backup) 
 {

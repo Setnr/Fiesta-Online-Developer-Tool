@@ -262,7 +262,8 @@ namespace SHN
 				{NPCViewInfo,"NPCViewInfo"},
 				{ItemViewInfo,"ItemViewInfo"},
 				{ItemInfo, "ItemInfo"},
-				{ItemViewDummy, "ItemViewDummy"}
+				{ItemViewDummy, "ItemViewDummy"},
+				{HairInfo, "HairInfo"}
 			};
 			for(auto shn :  shnlist)
 			{
@@ -319,6 +320,20 @@ namespace SHN
 					}
 				}
 			}
+			{
+				std::shared_ptr<CDataReader> reader;
+				if (!GetSHN(SHNType::HairInfo, reader))
+				{
+					LogError("ItemInfo wasnt loaded properly");
+					return;
+				}
+				struct HairInfo* info = nullptr;
+				for (int i = 0; i < reader->GetRows(); i++)
+				{
+					info = (struct HairInfo*)reader->GetRow(i, (SHN::CDataReader::SHNRow*)info);
+					IDHairInfo.insert({ info->ID, info });
+				}
+			}
 		}
 		static bool GetSHN(SHN::SHNType type, std::shared_ptr<CDataReader>& reader)
 		{
@@ -366,6 +381,12 @@ namespace SHN
 			else
 				return it->second;
 		}
+		static struct HairInfo* GetHairByID(unsigned char ID) {
+			auto it = IDHairInfo.find(ID);
+			if (it == IDHairInfo.end())
+				return nullptr;
+			return it->second;
+		}
 	private:
 		static std::map<SHNType, std::shared_ptr<CDataReader>> SHNList;
 		static std::map<unsigned short, struct ItemViewInfo*> IDItemsView;
@@ -373,6 +394,7 @@ namespace SHN
 		static std::map<unsigned short, struct ItemInfo*> IDItems;
 		static std::map<std::string, struct ItemInfo*> InxItems;
 		static std::map < std::string, std::vector<struct ItemViewDummy*>> ItemViewDummyList;
+		static std::map<unsigned char, struct HairInfo*> IDHairInfo;
 	};
 
 	

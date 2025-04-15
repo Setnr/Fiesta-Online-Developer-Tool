@@ -140,9 +140,38 @@ public:
             return CONTINUE_TOUR;
         NiTexturingProperty* prop = NiSmartPointerCast(NiTexturingProperty,obj->GetProperty(NiProperty::TEXTURING));
         if (prop)
+        {
             prop->SetBaseTexture((NiTexture*)_data_);
+        }
+        if (NiIsKindOf(NiGeometry, obj)) 
+        {
+            NiGeometry* geo = (NiGeometry*)obj;
+            geo->SetConsistency(NiGeometryData::MUTABLE);
+            geo->CalculateNormals();
+            geo->GetModelData()->MarkAsChanged(NiGeometryData::NORMAL_MASK);
+            
+        }
         return NEXT_TOUR;
     }
+};
+class DisableLight : public NS_TourScene
+{
+public:
+
+    TS_RESULT ProcessData(NiAVObject* obj, void* _data_) override
+    {
+        if (!obj)
+            return CONTINUE_TOUR;
+        if (NiIsKindOf(NiLight, obj)) 
+        {
+            NiLightPtr light = (NiLight*)obj; 
+            auto Parent = light->GetParent();
+            Parent->DetachChild(light);
+            DeletedLights.push_back(light);
+        }
+        return NEXT_TOUR;
+    }
+    std::vector<NiLightPtr> DeletedLights;
 };
 class FindFaceNode : public NS_TourScene
 {
@@ -162,6 +191,25 @@ public:
         
     }
     NiNode* FaceNode;
+};
+class FindHairNode : public NS_TourScene
+{
+public:
+
+    TS_RESULT ProcessData(NiAVObject* obj, void* _data_) override
+    {
+        if (!obj)
+            return CONTINUE_TOUR;
+        if (obj->GetName().Contains("#Hair") && NiIsKindOf(NiNode, obj))
+        {
+            HairNode.push_back((NiNode*)obj);
+            return TERMINATE_TOUR;
+        }
+        else
+            return CONTINUE_TOUR;
+
+    }
+    std::vector<NiNode*> HairNode;
 };
 CharSet::CharSet(NiNodePtr Node)
 {
@@ -220,7 +268,10 @@ bool CharSet::SetNormalGeometry()
 CharShape::CharShape(NiAVObject* node)
 {
     m_pkRootNode = NiSmartPointerCast(NiNode,node);
-    
+
+    DisableLight _ResTex;
+    _ResTex.TourScene<NiAVObject>(m_pkRootNode, 0);
+
     memset(&Equipment, 0, sizeof(Equipment));
 
     std::vector<const char*> ModelPartName = {
@@ -344,7 +395,11 @@ void CharShape::SetEquipment(NPCViewInfo* npcviewinfo)
     }
     m_byFaceShapeType = 0;
     m_byFace = npcviewinfo->FaceShape;
+    m_byHairType = npcviewinfo->HairType;
+    m_byHairColor = npcviewinfo->HairColor;
     UpdateFaceShape();
+    UpdateHair();
+
     m_pkRootNode->UpdateProperties();
     m_pkRootNode->UpdateEffects();
     m_pkRootNode->Update(0.0f);
@@ -569,7 +624,6 @@ char CharShape::ChangeGeom(NiGeometryPtr* pkCurGeom, NiGeometryPtr pkChgGeom, in
     pkChgGeom->SetRotate(OldGeometry->GetRotate());
 
     *pkCurGeom = pkChgGeom;
-
     Parent->DetachChild(OldNode);
     Parent->AttachChild(NewNode);
     NewNode->SetTranslate(OldNode->GetTranslate());
@@ -811,4 +865,54 @@ void CharShape::UpdateFaceShape()
         ResetTexture _ResTex;
         _ResTex.TourScene<NiAVObject>(m_spFaceNode, (void*)tex);
     }
+}
+
+void CharShape::UpdateHair()
+{
+    HairInfo* _HairInfo = SHN::SHNManager::GetHairByID(m_byHairType);
+    if (!_HairInfo)
+        return;
+    HideAllHair();
+    SetHairParts(0, _HairInfo->ID, _HairInfo->ucIsLink_Front != 0, _HairInfo->acModelName_Front, _HairInfo->FrontTex);
+    SetHairParts(1, _HairInfo->ID, _HairInfo->ucIsLink_Bottom != 0, _HairInfo->acModelName_Bottom, _HairInfo->BottomTex);
+    SetHairParts(2, _HairInfo->ID, _HairInfo->ucIsLink_Top != 0, _HairInfo->acModelName_Top, _HairInfo->TopTex);
+    SetHairParts(3, _HairInfo->ID, _HairInfo->ucIsLink_Acc != 0, _HairInfo->acModelName_Acc, _HairInfo->Acc1Tex);
+    SetHairParts(4, _HairInfo->ID, _HairInfo->ucIsLink_Acc2 != 0, _HairInfo->acModelName_Acc2, _HairInfo->Acc2Tex);
+    SetHairParts(5, _HairInfo->ID, _HairInfo->ucIsLink_Acc3 != 0, _HairInfo->acModelName_Acc3, _HairInfo->Acc3Tex);
+    //SetHairDetailMap(m_byHairColor);
+}
+
+void CharShape::HideAllHair()
+{
+    FindHairNode nodetour;
+    nodetour.TourScene<NiNode>(m_pkRootNode,0);
+    for (auto j = LinkNodes[1]->GetObjectByName("HairPartsNode") ; j ; j = LinkNodes[1]->GetObjectByName("HairPartsNode"))
+    {
+        LinkNodes[1]->DetachChild(j);
+    }
+    for (auto node : nodetour.HairNode)
+        if(node != LinkNodes[1])
+            node->GetParent()->DetachChild(node);
+}
+
+void CharShape::SetHairParts(int PartsIndex, int id, bool show, std::string ModelName, std::string FrontText)
+{
+    return;
+    if (!LinkNodes[LinkIndex::LINK_HAIR] && !show)
+        return;
+
+    std::string NifPath = "reschar\\" + PgUtil::GetBaseClassName(_Class) + "-" + PgUtil::GetGenderString(_Gender) + "\\";
+    std::string TexturePath = NifPath + FrontText + ".dds";
+    NifPath = NifPath + ModelName + ".nif";
+
+    NiNodePtr EquipNode = PgUtil::LoadNifFile<NiNode>(PgUtil::PathFromClientFolder("resitem//" + ModelName + ".nif").c_str());
+    EquipNode->SetName("HairPartsNode");
+
+    auto DetachNode = LinkNodes[1]->GetObjectByName("HairPartsNode");
+    if (DetachNode)
+        LinkNodes[LinkIndex::LINK_HAIR]->DetachChild(DetachNode);
+    LinkNodes[LinkIndex::LINK_HAIR]->AttachChild(EquipNode);
+    LinkNodes[LinkIndex::LINK_HAIR]->UpdateProperties();
+    LinkNodes[LinkIndex::LINK_HAIR]->UpdateEffects();
+    LinkNodes[LinkIndex::LINK_HAIR]->Update(0.0f);
 }

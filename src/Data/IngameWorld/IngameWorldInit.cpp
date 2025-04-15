@@ -153,8 +153,9 @@ bool IngameWorld::InitLightFog()
 	m_spDirectionalLight->SetAmbientColor(NiColor::BLACK);
 	m_spDirectionalLight->SetDiffuseColor(NiColor::WHITE);
 	m_spDirectionalLight->SetSpecularColor(NiColor::BLACK);
-	m_spDirectionalLight->AttachAffectedNode(m_spDirectionalLightScene);
 	m_spDirectionalLightScene->AttachChild(m_spDirectionalLight);
+	m_spDirectionalLight->AttachAffectedNode(m_spDirectionalLightScene);
+	m_spDirectionalLight->SetRotate(1.f, 0.5, 0.7, -0.4);
 	m_spMapDirectionalLight = NiNew NiDirectionalLight;
 	m_spMapDirectionalLight->SetAmbientColor(NiColor(.75, .75, .75));
 	m_spMapDirectionalLight->SetDiffuseColor(NiColor::WHITE);
@@ -162,9 +163,11 @@ bool IngameWorld::InitLightFog()
 	m_spMapDirectionalLight->SetSwitch(false); //This one kinda sucks xD
 	m_spMapDirectionalLight->SetDimmer(1.0f);
 
-	m_spMapDirectionalLight->AttachAffectedNode(m_spAllGroundScene);
 	m_spAllGroundScene->AttachChild(m_spMapDirectionalLight);
+	m_spMapDirectionalLight->AttachAffectedNode(m_spAllGroundScene);
 	m_spAllGroundScene->UpdateEffects();
+
+
 	return 1;
 }
 bool IngameWorld::LoadHTD()

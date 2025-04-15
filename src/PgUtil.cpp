@@ -169,6 +169,7 @@ NiActorManager* PgUtil::CreatePlayerNPC(unsigned short NPCViewIndex)
     std::string Combine = Class + "-" + Gender; 
 
     NiActorManager* actor = MobLoader::GetPlayerKFM(Combine);
+
     return actor;
 }
 

@@ -1850,7 +1850,58 @@ struct ItemViewDummy : SHNRow
 	DummyTypeEnum DummyType;
 	char Nif[32];
 	char ArmorTexture[32];
+}; 
+enum EquipType : __int32
+{
+	ET_NONE = 0x0,
+	ET_MALE = 0x1,
+	ET_FEMALE = 0x2,
+	ET_BOTH = 0x3,
+	MAX_EQUIPTYPE = 0x4,
 };
-
+enum HairDummyType : __int32
+{
+	HAIR_NONE = 0x0,
+	HAIR_FRONT = 0x1,
+	HAIR_BOTTOM = 0x2,
+	HAIR_TOP = 0x3,
+	HAIR_ACC = 0x4,
+	HAIR_ACC2 = 0x5,
+	HAIR_ACC3 = 0x6,
+	MAX_HAIRDUMMYTYPE = 0x7,
+};
+struct HairInfo : SHNRow
+{
+	unsigned __int8 ID;
+	char IndexName[32];
+	char HairName[32];
+	unsigned __int8 Grade;
+	EquipType fighter;
+	EquipType archer;
+	EquipType cleric;
+	EquipType mage;
+	EquipType Joker;
+	EquipType Sentinel;
+	unsigned __int8 ucIsLink_Front;
+	char acModelName_Front[32];
+	char FrontTex[32];
+	unsigned __int8 ucIsLink_Bottom;
+	char acModelName_Bottom[32];
+	char BottomTex[32];
+	unsigned __int8 ucIsLink_Top;
+	char acModelName_Top[32];
+	char TopTex[32];
+	HairDummyType Exception1;
+	HairDummyType Exception2;
+	unsigned __int8 ucIsLink_Acc;
+	char acModelName_Acc[32];
+	char Acc1Tex[32];
+	unsigned __int8 ucIsLink_Acc2;
+	char acModelName_Acc2[32];
+	char Acc2Tex[32];
+	unsigned __int8 ucIsLink_Acc3;
+	char acModelName_Acc3[32];
+	char Acc3Tex[32];
+};
 #pragma pack(pop)
 #endif

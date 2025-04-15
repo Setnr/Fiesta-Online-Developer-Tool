@@ -48,6 +48,8 @@ private:
 	NiNodePtr m_spFaceNode;
 	unsigned char m_byFaceShapeType;
 	unsigned __int8 m_byFace;
+	unsigned __int8 m_byHairType;
+	unsigned __int8 m_byHairColor;
 
 	void CreateSetEquipment(ItemViewInfo* info);
 	void CreateLinkEquipment(LinkIndex slot, ItemViewInfo* info);
@@ -60,4 +62,7 @@ private:
 	void SetSubItem(ItemEquipEnum slot, DummyTypeEnum DummyType, std::string szNifName, std::string szSubItemTextureName, std::string szSubItemNode);
 	void SetSubItem(LinkIndex enumIndex, std::string szNifName, std::string szSubItemTextureName, std::string szSubItemNode, AttachType eAttachType);
 	void UpdateFaceShape();
+	void UpdateHair();
+	void HideAllHair();
+	void SetHairParts(int PartsIndex, int id, bool show, std::string ModelName, std::string FrontText);
 };
