@@ -37,6 +37,10 @@ If you're interested in experimenting with the latest features and improvements,
 ### Map-Creator Submodule
  
 - **Map Generation**: Generate new maps using algorithms like Perlin, Worley, or DiamondSquare. Customize parameters to create endless map variations. The generated maps can be instantly edited with all other tools, but need to be added to the .shn files manually. Apply erosion to smooth the entire map and create shadows for the VertexColors.
+
+### NPC-Editor
+
+- **NPC.txt** Place and Edit NPCs and Gates loaded from the NPC.txt and change/edit Spawnpoints from Gates
  
 ### General Features
  
@@ -50,49 +54,36 @@ If you're interested in experimenting with the latest features and improvements,
  
 ### SHMD Editor
  
-1. Middle Mouse Button Menu<br></br>
- 
-https://github.com/user-attachments/assets/7eee7437-4e08-4128-87f4-9f2f427d706b
- 
- 
-2. Start Screen<br></br>
-   ![Start Screen](./Images/StartScreen.jpg)
- 
-3. Translate Gizmo<br></br>
-   ![Translate Gizmo](./Images/Translate.jpg)
- 
-4. Rotate Gizmo<br></br>
-   ![Rotate Gizmo](./Images/Rotate.jpg)
+https://github.com/user-attachments/assets/10154565-1eb1-456e-ae05-476cfcb81b78
+
  
 ### SHBD Editor
  
-1. SHBD Editor Tool Part<br></br>
-   ![SHBD Editor](./Images/SHBD.jpg)
- 
+
+https://github.com/user-attachments/assets/fcbb8152-98af-41aa-874a-2d1615c11818
+
+
 ### HTDG-Editor
  
-1. Heightmap Editing<br></br>
 
 https://github.com/user-attachments/assets/798623bc-5faa-4f25-853e-7b66d69b122c
  
  
 ### Texture-Editor
  
-1. Texture Editing<br></br>
  
-https://github.com/user-attachments/assets/88eaa050-bef6-4b47-ba06-5489043abe3f
+https://github.com/user-attachments/assets/d5169869-09b3-432d-8456-756c0cc3a233
+
+### NPC-Editor
+
  
- 
-### Map-Creator
- 
-1. Map Generation<br></br>
-   ![MapCreation Parameters](./Images/MapCreateAlgorithmParameters.gif)
-   ![MapCreation Random Maps](./Images/MapCreateRandom.gif)
-   ![MapCreation Create Shadows](./Images/MapCreateShadow.gif)
+https://github.com/user-attachments/assets/2d7453e3-48a6-4d42-88d7-49ffd57bffe6
+
+
  
 ## Usage
  
-To get started with the Fiesta Online Developer Tool, simply download the latest release from the Releases section of this repository. Once downloaded, run the executable file to launch the tool. You can then select your client path and after a restart, the tool will prompt you with an overview of your MapInfo.shn.
+To get started with the Fiesta Online Developer Tool, simply download the latest release from the Releases section of this repository. Once downloaded, run the executable file to launch the tool. You can then select your client and server path and after a restart, the tool will prompt you with an overview of your MapInfo.shn.
  
 ## License
  
