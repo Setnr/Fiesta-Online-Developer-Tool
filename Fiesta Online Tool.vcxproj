@@ -63,6 +63,13 @@
     <ClInclude Include="src\Data\ShineObject\ShineNPC.h" />
     <ClInclude Include="src\Data\ShineObject\ShineObject.h" />
     <ClInclude Include="src\Data\ShineObject\ShinePlayer.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\DisableLight.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\FindBoneNode.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\FindFaceNode.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\FindHairNode.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\NS_TourScene.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\ResetTextureTour.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\SetHairTexture.h" />
     <ClInclude Include="src\Data\SHN\MobLoader.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\Brush\Brush.h" />
     <ClInclude Include="src\Scene\EditorScene\Modes\Brush\LuaBrush.h" />

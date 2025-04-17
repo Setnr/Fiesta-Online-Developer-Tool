@@ -62,7 +62,9 @@ void ShineMob::UpdateActor(NiActorManagerPtr NewActor)
             AnimationEventCodes::GetWeaponAnimationType(_Info);
     }
     else
+    {
         _ActionInfoSet = ActionInfoSetManager::GetActionInfoSet(_MobViewInfo->FileName);
+    }
     if (!ActionCode)
     {
         if (_MobInfo)

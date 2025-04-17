@@ -53,9 +53,11 @@ bool FiestaOnlineTool::Initialize()
         NiMessageBox("Failed to Load Settings!\nContinue with DefaultSettings", "Settings Error");
 
     AddSingleObject::SetInitPath(PgUtil::PathFromClientFolder(""));
+    std::vector<std::future<void>> Tasks;
 
-    auto SHN = std::async(std::launch::async, StartSHNLoadingThread);
-    auto VersionCheck = std::async(std::launch::async, StartVersionCheckThread);
+    if (Settings::IsClientSetup() || Settings::IsServerSetup())
+        Tasks.push_back(std::async(std::launch::async, StartSHNLoadingThread));
+    Tasks.push_back(std::async(std::launch::async, StartVersionCheckThread));
 
 	NiApplication::Initialize();
 
@@ -103,15 +105,15 @@ bool FiestaOnlineTool::Initialize()
 
     BoundingBox = NiBoundingBox::LoadBaseNode();
 
-    SHN.get();
-    VersionCheck.get();
+    for (auto& task : Tasks)
+        task.get();
 
-    return true;
+    return true;    
 }  
 
 void FiestaOnlineTool::StartSHNLoadingThread()
 {
-    SHN::SHNManager::Load();
+    SHN::SHNManager::Load(); 
 }
 
 void FiestaOnlineTool::StartVersionCheckThread()

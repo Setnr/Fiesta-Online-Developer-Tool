@@ -7,6 +7,12 @@
 #include <NiMultiTargetTransformController.h>
 #include <NiBoneLODController.h>
 #include <set>
+#include "TourScene/FindBoneNode.h"
+#include "TourScene/ResetTextureTour.h"
+#include "TourScene/SetHairTexture.h"
+#include "TourScene/DisableLight.h"
+#include "TourScene/FindFaceNode.h"
+#include "TourScene/FindHairNode.h"
 
 NiSmartPointer(NiCustomSkinData);
 class NiCustomSkinData : public NiSkinData 
@@ -52,165 +58,6 @@ public:
     }
 };
 
-class NS_TourScene 
-{
-public:
-    enum TS_RESULT : __int32
-    {
-        CONTINUE_TOUR = 0xFFFFFFFF,
-        TERMINATE_TOUR = 0x0,
-        NEXT_TOUR = 0x1,
-    };
-    virtual TS_RESULT ProcessData(NiAVObject* obj, void* _data_) 
-    {
-        if (m_pCallBack)
-            return m_pCallBack(obj, _data_);
-        LogError("TourScene ProcessData doesnt have a CallBack");
-        return TERMINATE_TOUR;
-    }
-    template <class T>
-    TS_RESULT TourScene(NiNode* pNiNode, void* _data_)
-    {
-        if (!pNiNode)
-            return TERMINATE_TOUR;
-        int nChildCnt = pNiNode->GetArrayCount();
-        m_nCurLevel++;
-        for (int i = 0; i < nChildCnt; i++) 
-        {
-            auto child = pNiNode->GetAt(i);
-            if (!child)
-                continue;
-            if (NiIsKindOf(T, child)) 
-            {
-                TS_RESULT data = ProcessData(child, _data_);
-                if (data == TERMINATE_TOUR)
-                    return TERMINATE_TOUR;
-                if (NiIsKindOf(NiNode, child))
-                    if (!TourScene<T>(NiSmartPointerCast(NiNode, child), _data_))
-                        return TERMINATE_TOUR;
-            }
-        }
-
-        m_nCurLevel--;
-        return NEXT_TOUR;
-    }
-    TS_RESULT(__cdecl* m_pCallBack)(NiAVObject*, void*);
-    int m_nCurLevel;
-};
-
-class FindBoneNode : public NS_TourScene
-{
-public:
-    FindBoneNode(NiNodePtr* ppNode, int nArry, const char* szName) 
-    {
-        m_nCurLevel = -1;
-        m_szName = szName;
-        m_pkBone = 0;
-        for (int i = 0; i < nArry; i++)
-        {
-            if (ppNode[i])
-                m_setLinkNode.insert(NiSmartPointerCast(NiAVObject,ppNode[i]));
-        }
-    }
-    TS_RESULT ProcessData(NiAVObject* obj, void* _data_) override
-    {
-        if (!obj->GetName())
-            return NEXT_TOUR;
-        auto it = m_setLinkNode.find(obj);
-        if (it != m_setLinkNode.end())
-            return CONTINUE_TOUR;
-        if(strcmp(obj->GetName(), m_szName))
-            return NEXT_TOUR;
-        m_pkBone = obj;
-        return TERMINATE_TOUR;
-    }
-    const char* m_szName;
-    NiAVObject* m_pkBone;
-    std::set<NiAVObjectPtr> m_setLinkNode;
-};
-class ResetTexture : public NS_TourScene
-{
-public:
-
-    TS_RESULT ProcessData(NiAVObject* obj, void* _data_) override
-    {
-        if (!obj)
-            return CONTINUE_TOUR;
-        if(obj->GetName().Equals("Scene Root"))
-            return CONTINUE_TOUR;
-        NiTexturingProperty* prop = NiSmartPointerCast(NiTexturingProperty,obj->GetProperty(NiProperty::TEXTURING));
-        if (prop)
-        {
-            prop->SetBaseTexture((NiTexture*)_data_);
-        }
-        if (NiIsKindOf(NiGeometry, obj)) 
-        {
-            NiGeometry* geo = (NiGeometry*)obj;
-            geo->SetConsistency(NiGeometryData::MUTABLE);
-            geo->CalculateNormals();
-            geo->GetModelData()->MarkAsChanged(NiGeometryData::NORMAL_MASK);
-            
-        }
-        return NEXT_TOUR;
-    }
-};
-class DisableLight : public NS_TourScene
-{
-public:
-
-    TS_RESULT ProcessData(NiAVObject* obj, void* _data_) override
-    {
-        if (!obj)
-            return CONTINUE_TOUR;
-        if (NiIsKindOf(NiLight, obj)) 
-        {
-            NiLightPtr light = (NiLight*)obj; 
-            auto Parent = light->GetParent();
-            Parent->DetachChild(light);
-            DeletedLights.push_back(light);
-        }
-        return NEXT_TOUR;
-    }
-    std::vector<NiLightPtr> DeletedLights;
-};
-class FindFaceNode : public NS_TourScene
-{
-public:
-
-    TS_RESULT ProcessData(NiAVObject* obj, void* _data_) override
-    {
-        if (!obj)
-            return CONTINUE_TOUR;
-        if (obj->GetName().Equals("#Face") && NiIsKindOf(NiNode, obj))
-        {
-            FaceNode = (NiNode*)obj;
-            return TERMINATE_TOUR;
-        }
-        else
-            return CONTINUE_TOUR;
-        
-    }
-    NiNode* FaceNode;
-};
-class FindHairNode : public NS_TourScene
-{
-public:
-
-    TS_RESULT ProcessData(NiAVObject* obj, void* _data_) override
-    {
-        if (!obj)
-            return CONTINUE_TOUR;
-        if (obj->GetName().Contains("#Hair") && NiIsKindOf(NiNode, obj))
-        {
-            HairNode.push_back((NiNode*)obj);
-            return TERMINATE_TOUR;
-        }
-        else
-            return CONTINUE_TOUR;
-
-    }
-    std::vector<NiNode*> HairNode;
-};
 CharSet::CharSet(NiNodePtr Node)
 {
     m_spRootNode = Node;
@@ -848,7 +695,6 @@ void CharShape::SetSubItem(LinkIndex enumIndex, std::string szNifName, std::stri
     LinkNode->UpdateProperties();
     LinkNode->Update(0.0);
 }
-
 void CharShape::UpdateFaceShape()
 {
     char buffer[512];
@@ -866,7 +712,6 @@ void CharShape::UpdateFaceShape()
         _ResTex.TourScene<NiAVObject>(m_spFaceNode, (void*)tex);
     }
 }
-
 void CharShape::UpdateHair()
 {
     HairInfo* _HairInfo = SHN::SHNManager::GetHairByID(m_byHairType);
@@ -879,9 +724,8 @@ void CharShape::UpdateHair()
     SetHairParts(3, _HairInfo->ID, _HairInfo->ucIsLink_Acc != 0, _HairInfo->acModelName_Acc, _HairInfo->Acc1Tex);
     SetHairParts(4, _HairInfo->ID, _HairInfo->ucIsLink_Acc2 != 0, _HairInfo->acModelName_Acc2, _HairInfo->Acc2Tex);
     SetHairParts(5, _HairInfo->ID, _HairInfo->ucIsLink_Acc3 != 0, _HairInfo->acModelName_Acc3, _HairInfo->Acc3Tex);
-    //SetHairDetailMap(m_byHairColor);
+    SetHairDetailMap(m_byHairColor);
 }
-
 void CharShape::HideAllHair()
 {
     FindHairNode nodetour;
@@ -891,28 +735,42 @@ void CharShape::HideAllHair()
         LinkNodes[1]->DetachChild(j);
     }
     for (auto node : nodetour.HairNode)
-        if(node != LinkNodes[1])
+        if(node != LinkNodes[LinkIndex::LINK_HAIR])
             node->GetParent()->DetachChild(node);
 }
-
 void CharShape::SetHairParts(int PartsIndex, int id, bool show, std::string ModelName, std::string FrontText)
 {
-    return;
-    if (!LinkNodes[LinkIndex::LINK_HAIR] && !show)
+    if (!LinkNodes[LinkIndex::LINK_HAIR] && !show || ModelName == "-" || FrontText == "-")
+        return;
+    std::string NifPath = PgUtil::CreateResCharPath(ModelName + ".nif", _Class, _Gender);
+    std::string TexturePath = PgUtil::CreateResCharPath(FrontText +".dds", _Class, _Gender);
+
+    if (NifPath == "-" || TexturePath == "-")
         return;
 
-    std::string NifPath = "reschar\\" + PgUtil::GetBaseClassName(_Class) + "-" + PgUtil::GetGenderString(_Gender) + "\\";
-    std::string TexturePath = NifPath + FrontText + ".dds";
-    NifPath = NifPath + ModelName + ".nif";
-
-    NiNodePtr EquipNode = PgUtil::LoadNifFile<NiNode>(PgUtil::PathFromClientFolder("resitem//" + ModelName + ".nif").c_str());
+    NiNodePtr EquipNode = PgUtil::LoadNifFile<NiNode>(NifPath.c_str());
     EquipNode->SetName("HairPartsNode");
 
-    auto DetachNode = LinkNodes[1]->GetObjectByName("HairPartsNode");
-    if (DetachNode)
-        LinkNodes[LinkIndex::LINK_HAIR]->DetachChild(DetachNode);
+    NiSourceTexturePtr Texture = PgUtil::LoadTextureWithPixelData(TexturePath.c_str());
+
+    m_aspHairNode[PartsIndex] = EquipNode;
+    m_aspHairNodeTexture[PartsIndex] = Texture;
     LinkNodes[LinkIndex::LINK_HAIR]->AttachChild(EquipNode);
     LinkNodes[LinkIndex::LINK_HAIR]->UpdateProperties();
     LinkNodes[LinkIndex::LINK_HAIR]->UpdateEffects();
     LinkNodes[LinkIndex::LINK_HAIR]->Update(0.0f);
+}
+void CharShape::SetHairDetailMap(unsigned char HairColor)
+{
+    HairColorInfo* _HairColor = SHN::SHNManager::GetHairColorByID(HairColor);
+    std::string TexturePath = PgUtil::PathFromClientFolder("reschar\\HDetail\\" + std::string(_HairColor->ColorTextureName) +".tga");
+    NiSourceTexturePtr Texture = PgUtil::LoadTextureWithPixelData(TexturePath);
+    for(int i = 0; i < 6; i++)
+    {
+        if(m_aspHairNode[i])
+        {
+            SetHairTexture _ResetTexture(m_aspHairNodeTexture[i], Texture);
+            _ResetTexture.TourScene<NiAVObject>(m_aspHairNode[i], 0);
+        }
+    }
 }

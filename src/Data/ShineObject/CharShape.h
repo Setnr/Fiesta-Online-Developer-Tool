@@ -38,6 +38,8 @@ private:
 	PROTO_EQUIPMENT Equipment;
 	NiGeometryPtr m_apkLodGeom[9] = { nullptr };
 	NiGeometryPtr m_apkGeom[5] = { nullptr };
+	NiNodePtr m_aspHairNode[6];
+	NiSourceTexturePtr m_aspHairNodeTexture[6];
 	int m_nSetLodGeoCnt = 0;
 	bool _Gender;
 	BaseCharClass _Class;
@@ -65,4 +67,5 @@ private:
 	void UpdateHair();
 	void HideAllHair();
 	void SetHairParts(int PartsIndex, int id, bool show, std::string ModelName, std::string FrontText);
+	void SetHairDetailMap(unsigned char HairColor);
 };

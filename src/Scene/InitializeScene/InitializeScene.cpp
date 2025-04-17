@@ -12,10 +12,11 @@ void InitializeScene::DrawImGui()
 {
 	FiestaScene::DrawImGui();
 	ImGuiIO& io = ImGui::GetIO();
+
 	if (!Init)
 	{
 		Init = true;
-		ClientFolderPath.Display();
+		ClientFolderPath.Display(); 
 	}
 	if (ClientFolderPath.IsOpened())
 	{
@@ -26,7 +27,7 @@ void InitializeScene::DrawImGui()
 			std::string File = ClientFolderPath.GetSelected().string();
 			if (File.find(".exe") != std::string::npos || File.find(".bin") != std::string::npos)
 			{
-				NiMessageBox::DisplayMessage("Please Select the Folder!", "Info");
+				NiMessageBox::DisplayMessage("Please Select the Game.Exe!", "Info");
 				ClientFolderPath.ClearSelected();
 				return;
 			}
@@ -53,7 +54,7 @@ void InitializeScene::DrawImGui()
 			ServerFolderPath.Open();
 			ServerFolderPath.Display();
 		}
-	}
+	} 
 	if (ServerFolderPath.IsOpened()) 
 	{
 		ServerFolderPath.SetWindowPos(io.DisplaySize.x, io.DisplaySize.y);

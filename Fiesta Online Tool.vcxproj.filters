@@ -244,6 +244,13 @@
     <ClInclude Include="src\Data\PROTOStructs.h" />
     <ClInclude Include="src\Data\GenerallFiestaStructs.h" />
     <ClInclude Include="src\Data\ShineObject\ActionInfoSet.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\NS_TourScene.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\FindBoneNode.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\ResetTextureTour.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\SetHairTexture.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\DisableLight.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\FindFaceNode.h" />
+    <ClInclude Include="src\Data\ShineObject\TourScene\FindHairNode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\NiApplication\FiestaOnlineTool.cpp">

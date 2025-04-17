@@ -12,6 +12,8 @@
 #include "SHN/SHNStruct.h"
 #include <NiProperty.h>
 #include <NiSourceTexture.h>
+#include <NiFont.h>
+#include <filesystem>
 
 class PgUtil 
 {
@@ -164,6 +166,25 @@ public:
 		BlendPref.m_eAlphaFmt = NiTexture::FormatPrefs::ALPHA_DEFAULT;
 
 		return NiSourceTexture::Create(ReadImage, BlendPref);
+	}
+	static std::string CreateResCharPath(std::string ItemInx, BaseCharClass Class, bool Gender) 
+	{
+		std::string Path;
+		if (ItemInx.starts_with("_"))
+		{
+			Path = PathFromClientFolder("reschar\\common\\" + PgUtil::GetGenderString(Gender) + "\\" + ItemInx);
+			if(!std::filesystem::exists(Path))
+				Path = PathFromClientFolder("reschar\\common\\" + ItemInx);
+		}
+		else
+		{
+			Path = PathFromClientFolder("reschar\\" + PgUtil::GetBaseClassName(Class) + "-" + PgUtil::GetGenderString(Gender) + "\\" + ItemInx);
+		}
+		if (!std::filesystem::exists(Path))
+		{
+			return "-";
+		}
+		return Path;
 	}
 
 };

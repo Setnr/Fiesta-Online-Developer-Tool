@@ -180,6 +180,7 @@ public:
 	bool UpdateZCoord(NiPoint3& Pos);
 	NiPickablePtr CreateNewNPC();
 	void GateSpawnPoints(bool show);
+
 private:
 
 	void SetVertexColorInternal(int ShapeID, int InternalBlockX, int InternalBlockY, NiColorA Color);

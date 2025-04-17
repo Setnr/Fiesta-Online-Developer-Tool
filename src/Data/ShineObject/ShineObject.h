@@ -5,6 +5,7 @@
 #include <string>
 #include "NiCustom/NiPickable.h"
 #include <NiActorManager.h>
+#include <Ni2DString.h>
 #include "ActionInfoSet.h"
 NiSmartPointer(ShineObject);
 class ShineObject : public NiPickable
@@ -21,6 +22,11 @@ public:
 		_Pos = NewPos;
 		NiNode::SetTranslate(NewPos);
 	}
+	void SetTranslate(NiPoint3 NewPos)
+	{
+		_Pos = NewPos;
+		NiNode::SetTranslate(NewPos);
+	}
 	virtual void UpdateRotation(float NewRotation) 
 	{ 
 		auto fAngle = (NewRotation * NI_PI) / 180.0;
@@ -29,6 +35,7 @@ public:
 		NiNode::SetRotate(m);
 		_Rotation = NewRotation; 
 	}
+	
 	virtual void DrawObjectMenu(){}
 	virtual void UpdateActor(NiActorManagerPtr NewActor);
 	bool HasActor() { return _Actor; }

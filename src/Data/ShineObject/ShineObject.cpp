@@ -1,6 +1,8 @@
 #include "ShineObject.h"
+#include "FiestaOnlineTool.h"
 
 NiImplementRTTI(ShineObject, NiPickable);
+
 
 void ShineObject::UpdateActor(NiActorManagerPtr NewActor)
 {

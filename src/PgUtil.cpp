@@ -8,6 +8,7 @@
 #include <algorithm>
 #include "SHN/SHNManager.h"
 #include <SHN/MobLoader.h>
+#include "FiestaOnlineTool.h"
 
 std::string PgUtil::ClientFolderPath = "";
 std::string PgUtil::ApplicationPath = "";

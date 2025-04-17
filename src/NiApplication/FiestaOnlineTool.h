@@ -37,7 +37,6 @@ public:
 		BoundingBox = NULL;
 		_Scene = NULL;
 		Sorter = NULL;
-
 		m_spScene = 0;
 
 		ImGui_ImplDX9_Shutdown();

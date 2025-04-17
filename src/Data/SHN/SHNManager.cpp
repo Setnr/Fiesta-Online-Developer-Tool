@@ -7,4 +7,5 @@ namespace SHN {
 	std::map<std::string, struct ItemInfo*> SHNManager::InxItems;
 	std::map < std::string, std::vector<struct ItemViewDummy*>> SHNManager::ItemViewDummyList;
 	std::map<unsigned char, struct HairInfo*> SHNManager::IDHairInfo;
+	std::map<unsigned char, struct HairColorInfo*> SHNManager::IDHairColorInfo;
 }

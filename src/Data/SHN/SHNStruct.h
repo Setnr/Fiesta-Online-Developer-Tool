@@ -1903,5 +1903,13 @@ struct HairInfo : SHNRow
 	char acModelName_Acc3[32];
 	char Acc3Tex[32];
 };
+struct HairColorInfo : SHNRow
+{
+	unsigned __int8 ID;
+	char IndexName[15];
+	char Name[30];
+	char ColorTextureName[15];
+	unsigned __int8 Grade;
+};
 #pragma pack(pop)
 #endif

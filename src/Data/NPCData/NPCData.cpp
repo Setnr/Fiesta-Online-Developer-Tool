@@ -40,7 +40,7 @@ void NPCData::Load()
 	}
 	std::string line;
 	ShineNPCPtr LastNPC;
-
+	
 	std::vector<std::string> CurrentLines;
 	std::vector<std::future<void>> futures;
 
@@ -69,6 +69,7 @@ void NPCData::Load()
 			
 		}
 	}
+	futures.push_back(std::async(std::launch::async, &NPCData::ProcessNPCData, this, CurrentLines));
 	for (auto& fut : futures)
 		fut.get();
 }

@@ -2,6 +2,8 @@
 #include <Logger.h>
 #include <SHN/SHNManager.h>
 
+#include "Data/ShineObject/TourScene/ResetTextureTour.h"
+
 std::map<unsigned short, NiActorManagerPtr> MobLoader::IDNodeMap;
 std::map<std::string, NiActorManagerPtr> MobLoader::PlayerKFMMap;
 std::mutex MobLoader::ActorLoadLock;
@@ -36,6 +38,19 @@ NiActorManager* MobLoader::GetNodeByMobInfo(MobInfo* info)
             if (!Node) {
                 LogError("Failed to Load Node for " + info->InxName);
                 return nullptr;
+            }
+            std::string TextureName = _MobViewInfo->Texture;
+            if(TextureName != "" && TextureName != "-")
+            {
+                std::string Path = PgUtil::PathFromClientFolder("reschar\\" + std::string(_MobViewInfo->FileName) + "\\" + TextureName + ".dds");
+                NiSourceTexturePtr Texture = PgUtil::LoadTextureWithPixelData(Path);
+                NiAVObjectPtr obj = Node->GetNIFRoot();
+                if(NiIsKindOf(NiNode, obj))
+                {
+                    NiNodePtr node = NiSmartPointerCast(NiNode, obj);
+                    ResetTexture _ResetTexture;
+                    _ResetTexture.TourScene<NiAVObject>(node, (void*)Texture);
+                }
             }
             IDNodeMap.insert({ info->ID, Node });
             NewNode = Node->Clone();

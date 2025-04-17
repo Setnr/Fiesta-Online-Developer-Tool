@@ -35,7 +35,6 @@ ShineNPC::ShineNPC(std::vector<std::string>::iterator& start, std::vector<std::s
 		}
 		if (*iter == "" || iter->empty())
 			continue;
-		
 		switch (DataID) 
 		{
 		case 0:

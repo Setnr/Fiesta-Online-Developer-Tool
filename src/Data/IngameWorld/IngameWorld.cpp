@@ -114,6 +114,10 @@ IngameWorld::IngameWorld(MapInfo* Info) : _MapInfo(Info)
 	m_spGroundCollidee->UpdateEffects();
 	m_spGroundCollidee->Update(0.f);
 
+	m_spWorldScene->UpdateProperties();
+	m_spWorldScene->UpdateEffects();
+	m_spWorldScene->Update(0.f);
+
 	auto NPCFuture = std::async(std::launch::async, [this]()
 		{
 			return LoadNPCS();
@@ -966,7 +970,8 @@ std::vector<ShineObjectPtr> IngameWorld::LoadNPCS()
 	std::vector<std::future<ShineNPCPtr>> asyncTasks;
 	for (auto npc : NPCS)
 	{
-		asyncTasks.emplace_back(std::async(std::launch::async, [this,npc]() {
+		asyncTasks.emplace_back(std::async(std::launch::async, [this,npc]() 
+			{
 			if (!npc->HasActor())
 				npc->LoadActor();
 

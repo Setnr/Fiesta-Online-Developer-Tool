@@ -11,8 +11,8 @@ class InitializeScene : public FiestaScene
 	NiDeclareRTTI;
 public:
 	InitializeScene() : 
-		ClientFolderPath(ImGuiFileBrowserFlags_SelectDirectory | ImGuiFileBrowserFlags_NoModal) ,
-		ServerFolderPath(ImGuiFileBrowserFlags_SelectDirectory | ImGuiFileBrowserFlags_NoModal)
+		ClientFolderPath(ImGuiFileBrowserFlags_SelectDirectory) ,
+		ServerFolderPath(ImGuiFileBrowserFlags_SelectDirectory)
 	{
 		ClientFolderPath.SetTitle("Select Game-Client-Folder");
 		ClientFolderPath.SetTypeFilters({ ".exe", ".bin" });
