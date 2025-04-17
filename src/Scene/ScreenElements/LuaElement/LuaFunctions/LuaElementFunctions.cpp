@@ -1548,7 +1548,7 @@ int SetVertexColor(lua_State* Script)
 		int h = lua_tointeger(Script, 3);
 		NiColorA Color(lua_tonumber(Script, 4), lua_tonumber(Script, 5), lua_tonumber(Script, 6), 1.0f);
 		world->SetVertexColor(w, h, Color);
-
+		  
 	}
 	return 0;
 }

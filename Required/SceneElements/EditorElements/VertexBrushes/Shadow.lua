@@ -43,7 +43,7 @@ function render(BrushPtr)
     end
 end
 
-function algorithm(MiddleW,MiddleH, z, SizeW, SizeH ,BrushSize,WorldPtr)
+function algorithm(MiddleW,MiddleH, z,zAtClick, SizeW, SizeH ,BrushSize,WorldPtr)
     if BrushData.LiveRender then
         CreateShadow(WorldPtr, BrushData.red, BrushData.green, BrushData.blue, BrushData.red2, BrushData.green2, BrushData.blue2)
     end

@@ -30,7 +30,7 @@ function render(BrushPtr)
     BrushData["UpdateTime"] = value
 end
 
-function algorithm(MiddleW,MiddleH, z, SizeW, SizeH ,BrushSize,WorldPtr)
+function algorithm(MiddleW,MiddleH, z,zAtClick, SizeW, SizeH ,BrushSize,WorldPtr)
     CurTime = GetCurrentTime()
     if BrushData["UpdateTime"] + BrushData["LastUpdateTime"] > CurTime then
         return

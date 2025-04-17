@@ -16,7 +16,7 @@ function render(BrushPtr)
     BrushData.Color = Color
 end
 
-function algorithm(MiddleW,MiddleH, z, SizeW, SizeH ,BrushSize,WorldPtr)
+function algorithm(MiddleW,MiddleH, z,zAtClick, SizeW, SizeH ,BrushSize,WorldPtr)
     for w = MiddleW - BrushSize, MiddleW + BrushSize , 1 do
         if w >= 0 and w < SizeW then
             for h = MiddleH - BrushSize, MiddleH + BrushSize , 1 do

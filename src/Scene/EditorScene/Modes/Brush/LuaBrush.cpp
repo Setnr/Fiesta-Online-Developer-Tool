@@ -50,7 +50,7 @@ void LuaBrush::RunAlgorithm(int middelw, int middleh,float z, int SizeW, int Siz
 	lua_pushinteger(Script, (long long)&*World);
 	lua_pushinteger(Script, (long long)this);
 
-
+	 
 	if (lua_pcallk(Script, 9, 0, 0, 0, 0))
 		LogLua(_FileName, lua_tostring(Script, -1));
 }

@@ -50,7 +50,6 @@ void TerrainMode::ProcessInput()
 	{
 		_Update = true;
 		MouseIntersectAtClick = MouseIntersect;
-		LogInfo("Mouse Down at " + std::to_string(MouseIntersect.z));
 	}
 	if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
 	{
