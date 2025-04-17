@@ -14,7 +14,7 @@ public:
 		ClientFolderPath(ImGuiFileBrowserFlags_SelectDirectory) ,
 		ServerFolderPath(ImGuiFileBrowserFlags_SelectDirectory)
 	{
-		ClientFolderPath.SetTitle("Select Game-Client-Folder");
+		ClientFolderPath.SetTitle("Select Game-Client-Exe");
 		ClientFolderPath.SetTypeFilters({ ".exe", ".bin" });
 		ClientFolderPath.SetPwd(PgUtil::PathFromApplicationFolder(""));
 		ClientFolderPath.Open();
